@@ -8,6 +8,10 @@ const editorTitle = document.getElementById('editor-title');
 const markdownEditor = document.getElementById('markdown-editor');
 const htmlPreview = document.getElementById('html-preview');
 const toggleViewButton = document.getElementById('toggle-view-button');
+const settingsView = document.getElementById('settings-view');
+const settingsButton = document.getElementById('settings-button');
+const globalSettingsButton = document.getElementById('global-settings-button');
+const settingsBackButton = document.getElementById('settings-back-button');
 
 let notes = [];
 let activeNoteId = null;
@@ -46,10 +50,10 @@ function renderNoteList() {
   notes.forEach(note => {
     const li = document.createElement('li');
     li.dataset.noteId = note.id;
+    li.addEventListener('click', () => openNote(note.id));
 
     const titleSpan = document.createElement('span');
     titleSpan.textContent = note.title;
-    titleSpan.addEventListener('click', () => openNote(note.id));
 
     const deleteSpan = document.createElement('span');
     deleteSpan.textContent = '🗑';
@@ -71,7 +75,7 @@ function deleteNote(noteId) {
   renderNoteList();
 }
 
-function openNote(noteId) {
+function openNote(noteId, inEditMode = false) {
   const note = notes.find(n => n.id === noteId);
   if (note) {
     activeNoteId = noteId;
@@ -79,6 +83,17 @@ function openNote(noteId) {
     markdownEditor.value = note.content;
     renderMarkdown();
     showEditorView();
+    isPreview = !inEditMode;
+    if (isPreview) {
+      htmlPreview.style.display = 'block';
+      markdownEditor.style.display = 'none';
+      toggleViewButton.textContent = 'Edit';
+    } else {
+      htmlPreview.style.display = 'none';
+      markdownEditor.style.display = 'block';
+      toggleViewButton.textContent = 'Preview';
+      markdownEditor.focus();
+    }
   }
 }
 
@@ -86,12 +101,20 @@ function showListView() {
   activeNoteId = null;
   listView.style.display = 'block';
   editorView.style.display = 'none';
+  settingsView.style.display = 'none';
   renderNoteList();
 }
 
 function showEditorView() {
   listView.style.display = 'none';
   editorView.style.display = 'block';
+  settingsView.style.display = 'none';
+}
+
+function showSettingsView() {
+  listView.style.display = 'none';
+  editorView.style.display = 'none';
+  settingsView.style.display = 'block';
 }
 
 function renderMarkdown() {
@@ -106,7 +129,7 @@ newNoteButton.addEventListener('click', () => {
   };
   notes.unshift(newNote);
   saveNotes();
-  openNote(newNote.id);
+  openNote(newNote.id, true);
 });
 
 backButton.addEventListener('click', () => {
@@ -137,9 +160,10 @@ markdownEditor.addEventListener('input', () => {
   }
 });
 
-toggleViewButton.addEventListener('click', () => {
+function togglePreview() {
   isPreview = !isPreview;
   if (isPreview) {
+    renderMarkdown();
     htmlPreview.style.display = 'block';
     markdownEditor.style.display = 'none';
     toggleViewButton.textContent = 'Edit';
@@ -147,6 +171,38 @@ toggleViewButton.addEventListener('click', () => {
     htmlPreview.style.display = 'none';
     markdownEditor.style.display = 'block';
     toggleViewButton.textContent = 'Preview';
+    markdownEditor.focus();
+  }
+}
+
+toggleViewButton.addEventListener('click', togglePreview);
+
+markdownEditor.addEventListener('keydown', (e) => {
+  if (e.shiftKey && e.key === 'Enter') {
+    e.preventDefault();
+    togglePreview();
+  }
+});
+
+htmlPreview.addEventListener('dblclick', togglePreview);
+
+let isGlobalSettings = false;
+
+settingsButton.addEventListener('click', () => {
+  isGlobalSettings = false;
+  showSettingsView();
+});
+
+globalSettingsButton.addEventListener('click', () => {
+  isGlobalSettings = true;
+  showSettingsView();
+});
+
+settingsBackButton.addEventListener('click', () => {
+  if (isGlobalSettings) {
+    showListView();
+  } else {
+    showEditorView();
   }
 });
 

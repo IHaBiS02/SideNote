@@ -2,6 +2,7 @@ body {
   margin: 0;
   font-family: sans-serif;
   width: 350px;
+  overflow-x: hidden;
 }
 
 .header {
@@ -70,6 +71,7 @@ h1 {
   border: none;
   outline: none;
   overflow-y: auto;
+  resize: none;
 }
 
 #html-preview {
@@ -100,4 +102,14 @@ button:hover {
 
 #editor-title {
   text-align: center;
+  flex-grow: 1;
+}
+
+#settings-button {
+  font-size: 18px;
+}
+
+#settings-title {
+  text-align: center;
+  flex-grow: 1;
 }

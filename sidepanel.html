@@ -10,6 +10,7 @@
     <div class="header">
       <h1>Notes</h1>
       <button id="new-note-button">+</button>
+      <button id="global-settings-button">⚙️</button>
     </div>
     <ul id="note-list"></ul>
   </div>
@@ -18,6 +19,7 @@
     <div class="header">
       <button id="back-button"><</button>
       <h1 id="editor-title"></h1>
+      <button id="settings-button">⚙️</button>
     </div>
     <div id="editor-container">
       <textarea id="markdown-editor"></textarea>
@@ -25,6 +27,16 @@
     </div>
     <div class="toolbar">
       <button id="toggle-view-button">Preview</button>
+    </div>
+  </div>
+
+  <div id="settings-view" style="display: none;">
+    <div class="header">
+      <button id="settings-back-button"><</button>
+      <h1 id="settings-title">Settings</h1>
+    </div>
+    <div id="settings-container">
+      <!-- Settings will go here -->
     </div>
   </div>
 
