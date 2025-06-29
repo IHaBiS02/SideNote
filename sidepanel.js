@@ -45,11 +45,30 @@ function renderNoteList() {
   if (!Array.isArray(notes)) return;
   notes.forEach(note => {
     const li = document.createElement('li');
-    li.textContent = note.title;
     li.dataset.noteId = note.id;
-    li.addEventListener('click', () => openNote(note.id));
+
+    const titleSpan = document.createElement('span');
+    titleSpan.textContent = note.title;
+    titleSpan.addEventListener('click', () => openNote(note.id));
+
+    const deleteSpan = document.createElement('span');
+    deleteSpan.textContent = '🗑';
+    deleteSpan.classList.add('delete-note-icon');
+    deleteSpan.addEventListener('click', (e) => {
+      e.stopPropagation();
+      deleteNote(note.id);
+    });
+
+    li.appendChild(titleSpan);
+    li.appendChild(deleteSpan);
     noteList.appendChild(li);
   });
+}
+
+function deleteNote(noteId) {
+  notes = notes.filter(n => n.id !== noteId);
+  saveNotes();
+  renderNoteList();
 }
 
 function openNote(noteId) {
@@ -101,11 +120,7 @@ backButton.addEventListener('click', () => {
   showListView();
 });
 
-deleteNoteButton.addEventListener('click', () => {
-  notes = notes.filter(n => n.id !== activeNoteId);
-  saveNotes();
-  showListView();
-});
+
 
 markdownEditor.addEventListener('input', () => {
   const note = notes.find(n => n.id === activeNoteId);

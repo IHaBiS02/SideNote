@@ -24,6 +24,9 @@ h1 {
 }
 
 #note-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 10px;
   border-bottom: 1px solid #eee;
   cursor: pointer;
@@ -31,6 +34,16 @@ h1 {
 
 #note-list li:hover {
   background-color: #f5f5f5;
+}
+
+.delete-note-icon {
+  cursor: pointer;
+  padding: 5px;
+}
+
+.delete-note-icon:hover {
+  background-color: #ddd;
+  border-radius: 50%;
 }
 
 #editor-view {
@@ -83,4 +96,8 @@ button {
 
 button:hover {
   background-color: #eee;
+}
+
+#editor-title {
+  text-align: center;
 }
