@@ -80,12 +80,21 @@ h1 {
 
 .toolbar {
   display: flex;
+  justify-content: flex-end;
   padding: 5px;
   border-top: 1px solid #ccc;
-  position: absolute; /* Add absolute positioning */
+  position: absolute;
   bottom: 0;
   width: 100%;
-  background-color: white; /* Add background color */
+  background-color: white;
+}
+
+#list-view .toolbar {
+  justify-content: flex-end;
+}
+
+#editor-view .toolbar {
+  justify-content: space-between;
 }
 
 button {
