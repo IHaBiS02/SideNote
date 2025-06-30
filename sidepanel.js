@@ -13,9 +13,12 @@ const settingsButton = document.getElementById('settings-button');
 const globalSettingsButton = document.getElementById('global-settings-button');
 const settingsBackButton = document.getElementById('settings-back-button');
 const titleSetting = document.getElementById('title-setting');
-const exportButton = document.getElementById('export-button');
-const importButton = document.getElementById('import-button');
-const importInput = document.getElementById('import-input');
+const globalExportButton = document.getElementById('global-export-button');
+const globalImportButton = document.getElementById('global-import-button');
+const globalImportInput = document.getElementById('global-import-input');
+const exportNoteButton = document.getElementById('export-note-button');
+const importNoteButton = document.getElementById('import-note-button');
+const importNoteInput = document.getElementById('import-note-input');
 
 let notes = [];
 let activeNoteId = null;
@@ -300,24 +303,28 @@ function downloadFile(content, fileName) {
   URL.revokeObjectURL(a.href);
 }
 
-exportButton.addEventListener('click', () => {
-  if (isGlobalSettings) {
-    const data = JSON.stringify(notes, null, 2);
-    downloadFile(data, 'notes.snotes');
-  } else {
-    const note = notes.find(n => n.id === activeNoteId);
-    if (note) {
-      const data = JSON.stringify(note, null, 2);
-      downloadFile(data, `${note.title}.snote`);
-    }
+globalExportButton.addEventListener('click', () => {
+  const data = JSON.stringify(notes, null, 2);
+  downloadFile(data, 'notes.snotes');
+});
+
+exportNoteButton.addEventListener('click', () => {
+  const note = notes.find(n => n.id === activeNoteId);
+  if (note) {
+    const data = JSON.stringify(note, null, 2);
+    downloadFile(data, `${note.title}.snote`);
   }
 });
 
-importButton.addEventListener('click', () => {
-  importInput.click();
+globalImportButton.addEventListener('click', () => {
+  globalImportInput.click();
 });
 
-importInput.addEventListener('change', (e) => {
+importNoteButton.addEventListener('click', () => {
+  importNoteInput.click();
+});
+
+globalImportInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) {
     return;
@@ -325,41 +332,51 @@ importInput.addEventListener('change', (e) => {
   const reader = new FileReader();
   reader.onload = (event) => {
     const content = event.target.result;
-    if (isGlobalSettings) {
-      try {
-        const importedNotes = JSON.parse(content);
-        if (Array.isArray(importedNotes)) {
-          const newNotes = importedNotes.map(note => ({
-            ...note,
-            id: Date.now().toString() + Math.random().toString(36).substring(2)
-          }));
-          notes.push(...newNotes);
-          saveNotes();
-          renderNoteList();
-        }
-      } catch (error) {
-        console.error('Error parsing JSON file:', error);
+    try {
+      const importedNotes = JSON.parse(content);
+      if (Array.isArray(importedNotes)) {
+        const newNotes = importedNotes.map(note => ({
+          ...note,
+          id: Date.now().toString() + Math.random().toString(36).substring(2)
+        }));
+        notes.push(...newNotes);
+        saveNotes();
+        renderNoteList();
       }
-    } else {
-      try {
-        const importedNote = JSON.parse(content);
-        const note = notes.find(n => n.id === activeNoteId);
-        if (note) {
-          note.title = importedNote.title;
-          note.content = importedNote.content;
-          note.settings = importedNote.settings;
-          editorTitle.textContent = note.title;
-          markdownEditor.value = note.content;
-          saveNotes();
-          renderMarkdown();
-        }
-      } catch (error) {
-        console.error('Error parsing JSON file:', error);
-      }
+    } catch (error) {
+      console.error('Error parsing JSON file:', error);
     }
   };
   reader.readAsText(file);
-  importInput.value = '';
+  globalImportInput.value = '';
+});
+
+importNoteInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) {
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    const content = event.target.result;
+    try {
+      const importedNote = JSON.parse(content);
+      const note = notes.find(n => n.id === activeNoteId);
+      if (note) {
+        note.title = importedNote.title;
+        note.content = importedNote.content;
+        note.settings = importedNote.settings;
+        editorTitle.textContent = note.title;
+        markdownEditor.value = note.content;
+        saveNotes();
+        renderMarkdown();
+      }
+    } catch (error) {
+      console.error('Error parsing JSON file:', error);
+    }
+  };
+  reader.readAsText(file);
+  importNoteInput.value = '';
 });
 
 document.addEventListener('keydown', (e) => {

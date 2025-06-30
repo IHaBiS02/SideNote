@@ -13,6 +13,9 @@
     </div>
     <ul id="note-list"></ul>
     <div class="toolbar">
+      <button id="global-export-button">💾</button>
+      <button id="global-import-button">📂</button>
+      <input type="file" id="global-import-input" style="display: none;" />
       <button id="global-settings-button">⚙️</button>
     </div>
   </div>
@@ -28,6 +31,9 @@
     </div>
     <div class="toolbar">
       <button id="toggle-view-button">Preview</button>
+      <button id="export-note-button">💾</button>
+      <button id="import-note-button">📂</button>
+      <input type="file" id="import-note-input" style="display: none;" />
       <button id="settings-button">⚙️</button>
     </div>
   </div>
@@ -44,15 +50,6 @@
           <option value="default">Default (First line)</option>
           <option value="custom">Custom</option>
         </select>
-      </div>
-      <div class="setting">
-        <label>Export</label>
-        <button id="export-button">Export</button>
-      </div>
-      <div class="setting">
-        <label>Import</label>
-        <button id="import-button">Import</button>
-        <input type="file" id="import-input" style="display: none;" />
       </div>
     </div>
   </div>
