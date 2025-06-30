@@ -137,7 +137,8 @@ function showSettingsView() {
 }
 
 function renderMarkdown() {
-  htmlPreview.innerHTML = marked.parse(markdownEditor.value);
+  const dirtyHtml = marked.parse(markdownEditor.value);
+  htmlPreview.innerHTML = DOMPurify.sanitize(dirtyHtml);
 }
 
 newNoteButton.addEventListener('click', () => {
