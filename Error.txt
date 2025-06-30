@@ -1,1 +1,602 @@
-ðŸ—‘
+오류
+Uncaught NotFoundError: Failed to execute 'replaceWith' on 'Element': The node to be removed is no longer a child of this node. Perhaps it was moved in a 'blur' event handler?
+컨텍스트
+sidepanel.html
+스택 추적
+sidepanel.js:222 (익명의 함수)
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+const listView = document.getElementById('list-view');
+const editorView = document.getElementById('editor-view');
+const noteList = document.getElementById('note-list');
+const newNoteButton = document.getElementById('new-note-button');
+const backButton = document.getElementById('back-button');
+const deleteNoteButton = document.getElementById('delete-note-button');
+const editorTitle = document.getElementById('editor-title');
+const markdownEditor = document.getElementById('markdown-editor');
+const htmlPreview = document.getElementById('html-preview');
+const toggleViewButton = document.getElementById('toggle-view-button');
+const settingsView = document.getElementById('settings-view');
+const settingsButton = document.getElementById('settings-button');
+const globalSettingsButton = document.getElementById('global-settings-button');
+const settingsBackButton = document.getElementById('settings-back-button');
+const titleSetting = document.getElementById('title-setting');
+
+let notes = [];
+let activeNoteId = null;
+let isPreview = false;
+let globalSettings = {};
+
+// Load notes and settings from storage
+chrome.storage.local.get(['notes', 'globalSettings'], (data) => {
+  const loadedNotes = data.notes;
+  const loadedSettings = data.globalSettings;
+
+  if (loadedSettings) {
+    globalSettings = loadedSettings;
+  } else {
+    globalSettings = {
+      title: 'default'
+    };
+  }
+
+  if (!loadedNotes) {
+    notes = [];
+  } else if (typeof loadedNotes === 'string') {
+    const content = loadedNotes;
+    const title = content.trim().split('\n')[0].substring(0, 30) || 'Imported Note';
+    notes = [{
+      id: `migrated-${Date.now()}`,
+      title: title,
+      content: content,
+      settings: {}
+    }];
+    saveNotes();
+  } else if (Array.isArray(loadedNotes)) {
+    notes = loadedNotes.map(note => ({
+      ...note,
+      settings: note.settings || {}
+    }));
+  } else {
+    notes = [];
+  }
+  renderNoteList();
+});
+
+function saveNotes() {
+  chrome.storage.local.set({ notes });
+}
+
+function saveGlobalSettings() {
+  chrome.storage.local.set({ globalSettings });
+}
+
+function renderNoteList() {
+  noteList.innerHTML = '';
+  if (!Array.isArray(notes)) return;
+  notes.forEach(note => {
+    const li = document.createElement('li');
+    li.dataset.noteId = note.id;
+    li.addEventListener('click', () => openNote(note.id));
+
+    const titleSpan = document.createElement('span');
+    titleSpan.textContent = note.title;
+
+    const deleteSpan = document.createElement('span');
+    deleteSpan.textContent = '🗑';
+    deleteSpan.classList.add('delete-note-icon');
+    deleteSpan.addEventListener('click', (e) => {
+      e.stopPropagation();
+      deleteNote(note.id);
+    });
+
+    li.appendChild(titleSpan);
+    li.appendChild(deleteSpan);
+    noteList.appendChild(li);
+  });
+}
+
+function deleteNote(noteId) {
+  notes = notes.filter(n => n.id !== noteId);
+  saveNotes();
+  renderNoteList();
+}
+
+function openNote(noteId, inEditMode = false) {
+  const note = notes.find(n => n.id === noteId);
+  if (note) {
+    activeNoteId = noteId;
+    editorTitle.textContent = note.title;
+    markdownEditor.value = note.content;
+    renderMarkdown();
+    showEditorView();
+    isPreview = !inEditMode;
+    if (isPreview) {
+      htmlPreview.style.display = 'block';
+      markdownEditor.style.display = 'none';
+      toggleViewButton.textContent = 'Edit';
+    } else {
+      htmlPreview.style.display = 'none';
+      markdownEditor.style.display = 'block';
+      toggleViewButton.textContent = 'Preview';
+      markdownEditor.focus();
+    }
+  }
+}
+
+function showListView() {
+  activeNoteId = null;
+  listView.style.display = 'block';
+  editorView.style.display = 'none';
+  settingsView.style.display = 'none';
+  renderNoteList();
+}
+
+function showEditorView() {
+  listView.style.display = 'none';
+  editorView.style.display = 'block';
+  settingsView.style.display = 'none';
+}
+
+function showSettingsView() {
+  listView.style.display = 'none';
+  editorView.style.display = 'none';
+  settingsView.style.display = 'block';
+}
+
+function renderMarkdown() {
+  htmlPreview.innerHTML = marked.parse(markdownEditor.value);
+}
+
+newNoteButton.addEventListener('click', () => {
+  const newNote = {
+    id: Date.now().toString(),
+    title: 'New Note',
+    content: '',
+    settings: {}
+  };
+  notes.unshift(newNote);
+  saveNotes();
+  openNote(newNote.id, true);
+});
+
+backButton.addEventListener('click', () => {
+  const note = notes.find(n => n.id === activeNoteId);
+  if (note) {
+    note.content = markdownEditor.value;
+    saveNotes();
+  }
+  showListView();
+});
+
+markdownEditor.addEventListener('input', () => {
+  const note = notes.find(n => n.id === activeNoteId);
+  if (note) {
+    note.content = markdownEditor.value;
+    const titleSource = note.settings.title || globalSettings.title;
+    if (titleSource === 'default') {
+      const firstLine = note.content.trim().split('\n')[0];
+      note.title = firstLine.substring(0, 30) || 'New Note';
+      editorTitle.textContent = note.title;
+    }
+    saveNotes();
+    renderMarkdown();
+  }
+});
+
+function togglePreview() {
+  isPreview = !isPreview;
+  if (isPreview) {
+    renderMarkdown();
+    htmlPreview.style.display = 'block';
+    markdownEditor.style.display = 'none';
+    toggleViewButton.textContent = 'Edit';
+  } else {
+    htmlPreview.style.display = 'none';
+    markdownEditor.style.display = 'block';
+    toggleViewButton.textContent = 'Preview';
+    markdownEditor.focus();
+  }
+}
+
+toggleViewButton.addEventListener('click', togglePreview);
+
+markdownEditor.addEventListener('keydown', (e) => {
+  if (e.shiftKey && e.key === 'Enter') {
+    e.preventDefault();
+    togglePreview();
+  }
+});
+
+htmlPreview.addEventListener('dblclick', togglePreview);
+
+editorTitle.addEventListener('dblclick', () => {
+  const note = notes.find(n => n.id === activeNoteId);
+  if (note) {
+    const titleSource = note.settings.title || globalSettings.title;
+    if (titleSource === 'custom') {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = note.title;
+      input.classList.add('title-input');
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.isComposing) {
+          e.preventDefault();
+          note.title = input.value;
+          editorTitle.textContent = note.title;
+          saveNotes();
+          renderNoteList();
+          input.replaceWith(editorTitle);
+        }
+      });
+
+      input.addEventListener('blur', () => {
+        if (document.body.contains(input)) {
+          note.title = input.value;
+          editorTitle.textContent = note.title;
+          saveNotes();
+          renderNoteList();
+          input.replaceWith(editorTitle);
+        }
+      });
+
+      editorTitle.replaceWith(input);
+      input.focus();
+    }
+  }
+});
+
+let isGlobalSettings = false;
+
+settingsButton.addEventListener('click', () => {
+  isGlobalSettings = false;
+  const note = notes.find(n => n.id === activeNoteId);
+  titleSetting.value = note.settings.title || 'default';
+  showSettingsView();
+});
+
+globalSettingsButton.addEventListener('click', () => {
+  isGlobalSettings = true;
+  titleSetting.value = globalSettings.title || 'default';
+  showSettingsView();
+});
+
+settingsBackButton.addEventListener('click', () => {
+  if (isGlobalSettings) {
+    showListView();
+  } else {
+    showEditorView();
+  }
+});
+
+titleSetting.addEventListener('change', () => {
+  const value = titleSetting.value;
+  if (isGlobalSettings) {
+    globalSettings.title = value;
+    saveGlobalSettings();
+  } else {
+    const note = notes.find(n => n.id === activeNoteId);
+    if (note) {
+      note.settings.title = value;
+      if (value === 'default') {
+        const firstLine = note.content.trim().split('\n')[0];
+        note.title = firstLine.substring(0, 30) || 'New Note';
+        editorTitle.textContent = note.title;
+      }
+      saveNotes();
+    }
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+
+  if (e.key === 'Escape') {
+    if (editorView.style.display === 'block') {
+      if (isPreview) {
+        showListView();
+      } else {
+        togglePreview();
+      }
+    }
+  }
+});
+
+showListView();
+ 

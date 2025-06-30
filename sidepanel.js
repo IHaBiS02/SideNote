@@ -12,14 +12,25 @@ const settingsView = document.getElementById('settings-view');
 const settingsButton = document.getElementById('settings-button');
 const globalSettingsButton = document.getElementById('global-settings-button');
 const settingsBackButton = document.getElementById('settings-back-button');
+const titleSetting = document.getElementById('title-setting');
 
 let notes = [];
 let activeNoteId = null;
 let isPreview = false;
+let globalSettings = {};
 
-// Load notes from storage
-chrome.storage.local.get('notes', (data) => {
+// Load notes and settings from storage
+chrome.storage.local.get(['notes', 'globalSettings'], (data) => {
   const loadedNotes = data.notes;
+  const loadedSettings = data.globalSettings;
+
+  if (loadedSettings) {
+    globalSettings = loadedSettings;
+  } else {
+    globalSettings = {
+      title: 'default'
+    };
+  }
 
   if (!loadedNotes) {
     notes = [];
@@ -29,11 +40,15 @@ chrome.storage.local.get('notes', (data) => {
     notes = [{
       id: `migrated-${Date.now()}`,
       title: title,
-      content: content
+      content: content,
+      settings: {}
     }];
     saveNotes();
   } else if (Array.isArray(loadedNotes)) {
-    notes = loadedNotes;
+    notes = loadedNotes.map(note => ({
+      ...note,
+      settings: note.settings || {}
+    }));
   } else {
     notes = [];
   }
@@ -42,6 +57,10 @@ chrome.storage.local.get('notes', (data) => {
 
 function saveNotes() {
   chrome.storage.local.set({ notes });
+}
+
+function saveGlobalSettings() {
+  chrome.storage.local.set({ globalSettings });
 }
 
 function renderNoteList() {
@@ -125,7 +144,8 @@ newNoteButton.addEventListener('click', () => {
   const newNote = {
     id: Date.now().toString(),
     title: 'New Note',
-    content: ''
+    content: '',
+    settings: {}
   };
   notes.unshift(newNote);
   saveNotes();
@@ -145,6 +165,12 @@ markdownEditor.addEventListener('input', () => {
   const note = notes.find(n => n.id === activeNoteId);
   if (note) {
     note.content = markdownEditor.value;
+    const titleSource = note.settings.title || globalSettings.title;
+    if (titleSource === 'default') {
+      const firstLine = note.content.trim().split('\n')[0];
+      note.title = firstLine.substring(0, 30) || 'New Note';
+      editorTitle.textContent = note.title;
+    }
     saveNotes();
     renderMarkdown();
   }
@@ -179,34 +205,38 @@ htmlPreview.addEventListener('dblclick', togglePreview);
 editorTitle.addEventListener('dblclick', () => {
   const note = notes.find(n => n.id === activeNoteId);
   if (note) {
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = note.title;
-    input.classList.add('title-input');
+    const titleSource = note.settings.title || globalSettings.title;
+    if (titleSource === 'custom') {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = note.title;
+      input.classList.add('title-input');
 
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.isComposing) {
-        e.preventDefault();
+      const finishEditing = () => {
+        if (!document.body.contains(input)) {
+          return;
+        }
         note.title = input.value;
         editorTitle.textContent = note.title;
         saveNotes();
         renderNoteList();
         input.replaceWith(editorTitle);
-      }
-    });
+      };
 
-    input.addEventListener('blur', () => {
-      if (document.body.contains(input)) {
-        note.title = input.value;
-        editorTitle.textContent = note.title;
-        saveNotes();
-        renderNoteList();
-        input.replaceWith(editorTitle);
-      }
-    });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.isComposing) {
+          e.preventDefault();
+          finishEditing();
+        } else if (e.key === 'Escape') {
+          input.replaceWith(editorTitle);
+        }
+      });
 
-    editorTitle.replaceWith(input);
-    input.focus();
+      input.addEventListener('blur', finishEditing);
+
+      editorTitle.replaceWith(input);
+      input.focus();
+    }
   }
 });
 
@@ -214,11 +244,14 @@ let isGlobalSettings = false;
 
 settingsButton.addEventListener('click', () => {
   isGlobalSettings = false;
+  const note = notes.find(n => n.id === activeNoteId);
+  titleSetting.value = note.settings.title || 'default';
   showSettingsView();
 });
 
 globalSettingsButton.addEventListener('click', () => {
   isGlobalSettings = true;
+  titleSetting.value = globalSettings.title || 'default';
   showSettingsView();
 });
 
@@ -230,7 +263,27 @@ settingsBackButton.addEventListener('click', () => {
   }
 });
 
+titleSetting.addEventListener('change', () => {
+  const value = titleSetting.value;
+  if (isGlobalSettings) {
+    globalSettings.title = value;
+    saveGlobalSettings();
+  } else {
+    const note = notes.find(n => n.id === activeNoteId);
+    if (note) {
+      note.settings.title = value;
+      if (value === 'default') {
+        const firstLine = note.content.trim().split('\n')[0];
+        note.title = firstLine.substring(0, 30) || 'New Note';
+        editorTitle.textContent = note.title;
+      }
+      saveNotes();
+    }
+  }
+});
+
 document.addEventListener('keydown', (e) => {
+
   if (e.key === 'Escape') {
     if (editorView.style.display === 'block') {
       if (isPreview) {
