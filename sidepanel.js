@@ -136,27 +136,17 @@ backButton.addEventListener('click', () => {
   const note = notes.find(n => n.id === activeNoteId);
   if (note) {
     note.content = markdownEditor.value;
-    const firstLine = note.content.trim().split('\n')[0].substring(0, 30);
-    note.title = firstLine || 'New Note';
     saveNotes();
   }
   showListView();
 });
 
-
-
 markdownEditor.addEventListener('input', () => {
   const note = notes.find(n => n.id === activeNoteId);
   if (note) {
     note.content = markdownEditor.value;
-    const firstLine = note.content.trim().split('\n')[0].substring(0, 30);
-    note.title = firstLine || 'New Note';
     saveNotes();
     renderMarkdown();
-    const noteListItem = noteList.querySelector(`[data-note-id="${activeNoteId}"]`);
-    if (noteListItem) {
-      noteListItem.textContent = note.title;
-    }
   }
 });
 
@@ -185,6 +175,40 @@ markdownEditor.addEventListener('keydown', (e) => {
 });
 
 htmlPreview.addEventListener('dblclick', togglePreview);
+
+editorTitle.addEventListener('dblclick', () => {
+  const note = notes.find(n => n.id === activeNoteId);
+  if (note) {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = note.title;
+    input.classList.add('title-input');
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.isComposing) {
+        e.preventDefault();
+        note.title = input.value;
+        editorTitle.textContent = note.title;
+        saveNotes();
+        renderNoteList();
+        input.replaceWith(editorTitle);
+      }
+    });
+
+    input.addEventListener('blur', () => {
+      if (document.body.contains(input)) {
+        note.title = input.value;
+        editorTitle.textContent = note.title;
+        saveNotes();
+        renderNoteList();
+        input.replaceWith(editorTitle);
+      }
+    });
+
+    editorTitle.replaceWith(input);
+    input.focus();
+  }
+});
 
 let isGlobalSettings = false;
 
