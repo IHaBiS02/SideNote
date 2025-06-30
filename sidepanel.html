@@ -38,14 +38,23 @@
       <h1 id="settings-title">Settings</h1>
     </div>
     <div id="settings-container">
-        <div class="setting">
-          <label for="title-setting">Title</label>
-          <select id="title-setting">
-            <option value="default">Default (First line)</option>
-            <option value="custom">Custom</option>
-          </select>
-        </div>
+      <div class="setting">
+        <label for="title-setting">Title</label>
+        <select id="title-setting">
+          <option value="default">Default (First line)</option>
+          <option value="custom">Custom</option>
+        </select>
       </div>
+      <div class="setting">
+        <label>Export</label>
+        <button id="export-button">Export</button>
+      </div>
+      <div class="setting">
+        <label>Import</label>
+        <button id="import-button">Import</button>
+        <input type="file" id="import-input" style="display: none;" />
+      </div>
+    </div>
   </div>
 
   <script src="vendor/marked.min.js"></script>
