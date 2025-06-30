@@ -230,4 +230,16 @@ settingsBackButton.addEventListener('click', () => {
   }
 });
 
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (editorView.style.display === 'block') {
+      if (isPreview) {
+        showListView();
+      } else {
+        togglePreview();
+      }
+    }
+  }
+});
+
 showListView();
