@@ -212,10 +212,12 @@ editorTitle.addEventListener('dblclick', () => {
       input.value = note.title;
       input.classList.add('title-input');
 
+      let editingFinished = false;
+
       const finishEditing = () => {
-        if (!document.body.contains(input)) {
-          return;
-        }
+        if (editingFinished) return;
+        editingFinished = true;
+
         note.title = input.value;
         editorTitle.textContent = note.title;
         saveNotes();
@@ -223,15 +225,18 @@ editorTitle.addEventListener('dblclick', () => {
         input.replaceWith(editorTitle);
       };
 
-      input.addEventListener('keydown', (e) => {
+      const handleKeyDown = (e) => {
         if (e.key === 'Enter' && !e.isComposing) {
           e.preventDefault();
           finishEditing();
         } else if (e.key === 'Escape') {
+          if (editingFinished) return;
+          editingFinished = true;
           input.replaceWith(editorTitle);
         }
-      });
+      };
 
+      input.addEventListener('keydown', handleKeyDown);
       input.addEventListener('blur', finishEditing);
 
       editorTitle.replaceWith(input);
