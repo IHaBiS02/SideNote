@@ -289,9 +289,10 @@ titleSetting.addEventListener('change', () => {
 });
 
 document.addEventListener('keydown', (e) => {
-
   if (e.key === 'Escape') {
-    if (editorView.style.display === 'block') {
+    if (settingsView.style.display === 'block') {
+      settingsBackButton.click();
+    } else if (editorView.style.display === 'block') {
       if (isPreview) {
         showListView();
       } else {
