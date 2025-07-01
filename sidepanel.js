@@ -194,6 +194,7 @@ function showListView() {
   listView.style.display = 'block';
   editorView.style.display = 'none';
   settingsView.style.display = 'none';
+  recycleBinView.style.display = 'none';
   renderNoteList();
 }
 
@@ -201,6 +202,7 @@ function showEditorView() {
   listView.style.display = 'none';
   editorView.style.display = 'block';
   settingsView.style.display = 'none';
+  recycleBinView.style.display = 'none';
 }
 
 function showSettingsView() {
@@ -208,6 +210,7 @@ function showSettingsView() {
   editorView.style.display = 'none';
   settingsView.style.display = 'block';
   licenseView.style.display = 'none';
+  recycleBinView.style.display = 'none';
 }
 
 function showLicenseView() {
@@ -215,6 +218,7 @@ function showLicenseView() {
   editorView.style.display = 'none';
   settingsView.style.display = 'none';
   licenseView.style.display = 'block';
+  recycleBinView.style.display = 'none';
 }
 
 function showRecycleBinView() {
