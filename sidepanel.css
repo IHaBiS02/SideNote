@@ -180,6 +180,7 @@ button:hover {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  word-break: keep-all;
 }
 
 /* For line-breaking */
