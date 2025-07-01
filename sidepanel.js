@@ -12,6 +12,10 @@ const settingsView = document.getElementById('settings-view');
 const settingsButton = document.getElementById('settings-button');
 const globalSettingsButton = document.getElementById('global-settings-button');
 const settingsBackButton = document.getElementById('settings-back-button');
+const licensesButton = document.getElementById('licenses-button');
+const licenseView = document.getElementById('license-view');
+const licenseBackButton = document.getElementById('license-back-button');
+const licenseContent = document.getElementById('license-content');
 const titleSetting = document.getElementById('title-setting');
 const fontSizeSetting = document.getElementById('font-size-setting');
 const globalExportButton = document.getElementById('global-export-button');
@@ -180,6 +184,14 @@ function showSettingsView() {
   listView.style.display = 'none';
   editorView.style.display = 'none';
   settingsView.style.display = 'block';
+  licenseView.style.display = 'none';
+}
+
+function showLicenseView() {
+  listView.style.display = 'none';
+  editorView.style.display = 'none';
+  settingsView.style.display = 'none';
+  licenseView.style.display = 'block';
 }
 
 function renderMarkdown() {
@@ -348,6 +360,18 @@ settingsBackButton.addEventListener('click', () => {
   } else {
     showEditorView();
   }
+});
+
+licensesButton.addEventListener('click', async () => {
+  const response = await fetch('LICENSES.md');
+  const text = await response.text();
+  const dirtyHtml = marked.parse(text);
+  licenseContent.innerHTML = DOMPurify.sanitize(dirtyHtml);
+  showLicenseView();
+});
+
+licenseBackButton.addEventListener('click', () => {
+  showSettingsView();
 });
 
 titleSetting.addEventListener('change', () => {

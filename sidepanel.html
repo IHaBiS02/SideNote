@@ -60,7 +60,18 @@
         <label for="font-size-setting">Font Size</label>
         <input type="number" id="font-size-setting" min="1" value="12">
       </div>
+      <div class="setting">
+        <button id="licenses-button">Licenses</button>
+      </div>
     </div>
+  </div>
+
+  <div id="license-view" style="display: none;">
+    <div class="header">
+      <button id="license-back-button"><</button>
+      <h1 id="license-title">Licenses</h1>
+    </div>
+    <div id="license-content"></div>
   </div>
 
   <script src="vendor/marked.min.js"></script>
