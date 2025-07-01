@@ -37,7 +37,7 @@ chrome.storage.local.get(['notes', 'globalSettings'], (data) => {
   } else {
     globalSettings = {
       title: 'default',
-      fontSize: 16
+      fontSize: 12
     };
   }
 
@@ -144,7 +144,7 @@ function openNote(noteId, inEditMode = false) {
     originalNoteContent = note.content; // Store original content
     editorTitle.textContent = note.title;
     markdownEditor.value = note.content;
-    const fontSize = note.settings.fontSize || globalSettings.fontSize || 16;
+    const fontSize = note.settings.fontSize || globalSettings.fontSize || 12;
     applyFontSize(fontSize);
     renderMarkdown();
     showEditorView();
@@ -194,7 +194,7 @@ newNoteButton.addEventListener('click', () => {
     title: 'New Note',
     content: '',
     settings: {
-      fontSize: globalSettings.fontSize || 16
+      fontSize: globalSettings.fontSize || 12
     },
     metadata: {
       createdAt: now,
@@ -321,14 +321,14 @@ settingsButton.addEventListener('click', () => {
   isGlobalSettings = false;
   const note = notes.find(n => n.id === activeNoteId);
   titleSetting.value = note.settings.title || 'default';
-  fontSizeSetting.value = note.settings.fontSize || globalSettings.fontSize || 16;
+  fontSizeSetting.value = note.settings.fontSize || globalSettings.fontSize || 12;
   showSettingsView();
 });
 
 globalSettingsButton.addEventListener('click', () => {
   isGlobalSettings = true;
   titleSetting.value = globalSettings.title || 'default';
-  fontSizeSetting.value = globalSettings.fontSize || 16;
+  fontSizeSetting.value = globalSettings.fontSize || 12;
   showSettingsView();
 });
 
