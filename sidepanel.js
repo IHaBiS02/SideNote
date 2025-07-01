@@ -207,6 +207,9 @@ function renderMarkdown() {
     ADD_TAGS: ['pre', 'code', 'span'],
     ADD_ATTR: ['class']
   });
+  htmlPreview.querySelectorAll('pre code').forEach((block) => {
+    hljs.lineNumbersBlock(block);
+  });
 }
 
 newNoteButton.addEventListener('click', () => {
