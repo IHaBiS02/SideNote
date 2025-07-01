@@ -192,3 +192,11 @@ pre code {
   padding: 10px;
 }
 
+.hljs {
+  display: flex;
+}
+
+.hljs-ln {
+  width: 100%;
+}
+
