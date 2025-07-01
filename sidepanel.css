@@ -157,6 +157,7 @@ button:hover {
   transform: translateX(-50%);
   text-align: center;
   flex-grow: 1;
+  width: 75%;
 }
 
 #settings-title, #license-title, #recycle-bin-title {
