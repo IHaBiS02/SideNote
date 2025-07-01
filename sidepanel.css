@@ -92,7 +92,8 @@ h1 {
 
 .toolbar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   padding: 5px;
   border-top: 1px solid #ccc;
   position: absolute;
@@ -101,11 +102,12 @@ h1 {
   background-color: white;
 }
 
-#list-view .toolbar {
-  justify-content: flex-end;
+.toolbar-left, .toolbar-right {
+  display: flex;
+  align-items: center;
 }
 
-#editor-view .toolbar {
+#list-view .toolbar {
   justify-content: flex-end;
 }
 
@@ -124,10 +126,6 @@ button:hover {
 #editor-title {
   text-align: center;
   flex-grow: 1;
-}
-
-#settings-button {
-  font-size: 18px;
 }
 
 #settings-title {
