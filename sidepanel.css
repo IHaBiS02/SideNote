@@ -57,6 +57,16 @@ h1 {
   justify-content: space-between;
 }
 
+#deleted-note-list .note-info {
+  display: flex;
+  flex-direction: column;
+}
+
+#deleted-note-list .deletion-date {
+  font-size: 0.8em;
+  color: #888;
+}
+
 #deleted-note-list .button-container {
   margin-left: auto;
 }

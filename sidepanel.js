@@ -244,8 +244,18 @@ function renderDeletedNoteList() {
     const li = document.createElement('li');
     li.dataset.noteId = note.id;
 
+    const noteInfo = document.createElement('div');
+    noteInfo.classList.add('note-info');
+
     const titleSpan = document.createElement('span');
     titleSpan.textContent = note.title;
+    noteInfo.appendChild(titleSpan);
+
+    const deletionDate = new Date(note.metadata.deletedAt + 30 * 24 * 60 * 60 * 1000);
+    const deletionDateSpan = document.createElement('span');
+    deletionDateSpan.textContent = `Deletes on: ${deletionDate.toLocaleDateString()}`;
+    deletionDateSpan.classList.add('deletion-date');
+    noteInfo.appendChild(deletionDateSpan);
 
     const buttonContainer = document.createElement('div');
     buttonContainer.classList.add('button-container');
@@ -268,7 +278,7 @@ function renderDeletedNoteList() {
       deleteNotePermanently(note.id);
     });
 
-    li.appendChild(titleSpan);
+    li.appendChild(noteInfo);
     buttonContainer.appendChild(restoreSpan);
     buttonContainer.appendChild(deleteSpan);
     li.appendChild(buttonContainer);
