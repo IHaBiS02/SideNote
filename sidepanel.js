@@ -183,8 +183,18 @@ function showSettingsView() {
 }
 
 function renderMarkdown() {
+  marked.setOptions({
+    highlight: function(code, lang) {
+      const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+      return hljs.highlight(code, { language }).value;
+    }
+  });
+
   const dirtyHtml = marked.parse(markdownEditor.value);
-  htmlPreview.innerHTML = DOMPurify.sanitize(dirtyHtml);
+  htmlPreview.innerHTML = DOMPurify.sanitize(dirtyHtml, {
+    ADD_TAGS: ['pre', 'code', 'span'],
+    ADD_ATTR: ['class']
+  });
 }
 
 newNoteButton.addEventListener('click', () => {
