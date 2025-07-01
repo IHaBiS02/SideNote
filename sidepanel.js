@@ -191,10 +191,7 @@ function renderMarkdown() {
       return hljs.highlightAuto(code).value;
     }
   });
-  htmlPreview.innerHTML = DOMPurify.sanitize(dirtyHtml, {
-    ADD_TAGS: ['pre', 'code'],
-    ADD_ATTR: ['class']
-  });
+  htmlPreview.innerHTML = DOMPurify.sanitize(dirtyHtml);
 }
 
 newNoteButton.addEventListener('click', () => {
