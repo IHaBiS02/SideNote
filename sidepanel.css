@@ -143,6 +143,11 @@ button:hover {
   flex-grow: 1;
 }
 
+.setting {
+  margin-bottom: 15px;
+}
+
+
 .title-input {
   position: absolute;
   left: 50%;
