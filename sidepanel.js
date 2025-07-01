@@ -576,23 +576,13 @@ fontSizeSetting.addEventListener('input', () => {
 });
 
 function updateAutoLineBreakButton() {
-  const note = notes.find(n => n.id === activeNoteId);
-  if (note) {
-    const autoLineBreak = note.settings.autoLineBreak === undefined ? globalSettings.autoLineBreak : note.settings.autoLineBreak;
-    autoLineBreakButton.textContent = autoLineBreak ? '↩' : '↪';
-  }
+  autoLineBreakButton.textContent = globalSettings.autoLineBreak ? '↩✅' : '↩❌';
 }
 
 autoLineBreakButton.addEventListener('click', () => {
-  const note = notes.find(n => n.id === activeNoteId);
-  if (note) {
-    const currentValue = note.settings.autoLineBreak === undefined ? globalSettings.autoLineBreak : note.settings.autoLineBreak;
-    note.settings.autoLineBreak = !currentValue;
-    note.metadata.lastModified = Date.now();
-    updateAutoLineBreakButton();
-    sortNotes();
-    saveNotes();
-  }
+  globalSettings.autoLineBreak = !globalSettings.autoLineBreak;
+  updateAutoLineBreakButton();
+  saveGlobalSettings();
 });
 
 function getTimestamp() {
