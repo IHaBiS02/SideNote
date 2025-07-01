@@ -18,7 +18,7 @@ const licenseBackButton = document.getElementById('license-back-button');
 const licenseContent = document.getElementById('license-content');
 const titleSetting = document.getElementById('title-setting');
 const fontSizeSetting = document.getElementById('font-size-setting');
-const autoLineBreakSetting = document.getElementById('auto-line-break-setting');
+const autoLineBreakButton = document.getElementById('auto-line-break-button');
 const globalExportButton = document.getElementById('global-export-button');
 const globalImportButton = document.getElementById('global-import-button');
 const globalImportInput = document.getElementById('global-import-input');
@@ -182,6 +182,7 @@ function openNote(noteId, inEditMode = false) {
     markdownEditor.value = note.content;
     const fontSize = note.settings.fontSize || globalSettings.fontSize || 12;
     applyFontSize(fontSize);
+    updateAutoLineBreakButton();
     renderMarkdown();
     showEditorView();
     isPreview = !inEditMode;
@@ -501,7 +502,6 @@ globalSettingsButton.addEventListener('click', () => {
   isGlobalSettings = true;
   titleSetting.value = globalSettings.title || 'default';
   fontSizeSetting.value = globalSettings.fontSize || 12;
-  autoLineBreakSetting.checked = globalSettings.autoLineBreak === undefined ? true : globalSettings.autoLineBreak;
   showSettingsView();
 });
 
@@ -575,19 +575,23 @@ fontSizeSetting.addEventListener('input', () => {
   }
 });
 
-autoLineBreakSetting.addEventListener('change', () => {
-  const value = autoLineBreakSetting.checked;
-  if (isGlobalSettings) {
-    globalSettings.autoLineBreak = value;
-    saveGlobalSettings();
-  } else {
-    const note = notes.find(n => n.id === activeNoteId);
-    if (note) {
-      note.settings.autoLineBreak = value;
-      note.metadata.lastModified = Date.now();
-      sortNotes();
-      saveNotes();
-    }
+function updateAutoLineBreakButton() {
+  const note = notes.find(n => n.id === activeNoteId);
+  if (note) {
+    const autoLineBreak = note.settings.autoLineBreak === undefined ? globalSettings.autoLineBreak : note.settings.autoLineBreak;
+    autoLineBreakButton.textContent = autoLineBreak ? '↩' : '↪';
+  }
+}
+
+autoLineBreakButton.addEventListener('click', () => {
+  const note = notes.find(n => n.id === activeNoteId);
+  if (note) {
+    const currentValue = note.settings.autoLineBreak === undefined ? globalSettings.autoLineBreak : note.settings.autoLineBreak;
+    note.settings.autoLineBreak = !currentValue;
+    note.metadata.lastModified = Date.now();
+    updateAutoLineBreakButton();
+    sortNotes();
+    saveNotes();
   }
 });
 
