@@ -144,8 +144,7 @@ button:hover {
 }
 
 
-#license-content {
-  padding: 15px;
+#license-content pre {
   white-space: pre-wrap;
   word-break: break-word;
 }
