@@ -97,6 +97,10 @@ h1 {
   display: none;
 }
 
+#html-preview table {
+  margin: 0;
+}
+
 .toolbar {
   display: flex;
   justify-content: space-between;
@@ -176,45 +180,36 @@ button:hover {
   width: 60%;
 }
 
-/* For line numbers */
-.hljs-ln-numbers {
+pre {
+  position: relative;
+  padding-left: 3.5em; /* Space for line numbers */
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+}
+
+pre code {
+  display: block;
+  overflow-x: auto;
+  white-space: pre; /* Use pre to enable horizontal scrolling */
+  word-wrap: normal; /* Prevent wrapping */
+  padding: 5px;
+}
+
+.line-number {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3em; /* Width of the line number column */
+  padding-right: 1em;
   text-align: right;
-  color: black;
-  border-right: 1px solid #ccc;
-  vertical-align: top;
-  padding-right: 15px;
-  -webkit-touch-callout: none;
+  color: #999;
   -webkit-user-select: none;
-  -khtml-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  word-break: keep-all;
 }
 
-.hljs-ln td.hljs-ln-numbers {
-  padding-right: 5px;
-}
-
-.hljs-ln td.hljs-ln-code {
-	padding-left: 5px;
-}
-
-/* For line-breaking */
-pre code {
-  white-space: pre-wrap;
-  word-break: break-all;
-  background-color: #f5f5f5;
-  border: 1px solid #ccc;
+.line-number span {
   display: block;
-  padding: 10px;
-}
-
-.hljs {
-  display: flex;
-}
-
-.hljs-ln {
-  width: 100%;
 }
 

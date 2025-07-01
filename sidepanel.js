@@ -203,13 +203,29 @@ function renderMarkdown() {
   });
 
   const dirtyHtml = marked.parse(markdownEditor.value);
-  htmlPreview.innerHTML = DOMPurify.sanitize(dirtyHtml, {
-    ADD_TAGS: ['pre', 'code', 'span'],
+  const sanitizedHtml = DOMPurify.sanitize(dirtyHtml, {
+    ADD_TAGS: ['pre', 'code', 'span', 'div'],
     ADD_ATTR: ['class']
   });
-  htmlPreview.querySelectorAll('pre code').forEach((block) => {
-    hljs.lineNumbersBlock(block);
+
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = sanitizedHtml;
+
+  tempDiv.querySelectorAll('pre code').forEach((block) => {
+    const lines = block.innerHTML.split('\n');
+    const lineNumbers = document.createElement('div');
+    lineNumbers.classList.add('line-number');
+    
+    for (let i = 1; i <= lines.length; i++) {
+      const span = document.createElement('span');
+      span.textContent = i;
+      lineNumbers.appendChild(span);
+    }
+
+    block.parentNode.insertBefore(lineNumbers, block);
   });
+
+  htmlPreview.innerHTML = tempDiv.innerHTML;
 }
 
 newNoteButton.addEventListener('click', () => {
