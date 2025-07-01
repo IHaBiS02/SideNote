@@ -138,10 +138,20 @@ button:hover {
   flex-grow: 1;
 }
 
-#settings-title {
+#settings-title, #license-title {
   text-align: center;
   flex-grow: 1;
 }
+
+#settings-view .header, #license-view .header {
+  justify-content: center;
+}
+
+#settings-back-button, #license-back-button {
+  position: absolute;
+  left: 10px;
+}
+
 
 
 #license-content pre {
