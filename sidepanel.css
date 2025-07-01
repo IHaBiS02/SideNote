@@ -89,6 +89,9 @@ h1 {
   outline: none;
   overflow-y: auto;
   resize: none;
+  font-family: sans-serif;
+  font-size: inherit;
+  line-height: inherit;
 }
 
 #html-preview {
