@@ -253,7 +253,7 @@ function renderDeletedNoteList() {
 
     const deletionDate = new Date(note.metadata.deletedAt + 30 * 24 * 60 * 60 * 1000);
     const deletionDateSpan = document.createElement('span');
-    deletionDateSpan.textContent = `Deletes on: ${deletionDate.toLocaleDateString()}`;
+    deletionDateSpan.textContent = `Deletes on: ${deletionDate.toLocaleString()}`;
     deletionDateSpan.classList.add('deletion-date');
     noteInfo.appendChild(deletionDateSpan);
 
