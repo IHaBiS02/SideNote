@@ -24,16 +24,22 @@ const globalImportInput = document.getElementById('global-import-input');
 const exportNoteButton = document.getElementById('export-note-button');
 const importNoteButton = document.getElementById('import-note-button');
 const importNoteInput = document.getElementById('import-note-input');
+const recycleBinButton = document.getElementById('recycle-bin-button');
+const recycleBinView = document.getElementById('recycle-bin-view');
+const recycleBinBackButton = document.getElementById('recycle-bin-back-button');
+const deletedNoteList = document.getElementById('deleted-note-list');
 
 let notes = [];
+let deletedNotes = [];
 let activeNoteId = null;
 let isPreview = false;
 let globalSettings = {};
 let originalNoteContent = '';
 
 // Load notes and settings from storage
-chrome.storage.local.get(['notes', 'globalSettings'], (data) => {
+chrome.storage.local.get(['notes', 'deletedNotes', 'globalSettings'], (data) => {
   const loadedNotes = data.notes;
+  const loadedDeletedNotes = data.deletedNotes;
   const loadedSettings = data.globalSettings;
 
   if (loadedSettings) {
@@ -45,6 +51,12 @@ chrome.storage.local.get(['notes', 'globalSettings'], (data) => {
     };
   }
 
+  if (loadedDeletedNotes) {
+    deletedNotes = loadedDeletedNotes;
+  } else {
+    deletedNotes = [];
+  }
+  
   if (!loadedNotes) {
     notes = [];
   } else if (typeof loadedNotes === 'string') {
@@ -103,6 +115,10 @@ function saveGlobalSettings() {
   chrome.storage.local.set({ globalSettings });
 }
 
+function saveDeletedNotes() {
+  chrome.storage.local.set({ deletedNotes });
+}
+
 function renderNoteList() {
   noteList.innerHTML = '';
   if (!Array.isArray(notes)) return;
@@ -130,9 +146,15 @@ function renderNoteList() {
 }
 
 function deleteNote(noteId) {
-  notes = notes.filter(n => n.id !== noteId);
-  saveNotes();
-  renderNoteList();
+  const noteIndex = notes.findIndex(n => n.id === noteId);
+  if (noteIndex > -1) {
+    const [deletedNote] = notes.splice(noteIndex, 1);
+    deletedNote.metadata.deletedAt = Date.now();
+    deletedNotes.push(deletedNote);
+    saveNotes();
+    saveDeletedNotes();
+    renderNoteList();
+  }
 }
 
 function applyFontSize(size) {
@@ -193,6 +215,30 @@ function showLicenseView() {
   editorView.style.display = 'none';
   settingsView.style.display = 'none';
   licenseView.style.display = 'block';
+}
+
+function showRecycleBinView() {
+  listView.style.display = 'none';
+  editorView.style.display = 'none';
+  settingsView.style.display = 'none';
+  licenseView.style.display = 'none';
+  recycleBinView.style.display = 'block';
+  renderDeletedNoteList();
+}
+
+function renderDeletedNoteList() {
+  deletedNoteList.innerHTML = '';
+  deletedNotes.sort((a, b) => a.metadata.deletedAt - b.metadata.deletedAt);
+  deletedNotes.forEach(note => {
+    const li = document.createElement('li');
+    li.dataset.noteId = note.id;
+
+    const titleSpan = document.createElement('span');
+    titleSpan.textContent = note.title;
+
+    li.appendChild(titleSpan);
+    deletedNoteList.appendChild(li);
+  });
 }
 
 function renderMarkdown() {
@@ -375,6 +421,14 @@ licensesButton.addEventListener('click', async () => {
 });
 
 licenseBackButton.addEventListener('click', () => {
+  showSettingsView();
+});
+
+recycleBinButton.addEventListener('click', () => {
+  showRecycleBinView();
+});
+
+recycleBinBackButton.addEventListener('click', () => {
   showSettingsView();
 });
 
