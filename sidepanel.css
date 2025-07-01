@@ -144,6 +144,12 @@ button:hover {
 }
 
 
+#license-content {
+  padding: 15px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 #settings-container {
   padding: 15px;
 }
