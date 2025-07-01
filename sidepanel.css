@@ -168,12 +168,11 @@ button:hover {
 
 /* For line numbers */
 .hljs-ln-numbers {
-  text-align: center;
+  text-align: right;
   color: black;
-  border-right: 2px solid #999;
+  border-right: 1px solid #ccc;
   vertical-align: top;
   padding-right: 15px;
-  padding-left: 15px;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
