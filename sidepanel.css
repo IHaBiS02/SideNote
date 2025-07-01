@@ -143,6 +143,11 @@ button:hover {
   flex-grow: 1;
 }
 
+
+#settings-container {
+  padding: 15px;
+}
+
 .setting {
   margin-bottom: 15px;
 }
