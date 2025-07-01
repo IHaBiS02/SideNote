@@ -41,25 +41,52 @@ chrome.storage.local.get(['notes', 'globalSettings'], (data) => {
   if (!loadedNotes) {
     notes = [];
   } else if (typeof loadedNotes === 'string') {
+    const now = Date.now();
     const content = loadedNotes;
     const title = content.trim().split('\n')[0].substring(0, 30) || 'Imported Note';
     notes = [{
-      id: `migrated-${Date.now()}`,
+      id: crypto.randomUUID(),
       title: title,
       content: content,
-      settings: {}
+      settings: {},
+      metadata: {
+        createdAt: now,
+        lastModified: now
+      }
     }];
-    saveNotes();
   } else if (Array.isArray(loadedNotes)) {
-    notes = loadedNotes.map(note => ({
-      ...note,
-      settings: note.settings || {}
-    }));
+    notes = loadedNotes.map(note => {
+      if (note.metadata && note.metadata.createdAt && note.metadata.lastModified) {
+        return note;
+      }
+      const now = Date.now();
+      let timestamp = now;
+      if (typeof note.id === 'string') {
+        const idNumber = parseInt(note.id.replace('migrated-', ''));
+        if (!isNaN(idNumber)) {
+          timestamp = idNumber;
+        }
+      }
+      return {
+        ...note,
+        id: note.id || crypto.randomUUID(),
+        settings: note.settings || {},
+        metadata: {
+          createdAt: timestamp,
+          lastModified: timestamp
+        }
+      };
+    });
   } else {
     notes = [];
   }
+  sortNotes();
   renderNoteList();
 });
+
+function sortNotes() {
+  notes.sort((a, b) => b.metadata.lastModified - a.metadata.lastModified);
+}
 
 function saveNotes() {
   chrome.storage.local.set({ notes });
@@ -148,11 +175,16 @@ function renderMarkdown() {
 }
 
 newNoteButton.addEventListener('click', () => {
+  const now = Date.now();
   const newNote = {
-    id: Date.now().toString(),
+    id: crypto.randomUUID(),
     title: 'New Note',
     content: '',
-    settings: {}
+    settings: {},
+    metadata: {
+      createdAt: now,
+      lastModified: now
+    }
   };
   notes.unshift(newNote);
   saveNotes();
@@ -163,6 +195,8 @@ backButton.addEventListener('click', () => {
   const note = notes.find(n => n.id === activeNoteId);
   if (note) {
     note.content = markdownEditor.value;
+    note.metadata.lastModified = Date.now();
+    sortNotes();
     saveNotes();
   }
   showListView();
@@ -172,14 +206,17 @@ markdownEditor.addEventListener('input', () => {
   const note = notes.find(n => n.id === activeNoteId);
   if (note) {
     note.content = markdownEditor.value;
+    note.metadata.lastModified = Date.now();
     const titleSource = note.settings.title || globalSettings.title;
     if (titleSource === 'default') {
       const firstLine = note.content.trim().split('\n')[0];
       note.title = firstLine.substring(0, 30) || 'New Note';
       editorTitle.textContent = note.title;
     }
+    sortNotes();
     saveNotes();
     renderMarkdown();
+    renderNoteList();
   }
 });
 
@@ -226,7 +263,9 @@ editorTitle.addEventListener('dblclick', () => {
         editingFinished = true;
 
         note.title = input.value;
+        note.metadata.lastModified = Date.now();
         editorTitle.textContent = note.title;
+        sortNotes();
         saveNotes();
         renderNoteList();
         input.replaceWith(editorTitle);
@@ -284,11 +323,13 @@ titleSetting.addEventListener('change', () => {
     const note = notes.find(n => n.id === activeNoteId);
     if (note) {
       note.settings.title = value;
+      note.metadata.lastModified = Date.now();
       if (value === 'default') {
         const firstLine = note.content.trim().split('\n')[0];
         note.title = firstLine.substring(0, 30) || 'New Note';
         editorTitle.textContent = note.title;
       }
+      sortNotes();
       saveNotes();
     }
   }
@@ -333,13 +374,26 @@ globalImportInput.addEventListener('change', (e) => {
   reader.onload = (event) => {
     const content = event.target.result;
     try {
-      const importedNotes = JSON.parse(content);
+      let importedNotes = JSON.parse(content);
       if (Array.isArray(importedNotes)) {
-        const newNotes = importedNotes.map(note => ({
+        const now = Date.now();
+        
+        importedNotes = importedNotes.map(note => ({
           ...note,
-          id: Date.now().toString() + Math.random().toString(36).substring(2)
+          metadata: note.metadata || { createdAt: now, lastModified: now }
+        })).sort((a, b) => a.metadata.lastModified - b.metadata.lastModified);
+
+        const newNotes = importedNotes.map((note, index) => ({
+          ...note,
+          id: crypto.randomUUID(),
+          metadata: {
+            createdAt: note.metadata.createdAt || now,
+            lastModified: now + index
+          }
         }));
+
         notes.push(...newNotes);
+        sortNotes();
         saveNotes();
         renderNoteList();
       }
@@ -366,8 +420,10 @@ importNoteInput.addEventListener('change', (e) => {
         note.title = importedNote.title;
         note.content = importedNote.content;
         note.settings = importedNote.settings;
+        note.metadata.lastModified = Date.now();
         editorTitle.textContent = note.title;
         markdownEditor.value = note.content;
+        sortNotes();
         saveNotes();
         renderMarkdown();
       }
