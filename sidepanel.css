@@ -24,13 +24,13 @@ h1 {
 
 /* 기존 #note-list 스타일을 찾아서 아래 내용으로 교체합니다. */
 
-#note-list {
+#note-list, #deleted-note-list {
   list-style: none;
   padding: 0;
   margin: 0;
   /* position 속성을 사용하여 레이어처럼 띄웁니다. */
   position: absolute;
-  /* 헤더의 높이(약 50px)와 경계선(1px)을 고려하여 상단 위치를 지정합니다. */
+  /* 헤더의 높이(약 50px)와 경계선(1px)을 고려하여 상단 위���를 지정합니다. */
   top: 51px;
   /* 툴바의 높이(약 35px)와 경계선(1px)을 고려하여 하단 위치를 지정합니다. */
   bottom: 36px;
@@ -41,7 +41,7 @@ h1 {
   overflow-y: auto;
 }
 
-#note-list li {
+#note-list li, #deleted-note-list li {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -50,16 +50,16 @@ h1 {
   cursor: pointer;
 }
 
-#note-list li:hover {
+#note-list li:hover, #deleted-note-list li:hover {
   background-color: #f5f5f5;
 }
 
-.delete-note-icon {
+.delete-note-icon, .restore-note-icon {
   cursor: pointer;
   padding: 5px;
 }
 
-.delete-note-icon:hover {
+.delete-note-icon:hover, .restore-note-icon:hover {
   background-color: #ddd;
   border-radius: 50%;
 }
