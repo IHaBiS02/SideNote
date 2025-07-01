@@ -170,10 +170,10 @@ button:hover {
 .hljs-ln-numbers {
   text-align: center;
   color: black;
-  border-right: 1px solid #ccc;
+  border-right: 2px solid #999;
   vertical-align: top;
-  padding-right: 10px;
-  padding-left: 10px;
+  padding-right: 15px;
+  padding-left: 15px;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
