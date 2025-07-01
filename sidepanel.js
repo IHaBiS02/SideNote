@@ -137,7 +137,7 @@ function applyFontSize(size) {
   });
 }
 
-async function openNote(noteId, inEditMode = false) {
+function openNote(noteId, inEditMode = false) {
   const note = notes.find(n => n.id === noteId);
   if (note) {
     activeNoteId = noteId;
@@ -146,7 +146,7 @@ async function openNote(noteId, inEditMode = false) {
     markdownEditor.value = note.content;
     const fontSize = note.settings.fontSize || globalSettings.fontSize || 12;
     applyFontSize(fontSize);
-    await renderMarkdown();
+    renderMarkdown();
     showEditorView();
     isPreview = !inEditMode;
     if (isPreview) {
@@ -182,10 +182,8 @@ function showSettingsView() {
   settingsView.style.display = 'block';
 }
 
-async function renderMarkdown() {
-  const dirtyHtml = await marked.parse(markdownEditor.value, {
-    async: true,
-    gfm: true,
+function renderMarkdown() {
+  const dirtyHtml = marked.parse(markdownEditor.value, {
     highlight: function(code, lang) {
       if (lang && hljs.getLanguage(lang)) {
         return hljs.highlight(code, { language: lang }).value;
@@ -194,7 +192,7 @@ async function renderMarkdown() {
     }
   });
   htmlPreview.innerHTML = DOMPurify.sanitize(dirtyHtml, {
-    ADD_TAGS: ['pre', 'code', 'span'],
+    ADD_TAGS: ['pre', 'code'],
     ADD_ATTR: ['class']
   });
 }
@@ -231,7 +229,7 @@ backButton.addEventListener('click', () => {
   showListView();
 });
 
-markdownEditor.addEventListener('input', async () => {
+markdownEditor.addEventListener('input', () => {
   const note = notes.find(n => n.id === activeNoteId);
   if (note) {
     note.content = markdownEditor.value;
@@ -244,15 +242,15 @@ markdownEditor.addEventListener('input', async () => {
     }
     sortNotes();
     saveNotes();
-    await renderMarkdown();
+    renderMarkdown();
     renderNoteList();
   }
 });
 
-async function togglePreview() {
+function togglePreview() {
   isPreview = !isPreview;
   if (isPreview) {
-    await renderMarkdown();
+    renderMarkdown();
     htmlPreview.style.display = 'block';
     markdownEditor.style.display = 'none';
     toggleViewButton.textContent = 'Edit';
