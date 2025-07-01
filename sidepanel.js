@@ -577,6 +577,7 @@ fontSizeSetting.addEventListener('input', () => {
 
 function updateAutoLineBreakButton() {
   autoLineBreakButton.textContent = globalSettings.autoLineBreak ? '↩✅' : '↩❌';
+  autoLineBreakButton.title = globalSettings.autoLineBreak ? 'Auto Line Break Enabled' : 'Auto Line Break Disabled';
 }
 
 autoLineBreakButton.addEventListener('click', () => {
