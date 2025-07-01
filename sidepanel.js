@@ -13,6 +13,7 @@ const settingsButton = document.getElementById('settings-button');
 const globalSettingsButton = document.getElementById('global-settings-button');
 const settingsBackButton = document.getElementById('settings-back-button');
 const titleSetting = document.getElementById('title-setting');
+const fontSizeSetting = document.getElementById('font-size-setting');
 const globalExportButton = document.getElementById('global-export-button');
 const globalImportButton = document.getElementById('global-import-button');
 const globalImportInput = document.getElementById('global-import-input');
@@ -35,7 +36,8 @@ chrome.storage.local.get(['notes', 'globalSettings'], (data) => {
     globalSettings = loadedSettings;
   } else {
     globalSettings = {
-      title: 'default'
+      title: 'default',
+      fontSize: 'medium'
     };
   }
 
@@ -128,6 +130,14 @@ function deleteNote(noteId) {
   renderNoteList();
 }
 
+function applyFontSize(size) {
+  const editorElements = [markdownEditor, htmlPreview];
+  editorElements.forEach(el => {
+    el.classList.remove('font-small', 'font-medium', 'font-large');
+    el.classList.add(`font-${size}`);
+  });
+}
+
 function openNote(noteId, inEditMode = false) {
   const note = notes.find(n => n.id === noteId);
   if (note) {
@@ -135,6 +145,8 @@ function openNote(noteId, inEditMode = false) {
     originalNoteContent = note.content; // Store original content
     editorTitle.textContent = note.title;
     markdownEditor.value = note.content;
+    const fontSize = note.settings.fontSize || globalSettings.fontSize || 'medium';
+    applyFontSize(fontSize);
     renderMarkdown();
     showEditorView();
     isPreview = !inEditMode;
@@ -182,7 +194,9 @@ newNoteButton.addEventListener('click', () => {
     id: crypto.randomUUID(),
     title: 'New Note',
     content: '',
-    settings: {},
+    settings: {
+      fontSize: globalSettings.fontSize || 'medium'
+    },
     metadata: {
       createdAt: now,
       lastModified: now
@@ -308,12 +322,14 @@ settingsButton.addEventListener('click', () => {
   isGlobalSettings = false;
   const note = notes.find(n => n.id === activeNoteId);
   titleSetting.value = note.settings.title || 'default';
+  fontSizeSetting.value = note.settings.fontSize || globalSettings.fontSize || 'medium';
   showSettingsView();
 });
 
 globalSettingsButton.addEventListener('click', () => {
   isGlobalSettings = true;
   titleSetting.value = globalSettings.title || 'default';
+  fontSizeSetting.value = globalSettings.fontSize || 'medium';
   showSettingsView();
 });
 
@@ -340,6 +356,23 @@ titleSetting.addEventListener('change', () => {
         note.title = firstLine.substring(0, 30) || 'New Note';
         editorTitle.textContent = note.title;
       }
+      sortNotes();
+      saveNotes();
+    }
+  }
+});
+
+fontSizeSetting.addEventListener('change', () => {
+  const value = fontSizeSetting.value;
+  if (isGlobalSettings) {
+    globalSettings.fontSize = value;
+    saveGlobalSettings();
+  } else {
+    const note = notes.find(n => n.id === activeNoteId);
+    if (note) {
+      note.settings.fontSize = value;
+      note.metadata.lastModified = Date.now();
+      applyFontSize(value);
       sortNotes();
       saveNotes();
     }
