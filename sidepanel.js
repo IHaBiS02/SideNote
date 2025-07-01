@@ -253,7 +253,13 @@ htmlPreview.addEventListener('dblclick', togglePreview);
 editorTitle.addEventListener('dblclick', () => {
   const note = notes.find(n => n.id === activeNoteId);
   if (note) {
-    const titleSource = note.settings.title || globalSettings.title;
+    let titleSource = note.settings.title || globalSettings.title;
+    if (titleSource === 'default') {
+      note.settings.title = 'custom';
+      titleSource = 'custom';
+      saveNotes();
+    }
+
     if (titleSource === 'custom') {
       const input = document.createElement('input');
       input.type = 'text';
