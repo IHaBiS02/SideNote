@@ -143,3 +143,7 @@ button:hover {
   text-align: center;
   flex-grow: 1;
 }
+
+.title-input {
+  text-align: center;
+}
