@@ -47,7 +47,14 @@ h1 {
   align-items: center;
   padding: 10px;
   border-bottom: 1px solid #eee;
+}
+
+#note-list li {
   cursor: pointer;
+}
+
+#deleted-note-list li {
+  justify-content: flex-start;
 }
 
 #note-list li:hover, #deleted-note-list li:hover {

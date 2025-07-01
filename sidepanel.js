@@ -137,8 +137,6 @@ function renderNoteList() {
     const titleSpan = document.createElement('span');
     titleSpan.textContent = note.title;
 
-    const buttonContainer = document.createElement('div');
-
     const deleteSpan = document.createElement('span');
     deleteSpan.textContent = '🗑';
     deleteSpan.title = 'Delete Note';
@@ -149,8 +147,7 @@ function renderNoteList() {
     });
 
     li.appendChild(titleSpan);
-    buttonContainer.appendChild(deleteSpan);
-    li.appendChild(buttonContainer);
+    li.appendChild(deleteSpan);
     noteList.appendChild(li);
   });
 }
