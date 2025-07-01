@@ -37,7 +37,7 @@ chrome.storage.local.get(['notes', 'globalSettings'], (data) => {
   } else {
     globalSettings = {
       title: 'default',
-      fontSize: 'medium'
+      fontSize: 16
     };
   }
 
@@ -133,8 +133,7 @@ function deleteNote(noteId) {
 function applyFontSize(size) {
   const editorElements = [markdownEditor, htmlPreview];
   editorElements.forEach(el => {
-    el.classList.remove('font-small', 'font-medium', 'font-large');
-    el.classList.add(`font-${size}`);
+    el.style.fontSize = `${size}px`;
   });
 }
 
@@ -145,7 +144,7 @@ function openNote(noteId, inEditMode = false) {
     originalNoteContent = note.content; // Store original content
     editorTitle.textContent = note.title;
     markdownEditor.value = note.content;
-    const fontSize = note.settings.fontSize || globalSettings.fontSize || 'medium';
+    const fontSize = note.settings.fontSize || globalSettings.fontSize || 16;
     applyFontSize(fontSize);
     renderMarkdown();
     showEditorView();
@@ -195,7 +194,7 @@ newNoteButton.addEventListener('click', () => {
     title: 'New Note',
     content: '',
     settings: {
-      fontSize: globalSettings.fontSize || 'medium'
+      fontSize: globalSettings.fontSize || 16
     },
     metadata: {
       createdAt: now,
@@ -322,14 +321,14 @@ settingsButton.addEventListener('click', () => {
   isGlobalSettings = false;
   const note = notes.find(n => n.id === activeNoteId);
   titleSetting.value = note.settings.title || 'default';
-  fontSizeSetting.value = note.settings.fontSize || globalSettings.fontSize || 'medium';
+  fontSizeSetting.value = note.settings.fontSize || globalSettings.fontSize || 16;
   showSettingsView();
 });
 
 globalSettingsButton.addEventListener('click', () => {
   isGlobalSettings = true;
   titleSetting.value = globalSettings.title || 'default';
-  fontSizeSetting.value = globalSettings.fontSize || 'medium';
+  fontSizeSetting.value = globalSettings.fontSize || 16;
   showSettingsView();
 });
 
@@ -362,8 +361,12 @@ titleSetting.addEventListener('change', () => {
   }
 });
 
-fontSizeSetting.addEventListener('change', () => {
-  const value = fontSizeSetting.value;
+fontSizeSetting.addEventListener('input', () => {
+  const value = parseInt(fontSizeSetting.value, 10);
+  if (isNaN(value) || value < 1) {
+    return;
+  }
+
   if (isGlobalSettings) {
     globalSettings.fontSize = value;
     saveGlobalSettings();
