@@ -106,7 +106,7 @@ h1 {
 }
 
 #editor-view .toolbar {
-  justify-content: space-between;
+  justify-content: flex-end;
 }
 
 button {
