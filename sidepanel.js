@@ -648,7 +648,9 @@ importNoteInput.addEventListener('change', (e) => {
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
-    if (settingsView.style.display === 'block') {
+    if (recycleBinView.style.display === 'block') {
+      recycleBinBackButton.click();
+    } else if (settingsView.style.display === 'block') {
       settingsBackButton.click();
     } else if (editorView.style.display === 'block') {
       if (isPreview) {
