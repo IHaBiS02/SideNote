@@ -116,6 +116,7 @@ function renderNoteList() {
 
     const deleteSpan = document.createElement('span');
     deleteSpan.textContent = '🗑';
+    deleteSpan.title = 'Delete Note';
     deleteSpan.classList.add('delete-note-icon');
     deleteSpan.addEventListener('click', (e) => {
       e.stopPropagation();
