@@ -183,12 +183,7 @@ function showSettingsView() {
 }
 
 function renderMarkdown() {
-  const dirtyHtml = marked.parse(markdownEditor.value, {
-    highlight: function(code, lang) {
-      const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-      return hljs.highlight(code, { language }).value;
-    }
-  });
+  const dirtyHtml = marked.parse(markdownEditor.value);
   htmlPreview.innerHTML = DOMPurify.sanitize(dirtyHtml);
 }
 
