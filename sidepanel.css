@@ -54,7 +54,11 @@ h1 {
 }
 
 #deleted-note-list li {
-  justify-content: flex-start;
+  justify-content: space-between;
+}
+
+#deleted-note-list .button-container {
+  margin-left: auto;
 }
 
 #note-list li:hover, #deleted-note-list li:hover {

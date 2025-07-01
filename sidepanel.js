@@ -248,6 +248,7 @@ function renderDeletedNoteList() {
     titleSpan.textContent = note.title;
 
     const buttonContainer = document.createElement('div');
+    buttonContainer.classList.add('button-container');
 
     const restoreSpan = document.createElement('span');
     restoreSpan.textContent = '♻️';
