@@ -374,6 +374,37 @@ markdownEditor.addEventListener('input', () => {
   }
 });
 
+markdownEditor.addEventListener('paste', (e) => {
+  e.preventDefault();
+  const text = e.clipboardData.getData('text/plain');
+  const processedText = text.split('\n').map(line => {
+    return line.trim().length > 0 ? line + '  ' : line;
+  }).join('\n');
+  
+  const start = markdownEditor.selectionStart;
+  const end = markdownEditor.selectionEnd;
+  
+  markdownEditor.value = markdownEditor.value.substring(0, start) + processedText + markdownEditor.value.substring(end);
+  
+  markdownEditor.selectionStart = markdownEditor.selectionEnd = start + processedText.length;
+
+  const note = notes.find(n => n.id === activeNoteId);
+  if (note) {
+    note.content = markdownEditor.value;
+    note.metadata.lastModified = Date.now();
+    const titleSource = note.settings.title || globalSettings.title;
+    if (titleSource === 'default') {
+      const firstLine = note.content.trim().split('\n')[0];
+      note.title = firstLine.substring(0, 30) || 'New Note';
+      editorTitle.textContent = note.title;
+    }
+    sortNotes();
+    saveNotes();
+    renderMarkdown();
+    renderNoteList();
+  }
+});
+
 function togglePreview() {
   isPreview = !isPreview;
   if (isPreview) {
