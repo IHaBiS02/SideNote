@@ -24,6 +24,7 @@ let notes = [];
 let activeNoteId = null;
 let isPreview = false;
 let globalSettings = {};
+let originalNoteContent = '';
 
 // Load notes and settings from storage
 chrome.storage.local.get(['notes', 'globalSettings'], (data) => {
@@ -131,6 +132,7 @@ function openNote(noteId, inEditMode = false) {
   const note = notes.find(n => n.id === noteId);
   if (note) {
     activeNoteId = noteId;
+    originalNoteContent = note.content; // Store original content
     editorTitle.textContent = note.title;
     markdownEditor.value = note.content;
     renderMarkdown();
@@ -194,10 +196,12 @@ newNoteButton.addEventListener('click', () => {
 backButton.addEventListener('click', () => {
   const note = notes.find(n => n.id === activeNoteId);
   if (note) {
-    note.content = markdownEditor.value;
-    note.metadata.lastModified = Date.now();
-    sortNotes();
-    saveNotes();
+    if (markdownEditor.value !== originalNoteContent) {
+      note.content = markdownEditor.value;
+      note.metadata.lastModified = Date.now();
+      sortNotes();
+      saveNotes();
+    }
   }
   showListView();
 });
