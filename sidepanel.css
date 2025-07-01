@@ -149,16 +149,16 @@ button:hover {
   flex-grow: 1;
 }
 
-#settings-title, #license-title {
+#settings-title, #license-title, #recycle-bin-title {
   text-align: center;
   flex-grow: 1;
 }
 
-#settings-view .header, #license-view .header {
+#settings-view .header, #license-view .header, #recycle-bin-view .header {
   justify-content: center;
 }
 
-#settings-back-button, #license-back-button {
+#settings-back-button, #license-back-button, #recycle-bin-back-button {
   position: absolute;
   left: 10px;
 }
