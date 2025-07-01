@@ -10,6 +10,11 @@ body {
   align-items: center;
   padding: 10px;
   border-bottom: 1px solid #ccc;
+  position: relative;
+}
+
+#editor-view .header {
+  justify-content: flex-start;
 }
 
 h1 {
@@ -124,6 +129,9 @@ button:hover {
 }
 
 #editor-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   text-align: center;
   flex-grow: 1;
 }
