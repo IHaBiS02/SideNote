@@ -236,9 +236,49 @@ function renderDeletedNoteList() {
     const titleSpan = document.createElement('span');
     titleSpan.textContent = note.title;
 
+    const restoreSpan = document.createElement('span');
+    restoreSpan.textContent = '♻️';
+    restoreSpan.title = 'Restore Note';
+    restoreSpan.classList.add('restore-note-icon');
+    restoreSpan.addEventListener('click', (e) => {
+      e.stopPropagation();
+      restoreNote(note.id);
+    });
+
+    const deleteSpan = document.createElement('span');
+    deleteSpan.textContent = '🗑️';
+    deleteSpan.title = 'Delete Note Permanently';
+    deleteSpan.classList.add('delete-note-icon');
+    deleteSpan.addEventListener('click', (e) => {
+      e.stopPropagation();
+      deleteNotePermanently(note.id);
+    });
+
     li.appendChild(titleSpan);
+    li.appendChild(restoreSpan);
+    li.appendChild(deleteSpan);
     deletedNoteList.appendChild(li);
   });
+}
+
+function restoreNote(noteId) {
+  const noteIndex = deletedNotes.findIndex(n => n.id === noteId);
+  if (noteIndex > -1) {
+    const [restoredNote] = deletedNotes.splice(noteIndex, 1);
+    restoredNote.metadata.lastModified = Date.now();
+    delete restoredNote.metadata.deletedAt;
+    notes.push(restoredNote);
+    sortNotes();
+    saveNotes();
+    saveDeletedNotes();
+    renderDeletedNoteList();
+  }
+}
+
+function deleteNotePermanently(noteId) {
+  deletedNotes = deletedNotes.filter(n => n.id !== noteId);
+  saveDeletedNotes();
+  renderDeletedNoteList();
 }
 
 function renderMarkdown() {
