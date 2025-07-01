@@ -286,6 +286,7 @@ editorTitle.addEventListener('dblclick', () => {
           e.preventDefault();
           finishEditing();
         } else if (e.key === 'Escape') {
+          e.stopPropagation();
           if (editingFinished) return;
           editingFinished = true;
           input.replaceWith(editorTitle);
