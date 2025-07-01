@@ -346,6 +346,21 @@ titleSetting.addEventListener('change', () => {
   }
 });
 
+function getTimestamp() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  return `${year}_${month}_${day}_${hours}_${minutes}_${seconds}`;
+}
+
+function sanitizeFilename(filename) {
+  return filename.replace(/[\/\\?%*:|"<>]/g, '_');
+}
+
 function downloadFile(content, fileName) {
   const a = document.createElement('a');
   const file = new Blob([content], { type: 'text/plain' });
@@ -357,14 +372,16 @@ function downloadFile(content, fileName) {
 
 globalExportButton.addEventListener('click', () => {
   const data = JSON.stringify(notes, null, 2);
-  downloadFile(data, 'notes.snotes');
+  const timestamp = getTimestamp();
+  downloadFile(data, `notes_${timestamp}.snotes`);
 });
 
 exportNoteButton.addEventListener('click', () => {
   const note = notes.find(n => n.id === activeNoteId);
   if (note) {
     const data = JSON.stringify(note, null, 2);
-    downloadFile(data, `${note.title}.snote`);
+    const sanitizedTitle = sanitizeFilename(note.title);
+    downloadFile(data, `${sanitizedTitle}.snote`);
   }
 });
 
