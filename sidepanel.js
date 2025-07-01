@@ -101,7 +101,14 @@ chrome.storage.local.get(['notes', 'deletedNotes', 'globalSettings'], (data) => 
   }
   sortNotes();
   renderNoteList();
+  cleanupDeletedNotes();
 });
+
+function cleanupDeletedNotes() {
+  const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  deletedNotes = deletedNotes.filter(note => note.metadata.deletedAt > thirtyDaysAgo);
+  saveDeletedNotes();
+}
 
 function sortNotes() {
   notes.sort((a, b) => b.metadata.lastModified - a.metadata.lastModified);
