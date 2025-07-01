@@ -145,5 +145,9 @@ button:hover {
 }
 
 .title-input {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   text-align: center;
+  width: 60%;
 }
