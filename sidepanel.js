@@ -240,6 +240,8 @@ function renderDeletedNoteList() {
     const titleSpan = document.createElement('span');
     titleSpan.textContent = note.title;
 
+    const buttonContainer = document.createElement('div');
+
     const restoreSpan = document.createElement('span');
     restoreSpan.textContent = '♻️';
     restoreSpan.title = 'Restore Note';
@@ -259,8 +261,9 @@ function renderDeletedNoteList() {
     });
 
     li.appendChild(titleSpan);
-    li.appendChild(restoreSpan);
-    li.appendChild(deleteSpan);
+    buttonContainer.appendChild(restoreSpan);
+    buttonContainer.appendChild(deleteSpan);
+    li.appendChild(buttonContainer);
     deletedNoteList.appendChild(li);
   });
 }
