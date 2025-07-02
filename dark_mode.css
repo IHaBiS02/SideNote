@@ -1,0 +1,69 @@
+
+body.dark-mode {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+.dark-mode .header {
+    background-color: #1e1e1e;
+    border-bottom: 1px solid #333;
+}
+
+.dark-mode h1 {
+    color: #e0e0e0;
+}
+
+.dark-mode #note-list li, .dark-mode #deleted-note-list li {
+    background-color: #1e1e1e;
+    border-bottom: 1px solid #333;
+}
+
+.dark-mode #note-list li:hover, .dark-mode #deleted-note-list li:hover {
+    background-color: #333;
+}
+
+.dark-mode .delete-note-icon:hover, .dark-mode .restore-note-icon:hover {
+    background-color: #444;
+}
+
+.dark-mode #markdown-editor, .dark-mode #html-preview {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+.dark-mode .toolbar {
+    background-color: #1e1e1e;
+    border-top: 1px solid #333;
+}
+
+.dark-mode button {
+    color: #e0e0e0;
+}
+
+.dark-mode button:hover {
+    background-color: #333;
+}
+
+.dark-mode #settings-view, .dark-mode #license-view, .dark-mode #recycle-bin-view {
+    background-color: #121212;
+}
+
+.dark-mode .setting label, .dark-mode #settings-title, .dark-mode #license-title, .dark-mode #recycle-bin-title {
+    color: #e0e0e0;
+}
+
+.dark-mode select, .dark-mode input[type="number"] {
+    background-color: #333;
+    color: #e0e0e0;
+    border: 1px solid #555;
+}
+
+.dark-mode pre code {
+    background-color: #2d2d2d;
+    border: 1px solid #444;
+}
+
+.dark-mode .hljs-ln-numbers {
+    color: #ccc;
+    border-right: 1px solid #444;
+}

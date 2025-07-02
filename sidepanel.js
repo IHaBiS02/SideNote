@@ -18,6 +18,7 @@ const licenseBackButton = document.getElementById('license-back-button');
 const licenseContent = document.getElementById('license-content');
 const titleSetting = document.getElementById('title-setting');
 const fontSizeSetting = document.getElementById('font-size-setting');
+const modeSetting = document.getElementById('mode-setting');
 const autoLineBreakButton = document.getElementById('auto-line-break-button');
 const tildeReplacementButton = document.getElementById('tilde-replacement-button');
 const globalExportButton = document.getElementById('global-export-button');
@@ -51,7 +52,8 @@ chrome.storage.local.get(['notes', 'deletedNotes', 'globalSettings'], (data) => 
       title: 'default',
       fontSize: 12,
       autoLineBreak: true,
-      tildeReplacement: true
+      tildeReplacement: true,
+      mode: 'system'
     };
   }
 
@@ -105,6 +107,7 @@ chrome.storage.local.get(['notes', 'deletedNotes', 'globalSettings'], (data) => 
   }
   sortNotes();
   renderNoteList();
+  applyMode(globalSettings.mode);
   cleanupDeletedNotes();
 });
 
@@ -496,11 +499,35 @@ editorTitle.addEventListener('dblclick', () => {
 
 let isGlobalSettings = false;
 
+  }
+});
+
+function applyMode(mode) {
+  if (mode === 'dark') {
+    document.body.classList.add('dark-mode');
+  } else if (mode === 'light') {
+    document.body.classList.remove('dark-mode');
+  } else {
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+  }
+}
+
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (globalSettings.mode === 'system') {
+        applyMode('system');
+    }
+});
+
 settingsButton.addEventListener('click', () => {
   isGlobalSettings = false;
   const note = notes.find(n => n.id === activeNoteId);
   titleSetting.value = note.settings.title || 'default';
   fontSizeSetting.value = note.settings.fontSize || globalSettings.fontSize || 12;
+  modeSetting.value = globalSettings.mode || 'system';
   showSettingsView();
 });
 
@@ -508,6 +535,7 @@ globalSettingsButton.addEventListener('click', () => {
   isGlobalSettings = true;
   titleSetting.value = globalSettings.title || 'default';
   fontSizeSetting.value = globalSettings.fontSize || 12;
+  modeSetting.value = globalSettings.mode || 'system';
   showSettingsView();
 });
 
@@ -537,6 +565,13 @@ recycleBinButton.addEventListener('click', () => {
 
 recycleBinBackButton.addEventListener('click', () => {
   showSettingsView();
+});
+
+modeSetting.addEventListener('change', () => {
+  const value = modeSetting.value;
+  globalSettings.mode = value;
+  saveGlobalSettings();
+  applyMode(value);
 });
 
 titleSetting.addEventListener('change', () => {
@@ -758,4 +793,5 @@ showListView();
 updateAutoLineBreakButton();
 updateTildeReplacementButton();
 applyFontSize(globalSettings.fontSize || 12);
+applyMode(globalSettings.mode || 'system');
 renderNoteList();

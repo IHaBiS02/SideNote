@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Simple Notes</title>
   <link rel="stylesheet" href="sidepanel.css">
+  <link rel="stylesheet" href="dark_mode.css">
   <link rel="stylesheet" href="vendor/atom-one-dark.min.css">
 </head>
 <body>
@@ -51,6 +52,14 @@
       <h1 id="settings-title">Settings</h1>
     </div>
     <div id="settings-container">
+      <div class="setting">
+        <label for="mode-setting">Mode</label>
+        <select id="mode-setting">
+          <option value="system">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
       <div class="setting">
         <label for="title-setting">Title</label>
         <select id="title-setting">
