@@ -772,6 +772,8 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     if (recycleBinView.style.display === 'block') {
       recycleBinBackButton.click();
+    } else if (licenseView.style.display === 'block') {
+      licenseBackButton.click();
     } else if (settingsView.style.display === 'block') {
       settingsBackButton.click();
     } else if (editorView.style.display === 'block') {
