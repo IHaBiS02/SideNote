@@ -19,6 +19,7 @@ const licenseContent = document.getElementById('license-content');
 const titleSetting = document.getElementById('title-setting');
 const fontSizeSetting = document.getElementById('font-size-setting');
 const autoLineBreakButton = document.getElementById('auto-line-break-button');
+const tildeReplacementButton = document.getElementById('tilde-replacement-button');
 const globalExportButton = document.getElementById('global-export-button');
 const globalImportButton = document.getElementById('global-import-button');
 const globalImportInput = document.getElementById('global-import-input');
@@ -49,7 +50,8 @@ chrome.storage.local.get(['notes', 'deletedNotes', 'globalSettings'], (data) => 
     globalSettings = {
       title: 'default',
       fontSize: 12,
-      autoLineBreak: true
+      autoLineBreak: true,
+      tildeReplacement: true
     };
   }
 
@@ -183,6 +185,7 @@ function openNote(noteId, inEditMode = false) {
     const fontSize = note.settings.fontSize || globalSettings.fontSize || 12;
     applyFontSize(fontSize);
     updateAutoLineBreakButton();
+    updateTildeReplacementButton();
     renderMarkdown();
     showEditorView();
     isPreview = !inEditMode;
@@ -378,35 +381,41 @@ markdownEditor.addEventListener('input', () => {
 });
 
 markdownEditor.addEventListener('paste', (e) => {
+  e.preventDefault();
+  let text = e.clipboardData.getData('text/plain');
+
+  if (globalSettings.tildeReplacement) {
+    text = text.replace(/~/g, '\\~');
+  }
+
   if (globalSettings.autoLineBreak) {
-    e.preventDefault();
-    const text = e.clipboardData.getData('text/plain');
     const processedText = text.split('\n').map(line => {
       return line.trim().length > 0 ? line + '  ' : line;
     }).join('\n');
-    
-    const start = markdownEditor.selectionStart;
-    const end = markdownEditor.selectionEnd;
-    
-    markdownEditor.value = markdownEditor.value.substring(0, start) + processedText + markdownEditor.value.substring(end);
-    
-    markdownEditor.selectionStart = markdownEditor.selectionEnd = start + processedText.length;
+    text = processedText;
+  }
 
-    const note = notes.find(n => n.id === activeNoteId);
-    if (note) {
-      note.content = markdownEditor.value;
-      note.metadata.lastModified = Date.now();
-      const titleSource = note.settings.title || globalSettings.title;
-      if (titleSource === 'default') {
-        const firstLine = note.content.trim().split('\n')[0];
-        note.title = firstLine.substring(0, 30) || 'New Note';
-        editorTitle.textContent = note.title;
-      }
-      sortNotes();
-      saveNotes();
-      renderMarkdown();
-      renderNoteList();
+  const start = markdownEditor.selectionStart;
+  const end = markdownEditor.selectionEnd;
+  
+  markdownEditor.value = markdownEditor.value.substring(0, start) + text + markdownEditor.value.substring(end);
+  
+  markdownEditor.selectionStart = markdownEditor.selectionEnd = start + text.length;
+
+  const note = notes.find(n => n.id === activeNoteId);
+  if (note) {
+    note.content = markdownEditor.value;
+    note.metadata.lastModified = Date.now();
+    const titleSource = note.settings.title || globalSettings.title;
+    if (titleSource === 'default') {
+      const firstLine = note.content.trim().split('\n')[0];
+      note.title = firstLine.substring(0, 30) || 'New Note';
+      editorTitle.textContent = note.title;
     }
+    sortNotes();
+    saveNotes();
+    renderMarkdown();
+    renderNoteList();
   }
 });
 
@@ -583,6 +592,17 @@ autoLineBreakButton.addEventListener('click', () => {
   saveGlobalSettings();
 });
 
+function updateTildeReplacementButton() {
+  tildeReplacementButton.textContent = globalSettings.tildeReplacement ? '~✅' : '~❌';
+  tildeReplacementButton.title = globalSettings.tildeReplacement ? 'Tilde Replacement Enabled' : 'Tilde Replacement Disabled';
+}
+
+tildeReplacementButton.addEventListener('click', () => {
+  globalSettings.tildeReplacement = !globalSettings.tildeReplacement;
+  updateTildeReplacementButton();
+  saveGlobalSettings();
+});
+
 function getTimestamp() {
   const now = new Date();
   const year = now.getFullYear();
@@ -717,3 +737,9 @@ document.addEventListener('keydown', (e) => {
 });
 
 showListView();
+
+// Initial setup
+updateAutoLineBreakButton();
+updateTildeReplacementButton();
+applyFontSize(globalSettings.fontSize || 12);
+renderNoteList();
