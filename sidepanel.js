@@ -499,9 +499,6 @@ editorTitle.addEventListener('dblclick', () => {
 
 let isGlobalSettings = false;
 
-  }
-});
-
 function applyMode(mode) {
   if (mode === 'dark') {
     document.body.classList.add('dark-mode');
