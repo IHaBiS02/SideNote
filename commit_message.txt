@@ -1,0 +1,1 @@
+feat: allow importing single notes and restrict file types

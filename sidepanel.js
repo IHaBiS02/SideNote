@@ -659,28 +659,44 @@ globalImportInput.addEventListener('change', (e) => {
   reader.onload = (event) => {
     const content = event.target.result;
     try {
-      let importedNotes = JSON.parse(content);
-      if (Array.isArray(importedNotes)) {
+      const importedData = JSON.parse(content);
+      if (file.name.endsWith('.snote')) {
         const now = Date.now();
-        
-        importedNotes = importedNotes.map(note => ({
-          ...note,
-          metadata: note.metadata || { createdAt: now, lastModified: now }
-        })).sort((a, b) => a.metadata.lastModified - b.metadata.lastModified);
-
-        const newNotes = importedNotes.map((note, index) => ({
-          ...note,
+        const newNote = {
+          ...importedData,
           id: crypto.randomUUID(),
           metadata: {
-            createdAt: note.metadata.createdAt || now,
-            lastModified: now + index
+            createdAt: importedData.metadata?.createdAt || now,
+            lastModified: now
           }
-        }));
-
-        notes.push(...newNotes);
+        };
+        notes.push(newNote);
         sortNotes();
         saveNotes();
         renderNoteList();
+      } else if (file.name.endsWith('.snotes')) {
+        if (Array.isArray(importedData)) {
+          const now = Date.now();
+          
+          const importedNotes = importedData.map(note => ({
+            ...note,
+            metadata: note.metadata || { createdAt: now, lastModified: now }
+          })).sort((a, b) => a.metadata.lastModified - b.metadata.lastModified);
+
+          const newNotes = importedNotes.map((note, index) => ({
+            ...note,
+            id: crypto.randomUUID(),
+            metadata: {
+              createdAt: note.metadata.createdAt || now,
+              lastModified: now + index
+            }
+          }));
+
+          notes.push(...newNotes);
+          sortNotes();
+          saveNotes();
+          renderNoteList();
+        }
       }
     } catch (error) {
       console.error('Error parsing JSON file:', error);
