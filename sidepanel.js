@@ -520,7 +520,7 @@ settingsBackButton.addEventListener('click', () => {
 });
 
 licensesButton.addEventListener('click', async () => {
-  const response = await fetch('LICENSES.md');
+  const response = await fetch('LIBRARY_LICENSES.md');
   const text = await response.text();
   const dirtyHtml = marked.parse(text);
   licenseContent.innerHTML = DOMPurify.sanitize(dirtyHtml);
