@@ -317,14 +317,15 @@ function deleteNotePermanently(noteId) {
 
 function renderMarkdown() {
   const renderer = new marked.Renderer();
-  renderer.listitem = function(text) {
-    if (/^\s*\[[x ]\]\s*/.test(text)) {
+  renderer.listitem = function(text, task, checked) {
+    if (task) {
       return '<li class="task-list-item">' + text + '</li>';
     }
     return '<li>' + text + '</li>';
   };
 
   marked.setOptions({
+    gfm: true,
     renderer: renderer,
     highlight: function(code, lang) {
       const language = hljs.getLanguage(lang) ? lang : 'plaintext';

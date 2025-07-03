@@ -1,1 +1,1 @@
-feat: apply list-style-type none to checkbox lists
+fix: correctly apply list-style-type none to checkbox lists

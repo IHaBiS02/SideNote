@@ -348,6 +348,6 @@ ul, ol {
   padding-left: 20px;
 }
 
-ul .task-list-item, ol .task-list-item {
+li.task-list-item {
   list-style-type: none;
 }
