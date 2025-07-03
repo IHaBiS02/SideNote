@@ -17,7 +17,11 @@ body {
   justify-content: flex-start;
 }
 
-h1 {
+#notes-list-title,
+#editor-title,
+#settings-title,
+#license-title,
+#recycle-bin-title {
   margin: 0;
   font-size: 18px;
 }

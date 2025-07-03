@@ -1,7 +1,6 @@
-feat: Differentiate styling for single and multi-line code blocks
+refactor: Unify title styling and enhance dark mode
 
-This commit introduces separate styling for single-line and multi-line code blocks to improve readability.
+This commit refactors the CSS for view titles to use specific IDs instead of a generic h1 selector, improving style encapsulation and preventing conflicts.
 
-- Adds logic to `sidepanel.js` to detect single-line and multi-line code blocks and apply corresponding classes.
-- Adjusts padding in `sidepanel.css` for `.single-line-code` and `.multi-line-code`.
-- Refactors blockquote and list styling for better consistency.
+- Replaced the h1 selector with IDs (#notes-list-title, #editor-title, etc.) for precise styling.
+- Added a dark mode style for checkboxes to ensure they match the theme's aesthetic.

@@ -125,3 +125,7 @@ body.dark-mode {
   padding-left: 10px;
   margin-left: 0;
 }
+
+.dark-mode input[type="checkbox"] {
+  accent-color: #555;
+}
