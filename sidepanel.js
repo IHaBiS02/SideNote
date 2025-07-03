@@ -316,7 +316,16 @@ function deleteNotePermanently(noteId) {
 }
 
 function renderMarkdown() {
+  const renderer = new marked.Renderer();
+  renderer.listitem = function(text) {
+    if (/^\s*\[[x ]\]\s*/.test(text)) {
+      return '<li class="task-list-item">' + text + '</li>';
+    }
+    return '<li>' + text + '</li>';
+  };
+
   marked.setOptions({
+    renderer: renderer,
     highlight: function(code, lang) {
       const language = hljs.getLanguage(lang) ? lang : 'plaintext';
       return hljs.highlight(code, { language }).value;
