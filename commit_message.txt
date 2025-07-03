@@ -1,1 +1,7 @@
-feat: change checkbox color to grey
+feat: Differentiate styling for single and multi-line code blocks
+
+This commit introduces separate styling for single-line and multi-line code blocks to improve readability.
+
+- Adds logic to `sidepanel.js` to detect single-line and multi-line code blocks and apply corresponding classes.
+- Adjusts padding in `sidepanel.css` for `.single-line-code` and `.multi-line-code`.
+- Refactors blockquote and list styling for better consistency.

@@ -342,6 +342,17 @@ function renderMarkdown() {
     ADD_ATTR: ['class']
   });
   htmlPreview.querySelectorAll('pre code').forEach((block) => {
+    // block(<code>)의 텍스트 컨텐츠를 가져와 줄바꿈(\n)으로 분리하여 줄 수를 계산합니다.
+    const lineCount = block.textContent.split('\n').length;
+    console.log(lineCount);
+    // 줄 수에 따라 부모 요소인 <pre> 태그에 클래스를 추가합니다.
+    if (lineCount === 2) {
+      block.parentElement.classList.add('single-line-code');
+    } else {
+      block.parentElement.classList.add('multi-line-code');
+    }
+
+    // 기존 라인 넘버 기능은 그대로 호출합니다.
     hljs.lineNumbersBlock(block);
   });
 }

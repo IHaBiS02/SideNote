@@ -118,3 +118,10 @@ body.dark-mode {
 .dark-mode a:active {
   color: #ffffff; /* 클릭 시 흰색으로 강조 */
 }
+
+/* 인용구 스타일 */
+.dark-mode blockquote {
+  border-left: 4px solid #444;
+  padding-left: 10px;
+  margin-left: 0;
+}
