@@ -334,6 +334,7 @@ blockquote {
 /* 체크박스 스타일 */
 input[type="checkbox"] {
   margin-right: 5px;
+  accent-color: grey;
 }
 
 /* 인용구 스타일 */

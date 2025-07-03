@@ -1,1 +1,1 @@
-feat: make checkboxes in markdown preview clickable
+feat: change checkbox color to grey
