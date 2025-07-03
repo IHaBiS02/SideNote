@@ -1,6 +1,0 @@
-refactor: Unify title styling and enhance dark mode
-
-This commit refactors the CSS for view titles to use specific IDs instead of a generic h1 selector, improving style encapsulation and preventing conflicts.
-
-- Replaced the h1 selector with IDs (#notes-list-title, #editor-title, etc.) for precise styling.
-- Added a dark mode style for checkboxes to ensure they match the theme's aesthetic.
