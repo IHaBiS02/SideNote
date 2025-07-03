@@ -323,6 +323,9 @@ function renderMarkdown() {
     }
     return '<li>' + text + '</li>';
   };
+  renderer.checkbox = function(checked) {
+    return `<input type="checkbox" ${checked ? 'checked' : ''}>`;
+  };
 
   marked.setOptions({
     gfm: true,
@@ -457,6 +460,45 @@ markdownEditor.addEventListener('keydown', (e) => {
 });
 
 htmlPreview.addEventListener('dblclick', togglePreview);
+
+htmlPreview.addEventListener('click', (e) => {
+  if (e.target.tagName === 'INPUT' && e.target.type === 'checkbox') {
+    const checkboxes = Array.from(htmlPreview.querySelectorAll('input[type="checkbox"]'));
+    const checkboxIndex = checkboxes.indexOf(e.target);
+
+    const markdown = markdownEditor.value;
+    const regex = /\[[x ]\]/g;
+    let match;
+    const matches = [];
+    while ((match = regex.exec(markdown)) !== null) {
+      matches.push(match);
+    }
+
+    if (checkboxIndex < matches.length) {
+      const matchToUpdate = matches[checkboxIndex];
+      const charIndex = matchToUpdate.index;
+      const originalText = matchToUpdate[0];
+      const newText = originalText === '[ ]' ? '[x]' : '[ ]';
+
+      const newMarkdown = markdown.substring(0, charIndex) +
+                          newText +
+                          markdown.substring(charIndex + 3);
+
+      markdownEditor.value = newMarkdown;
+
+      // Trigger update and save
+      const note = notes.find(n => n.id === activeNoteId);
+      if (note) {
+        note.content = markdownEditor.value;
+        note.metadata.lastModified = Date.now();
+        sortNotes();
+        saveNotes();
+        renderMarkdown(); // Re-render to show the change immediately
+        renderNoteList(); // Update note list if title changes
+      }
+    }
+  }
+});
 
 editorTitle.addEventListener('dblclick', () => {
   const note = notes.find(n => n.id === activeNoteId);

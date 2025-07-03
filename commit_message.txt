@@ -1,1 +1,1 @@
-fix: correctly apply list-style-type none to checkbox lists
+feat: make checkboxes in markdown preview clickable
