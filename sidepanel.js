@@ -471,17 +471,22 @@ async function renderDeletedItemsList() {
       }
       itemInfo.appendChild(img);
 
+      const textContainer = document.createElement('div');
+      textContainer.classList.add('text-container');
+
       const imageName = document.createElement('span');
       imageName.classList.add('image-name');
       imageName.textContent = `image_${item.id.substring(0, 8)}.png`;
-      itemInfo.appendChild(imageName);
-    }
+      textContainer.appendChild(imageName);
 
-    const deletionDate = new Date(item.deletedAt + 30 * 24 * 60 * 60 * 1000);
-    const deletionDateSpan = document.createElement('span');
-    deletionDateSpan.textContent = `Deletes on: ${deletionDate.toLocaleString()}`;
-    deletionDateSpan.classList.add('deletion-date');
-    itemInfo.appendChild(deletionDateSpan);
+      const deletionDate = new Date(item.deletedAt + 30 * 24 * 60 * 60 * 1000);
+      const deletionDateSpan = document.createElement('span');
+      deletionDateSpan.textContent = `Deletes on: ${deletionDate.toLocaleString()}`;
+      deletionDateSpan.classList.add('deletion-date');
+      textContainer.appendChild(deletionDateSpan);
+
+      itemInfo.appendChild(textContainer);
+    }
 
     const buttonContainer = document.createElement('div');
     buttonContainer.classList.add('button-container');

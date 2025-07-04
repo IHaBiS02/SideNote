@@ -70,6 +70,11 @@ body {
   object-fit: cover;
 }
 
+.image-info .text-container {
+  display: flex;
+  flex-direction: column;
+}
+
 .image-info .image-name, .note-info .deletion-date, .image-info .deletion-date {
   font-size: 0.8em;
   color: #888;
