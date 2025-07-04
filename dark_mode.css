@@ -56,6 +56,11 @@ body.dark-mode {
   background-color: #333;
 }
 
+.dark-mode #image-management-button,
+.dark-mode #image-recycle-bin-button {
+  background-color: #333;
+}
+
 .dark-mode button:hover {
     background-color: #333;
 }

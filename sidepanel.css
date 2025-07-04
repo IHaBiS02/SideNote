@@ -284,6 +284,11 @@ button:hover {
   background-color: #f0f0f0;
 }
 
+#image-management-button,
+#image-recycle-bin-button {
+  background-color: #f0f0f0;
+}
+
 #settings-button,
 #global-settings-button {
   margin-right: 10px;
