@@ -106,7 +106,7 @@ function saveImage(id, blob) {
     }
     const transaction = db.transaction(['images'], 'readwrite');
     const store = transaction.objectStore('images');
-    const request = store.put({ id: id, blob: blob });
+    const request = store.put({ id: id, blob: blob, deletedAt: null });
 
     request.onsuccess = () => {
       resolve();
