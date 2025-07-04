@@ -48,7 +48,26 @@ This file requires the most significant changes. I will break down the implement
     *   **Action:** The import functions (`globalImportInput`, `importNoteInput`) will also be replaced.
     *   **Change:** The new logic will use `JSZip` to read the uploaded `.snote` or `.snotes` file. It will parse the `metadata.json`, read the `note.md` content, and, crucially, extract any images from the `images/` folder and save them into the browser's `IndexedDB` using the `saveImage` function.
 
-#### 3. **File Updates**
+#### 3. **Image Management UI (New Feature)**
+*   **File to Modify:** `sidepanel.html`
+    *   **Action:** Add a new button labeled "Images" to the settings view (`id="settings-view"`). This button will be styled similarly to the existing settings buttons.
+    *   **Action:** Create a new view container (`id="image-management-view"`) that will be shown when the "Images" button is clicked. This view will be hidden by default.
+
+*   **File to Modify:** `sidepanel.js`
+    *   **Action:** Implement the logic to show the `image-management-view` and hide other views when the "Images" button is clicked.
+    *   **Action:** Create a function to populate the `image-management-view` with a list of all images stored in `IndexedDB`.
+    *   **UI Layout:** The layout will be similar to the "Recycle Bin" and "Notes List" views. Each image entry will display:
+        *   A small thumbnail of the image on the left.
+        *   The image's name (e.g., `image_12345.png`) next to the thumbnail.
+        *   An icon indicating whether the image is currently used in any note.
+        *   A trashcan icon for deletion.
+    *   **New Functions & Event Handlers:**
+        *   `renderImagesList()`: Fetches all images from `IndexedDB` and dynamically creates the list items in the `image-management-view`.
+        *   **Thumbnail Click:** An event listener on the thumbnail will open a modal or popup to display a larger version of the image.
+        *   **Usage Icon Click:** An event listener on the usage icon will display a list of notes that currently use the selected image.
+        *   **Deletion Button Click:** An event listener on the trashcan icon will call the `deleteImage(id)` function and remove the image from both `IndexedDB` and the view. This will reuse existing deletion logic/UI patterns.
+
+#### 4. **File Updates**
 
 *   **`manifest.json`**: I will increment the version number to reflect these significant changes.
 *   **`STRUCTURE.md`**: After implementation, I will update this document to describe the new `.snote`/`.snotes` file structure and the use of `IndexedDB` for image storage.
