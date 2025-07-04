@@ -1,5 +1,0 @@
-fix: Ensure images fit within the note preview
-
-Adds a CSS rule to make images responsive in the HTML preview.
-
-Images wider than the preview area will now scale down to fit, preventing horizontal scrollbars and improving the viewing experience.
