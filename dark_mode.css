@@ -17,11 +17,15 @@ body.dark-mode {
     border-bottom: 1px solid #333;
 }
 
-.dark-mode #note-list li:hover, .dark-mode #deleted-item-list li:hover, .dark-mode #image-list li:hover {
+.dark-mode #note-list li:hover, .dark-mode #deleted-items-list li:hover, .dark-mode #image-list li:hover {
     background-color: #333;
 }
 
-.dark-mode .delete-item-icon:hover, .dark-mode .restore-item-icon:hover {
+.dark-mode .delete-note-icon:hover, .dark-mode .restore-note-icon:hover {
+    background-color: #444;
+}
+
+.dark-mode .delete-item-icon:hover, .dark-mode .restore-teim-icon:hover {
     background-color: #444;
 }
 
