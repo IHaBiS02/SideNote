@@ -127,6 +127,10 @@ body {
   display: none;
 }
 
+#html-preview > *:first-child {
+  margin-top: 0;
+}
+
 .toolbar {
   display: flex;
   justify-content: space-between;
@@ -349,7 +353,7 @@ input[type="checkbox"] {
 
 /* 리스트 스타일 */
 ul, ol {
-  padding-left: 10px;
+  padding-left: 15px;
 }
 
 li.task-list-item {
