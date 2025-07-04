@@ -781,7 +781,7 @@ htmlPreview.addEventListener('click', (e) => {
     modal.style.backgroundColor = 'rgba(0,0,0,0.8)';
     modal.style.display = 'flex';
     modal.style.boxSizing = 'border-box';
-    modal.style.padding = '10px';
+    modal.style.padding = '10%';
     modal.style.zIndex = '1000';
     modal.onclick = (event) => {
         if (event.target === modal) {
