@@ -1,7 +1,9 @@
-feat: Add JSZip dependency and license
+feat: Implement IndexedDB for image storage
 
-Adds the JSZip library to the project to support creating and reading .zip archives for the new .snote and .snotes formats.
+Adds the core functionality for storing images in IndexedDB. This includes:
+- `initDB()`: To set up the database and the "images" object store.
+- `saveImage(id, blob)`: To save an image.
+- `getImage(id)`: To retrieve an image.
+- `deleteImage(id)`: To remove an image.
 
-- Downloads `jszip.min.js` and places it in the `vendor/` directory.
-- Adds the script tag to `sidepanel.html`.
-- Updates `LIBRARY_LICENSES.md` with the MIT license for JSZip.
+This is the first step towards implementing image support in notes.

@@ -40,6 +40,103 @@ let isPreview = false;
 let globalSettings = {};
 let originalNoteContent = '';
 
+// =================================================================
+// IndexedDB for Image Storage
+// =================================================================
+
+let db;
+
+function initDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('SimpleNotesDB', 1);
+
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains('images')) {
+        db.createObjectStore('images', { keyPath: 'id' });
+      }
+    };
+
+    request.onsuccess = (event) => {
+      db = event.target.result;
+      console.log('Database initialized');
+      resolve(db);
+    };
+
+    request.onerror = (event) => {
+      console.error('Database error:', event.target.errorCode);
+      reject(event.target.error);
+    };
+  });
+}
+
+function saveImage(id, blob) {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject('DB not initialized');
+      return;
+    }
+    const transaction = db.transaction(['images'], 'readwrite');
+    const store = transaction.objectStore('images');
+    const request = store.put({ id: id, blob: blob });
+
+    request.onsuccess = () => {
+      resolve();
+    };
+
+    request.onerror = (event) => {
+      reject(event.target.error);
+    };
+  });
+}
+
+function getImage(id) {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject('DB not initialized');
+      return;
+    }
+    const transaction = db.transaction(['images'], 'readonly');
+    const store = transaction.objectStore('images');
+    const request = store.get(id);
+
+    request.onsuccess = (event) => {
+      if (event.target.result) {
+        resolve(event.target.result.blob);
+      } else {
+        resolve(null); // Or reject('Image not found')
+      }
+    };
+
+    request.onerror = (event) => {
+      reject(event.target.error);
+    };
+  });
+}
+
+function deleteImage(id) {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject('DB not initialized');
+      return;
+    }
+    const transaction = db.transaction(['images'], 'readwrite');
+    const store = transaction.objectStore('images');
+    const request = store.delete(id);
+
+    request.onsuccess = () => {
+      resolve();
+    };
+
+    request.onerror = (event) => {
+      reject(event.target.error);
+    };
+  });
+}
+
+// Initialize the database when the script loads
+initDB().catch(err => console.error("Failed to initialize DB:", err));
+
 // Load notes and settings from storage
 chrome.storage.local.get(['notes', 'deletedNotes', 'globalSettings'], (data) => {
   const loadedNotes = data.notes;
