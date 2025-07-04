@@ -782,12 +782,76 @@ htmlPreview.addEventListener('click', (e) => {
     modal.style.display = 'flex';
     modal.style.justifyContent = 'center';
     modal.style.alignItems = 'center';
-    modal.onclick = () => document.body.removeChild(modal);
+    modal.style.zIndex = '1000';
+    modal.onclick = (event) => {
+        if (event.target === modal) {
+            document.body.removeChild(modal);
+        }
+    };
 
     const modalImg = document.createElement('img');
     modalImg.src = e.target.src;
-    modalImg.style.maxWidth = '90%';
-    modalImg.style.maxHeight = '90%';
+    
+    let zoomState = 0;
+    const setZoomState = (state) => {
+        modal.style.overflow = 'hidden';
+        modalImg.style.cursor = 'zoom-in';
+        modalImg.style.maxWidth = '90%';
+        modalImg.style.maxHeight = '90%';
+        modalImg.style.width = 'auto';
+        modalImg.style.height = 'auto';
+
+        if (state === 1) { // Enlarged and Draggable
+            modal.style.overflow = 'auto';
+            modalImg.style.cursor = 'grab';
+            modalImg.style.maxWidth = 'none';
+            modalImg.style.maxHeight = 'none';
+        } else if (state === 2) { // Height-Fixed
+            modalImg.style.cursor = 'zoom-out';
+            modalImg.style.maxWidth = 'none';
+            modalImg.style.maxHeight = '100%';
+            modalImg.style.height = '100%';
+        }
+    };
+
+    setZoomState(zoomState);
+    
+    modalImg.onclick = () => {
+        zoomState = (zoomState + 1) % 3;
+        setZoomState(zoomState);
+    };
+
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    modal.addEventListener('mousedown', (e) => {
+        if (zoomState !== 1) return;
+        isDown = true;
+        modalImg.style.cursor = 'grabbing';
+        startX = e.pageX - modal.offsetLeft;
+        scrollLeft = modal.scrollLeft;
+    });
+
+    modal.addEventListener('mouseleave', () => {
+        if (zoomState !== 1) return;
+        isDown = false;
+        modalImg.style.cursor = 'grab';
+    });
+
+    modal.addEventListener('mouseup', () => {
+        if (zoomState !== 1) return;
+        isDown = false;
+        modalImg.style.cursor = 'grab';
+    });
+
+    modal.addEventListener('mousemove', (e) => {
+        if (!isDown || zoomState !== 1) return;
+        e.preventDefault();
+        const x = e.pageX - modal.offsetLeft;
+        const walk = (x - startX) * 2;
+        modal.scrollLeft = scrollLeft - walk;
+    });
 
     modal.appendChild(modalImg);
     document.body.appendChild(modal);
