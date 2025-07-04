@@ -377,6 +377,7 @@ pre.single-line-code code {
 /* 전체 스크롤바의 영역 */
 ::-webkit-scrollbar {
   width: 10px; /* 스크롤바의 너비 */
+  height: 10px; /* 스크롤바의 높이 */
 }
 
 /* 스크롤바의 배경 (트랙) */

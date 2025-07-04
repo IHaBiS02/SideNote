@@ -13,7 +13,7 @@ body.dark-mode {
     color: #e0e0e0;
 }
 
-.dark-mode #note-list li, .dark-mode #deleted-note-list li {
+.dark-mode #note-list li, .dark-mode #deleted-note-list li, .dark-mode #image-list li, .dark-mode #deleted-image-list li {
     background-color: #1e1e1e;
     border-bottom: 1px solid #333;
 }
@@ -92,6 +92,7 @@ body.dark-mode {
 /* 전체 스크롤바의 영역 */
 .dark-mode ::-webkit-scrollbar {
   width: 10px; /* 스크롤바의 너비 */
+  height: 10px; /* 스크롤바의 높이 */
 }
 
 /* 스크롤바의 배경 (트랙) */
