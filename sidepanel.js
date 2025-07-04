@@ -36,6 +36,10 @@ const imageManagementButton = document.getElementById('image-management-button')
 const imageManagementView = document.getElementById('image-management-view');
 const imageManagementBackButton = document.getElementById('image-management-back-button');
 const imageList = document.getElementById('image-list');
+const imageRecycleBinButton = document.getElementById('image-recycle-bin-button');
+const imageRecycleBinView = document.getElementById('image-recycle-bin-view');
+const imageRecycleBinBackButton = document.getElementById('image-recycle-bin-back-button');
+const deletedImageList = document.getElementById('deleted-image-list');
 
 let notes = [];
 let deletedNotes = [];
@@ -195,7 +199,10 @@ function deleteImagePermanently(id) {
 }
 
 // Initialize the database when the script loads
-initDB().catch(err => console.error("Failed to initialize DB:", err));
+initDB().then(() => {
+  cleanupDeletedNotes();
+  cleanupDeletedImages();
+}).catch(err => console.error("Failed to initialize DB:", err));
 
 // Load notes and settings from storage
 chrome.storage.local.get(['notes', 'deletedNotes', 'globalSettings'], (data) => {
@@ -269,6 +276,15 @@ chrome.storage.local.get(['notes', 'deletedNotes', 'globalSettings'], (data) => 
   applyMode(globalSettings.mode);
   cleanupDeletedNotes();
 });
+
+async function cleanupDeletedImages() {
+    const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    const imageObjects = await getAllImageObjectsFromDB();
+    const imagesToDelete = imageObjects.filter(img => img.deletedAt && img.deletedAt < thirtyDaysAgo);
+    for (const image of imagesToDelete) {
+        await deleteImagePermanently(image.id);
+    }
+}
 
 function cleanupDeletedNotes() {
   const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
@@ -371,6 +387,7 @@ function showListView() {
   settingsView.style.display = 'none';
   recycleBinView.style.display = 'none';
   imageManagementView.style.display = 'none';
+  imageRecycleBinView.style.display = 'none';
   renderNoteList();
 }
 
@@ -380,6 +397,7 @@ function showEditorView() {
   settingsView.style.display = 'none';
   recycleBinView.style.display = 'none';
   imageManagementView.style.display = 'none';
+  imageRecycleBinView.style.display = 'none';
 }
 
 function showSettingsView() {
@@ -389,6 +407,7 @@ function showSettingsView() {
   licenseView.style.display = 'none';
   recycleBinView.style.display = 'none';
   imageManagementView.style.display = 'none';
+  imageRecycleBinView.style.display = 'none';
 }
 
 function showLicenseView() {
@@ -398,6 +417,7 @@ function showLicenseView() {
   licenseView.style.display = 'block';
   recycleBinView.style.display = 'none';
   imageManagementView.style.display = 'none';
+  imageRecycleBinView.style.display = 'none';
 }
 
 function showRecycleBinView() {
@@ -407,6 +427,7 @@ function showRecycleBinView() {
   licenseView.style.display = 'none';
   recycleBinView.style.display = 'block';
   imageManagementView.style.display = 'none';
+  imageRecycleBinView.style.display = 'none';
   renderDeletedNoteList();
 }
 
@@ -417,7 +438,19 @@ function showImageManagementView() {
   licenseView.style.display = 'none';
   recycleBinView.style.display = 'none';
   imageManagementView.style.display = 'block';
+  imageRecycleBinView.style.display = 'none';
   renderImagesList();
+}
+
+function showImageRecycleBinView() {
+    listView.style.display = 'none';
+    editorView.style.display = 'none';
+    settingsView.style.display = 'none';
+    licenseView.style.display = 'none';
+    recycleBinView.style.display = 'none';
+    imageManagementView.style.display = 'none';
+    imageRecycleBinView.style.display = 'block';
+    renderDeletedImageList();
 }
 
 function renderDeletedNoteList() {
@@ -867,6 +900,14 @@ imageManagementBackButton.addEventListener('click', () => {
   showSettingsView();
 });
 
+imageRecycleBinButton.addEventListener('click', () => {
+    showImageRecycleBinView();
+});
+
+imageRecycleBinBackButton.addEventListener('click', () => {
+    showImageManagementView();
+});
+
 modeSetting.addEventListener('change', () => {
   const value = modeSetting.value;
   globalSettings.mode = value;
@@ -1155,7 +1196,9 @@ importNoteInput.addEventListener('change', async (e) => {
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
-    if (imageManagementView.style.display === 'block') {
+    if (imageRecycleBinView.style.display === 'block') {
+        imageRecycleBinBackButton.click();
+    } else if (imageManagementView.style.display === 'block') {
       imageManagementBackButton.click();
     } else if (recycleBinView.style.display === 'block') {
       recycleBinBackButton.click();
@@ -1313,6 +1356,84 @@ async function renderImagesList() {
     console.error('Failed to render image list:', err);
     imageList.innerHTML = '<li>Error loading images. See console for details.</li>';
   }
+}
+
+async function renderDeletedImageList() {
+    deletedImageList.innerHTML = '';
+    try {
+        const imageObjects = await getAllImageObjectsFromDB();
+        const deletedImages = imageObjects.filter(img => img.deletedAt);
+        deletedImages.sort((a, b) => b.deletedAt - a.deletedAt);
+
+        for (const imageObject of deletedImages) {
+            const imageId = imageObject.id;
+            const li = document.createElement('li');
+            li.dataset.imageId = imageId;
+
+            const imageInfo = document.createElement('div');
+            imageInfo.classList.add('image-info');
+
+            const img = document.createElement('img');
+            const imageBlob = imageObject.blob;
+            if (imageBlob) {
+                const blobUrl = URL.createObjectURL(imageBlob);
+                img.src = blobUrl;
+            }
+            imageInfo.appendChild(img);
+
+            const imageName = document.createElement('span');
+            imageName.classList.add('image-name');
+            imageName.textContent = `image_${imageId.substring(0, 8)}.png`;
+            imageInfo.appendChild(imageName);
+            
+            const deletionDate = new Date(imageObject.deletedAt + 30 * 24 * 60 * 60 * 1000);
+            const deletionDateSpan = document.createElement('span');
+            deletionDateSpan.textContent = `Deletes on: ${deletionDate.toLocaleString()}`;
+            deletionDateSpan.classList.add('deletion-date');
+            imageInfo.appendChild(deletionDateSpan);
+
+            li.appendChild(imageInfo);
+
+            const buttonContainer = document.createElement('div');
+            buttonContainer.classList.add('button-container');
+
+            const restoreIcon = document.createElement('span');
+            restoreIcon.textContent = '♻️';
+            restoreIcon.title = 'Restore Image';
+            restoreIcon.classList.add('restore-note-icon');
+            restoreIcon.onclick = async (e) => {
+                e.stopPropagation();
+                try {
+                    await restoreImage(imageId);
+                    renderDeletedImageList();
+                } catch (err) {
+                    console.error('Failed to restore image:', err);
+                }
+            };
+            buttonContainer.appendChild(restoreIcon);
+
+            const deleteIcon = document.createElement('span');
+            deleteIcon.textContent = '🗑️';
+            deleteIcon.title = 'Delete Image Permanently';
+            deleteIcon.classList.add('delete-note-icon');
+            deleteIcon.onclick = async (e) => {
+                e.stopPropagation();
+                try {
+                    await deleteImagePermanently(imageId);
+                    renderDeletedImageList();
+                } catch (err) {
+                    console.error('Failed to permanently delete image:', err);
+                }
+            };
+            buttonContainer.appendChild(deleteIcon);
+            
+            li.appendChild(buttonContainer);
+            deletedImageList.appendChild(li);
+        }
+    } catch (err) {
+        console.error('Failed to render deleted image list:', err);
+        deletedImageList.innerHTML = '<li>Error loading images. See console for details.</li>';
+    }
 }
 
 showListView();
