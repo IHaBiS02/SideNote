@@ -460,6 +460,12 @@ async function renderDeletedItemsList() {
       const titleSpan = document.createElement('span');
       titleSpan.textContent = item.title;
       itemInfo.appendChild(titleSpan);
+
+      const deletionDate = new Date(item.deletedAt + 30 * 24 * 60 * 60 * 1000);
+      const deletionDateSpan = document.createElement('span');
+      deletionDateSpan.textContent = `Deletes on: ${deletionDate.toLocaleString()}`;
+      deletionDateSpan.classList.add('deletion-date');
+      itemInfo.appendChild(deletionDateSpan);
     } else { // type === 'image'
       itemInfo.classList.add('image-info');
       const img = document.createElement('img');
