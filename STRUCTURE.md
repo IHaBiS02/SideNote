@@ -34,7 +34,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   Controls for UI Mode (Light/Dark), Title behavior, Font Size, and other options.
     -   Buttons to navigate to the Recycle Bin and Licenses page.
 -   **`#license-view`**: Displays the contents of `LIBRARY_LICENSES.md`.
--   **`#recycle-bin-view`**: Displays a list of deleted notes (`#deleted-note-list`) with options to restore or delete them permanently.
+-   **`#recycle-bin-view`**: Displays a list of deleted items (`#deleted-items-list`), both notes and images, with options to restore or delete them permanently.
 
 ## 4. JavaScript Logic (`sidepanel.js`)
 
@@ -48,50 +48,54 @@ This file orchestrates the entire application.
     -   `activeNoteId`: Stores the `id` of the note currently being edited.
     -   `globalSettings`: An object holding all global application settings.
     -   `isPreview`: A boolean flag to track if the editor is in "Preview" or "Edit" mode.
--   **Data Persistence**: All state (`notes`, `deletedNotes`, `globalSettings`) is saved to and loaded from the browser's local storage using the `chrome.storage.local` API.
+-   **Data Persistence**:
+    -   Text-based data (`notes`, `deletedNotes`, `globalSettings`) is saved to and loaded from the browser's local storage using the `chrome.storage.local` API.
+    -   Image data (pasted images) is stored in `IndexedDB` to handle binary blobs efficiently.
 
 ### Function Breakdown
 
 #### Initialization & Data Management
 
--   **`chrome.storage.local.get(...)`**: On startup, this function loads all data from storage. It initializes default settings if none are found and performs a one-time migration if it detects an old data format.
--   **`saveNotes()` / `saveDeletedNotes()` / `saveGlobalSettings()`**: These functions serialize their respective state variables and save them to `chrome.storage.local`. They are called whenever data is modified.
--   **`sortNotes()`**: Sorts the `notes` array based on the `lastModified` timestamp, ensuring the most recently edited notes appear first.
--   **`cleanupDeletedNotes()`**: Automatically and permanently deletes notes from the recycle bin that are older than 30 days.
+-   **`initDB()`**: Initializes the IndexedDB database and creates the `images` object store on first run.
+-   **`chrome.storage.local.get(...)`**: On startup, this function loads all text-based data from storage. It initializes default settings if none are found.
+-   **`saveNotes()` / `saveDeletedNotes()` / `saveGlobalSettings()`**: These functions serialize their respective state variables and save them to `chrome.storage.local`.
+-   **`saveImage()` / `getImage()` / `deleteImage()` / etc.**: A set of async functions to perform CRUD operations on image data in IndexedDB.
+-   **`sortNotes()`**: Sorts the `notes` array based on the `lastModified` timestamp.
+-   **`cleanupDeletedNotes()` / `cleanupDeletedImages()`**: Automatically and permanently deletes items from the recycle bin that are older than 30 days.
 
 #### View Management
 
--   **`showListView()` / `showEditorView()` / `showSettingsView()` / etc.**: A set of functions that control UI visibility by changing the `display` style of the different view containers. This creates the single-page application effect.
+-   **`showListView()` / `showEditorView()` / `showSettingsView()` / etc.**: A set of functions that control UI visibility by changing the `display` style of the different view containers.
 
 #### Note List (`#list-view`)
 
--   **`renderNoteList()`**: Clears and re-populates the `#note-list` UL with items from the `notes` array. It attaches click listeners to each item to open the note and a delete icon to move the note to the recycle bin.
--   **`newNoteButton` (Event Listener)**: Creates a new, empty note object, adds it to the `notes` array, saves it, and immediately opens it in the editor.
--   **`deleteNote(noteId)`**: Finds the note by its ID, removes it from the `notes` array, adds it to the `deletedNotes` array (with a `deletedAt` timestamp), and saves both arrays.
+-   **`renderNoteList()`**: Populates the `#note-list` with items from the `notes` array.
+-   **`newNoteButton` (Event Listener)**: Creates a new, empty note object and opens it.
+-   **`deleteNote(noteId)`**: Moves a note to the recycle bin by adding a `deletedAt` timestamp.
 
 #### Editor (`#editor-view`)
 
--   **`openNote(noteId)`**: Sets the `activeNoteId`, populates the editor with the note's content and title, applies the correct font size, and switches to the editor view.
+-   **`openNote(noteId)`**: Sets the `activeNoteId` and populates the editor with the note's content.
 -   **`markdownEditor` (Event Listeners)**:
-    -   `input`: Fired on every keystroke. It updates the `content` of the active note object, updates the title if it's set to the default (first line), saves the changes, and re-renders the Markdown preview.
-    -   `paste`: Intercepts pasted text to apply automatic formatting (tilde replacement, adding double spaces for line breaks).
-    -   `keydown`: Handles keyboard shortcuts, such as `Shift+Enter` to toggle the preview and `Enter` to auto-add double spaces for line breaks.
--   **`renderMarkdown()`**: The core rendering function. It uses `marked.js` to convert the editor's Markdown text to HTML. It then uses `DOMPurify` to sanitize the output before injection to prevent XSS attacks. Finally, it uses `highlight.js` and `highlightjs-line-numbers.js` to apply syntax highlighting and line numbers to code blocks.
--   **`togglePreview()`**: Switches between the raw text editor (`#markdown-editor`) and the rendered view (`#html-preview`).
--   **`editorTitle` (Event Listener)**: A `dblclick` listener that dynamically replaces the `<h1>` title with an `<input>` field, allowing the user to set a custom title for the note.
+    -   `input`: Updates the note content and metadata on every keystroke.
+    -   `paste`: Intercepts pasted content. If it's an image, it saves it to IndexedDB and inserts the corresponding Markdown tag. If it's text, it applies formatting.
+    -   `keydown`: Handles keyboard shortcuts.
+-   **`renderMarkdown()`**: Converts Markdown to HTML, sanitizes it, and applies syntax highlighting. It also calls `renderImages()`.
+-   **`renderImages()`**: Finds all `<img>` tags in the preview and loads their `src` from IndexedDB blob URLs.
+-   **`togglePreview()`**: Switches between the raw text editor and the rendered view.
 
 #### Settings & Recycle Bin
 
--   **Settings Listeners**: Event listeners on the various controls in the settings view (`mode-setting`, `font-size-setting`, etc.) update either the `globalSettings` object or the specific `settings` object for the active note, then save the changes.
--   **`applyMode(mode)`**: Toggles the `dark-mode` class on the `<body>` element based on the user's selection (Dark, Light, or System).
--   **`renderDeletedNoteList()`**: Populates the recycle bin view with deleted notes, adding listeners to restore or permanently delete them.
--   **`restoreNote(noteId)`**: Moves a note from `deletedNotes` back to the `notes` array.
--   **`deleteNotePermanently(noteId)`**: Removes a note from the `deletedNotes` array permanently.
+-   **Settings Listeners**: Update `globalSettings` or note-specific settings.
+-   **`applyMode(mode)`**: Toggles the `dark-mode` class on the `<body>`.
+-   **`renderDeletedItemsList()`**: Fetches all deleted notes (from `chrome.storage`) and deleted images (from `IndexedDB`). It combines them into a single array, sorts them by deletion date, and renders them in the `#deleted-items-list`. Each item has controls to be restored or permanently deleted.
+-   **`restoreNote(noteId)` / `restoreImage(id)`**: Moves an item from the recycle bin back to the active state.
+-   **`deleteNotePermanently(noteId)` / `deleteImagePermanently(id)`**: Removes an item permanently from storage.
 
 #### Import & Export
 
--   **Export Buttons**: Listeners that stringify either a single note or the entire `notes` array into a JSON format and trigger a file download (`.snote` for single, `.snotes` for all).
--   **Import Buttons**: Listeners that programmatically click hidden `<input type="file">` elements. When a user selects a file, the `change` event listener reads the file, parses the JSON, and adds the imported notes to the main `notes` array.
+-   **Export Buttons**: Package one or all notes into a `.snote` or `.snotes` zip file. The zip includes the note content (`note.md`), metadata (`metadata.json`), and any associated images from IndexedDB.
+-   **Import Buttons**: Unzip a `.snote` or `.snotes` file, read the metadata and content, save any included images to IndexedDB, and create new notes in the application.
 
 ## 5. External Libraries (`vendor/`)
 
@@ -99,3 +103,4 @@ This file orchestrates the entire application.
 -   **`dompurify.min.js`**: A robust HTML sanitizer used to prevent Cross-Site Scripting (XSS) vulnerabilities by cleaning the HTML generated from user-provided Markdown.
 -   **`highlight.min.js`**: A syntax highlighter that can parse and style code blocks in many different languages.
 -   **`highlightjs-line-numbers.min.js`**: A plugin for `highlight.js` that adds line numbers to the highlighted code blocks.
+-   **`jszip.min.js`**: A library for creating, reading, and editing `.zip` files, used for the import/export functionality.

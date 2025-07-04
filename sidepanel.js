@@ -36,10 +36,7 @@ const imageManagementButton = document.getElementById('image-management-button')
 const imageManagementView = document.getElementById('image-management-view');
 const imageManagementBackButton = document.getElementById('image-management-back-button');
 const imageList = document.getElementById('image-list');
-const imageRecycleBinButton = document.getElementById('image-recycle-bin-button');
-const imageRecycleBinView = document.getElementById('image-recycle-bin-view');
-const imageRecycleBinBackButton = document.getElementById('image-recycle-bin-back-button');
-const deletedImageList = document.getElementById('deleted-image-list');
+const deletedItemsList = document.getElementById('deleted-items-list');
 
 let notes = [];
 let deletedNotes = [];
@@ -387,7 +384,6 @@ function showListView() {
   settingsView.style.display = 'none';
   recycleBinView.style.display = 'none';
   imageManagementView.style.display = 'none';
-  imageRecycleBinView.style.display = 'none';
   renderNoteList();
 }
 
@@ -397,7 +393,6 @@ function showEditorView() {
   settingsView.style.display = 'none';
   recycleBinView.style.display = 'none';
   imageManagementView.style.display = 'none';
-  imageRecycleBinView.style.display = 'none';
 }
 
 function showSettingsView() {
@@ -407,7 +402,6 @@ function showSettingsView() {
   licenseView.style.display = 'none';
   recycleBinView.style.display = 'none';
   imageManagementView.style.display = 'none';
-  imageRecycleBinView.style.display = 'none';
 }
 
 function showLicenseView() {
@@ -417,7 +411,6 @@ function showLicenseView() {
   licenseView.style.display = 'block';
   recycleBinView.style.display = 'none';
   imageManagementView.style.display = 'none';
-  imageRecycleBinView.style.display = 'none';
 }
 
 function showRecycleBinView() {
@@ -427,8 +420,7 @@ function showRecycleBinView() {
   licenseView.style.display = 'none';
   recycleBinView.style.display = 'block';
   imageManagementView.style.display = 'none';
-  imageRecycleBinView.style.display = 'none';
-  renderDeletedNoteList();
+  renderDeletedItemsList();
 }
 
 function showImageManagementView() {
@@ -438,67 +430,93 @@ function showImageManagementView() {
   licenseView.style.display = 'none';
   recycleBinView.style.display = 'none';
   imageManagementView.style.display = 'block';
-  imageRecycleBinView.style.display = 'none';
   renderImagesList();
 }
 
-function showImageRecycleBinView() {
-    listView.style.display = 'none';
-    editorView.style.display = 'none';
-    settingsView.style.display = 'none';
-    licenseView.style.display = 'none';
-    recycleBinView.style.display = 'none';
-    imageManagementView.style.display = 'none';
-    imageRecycleBinView.style.display = 'block';
-    renderDeletedImageList();
-}
+async function renderDeletedItemsList() {
+  deletedItemsList.innerHTML = '';
 
-function renderDeletedNoteList() {
-  deletedNoteList.innerHTML = '';
-  deletedNotes.sort((a, b) => a.metadata.deletedAt - b.metadata.deletedAt);
-  deletedNotes.forEach(note => {
+  // 1. Get deleted notes and images
+  const deletedImageObjects = (await getAllImageObjectsFromDB()).filter(img => img.deletedAt);
+  
+  // 2. Combine and sort
+  const deletedItems = [
+    ...deletedNotes.map(n => ({ ...n, type: 'note', deletedAt: n.metadata.deletedAt })),
+    ...deletedImageObjects.map(i => ({ ...i, type: 'image', deletedAt: i.deletedAt }))
+  ];
+  deletedItems.sort((a, b) => b.deletedAt - a.deletedAt);
+
+  // 3. Render list
+  deletedItems.forEach(item => {
     const li = document.createElement('li');
-    li.dataset.noteId = note.id;
+    li.dataset.itemId = item.id;
+    li.dataset.itemType = item.type;
 
-    const noteInfo = document.createElement('div');
-    noteInfo.classList.add('note-info');
+    const itemInfo = document.createElement('div');
+    itemInfo.classList.add('item-info');
 
-    const titleSpan = document.createElement('span');
-    titleSpan.textContent = note.title;
-    noteInfo.appendChild(titleSpan);
+    if (item.type === 'note') {
+      itemInfo.classList.add('note-info');
+      const titleSpan = document.createElement('span');
+      titleSpan.textContent = item.title;
+      itemInfo.appendChild(titleSpan);
+    } else { // type === 'image'
+      itemInfo.classList.add('image-info');
+      const img = document.createElement('img');
+      const imageBlob = item.blob;
+      if (imageBlob) {
+          const blobUrl = URL.createObjectURL(imageBlob);
+          img.src = blobUrl;
+          img.onclick = () => showImageModal(blobUrl);
+      }
+      itemInfo.appendChild(img);
 
-    const deletionDate = new Date(note.metadata.deletedAt + 30 * 24 * 60 * 60 * 1000);
+      const imageName = document.createElement('span');
+      imageName.classList.add('image-name');
+      imageName.textContent = `image_${item.id.substring(0, 8)}.png`;
+      itemInfo.appendChild(imageName);
+    }
+
+    const deletionDate = new Date(item.deletedAt + 30 * 24 * 60 * 60 * 1000);
     const deletionDateSpan = document.createElement('span');
     deletionDateSpan.textContent = `Deletes on: ${deletionDate.toLocaleString()}`;
     deletionDateSpan.classList.add('deletion-date');
-    noteInfo.appendChild(deletionDateSpan);
+    itemInfo.appendChild(deletionDateSpan);
 
     const buttonContainer = document.createElement('div');
     buttonContainer.classList.add('button-container');
 
     const restoreSpan = document.createElement('span');
     restoreSpan.textContent = '♻️';
-    restoreSpan.title = 'Restore Note';
-    restoreSpan.classList.add('restore-note-icon');
+    restoreSpan.title = `Restore ${item.type === 'note' ? 'Note' : 'Image'}`;
+    restoreSpan.classList.add('restore-item-icon');
     restoreSpan.addEventListener('click', (e) => {
       e.stopPropagation();
-      restoreNote(note.id);
+      if (item.type === 'note') {
+        restoreNote(item.id);
+      } else {
+        restoreImage(item.id).then(renderDeletedItemsList);
+      }
     });
 
     const deleteSpan = document.createElement('span');
     deleteSpan.textContent = '🗑️';
-    deleteSpan.title = 'Delete Note Permanently';
-    deleteSpan.classList.add('delete-note-icon');
+    deleteSpan.title = `Delete ${item.type === 'note' ? 'Note' : 'Image'} Permanently`;
+    deleteSpan.classList.add('delete-item-icon');
     deleteSpan.addEventListener('click', (e) => {
       e.stopPropagation();
-      deleteNotePermanently(note.id);
+      if (item.type === 'note') {
+        deleteNotePermanently(item.id);
+      } else {
+        deleteImagePermanently(item.id).then(renderDeletedItemsList);
+      }
     });
 
-    li.appendChild(noteInfo);
+    li.appendChild(itemInfo);
     buttonContainer.appendChild(restoreSpan);
     buttonContainer.appendChild(deleteSpan);
     li.appendChild(buttonContainer);
-    deletedNoteList.appendChild(li);
+    deletedItemsList.appendChild(li);
   });
 }
 
@@ -512,14 +530,14 @@ function restoreNote(noteId) {
     sortNotes();
     saveNotes();
     saveDeletedNotes();
-    renderDeletedNoteList();
+    renderDeletedItemsList();
   }
 }
 
 function deleteNotePermanently(noteId) {
   deletedNotes = deletedNotes.filter(n => n.id !== noteId);
   saveDeletedNotes();
-  renderDeletedNoteList();
+  renderDeletedItemsList();
 }
 
 function renderMarkdown() {
@@ -958,14 +976,6 @@ imageManagementBackButton.addEventListener('click', () => {
   showSettingsView();
 });
 
-imageRecycleBinButton.addEventListener('click', () => {
-    showImageRecycleBinView();
-});
-
-imageRecycleBinBackButton.addEventListener('click', () => {
-    showSettingsView();
-});
-
 modeSetting.addEventListener('change', () => {
   const value = modeSetting.value;
   globalSettings.mode = value;
@@ -1273,9 +1283,7 @@ document.addEventListener('keydown', (e) => {
       return;
     }
 
-    if (imageRecycleBinView.style.display === 'block') {
-        imageRecycleBinBackButton.click();
-    } else if (imageManagementView.style.display === 'block') {
+    if (imageManagementView.style.display === 'block') {
       imageManagementBackButton.click();
     } else if (recycleBinView.style.display === 'block') {
       recycleBinBackButton.click();
@@ -1414,89 +1422,7 @@ async function renderImagesList() {
   }
 }
 
-async function renderDeletedImageList() {
-    deletedImageList.innerHTML = '';
-    try {
-        const imageObjects = await getAllImageObjectsFromDB();
-        const deletedImages = imageObjects.filter(img => img.deletedAt);
-        deletedImages.sort((a, b) => b.deletedAt - a.deletedAt);
-
-        for (const imageObject of deletedImages) {
-            const imageId = imageObject.id;
-            const li = document.createElement('li');
-            li.dataset.imageId = imageId;
-
-            const imageInfo = document.createElement('div');
-            imageInfo.classList.add('image-info');
-
-            const img = document.createElement('img');
-            const imageBlob = imageObject.blob;
-            if (imageBlob) {
-                const blobUrl = URL.createObjectURL(imageBlob);
-                img.src = blobUrl;
-                img.onclick = () => showImageModal(blobUrl);
-            }
-            imageInfo.appendChild(img);
-
-            const textContainer = document.createElement('div');
-
-            const imageName = document.createElement('span');
-            imageName.classList.add('image-name');
-            imageName.textContent = `image_${imageId.substring(0, 8)}.png`;
-            textContainer.appendChild(imageName);
-            
-            const deletionDate = new Date(imageObject.deletedAt + 30 * 24 * 60 * 60 * 1000);
-            const deletionDateSpan = document.createElement('span');
-            deletionDateSpan.textContent = `Deletes on: ${deletionDate.toLocaleString()}`;
-            deletionDateSpan.classList.add('deletion-date');
-            textContainer.appendChild(deletionDateSpan);
-
-            imageInfo.appendChild(textContainer);
-
-            li.appendChild(imageInfo);
-
-            const buttonContainer = document.createElement('div');
-            buttonContainer.classList.add('button-container');
-
-            const restoreIcon = document.createElement('span');
-            restoreIcon.textContent = '♻️';
-            restoreIcon.title = 'Restore Image';
-            restoreIcon.classList.add('restore-note-icon');
-            restoreIcon.onclick = async (e) => {
-                e.stopPropagation();
-                try {
-                    await restoreImage(imageId);
-                    renderDeletedImageList();
-                } catch (err) {
-                    console.error('Failed to restore image:', err);
-                }
-            };
-            buttonContainer.appendChild(restoreIcon);
-
-            const deleteIcon = document.createElement('span');
-            deleteIcon.textContent = '🗑️';
-            deleteIcon.title = 'Delete Image Permanently';
-            deleteIcon.classList.add('delete-note-icon');
-            deleteIcon.onclick = async (e) => {
-                e.stopPropagation();
-                try {
-                    await deleteImagePermanently(imageId);
-                    renderDeletedImageList();
-                } catch (err) {
-                    console.error('Failed to permanently delete image:', err);
-                }
-            };
-            buttonContainer.appendChild(deleteIcon);
-            
-            li.appendChild(buttonContainer);
-            deletedImageList.appendChild(li);
-        }
-    } catch (err) {
-        console.error('Failed to render deleted image list:', err);
-        deletedImageList.innerHTML = '<li>Error loading images. See console for details.</li>';
-    }
 }
-
 showListView();
 
 
