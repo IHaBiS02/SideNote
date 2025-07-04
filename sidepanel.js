@@ -163,7 +163,7 @@ function restoreImage(id) {
     try {
       const imageObject = await _getImageObject(id);
       if (imageObject) {
-        delete imageObject.deletedAt;
+        imageObject.deletedAt = null;
         const transaction = db.transaction(['images'], 'readwrite');
         const store = transaction.objectStore('images');
         const request = store.put(imageObject);
