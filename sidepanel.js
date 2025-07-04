@@ -21,6 +21,7 @@ const fontSizeSetting = document.getElementById('font-size-setting');
 const modeSetting = document.getElementById('mode-setting');
 const autoLineBreakButton = document.getElementById('auto-line-break-button');
 const tildeReplacementButton = document.getElementById('tilde-replacement-button');
+const autoAddSpacesButton = document.getElementById('auto-add-spaces-button');
 const globalExportButton = document.getElementById('global-export-button');
 const globalImportButton = document.getElementById('global-import-button');
 const globalImportInput = document.getElementById('global-import-input');
@@ -53,6 +54,7 @@ chrome.storage.local.get(['notes', 'deletedNotes', 'globalSettings'], (data) => 
       fontSize: 12,
       autoLineBreak: true,
       tildeReplacement: true,
+      autoAddSpaces: true,
       mode: 'system'
     };
   }
@@ -189,6 +191,7 @@ function openNote(noteId, inEditMode = false) {
     applyFontSize(fontSize);
     updateAutoLineBreakButton();
     updateTildeReplacementButton();
+    updateAutoAddSpacesButton();
     renderMarkdown();
     showEditorView();
     isPreview = !inEditMode;
@@ -467,6 +470,19 @@ function togglePreview() {
 toggleViewButton.addEventListener('click', togglePreview);
 
 markdownEditor.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.isComposing) {
+    if (globalSettings.autoAddSpaces) {
+      const start = markdownEditor.selectionStart;
+      const end = markdownEditor.selectionEnd;
+      const currentLine = markdownEditor.value.substring(0, start).split('\n').pop();
+      if (currentLine.trim().length > 0) {
+        e.preventDefault();
+        document.execCommand('insertText', false, '  \n');
+      }
+    }
+  }
+
+
   if (e.shiftKey && e.key === 'Enter') {
     e.preventDefault();
     togglePreview();
@@ -698,6 +714,17 @@ function updateTildeReplacementButton() {
 tildeReplacementButton.addEventListener('click', () => {
   globalSettings.tildeReplacement = !globalSettings.tildeReplacement;
   updateTildeReplacementButton();
+  saveGlobalSettings();
+});
+
+function updateAutoAddSpacesButton() {
+  autoAddSpacesButton.textContent = globalSettings.autoAddSpaces ? '✅' : '❌';
+  autoAddSpacesButton.title = globalSettings.autoAddSpaces ? 'Auto Add Two Spaces Enabled' : 'Auto Add Two Spaces Disabled';
+}
+
+autoAddSpacesButton.addEventListener('click', () => {
+  globalSettings.autoAddSpaces = !globalSettings.autoAddSpaces;
+  updateAutoAddSpacesButton();
   saveGlobalSettings();
 });
 
