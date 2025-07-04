@@ -416,12 +416,12 @@ markdownEditor.addEventListener('paste', (e) => {
   }
 
   if (globalSettings.autoLineBreak) {
-    const lines = text.split(/\r?\n/);
-    const processedText = lines.map((line, index) => {
-      if (line.trim().length > 0 && index < lines.length - 1 && lines[index + 1].trim().length > 0) {
+    const processedText = text.split(/\r?\n/).map(line => {
+      if (line.trim().length === 0) {
+        return '';
+      } else {
         return line.trimEnd() + '  ';
       }
-      return line;
     }).join('\n');
     text = processedText;
   }
