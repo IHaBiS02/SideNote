@@ -60,7 +60,7 @@ body {
   align-items: center;
 }
 
-#image-list li .image-info img {
+#image-list li .image-info img, #deleted-image-list li .image-info img {
   width: 40px;
   height: 40px;
   margin-right: 10px;

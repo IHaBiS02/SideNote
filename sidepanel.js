@@ -121,7 +121,7 @@ function saveImage(id, blob) {
 function getImage(id) {
   return new Promise((resolve, reject) => {
     _getImageObject(id).then(imageObject => {
-      if (imageObject) {
+      if (imageObject && !imageObject.deletedAt) {
         resolve(imageObject.blob);
       } else {
         resolve(null);
@@ -905,7 +905,7 @@ imageRecycleBinButton.addEventListener('click', () => {
 });
 
 imageRecycleBinBackButton.addEventListener('click', () => {
-    showImageManagementView();
+    showSettingsView();
 });
 
 modeSetting.addEventListener('change', () => {
