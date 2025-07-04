@@ -156,7 +156,7 @@ body {
     overflow-y: auto;
 }
 
-.delete-note-icon, .restore-note-icon {
+.delete-item-icon, .restore-item-icon {
   cursor: pointer;
   padding: 5px;
 }
