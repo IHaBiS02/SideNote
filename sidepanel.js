@@ -21,7 +21,7 @@ const fontSizeSetting = document.getElementById('font-size-setting');
 const modeSetting = document.getElementById('mode-setting');
 const autoLineBreakButton = document.getElementById('auto-line-break-button');
 const tildeReplacementButton = document.getElementById('tilde-replacement-button');
-const autoAddSpacesButton = document.getElementById('auto-add-spaces-button');
+const autoAddSpacesCheckbox = document.getElementById('auto-add-spaces-checkbox');
 const globalExportButton = document.getElementById('global-export-button');
 const globalImportButton = document.getElementById('global-import-button');
 const globalImportInput = document.getElementById('global-import-input');
@@ -191,7 +191,6 @@ function openNote(noteId, inEditMode = false) {
     applyFontSize(fontSize);
     updateAutoLineBreakButton();
     updateTildeReplacementButton();
-    updateAutoAddSpacesButton();
     renderMarkdown();
     showEditorView();
     isPreview = !inEditMode;
@@ -607,6 +606,7 @@ settingsButton.addEventListener('click', () => {
   titleSetting.value = note.settings.title || 'default';
   fontSizeSetting.value = note.settings.fontSize || globalSettings.fontSize || 12;
   modeSetting.value = globalSettings.mode || 'system';
+  autoAddSpacesCheckbox.checked = globalSettings.autoAddSpaces;
   showSettingsView();
 });
 
@@ -615,6 +615,7 @@ globalSettingsButton.addEventListener('click', () => {
   titleSetting.value = globalSettings.title || 'default';
   fontSizeSetting.value = globalSettings.fontSize || 12;
   modeSetting.value = globalSettings.mode || 'system';
+  autoAddSpacesCheckbox.checked = globalSettings.autoAddSpaces;
   showSettingsView();
 });
 
@@ -717,14 +718,8 @@ tildeReplacementButton.addEventListener('click', () => {
   saveGlobalSettings();
 });
 
-function updateAutoAddSpacesButton() {
-  autoAddSpacesButton.textContent = globalSettings.autoAddSpaces ? '✅' : '❌';
-  autoAddSpacesButton.title = globalSettings.autoAddSpaces ? 'Auto Add Two Spaces Enabled' : 'Auto Add Two Spaces Disabled';
-}
-
-autoAddSpacesButton.addEventListener('click', () => {
-  globalSettings.autoAddSpaces = !globalSettings.autoAddSpaces;
-  updateAutoAddSpacesButton();
+autoAddSpacesCheckbox.addEventListener('change', () => {
+  globalSettings.autoAddSpaces = autoAddSpacesCheckbox.checked;
   saveGlobalSettings();
 });
 
