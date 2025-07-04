@@ -1055,89 +1055,101 @@ importNoteButton.addEventListener('click', () => {
   importNoteInput.click();
 });
 
-globalImportInput.addEventListener('change', (e) => {
+globalImportInput.addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) {
     return;
   }
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    const content = event.target.result;
-    try {
-      const importedData = JSON.parse(content);
-      if (file.name.endsWith('.snote')) {
-        const now = Date.now();
-        const newNote = {
-          ...importedData,
-          id: crypto.randomUUID(),
-          metadata: {
-            createdAt: importedData.metadata?.createdAt || now,
-            lastModified: now
-          }
-        };
-        notes.push(newNote);
-        sortNotes();
-        saveNotes();
-        renderNoteList();
-      } else if (file.name.endsWith('.snotes')) {
-        if (Array.isArray(importedData)) {
-          const now = Date.now();
-          
-          const importedNotes = importedData.map(note => ({
-            ...note,
-            metadata: note.metadata || { createdAt: now, lastModified: now }
-          })).sort((a, b) => a.metadata.lastModified - b.metadata.lastModified);
 
-          const newNotes = importedNotes.map((note, index) => ({
-            ...note,
-            id: crypto.randomUUID(),
-            metadata: {
-              createdAt: note.metadata.createdAt || now,
-              lastModified: now + index
-            }
-          }));
-
-          notes.push(...newNotes);
-          sortNotes();
-          saveNotes();
-          renderNoteList();
+  try {
+    const zip = await JSZip.loadAsync(file);
+    if (file.name.endsWith('.snote')) {
+      const newNote = await processSnote(zip);
+      notes.push(newNote);
+    } else if (file.name.endsWith('.snotes')) {
+      const newNotes = [];
+      for (const noteId in zip.files) {
+        if (noteId.endsWith('/')) { // It's a folder representing a note
+          const noteFolder = zip.folder(noteId);
+          const newNote = await processSnote(noteFolder);
+          newNotes.push(newNote);
         }
       }
-    } catch (error) {
-      console.error('Error parsing JSON file:', error);
+      notes.push(...newNotes);
     }
-  };
-  reader.readAsText(file);
+    sortNotes();
+    saveNotes();
+    renderNoteList();
+  } catch (error) {
+    console.error('Error importing file:', error);
+    alert('Failed to import file. It may be corrupted or in the wrong format.');
+  }
+
   globalImportInput.value = '';
 });
 
-importNoteInput.addEventListener('change', (e) => {
+async function processSnote(zip) {
+  const metadataFile = zip.file('metadata.json');
+  const noteFile = zip.file('note.md');
+
+  if (!metadataFile || !noteFile) {
+    throw new Error('Invalid .snote format: missing metadata.json or note.md');
+  }
+
+  const metadata = JSON.parse(await metadataFile.async('string'));
+  const content = await noteFile.async('string');
+  
+  const imagesFolder = zip.folder('images');
+  if (imagesFolder) {
+    const imageFiles = Object.values(imagesFolder.files);
+    for (const imageFile of imageFiles) {
+      if (!imageFile.dir) {
+        const imageId = imageFile.name.split('/').pop().replace('.png', '');
+        const blob = await imageFile.async('blob');
+        await saveImage(imageId, blob);
+      }
+    }
+  }
+
+  const now = Date.now();
+  return {
+    id: crypto.randomUUID(),
+    title: metadata.title,
+    content: content,
+    settings: metadata.settings,
+    metadata: {
+      createdAt: metadata.metadata?.createdAt || now,
+      lastModified: now
+    }
+  };
+}
+
+importNoteInput.addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) {
     return;
   }
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    const content = event.target.result;
-    try {
-      const importedNote = JSON.parse(content);
-      const note = notes.find(n => n.id === activeNoteId);
-      if (note) {
-        note.title = importedNote.title;
-        note.content = importedNote.content;
-        note.settings = importedNote.settings;
-        note.metadata.lastModified = Date.now();
-        editorTitle.textContent = note.title;
-        markdownEditor.value = note.content;
-        sortNotes();
-        saveNotes();
-        renderMarkdown();
-      }
-    } catch (error) {
-      console.error('Error parsing JSON file:', error);
+  
+  try {
+    const zip = await JSZip.loadAsync(file);
+    const importedNote = await processSnote(zip);
+    const note = notes.find(n => n.id === activeNoteId);
+    if (note) {
+      note.title = importedNote.title;
+      note.content = importedNote.content;
+      note.settings = importedNote.settings;
+      note.metadata.lastModified = Date.now();
+      editorTitle.textContent = note.title;
+      markdownEditor.value = note.content;
+      sortNotes();
+      saveNotes();
+      renderMarkdown();
     }
-  };
-  reader.readAsText(file);
+  } catch (error) {
+    console.error('Error importing note:', error);
+    alert('Failed to import note. It may be corrupted or in the wrong format.');
+  }
+
   importNoteInput.value = '';
 });
 
