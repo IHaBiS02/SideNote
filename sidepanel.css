@@ -28,26 +28,19 @@ body {
   font-size: 18px;
 }
 
-/* 기존 #note-list 스타일을 찾아서 아래 내용으로 교체합니다. */
-
-#note-list, #deleted-note-list, #image-list, #deleted-image-list {
+#note-list, #deleted-items-list, #image-list {
   list-style: none;
   padding: 0;
   margin: 0;
-  /* position 속성을 사용하여 레이어처럼 띄웁니다. */
   position: absolute;
-  /* 헤더의 높이(약 50px)와 경계선(1px)을 고려하여 상단 위���를 지정합니다. */
   top: 51px;
-  /* 툴바의 높이(약 35px)와 경계선(1px)을 고려하여 하단 위치를 지정합니다. */
   bottom: 36px;
-  /* 좌우를 꽉 채우도록 설정합니다. */
   left: 0;
   right: 0;
-  /* 이 리스트만 스크롤바가 생기도록 합니다. */
   overflow-y: auto;
 }
 
-#note-list li, #deleted-note-list li, #image-list li, #deleted-image-list li {
+#note-list li, #deleted-items-list li, #image-list li {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -55,29 +48,52 @@ body {
   border-bottom: 1px solid #eee;
 }
 
-#image-list li .image-info {
-  display: flex;
+#deleted-items-list li {
   align-items: center;
 }
 
-#image-list li .image-info img, #deleted-image-list li .image-info img {
+.item-info {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.note-info {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.image-info img {
   width: 40px;
   height: 40px;
   margin-right: 10px;
   object-fit: cover;
 }
 
-#image-list li .image-info .image-name, #deleted-image-list li .image-info .image-name {
+.image-info .image-name, .note-info .deletion-date, .image-info .deletion-date {
+  font-size: 0.8em;
+  color: #888;
+}
+
+.button-container {
+  display: flex;
+  align-items: center;
+}
+
+#image-list li .image-info {
+  display: flex;
+  align-items: center;
+}
+
+#image-list li .image-info img {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+  object-fit: cover;
+}
+
+#image-list li .image-info .image-name {
   font-size: 0.9em;
-}
-
-#deleted-image-list li .image-info .deletion-date {
-    font-size: 0.8em;
-    color: #888;
-}
-
-#deleted-image-list li .image-info .image-name, #deleted-image-list li .image-info .deletion-date {
-    display: block;
 }
 
 #image-list li .usage-icon {
@@ -126,29 +142,11 @@ body {
   cursor: pointer;
 }
 
-#deleted-note-list li {
-  justify-content: space-between;
-}
-
-#deleted-note-list .note-info {
-  display: flex;
-  flex-direction: column;
-}
-
-#deleted-note-list .deletion-date {
-  font-size: 0.8em;
-  color: #888;
-}
-
-#deleted-note-list .button-container {
-  margin-left: auto;
-}
-
-#note-list li:hover, #deleted-note-list li:hover, #image-list li:hover, #deleted-image-list li:hover {
+#note-list li:hover, #deleted-items-list li:hover, #image-list li:hover {
   background-color: #f5f5f5;
 }
 
-#settings-view, #license-view, #recycle-bin-view, #image-management-view, #image-recycle-bin-view {
+#settings-view, #license-view, #recycle-bin-view, #image-management-view {
     height: 100vh;
     overflow-y: auto;
 }

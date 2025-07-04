@@ -1422,7 +1422,6 @@ async function renderImagesList() {
   }
 }
 
-}
 showListView();
 
 
