@@ -25,7 +25,7 @@ body.dark-mode {
     background-color: #444;
 }
 
-.dark-mode .delete-item-icon:hover, .dark-mode .restore-teim-icon:hover {
+.dark-mode .delete-item-icon:hover, .dark-mode .restore-item-icon:hover {
     background-color: #444;
 }
 
