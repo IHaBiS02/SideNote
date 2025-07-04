@@ -74,6 +74,26 @@ function initDB() {
   });
 }
 
+function _getImageObject(id) {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject('DB not initialized');
+      return;
+    }
+    const transaction = db.transaction(['images'], 'readonly');
+    const store = transaction.objectStore('images');
+    const request = store.get(id);
+
+    request.onsuccess = (event) => {
+      resolve(event.target.result);
+    };
+
+    request.onerror = (event) => {
+      reject(event.target.error);
+    };
+  });
+}
+
 function saveImage(id, blob) {
   return new Promise((resolve, reject) => {
     if (!db) {
@@ -96,29 +116,65 @@ function saveImage(id, blob) {
 
 function getImage(id) {
   return new Promise((resolve, reject) => {
-    if (!db) {
-      reject('DB not initialized');
-      return;
-    }
-    const transaction = db.transaction(['images'], 'readonly');
-    const store = transaction.objectStore('images');
-    const request = store.get(id);
-
-    request.onsuccess = (event) => {
-      if (event.target.result) {
-        resolve(event.target.result.blob);
+    _getImageObject(id).then(imageObject => {
+      if (imageObject) {
+        resolve(imageObject.blob);
       } else {
-        resolve(null); // Or reject('Image not found')
+        resolve(null);
       }
-    };
-
-    request.onerror = (event) => {
-      reject(event.target.error);
-    };
+    }).catch(reject);
   });
 }
 
 function deleteImage(id) {
+  return new Promise(async (resolve, reject) => {
+    if (!db) {
+      reject('DB not initialized');
+      return;
+    }
+    try {
+      const imageObject = await _getImageObject(id);
+      if (imageObject) {
+        imageObject.deletedAt = Date.now();
+        const transaction = db.transaction(['images'], 'readwrite');
+        const store = transaction.objectStore('images');
+        const request = store.put(imageObject);
+        request.onsuccess = () => resolve();
+        request.onerror = (event) => reject(event.target.error);
+      } else {
+        resolve(); // Image not found, nothing to do
+      }
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+function restoreImage(id) {
+  return new Promise(async (resolve, reject) => {
+    if (!db) {
+      reject('DB not initialized');
+      return;
+    }
+    try {
+      const imageObject = await _getImageObject(id);
+      if (imageObject) {
+        delete imageObject.deletedAt;
+        const transaction = db.transaction(['images'], 'readwrite');
+        const store = transaction.objectStore('images');
+        const request = store.put(imageObject);
+        request.onsuccess = () => resolve();
+        request.onerror = (event) => reject(event.target.error);
+      } else {
+        resolve();
+      }
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+function deleteImagePermanently(id) {
   return new Promise((resolve, reject) => {
     if (!db) {
       reject('DB not initialized');
@@ -482,6 +538,7 @@ async function renderImages() {
     const src = img.getAttribute('src');
     if (src && src.startsWith('images/')) {
       const imageId = src.substring(7, src.lastIndexOf('.'));
+      img.dataset.imageId = imageId; // Add data-id for scrolling
       try {
         const imageBlob = await getImage(imageId);
         if (imageBlob) {
@@ -1104,7 +1161,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-function getAllImageIdsFromDB() {
+function getAllImageObjectsFromDB() {
   return new Promise((resolve, reject) => {
     if (!db) {
       reject('DB not initialized');
@@ -1112,7 +1169,7 @@ function getAllImageIdsFromDB() {
     }
     const transaction = db.transaction(['images'], 'readonly');
     const store = transaction.objectStore('images');
-    const request = store.getAllKeys();
+    const request = store.getAll();
 
     request.onsuccess = (event) => {
       resolve(event.target.result);
@@ -1127,10 +1184,13 @@ function getAllImageIdsFromDB() {
 async function renderImagesList() {
   imageList.innerHTML = '';
   try {
-    const imageIds = await getAllImageIdsFromDB();
+    const imageObjects = await getAllImageObjectsFromDB();
     const allNoteContent = notes.map(n => n.content).join('\n');
 
-    for (const imageId of imageIds) {
+    const activeImages = imageObjects.filter(img => !img.deletedAt);
+
+    for (const imageObject of activeImages) {
+      const imageId = imageObject.id;
       const li = document.createElement('li');
       li.dataset.imageId = imageId;
 
@@ -1138,7 +1198,7 @@ async function renderImagesList() {
       imageInfo.classList.add('image-info');
 
       const img = document.createElement('img');
-      const imageBlob = await getImage(imageId);
+      const imageBlob = imageObject.blob;
       if (imageBlob) {
         const blobUrl = URL.createObjectURL(imageBlob);
         img.src = blobUrl;
@@ -1177,14 +1237,45 @@ async function renderImagesList() {
       const usageIcon = document.createElement('span');
       usageIcon.classList.add('usage-icon');
       const isUsed = allNoteContent.includes(imageId);
+      const notesUsingImage = isUsed ? notes.filter(n => n.content.includes(imageId)) : [];
+      
       usageIcon.textContent = isUsed ? '✅' : '❌';
       usageIcon.title = isUsed ? 'Image is used in one or more notes' : 'Image is not used in any note';
       
       if (isUsed) {
-        usageIcon.onclick = () => {
-          const notesUsingImage = notes.filter(n => n.content.includes(imageId)).map(n => n.title).join(', ');
-          alert(`Used in: ${notesUsingImage}`);
+        usageIcon.onclick = (e) => {
+          e.stopPropagation();
+          const existingDropdown = e.currentTarget.querySelector('.notes-dropdown');
+          if (existingDropdown) {
+            existingDropdown.remove();
+            return;
+          }
+
+          const dropdown = document.createElement('div');
+          dropdown.classList.add('notes-dropdown');
+          notesUsingImage.forEach(note => {
+            const noteItem = document.createElement('div');
+            noteItem.textContent = note.title;
+            noteItem.onclick = () => {
+              openNote(note.id, false);
+              setTimeout(() => {
+                const imageInNote = htmlPreview.querySelector(`img[data-image-id="${imageId}"]`);
+                if (imageInNote) {
+                  imageInNote.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+              }, 200); // Delay to allow rendering
+            };
+            dropdown.appendChild(noteItem);
+          });
+          e.currentTarget.appendChild(dropdown);
         };
+        
+        document.addEventListener('click', (e) => {
+            const dropdown = usageIcon.querySelector('.notes-dropdown');
+            if (dropdown && !usageIcon.contains(e.target)) {
+                dropdown.remove();
+            }
+        }, { once: true });
       }
 
       li.appendChild(usageIcon);
@@ -1192,17 +1283,14 @@ async function renderImagesList() {
       const deleteIcon = document.createElement('span');
       deleteIcon.textContent = '🗑️';
       deleteIcon.classList.add('delete-image-icon');
-      deleteIcon.title = 'Delete Image Permanently';
+      deleteIcon.title = 'Move Image to Recycle Bin';
       deleteIcon.onclick = async (e) => {
         e.stopPropagation();
-        if (confirm('Are you sure you want to delete this image permanently? This cannot be undone.')) {
-          try {
-            await deleteImage(imageId);
-            renderImagesList(); // Refresh the list
-          } catch (err) {
-            console.error('Failed to delete image:', err);
-            alert('Failed to delete image. See console for details.');
-          }
+        try {
+          await deleteImage(imageId);
+          renderImagesList(); // Refresh the list
+        } catch (err) {
+          console.error('Failed to delete image:', err);
         }
       };
       li.appendChild(deleteIcon);
