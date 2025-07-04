@@ -780,6 +780,8 @@ htmlPreview.addEventListener('click', (e) => {
     modal.style.height = '100%';
     modal.style.backgroundColor = 'rgba(0,0,0,0.8)';
     modal.style.display = 'flex';
+    modal.style.boxSizing = 'border-box';
+    modal.style.padding = '10px';
     modal.style.zIndex = '1000';
     modal.onclick = (event) => {
         if (event.target === modal) {
