@@ -161,7 +161,7 @@ body {
   padding: 5px;
 }
 
-.delete-note-icon:hover, .restore-note-icon:hover {
+.delete-item-icon:hover, .restore-item-icon:hover {
   background-color: #ddd;
   border-radius: 50%;
 }
