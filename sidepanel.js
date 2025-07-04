@@ -603,7 +603,7 @@ function togglePreview() {
 toggleViewButton.addEventListener('click', togglePreview);
 
 markdownEditor.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.isComposing) {
+  if (e.key === 'Enter' && !e.isComposing && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
     if (globalSettings.autoAddSpaces) {
       const start = markdownEditor.selectionStart;
       const end = markdownEditor.selectionEnd;

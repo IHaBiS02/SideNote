@@ -1,7 +1,5 @@
-feat: Implement new export logic for notes with images
+fix: Prevent auto space insertion when modifier keys are pressed with Enter
 
-Replaces the existing export functionality with a new system that packages notes and their images into zip archives.
+Adjusts the `keydown` event listener to ensure the "Auto Add Two Spaces on Enter" feature only triggers when the Enter key is pressed alone.
 
-- **Single Note Export (.snote):** Creates a zip file containing `note.md` (content), `metadata.json` (title, settings, etc.), and an `images/` folder with all images used in that specific note.
-- **Multiple Notes Export (.snotes):** Creates a single zip file where each note is a folder named after its ID, and each folder has the same structure as a `.snote` file.
-- Images are retrieved from IndexedDB and included in the archives.
+The check now ignores key presses when modifier keys (Shift, Ctrl, Alt, Meta) are active, preventing unexpected behavior with shortcuts like Shift+Enter.
