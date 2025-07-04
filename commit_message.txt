@@ -1,0 +1,7 @@
+feat: Add JSZip dependency and license
+
+Adds the JSZip library to the project to support creating and reading .zip archives for the new .snote and .snotes formats.
+
+- Downloads `jszip.min.js` and places it in the `vendor/` directory.
+- Adds the script tag to `sidepanel.html`.
+- Updates `LIBRARY_LICENSES.md` with the MIT license for JSZip.
