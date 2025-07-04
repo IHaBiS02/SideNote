@@ -21,14 +21,15 @@ body {
 #editor-title,
 #settings-title,
 #license-title,
-#recycle-bin-title {
+#recycle-bin-title,
+#image-management-title {
   margin: 0;
   font-size: 18px;
 }
 
 /* 기존 #note-list 스타일을 찾아서 아래 내용으로 교체합니다. */
 
-#note-list, #deleted-note-list {
+#note-list, #deleted-note-list, #image-list {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -45,12 +46,43 @@ body {
   overflow-y: auto;
 }
 
-#note-list li, #deleted-note-list li {
+#note-list li, #deleted-note-list li, #image-list li {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px;
   border-bottom: 1px solid #eee;
+}
+
+#image-list li .image-info {
+  display: flex;
+  align-items: center;
+}
+
+#image-list li .image-info img {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+  object-fit: cover;
+}
+
+#image-list li .image-info .image-name {
+  font-size: 0.9em;
+}
+
+#image-list li .usage-icon {
+  font-size: 1.2em;
+  cursor: pointer;
+}
+
+#image-list li .delete-image-icon {
+  cursor: pointer;
+  padding: 5px;
+}
+
+#image-list li .delete-image-icon:hover {
+  background-color: #ddd;
+  border-radius: 50%;
 }
 
 #note-list li {
@@ -75,11 +107,11 @@ body {
   margin-left: auto;
 }
 
-#note-list li:hover, #deleted-note-list li:hover {
+#note-list li:hover, #deleted-note-list li:hover, #image-list li:hover {
   background-color: #f5f5f5;
 }
 
-#settings-view, #license-view, #recycle-bin-view {
+#settings-view, #license-view, #recycle-bin-view, #image-management-view {
     height: 100vh;
     overflow-y: auto;
 }
@@ -173,16 +205,16 @@ button:hover {
   width: 75%;
 }
 
-#settings-title, #license-title, #recycle-bin-title {
+#settings-title, #license-title, #recycle-bin-title, #image-management-title {
   text-align: center;
   flex-grow: 1;
 }
 
-#settings-view .header, #license-view .header, #recycle-bin-view .header {
+#settings-view .header, #license-view .header, #recycle-bin-view .header, #image-management-view .header {
   justify-content: center;
 }
 
-#settings-back-button, #license-back-button, #recycle-bin-back-button {
+#settings-back-button, #license-back-button, #recycle-bin-back-button, #image-management-back-button {
   position: absolute;
   left: 10px;
 }

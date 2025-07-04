@@ -1,5 +1,11 @@
-fix: Adjust auto line break for multi-line pastes
+feat: Implement Image Management UI
 
-Modifies the paste handling logic to prevent unwanted spaces when pasting text.
+Adds a new UI for managing all images stored in the application.
 
-The auto line break feature now only adds two spaces to non-empty lines when pasting multi-line text, and it skips the last line. This ensures that pasting content mid-sentence or pasting single lines does not introduce extra spaces.
+- **New View:** Introduces an "Image Management" view accessible from the settings screen.
+- **Image List:** Displays a list of all images from IndexedDB, showing a thumbnail, a partial ID, and a usage status icon.
+- **Image Actions:**
+  - Clicking a thumbnail opens a larger preview.
+  - The usage icon indicates if an image is used in any note and can show which notes use it.
+  - A delete button allows for permanent deletion of images from IndexedDB.
+- **UI Integration:** The new view is integrated into the existing navigation and styling.

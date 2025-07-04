@@ -76,6 +76,9 @@
         <input type="checkbox" id="auto-add-spaces-checkbox">
       </div>
       <div class="setting">
+        <button id="image-management-button">Images</button>
+      </div>
+      <div class="setting">
         <button id="recycle-bin-button" title="Recycle Bin 🗑️">Recycle Bin 🗑️</button>
       </div>
       <div class="setting">
@@ -98,6 +101,14 @@
       <h1 id="recycle-bin-title">Recycle Bin</h1>
     </div>
     <ul id="deleted-note-list"></ul>
+  </div>
+
+  <div id="image-management-view" style="display: none;">
+    <div class="header">
+      <button id="image-management-back-button"><</button>
+      <h1 id="image-management-title">Image Management</h1>
+    </div>
+    <ul id="image-list"></ul>
   </div>
 
   <script src="vendor/marked.min.js"></script>

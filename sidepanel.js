@@ -32,6 +32,10 @@ const recycleBinButton = document.getElementById('recycle-bin-button');
 const recycleBinView = document.getElementById('recycle-bin-view');
 const recycleBinBackButton = document.getElementById('recycle-bin-back-button');
 const deletedNoteList = document.getElementById('deleted-note-list');
+const imageManagementButton = document.getElementById('image-management-button');
+const imageManagementView = document.getElementById('image-management-view');
+const imageManagementBackButton = document.getElementById('image-management-back-button');
+const imageList = document.getElementById('image-list');
 
 let notes = [];
 let deletedNotes = [];
@@ -310,6 +314,7 @@ function showListView() {
   editorView.style.display = 'none';
   settingsView.style.display = 'none';
   recycleBinView.style.display = 'none';
+  imageManagementView.style.display = 'none';
   renderNoteList();
 }
 
@@ -318,6 +323,7 @@ function showEditorView() {
   editorView.style.display = 'block';
   settingsView.style.display = 'none';
   recycleBinView.style.display = 'none';
+  imageManagementView.style.display = 'none';
 }
 
 function showSettingsView() {
@@ -326,6 +332,7 @@ function showSettingsView() {
   settingsView.style.display = 'block';
   licenseView.style.display = 'none';
   recycleBinView.style.display = 'none';
+  imageManagementView.style.display = 'none';
 }
 
 function showLicenseView() {
@@ -334,6 +341,7 @@ function showLicenseView() {
   settingsView.style.display = 'none';
   licenseView.style.display = 'block';
   recycleBinView.style.display = 'none';
+  imageManagementView.style.display = 'none';
 }
 
 function showRecycleBinView() {
@@ -342,7 +350,18 @@ function showRecycleBinView() {
   settingsView.style.display = 'none';
   licenseView.style.display = 'none';
   recycleBinView.style.display = 'block';
+  imageManagementView.style.display = 'none';
   renderDeletedNoteList();
+}
+
+function showImageManagementView() {
+  listView.style.display = 'none';
+  editorView.style.display = 'none';
+  settingsView.style.display = 'none';
+  licenseView.style.display = 'none';
+  recycleBinView.style.display = 'none';
+  imageManagementView.style.display = 'block';
+  renderImagesList();
 }
 
 function renderDeletedNoteList() {
@@ -783,6 +802,14 @@ recycleBinBackButton.addEventListener('click', () => {
   showSettingsView();
 });
 
+imageManagementButton.addEventListener('click', () => {
+  showImageManagementView();
+});
+
+imageManagementBackButton.addEventListener('click', () => {
+  showSettingsView();
+});
+
 modeSetting.addEventListener('change', () => {
   const value = modeSetting.value;
   globalSettings.mode = value;
@@ -1059,7 +1086,9 @@ importNoteInput.addEventListener('change', (e) => {
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
-    if (recycleBinView.style.display === 'block') {
+    if (imageManagementView.style.display === 'block') {
+      imageManagementBackButton.click();
+    } else if (recycleBinView.style.display === 'block') {
       recycleBinBackButton.click();
     } else if (licenseView.style.display === 'block') {
       licenseBackButton.click();
@@ -1075,7 +1104,119 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+function getAllImageIdsFromDB() {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject('DB not initialized');
+      return;
+    }
+    const transaction = db.transaction(['images'], 'readonly');
+    const store = transaction.objectStore('images');
+    const request = store.getAllKeys();
+
+    request.onsuccess = (event) => {
+      resolve(event.target.result);
+    };
+
+    request.onerror = (event) => {
+      reject(event.target.error);
+    };
+  });
+}
+
+async function renderImagesList() {
+  imageList.innerHTML = '';
+  try {
+    const imageIds = await getAllImageIdsFromDB();
+    const allNoteContent = notes.map(n => n.content).join('\n');
+
+    for (const imageId of imageIds) {
+      const li = document.createElement('li');
+      li.dataset.imageId = imageId;
+
+      const imageInfo = document.createElement('div');
+      imageInfo.classList.add('image-info');
+
+      const img = document.createElement('img');
+      const imageBlob = await getImage(imageId);
+      if (imageBlob) {
+        const blobUrl = URL.createObjectURL(imageBlob);
+        img.src = blobUrl;
+        img.onclick = () => {
+          // Simple modal for viewing larger image
+          const modal = document.createElement('div');
+          modal.style.position = 'fixed';
+          modal.style.left = '0';
+          modal.style.top = '0';
+          modal.style.width = '100%';
+          modal.style.height = '100%';
+          modal.style.backgroundColor = 'rgba(0,0,0,0.8)';
+          modal.style.display = 'flex';
+          modal.style.justifyContent = 'center';
+          modal.style.alignItems = 'center';
+          modal.onclick = () => document.body.removeChild(modal);
+
+          const modalImg = document.createElement('img');
+          modalImg.src = blobUrl;
+          modalImg.style.maxWidth = '90%';
+          modalImg.style.maxHeight = '90%';
+
+          modal.appendChild(modalImg);
+          document.body.appendChild(modal);
+        };
+      }
+      imageInfo.appendChild(img);
+
+      const imageName = document.createElement('span');
+      imageName.classList.add('image-name');
+      imageName.textContent = `image_${imageId.substring(0, 8)}.png`;
+      imageInfo.appendChild(imageName);
+
+      li.appendChild(imageInfo);
+
+      const usageIcon = document.createElement('span');
+      usageIcon.classList.add('usage-icon');
+      const isUsed = allNoteContent.includes(imageId);
+      usageIcon.textContent = isUsed ? '✅' : '❌';
+      usageIcon.title = isUsed ? 'Image is used in one or more notes' : 'Image is not used in any note';
+      
+      if (isUsed) {
+        usageIcon.onclick = () => {
+          const notesUsingImage = notes.filter(n => n.content.includes(imageId)).map(n => n.title).join(', ');
+          alert(`Used in: ${notesUsingImage}`);
+        };
+      }
+
+      li.appendChild(usageIcon);
+
+      const deleteIcon = document.createElement('span');
+      deleteIcon.textContent = '🗑️';
+      deleteIcon.classList.add('delete-image-icon');
+      deleteIcon.title = 'Delete Image Permanently';
+      deleteIcon.onclick = async (e) => {
+        e.stopPropagation();
+        if (confirm('Are you sure you want to delete this image permanently? This cannot be undone.')) {
+          try {
+            await deleteImage(imageId);
+            renderImagesList(); // Refresh the list
+          } catch (err) {
+            console.error('Failed to delete image:', err);
+            alert('Failed to delete image. See console for details.');
+          }
+        }
+      };
+      li.appendChild(deleteIcon);
+
+      imageList.appendChild(li);
+    }
+  } catch (err) {
+    console.error('Failed to render image list:', err);
+    imageList.innerHTML = '<li>Error loading images. See console for details.</li>';
+  }
+}
+
 showListView();
+
 
 // Initial setup
 updateAutoLineBreakButton();
