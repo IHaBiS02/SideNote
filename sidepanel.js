@@ -872,27 +872,92 @@ function sanitizeFilename(filename) {
   return filename.replace(/[\/\\?%*:|"<>]/g, '_');
 }
 
-function downloadFile(content, fileName) {
+function downloadFile(blob, fileName) {
   const a = document.createElement('a');
-  const file = new Blob([content], { type: 'text/plain' });
-  a.href = URL.createObjectURL(file);
+  a.href = URL.createObjectURL(blob);
   a.download = fileName;
   a.click();
   URL.revokeObjectURL(a.href);
 }
 
-globalExportButton.addEventListener('click', () => {
-  const data = JSON.stringify(notes, null, 2);
+function extractImageIds(content) {
+  const imageRegex = /!\[.*?\]\(images\/(.*?)\.png\)/g;
+  const ids = new Set();
+  let match;
+  while ((match = imageRegex.exec(content)) !== null) {
+    ids.add(match[1]);
+  }
+  return Array.from(ids);
+}
+
+globalExportButton.addEventListener('click', async () => {
+  const zip = new JSZip();
   const timestamp = getTimestamp();
-  downloadFile(data, `notes_${timestamp}.snotes`);
+
+  for (const note of notes) {
+    const noteFolder = zip.folder(note.id);
+    
+    const metadata = {
+      title: note.title,
+      settings: note.settings,
+      metadata: note.metadata
+    };
+    noteFolder.file('metadata.json', JSON.stringify(metadata, null, 2));
+    noteFolder.file('note.md', note.content);
+
+    const imageIds = extractImageIds(note.content);
+    if (imageIds.length > 0) {
+      const imagesFolder = noteFolder.folder('images');
+      for (const imageId of imageIds) {
+        try {
+          const imageBlob = await getImage(imageId);
+          if (imageBlob) {
+            imagesFolder.file(`${imageId}.png`, imageBlob);
+          }
+        } catch (err) {
+          console.error(`Failed to get image ${imageId} for export:`, err);
+        }
+      }
+    }
+  }
+
+  zip.generateAsync({ type: 'blob' }).then(blob => {
+    downloadFile(blob, `notes_${timestamp}.snotes`);
+  });
 });
 
-exportNoteButton.addEventListener('click', () => {
+exportNoteButton.addEventListener('click', async () => {
   const note = notes.find(n => n.id === activeNoteId);
   if (note) {
-    const data = JSON.stringify(note, null, 2);
+    const zip = new JSZip();
     const sanitizedTitle = sanitizeFilename(note.title);
-    downloadFile(data, `${sanitizedTitle}.snote`);
+
+    const metadata = {
+      title: note.title,
+      settings: note.settings,
+      metadata: note.metadata
+    };
+    zip.file('metadata.json', JSON.stringify(metadata, null, 2));
+    zip.file('note.md', note.content);
+
+    const imageIds = extractImageIds(note.content);
+    if (imageIds.length > 0) {
+      const imagesFolder = zip.folder('images');
+      for (const imageId of imageIds) {
+        try {
+          const imageBlob = await getImage(imageId);
+          if (imageBlob) {
+            imagesFolder.file(`${imageId}.png`, imageBlob);
+          }
+        } catch (err) {
+          console.error(`Failed to get image ${imageId} for export:`, err);
+        }
+      }
+    }
+
+    zip.generateAsync({ type: 'blob' }).then(blob => {
+      downloadFile(blob, `${sanitizedTitle}.snote`);
+    });
   }
 });
 

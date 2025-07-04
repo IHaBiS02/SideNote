@@ -1,7 +1,7 @@
-feat: Render images from IndexedDB in markdown preview
+feat: Implement new export logic for notes with images
 
-Updates the `renderMarkdown` function to display images stored in IndexedDB.
+Replaces the existing export functionality with a new system that packages notes and their images into zip archives.
 
-- After rendering the markdown to HTML, the function now scans for `<img>` tags with a local `images/` source.
-- For each found image, it retrieves the image blob from IndexedDB using the `getImage()` function.
-- A temporary Blob URL is created and set as the `src` for the `<img>` tag, making the image visible in the preview.
+- **Single Note Export (.snote):** Creates a zip file containing `note.md` (content), `metadata.json` (title, settings, etc.), and an `images/` folder with all images used in that specific note.
+- **Multiple Notes Export (.snotes):** Creates a single zip file where each note is a folder named after its ID, and each folder has the same structure as a `.snote` file.
+- Images are retrieved from IndexedDB and included in the archives.
