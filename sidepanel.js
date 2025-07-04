@@ -737,6 +737,7 @@ htmlPreview.addEventListener('dblclick', togglePreview);
 
 function showImageModal(blobUrl) {
   const modal = document.createElement('div');
+  modal.classList.add('image-preview-modal');
   modal.style.position = 'fixed';
   modal.style.left = '0';
   modal.style.top = '0';
@@ -1253,6 +1254,12 @@ importNoteInput.addEventListener('change', async (e) => {
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
+    const imagePreviewModal = document.querySelector('.image-preview-modal');
+    if (imagePreviewModal) {
+      document.body.removeChild(imagePreviewModal);
+      return;
+    }
+
     if (imageRecycleBinView.style.display === 'block') {
         imageRecycleBinBackButton.click();
     } else if (imageManagementView.style.display === 'block') {
