@@ -780,8 +780,6 @@ htmlPreview.addEventListener('click', (e) => {
     modal.style.height = '100%';
     modal.style.backgroundColor = 'rgba(0,0,0,0.8)';
     modal.style.display = 'flex';
-    modal.style.justifyContent = 'center';
-    modal.style.alignItems = 'center';
     modal.style.zIndex = '1000';
     modal.onclick = (event) => {
         if (event.target === modal) {
@@ -792,31 +790,33 @@ htmlPreview.addEventListener('click', (e) => {
     const modalImg = document.createElement('img');
     modalImg.src = e.target.src;
     
-    let zoomState = 0;
+    let zoomState = 0; // 0: fit-to-screen, 1: full-size
     const setZoomState = (state) => {
-        modal.style.overflow = 'hidden';
-        modalImg.style.cursor = 'zoom-in';
-        modalImg.style.maxWidth = '90%';
-        modalImg.style.maxHeight = '90%';
-        modalImg.style.width = 'auto';
-        modalImg.style.height = 'auto';
-
-        if (state === 1) { // Enlarged
+        if (state === 0) { // Fit-to-screen
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
+            modal.style.overflow = 'hidden';
+            modalImg.style.cursor = 'zoom-in';
+            modalImg.style.maxWidth = '90%';
+            modalImg.style.maxHeight = '90%';
+            modalImg.style.width = 'auto';
+            modalImg.style.height = 'auto';
+        } else { // state === 1, Full-size
+            modal.style.justifyContent = 'flex-start';
+            modal.style.alignItems = 'flex-start';
             modal.style.overflow = 'auto';
-            modalImg.style.maxWidth = 'none';
-            modalImg.style.maxHeight = 'none';
-        } else if (state === 2) { // Height-Fixed
             modalImg.style.cursor = 'zoom-out';
             modalImg.style.maxWidth = 'none';
-            modalImg.style.maxHeight = '100%';
-            modalImg.style.height = '100%';
+            modalImg.style.maxHeight = 'none';
+            modalImg.style.width = 'auto';
+            modalImg.style.height = 'auto';
         }
     };
 
     setZoomState(zoomState);
     
     modalImg.onclick = () => {
-        zoomState = (zoomState + 1) % 3;
+        zoomState = (zoomState + 1) % 2;
         setZoomState(zoomState);
     };
 
