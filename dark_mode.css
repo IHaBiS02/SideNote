@@ -26,6 +26,14 @@ body.dark-mode {
     background-color: #444;
 }
 
+.dark-mode #image-list li:hover, .dark-mode #deleted-image-list li:hover {
+    background-color: #333;
+}
+
+.dark-mode .delete-image-icon:hover, .dark-mode .restore-image-icon:hover {
+    background-color: #444;
+}
+
 .dark-mode #markdown-editor, .dark-mode #html-preview {
     background-color: #1e1e1e;
     color: #e0e0e0;

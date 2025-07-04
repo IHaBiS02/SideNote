@@ -67,8 +67,17 @@ body {
   object-fit: cover;
 }
 
-#image-list li .image-info .image-name {
+#image-list li .image-info .image-name, #deleted-image-list li .image-info .image-name {
   font-size: 0.9em;
+}
+
+#deleted-image-list li .image-info .deletion-date {
+    font-size: 0.8em;
+    color: #888;
+}
+
+#deleted-image-list li .image-info .image-name, #deleted-image-list li .image-info .deletion-date {
+    display: block;
 }
 
 #image-list li .usage-icon {

@@ -1381,16 +1381,20 @@ async function renderDeletedImageList() {
             }
             imageInfo.appendChild(img);
 
+            const textContainer = document.createElement('div');
+
             const imageName = document.createElement('span');
             imageName.classList.add('image-name');
             imageName.textContent = `image_${imageId.substring(0, 8)}.png`;
-            imageInfo.appendChild(imageName);
+            textContainer.appendChild(imageName);
             
             const deletionDate = new Date(imageObject.deletedAt + 30 * 24 * 60 * 60 * 1000);
             const deletionDateSpan = document.createElement('span');
             deletionDateSpan.textContent = `Deletes on: ${deletionDate.toLocaleString()}`;
             deletionDateSpan.classList.add('deletion-date');
-            imageInfo.appendChild(deletionDateSpan);
+            textContainer.appendChild(deletionDateSpan);
+
+            imageInfo.appendChild(textContainer);
 
             li.appendChild(imageInfo);
 
