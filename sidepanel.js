@@ -555,14 +555,16 @@ markdownEditor.addEventListener('paste', async (e) => {
     }
 
     if (globalSettings.autoLineBreak) {
-      const processedText = text.split(/\r?\n/).map(line => {
-        if (line.trim().length === 0) {
-          return '';
-        } else {
-          return line.trimEnd() + '  ';
-        }
-      }).join('\n');
-      text = processedText;
+      const lines = text.split(/\r?\n/);
+      if (lines.length > 1) {
+        const processedText = lines.map((line, index) => {
+          if (index < lines.length - 1 && line.trim().length > 0) {
+            return line.trimEnd() + '  ';
+          }
+          return line;
+        }).join('\n');
+        text = processedText;
+      }
     }
     document.execCommand('insertText', false, text);
   }
