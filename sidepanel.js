@@ -1179,6 +1179,14 @@ globalImportInput.addEventListener('change', async (e) => {
         const newNote = await processSnote(zip.folder(noteFolder));
         newNotes.push(newNote);
       }
+
+      newNotes.sort((a, b) => a.metadata.lastModified - b.metadata.lastModified);
+      
+      const now = Date.now();
+      newNotes.forEach((note, index) => {
+        note.metadata.lastModified = now + index;
+      });
+      
       notes.push(...newNotes);
     }
     sortNotes();
@@ -1223,7 +1231,7 @@ async function processSnote(zip) {
     settings: metadata.settings,
     metadata: {
       createdAt: metadata.metadata?.createdAt || now,
-      lastModified: now
+      lastModified: metadata.metadata?.lastModified || now
     }
   };
 }
