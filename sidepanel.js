@@ -1167,12 +1167,17 @@ globalImportInput.addEventListener('change', async (e) => {
       notes.push(newNote);
     } else if (file.name.endsWith('.snotes')) {
       const newNotes = [];
-      for (const noteId in zip.files) {
-        if (noteId.endsWith('/')) { // It's a folder representing a note
-          const noteFolder = zip.folder(noteId);
-          const newNote = await processSnote(noteFolder);
-          newNotes.push(newNote);
+      const topLevelFolders = new Set();
+      
+      for (const path in zip.files) {
+        if (path.endsWith('/') && path.split('/').length === 2) {
+          topLevelFolders.add(path);
         }
+      }
+
+      for (const noteFolder of topLevelFolders) {
+        const newNote = await processSnote(zip.folder(noteFolder));
+        newNotes.push(newNote);
       }
       notes.push(...newNotes);
     }
