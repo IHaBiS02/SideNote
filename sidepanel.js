@@ -417,7 +417,11 @@ markdownEditor.addEventListener('paste', (e) => {
 
   if (globalSettings.autoLineBreak) {
     const processedText = text.split(/\r?\n/).map(line => {
-      return line.trim().length > 0 ? line + '  ' : line;
+      if (line.trim().length === 0) {
+        return '';
+      } else {
+        return line.trimEnd() + '  ';
+      }
     }).join('\n');
     text = processedText;
   }
