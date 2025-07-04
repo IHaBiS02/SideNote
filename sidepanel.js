@@ -453,6 +453,30 @@ function renderMarkdown() {
     // 기존 라인 넘버 기능은 그대로 호출합니다.
     hljs.lineNumbersBlock(block);
   });
+
+  renderImages();
+}
+
+async function renderImages() {
+  const images = htmlPreview.querySelectorAll('img');
+  for (const img of images) {
+    const src = img.getAttribute('src');
+    if (src && src.startsWith('images/')) {
+      const imageId = src.substring(7, src.lastIndexOf('.'));
+      try {
+        const imageBlob = await getImage(imageId);
+        if (imageBlob) {
+          const blobUrl = URL.createObjectURL(imageBlob);
+          img.src = blobUrl;
+        } else {
+          img.alt = `Image not found: ${imageId}`;
+        }
+      } catch (err) {
+        console.error(`Failed to load image ${imageId} from DB:`, err);
+        img.alt = `Error loading image: ${imageId}`;
+      }
+    }
+  }
 }
 
 newNoteButton.addEventListener('click', () => {

@@ -1,8 +1,7 @@
-feat: Implement image pasting from clipboard
+feat: Render images from IndexedDB in markdown preview
 
-Enhances the paste event listener to support pasting images directly into the editor.
+Updates the `renderMarkdown` function to display images stored in IndexedDB.
 
-- When an image is pasted from the clipboard, it is saved to IndexedDB with a unique ID.
-- A markdown image reference (`![Image](images/UNIQUE_ID.png)`) is inserted into the editor at the cursor's position.
-- If no image is present, the existing text pasting functionality is used.
-- Updates the note content and metadata after the paste operation.
+- After rendering the markdown to HTML, the function now scans for `<img>` tags with a local `images/` source.
+- For each found image, it retrieves the image blob from IndexedDB using the `getImage()` function.
+- A temporary Blob URL is created and set as the `src` for the `<img>` tag, making the image visible in the preview.
