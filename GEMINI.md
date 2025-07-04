@@ -15,6 +15,8 @@ Here is the list of files and folders you need to work :
 
 For every changes, Change version number on the manifest.json, based on the amount of edit you write.  
 
+After all changes, read STRUCTURE.md file and if there are any changes which makes difference with the information on STRUCTURE.md, then write changes in STRUCTURE.md and update the documents.
+
 When committing changes, follow these steps:  
 
 1. Use `git diff` to review the changes.  
