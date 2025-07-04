@@ -1,11 +1,5 @@
-feat: Implement Image Management UI
+fix: Ensure images fit within the note preview
 
-Adds a new UI for managing all images stored in the application.
+Adds a CSS rule to make images responsive in the HTML preview.
 
-- **New View:** Introduces an "Image Management" view accessible from the settings screen.
-- **Image List:** Displays a list of all images from IndexedDB, showing a thumbnail, a partial ID, and a usage status icon.
-- **Image Actions:**
-  - Clicking a thumbnail opens a larger preview.
-  - The usage icon indicates if an image is used in any note and can show which notes use it.
-  - A delete button allows for permanent deletion of images from IndexedDB.
-- **UI Integration:** The new view is integrated into the existing navigation and styling.
+Images wider than the preview area will now scale down to fit, preventing horizontal scrollbars and improving the viewing experience.

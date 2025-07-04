@@ -163,6 +163,11 @@ body {
   margin-top: 0;
 }
 
+#html-preview img {
+  max-width: 100%;
+  height: auto;
+}
+
 .toolbar {
   display: flex;
   justify-content: space-between;
