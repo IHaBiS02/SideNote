@@ -1,9 +1,8 @@
-feat: Implement IndexedDB for image storage
+feat: Implement image pasting from clipboard
 
-Adds the core functionality for storing images in IndexedDB. This includes:
-- `initDB()`: To set up the database and the "images" object store.
-- `saveImage(id, blob)`: To save an image.
-- `getImage(id)`: To retrieve an image.
-- `deleteImage(id)`: To remove an image.
+Enhances the paste event listener to support pasting images directly into the editor.
 
-This is the first step towards implementing image support in notes.
+- When an image is pasted from the clipboard, it is saved to IndexedDB with a unique ID.
+- A markdown image reference (`![Image](images/UNIQUE_ID.png)`) is inserted into the editor at the cursor's position.
+- If no image is present, the existing text pasting functionality is used.
+- Updates the note content and metadata after the paste operation.

@@ -505,32 +505,45 @@ markdownEditor.addEventListener('input', () => {
   }
 });
 
-markdownEditor.addEventListener('paste', (e) => {
+markdownEditor.addEventListener('paste', async (e) => {
   e.preventDefault();
-  let text = e.clipboardData.getData('text/plain');
 
-  if (globalSettings.tildeReplacement) {
-    text = text.replace(/~/g, '\\~');
+  const items = Array.from(e.clipboardData.items);
+  const imageItem = items.find(item => item.kind === 'file' && item.type.startsWith('image/'));
+
+  if (imageItem) {
+    const imageFile = imageItem.getAsFile();
+    const imageId = crypto.randomUUID();
+    
+    try {
+      await saveImage(imageId, imageFile);
+      const markdownImageText = `![Image](images/${imageId}.png)`;
+      document.execCommand('insertText', false, markdownImageText);
+    } catch (err) {
+      console.error('Failed to save image:', err);
+      return; 
+    }
+  } else {
+    let text = e.clipboardData.getData('text/plain');
+
+    if (globalSettings.tildeReplacement) {
+      text = text.replace(/~/g, '\\~');
+    }
+
+    if (globalSettings.autoLineBreak) {
+      const processedText = text.split(/\r?\n/).map(line => {
+        if (line.trim().length === 0) {
+          return '';
+        } else {
+          return line.trimEnd() + '  ';
+        }
+      }).join('\n');
+      text = processedText;
+    }
+    document.execCommand('insertText', false, text);
   }
 
-  if (globalSettings.autoLineBreak) {
-    const processedText = text.split(/\r?\n/).map(line => {
-      if (line.trim().length === 0) {
-        return '';
-      } else {
-        return line.trimEnd() + '  ';
-      }
-    }).join('\n');
-    text = processedText;
-  }
-
-  const start = markdownEditor.selectionStart;
-  const end = markdownEditor.selectionEnd;
-  
-  markdownEditor.value = markdownEditor.value.substring(0, start) + text + markdownEditor.value.substring(end);
-  
-  markdownEditor.selectionStart = markdownEditor.selectionEnd = start + text.length;
-
+  // Common logic to update note after paste
   const note = notes.find(n => n.id === activeNoteId);
   if (note) {
     note.content = markdownEditor.value;
