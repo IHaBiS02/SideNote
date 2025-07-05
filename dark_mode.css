@@ -150,3 +150,9 @@ body.dark-mode {
 .dark-mode input[type="checkbox"] {
   accent-color: #555;
 }
+
+.dark-mode .setting {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

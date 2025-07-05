@@ -37,6 +37,7 @@ const imageManagementView = document.getElementById('image-management-view');
 const imageManagementBackButton = document.getElementById('image-management-back-button');
 const imageList = document.getElementById('image-list');
 const deletedItemsList = document.getElementById('deleted-items-list');
+const preventUsedImageDeletionCheckbox = document.getElementById('prevent-used-image-deletion-checkbox');
 
 let notes = [];
 let deletedNotes = [];
@@ -216,6 +217,7 @@ chrome.storage.local.get(['notes', 'deletedNotes', 'globalSettings'], (data) => 
       autoLineBreak: true,
       tildeReplacement: true,
       autoAddSpaces: true,
+      preventUsedImageDeletion: true,
       mode: 'system'
     };
   }
@@ -939,6 +941,7 @@ settingsButton.addEventListener('click', () => {
   fontSizeSetting.value = note.settings.fontSize || globalSettings.fontSize || 12;
   modeSetting.value = globalSettings.mode || 'system';
   autoAddSpacesCheckbox.checked = globalSettings.autoAddSpaces;
+  preventUsedImageDeletionCheckbox.checked = globalSettings.preventUsedImageDeletion;
   showSettingsView();
 });
 
@@ -948,6 +951,7 @@ globalSettingsButton.addEventListener('click', () => {
   fontSizeSetting.value = globalSettings.fontSize || 12;
   modeSetting.value = globalSettings.mode || 'system';
   autoAddSpacesCheckbox.checked = globalSettings.autoAddSpaces;
+  preventUsedImageDeletionCheckbox.checked = globalSettings.preventUsedImageDeletion;
   showSettingsView();
 });
 
@@ -1061,6 +1065,11 @@ tildeReplacementButton.addEventListener('click', () => {
 autoAddSpacesCheckbox.addEventListener('change', () => {
   globalSettings.autoAddSpaces = autoAddSpacesCheckbox.checked;
   saveGlobalSettings();
+});
+
+preventUsedImageDeletionCheckbox.addEventListener('change', () => {
+    globalSettings.preventUsedImageDeletion = preventUsedImageDeletionCheckbox.checked;
+    saveGlobalSettings();
 });
 
 function getTimestamp() {
@@ -1419,6 +1428,10 @@ async function renderImagesList() {
       deleteIcon.title = 'Move Image to Recycle Bin';
       deleteIcon.onclick = async (e) => {
         e.stopPropagation();
+        if (globalSettings.preventUsedImageDeletion && isUsed) {
+            alert('This image is currently used in a note and cannot be deleted.');
+            return;
+        }
         try {
           await deleteImage(imageId);
           renderImagesList(); // Refresh the list
