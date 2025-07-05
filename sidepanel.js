@@ -1234,14 +1234,17 @@ async function processSnote(zip) {
   
   const imagesFolder = zip.folder('images');
   if (imagesFolder) {
-    const imageFiles = Object.values(imagesFolder.files);
-    for (const imageFile of imageFiles) {
-      if (!imageFile.dir) {
-        const imageId = imageFile.name.split('/').pop().replace('.png', '');
-        const blob = await imageFile.async('blob');
-        await saveImage(imageId, blob);
-      }
-    }
+    const imagePromises = [];
+    imagesFolder.forEach((relativePath, imageFile) => {
+        if (!imageFile.dir) {
+            const imageId = imageFile.name.split('/').pop().replace('.png', '');
+            const promise = imageFile.async('blob').then(blob => {
+                return saveImage(imageId, blob);
+            });
+            imagePromises.push(promise);
+        }
+    });
+    await Promise.all(imagePromises);
   }
 
   const now = Date.now();
