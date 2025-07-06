@@ -1194,6 +1194,7 @@ globalImportInput.addEventListener('change', async (e) => {
     const zip = await JSZip.loadAsync(file);
     if (file.name.endsWith('.snote')) {
       const newNote = await processSnote(zip);
+      newNote.metadata.lastModified = Date.now();
       notes.push(newNote);
     } else if (file.name.endsWith('.snotes')) {
       const newNotes = [];
