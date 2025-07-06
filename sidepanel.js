@@ -38,6 +38,7 @@ const imageManagementBackButton = document.getElementById('image-management-back
 const imageList = document.getElementById('image-list');
 const deletedItemsList = document.getElementById('deleted-items-list');
 const preventUsedImageDeletionCheckbox = document.getElementById('prevent-used-image-deletion-checkbox');
+const pinNoteButton = document.getElementById('pin-note-button');
 
 let notes = [];
 let deletedNotes = [];
@@ -242,10 +243,12 @@ chrome.storage.local.get(['notes', 'deletedNotes', 'globalSettings'], (data) => 
       metadata: {
         createdAt: now,
         lastModified: now
-      }
+      },
+      isPinned: false
     }];
   } else if (Array.isArray(loadedNotes)) {
     notes = loadedNotes.map(note => {
+      note.isPinned = note.isPinned || false;
       if (note.metadata && note.metadata.createdAt && note.metadata.lastModified) {
         return note;
       }
@@ -292,7 +295,14 @@ function cleanupDeletedNotes() {
 }
 
 function sortNotes() {
-  notes.sort((a, b) => b.metadata.lastModified - a.metadata.lastModified);
+  notes.sort((a, b) => {
+    if (a.isPinned && !b.isPinned) return -1;
+    if (!a.isPinned && b.isPinned) return 1;
+    if (a.isPinned && b.isPinned) {
+        return (a.pinnedAt || 0) - (b.pinnedAt || 0);
+    }
+    return b.metadata.lastModified - a.metadata.lastModified;
+  });
 }
 
 function saveNotes() {
@@ -318,6 +328,18 @@ function renderNoteList() {
     const titleSpan = document.createElement('span');
     titleSpan.textContent = note.title;
 
+    const buttonContainer = document.createElement('div');
+    buttonContainer.classList.add('button-container');
+
+    const pinSpan = document.createElement('span');
+    pinSpan.textContent = note.isPinned ? '📌' : '📎';
+    pinSpan.title = note.isPinned ? 'Unpin Note' : 'Pin Note';
+    pinSpan.classList.add('pin-note-icon');
+    pinSpan.addEventListener('click', (e) => {
+        e.stopPropagation();
+        togglePin(note.id);
+    });
+
     const deleteSpan = document.createElement('span');
     deleteSpan.textContent = '🗑️';
     deleteSpan.title = 'Delete Note';
@@ -328,9 +350,26 @@ function renderNoteList() {
     });
 
     li.appendChild(titleSpan);
-    li.appendChild(deleteSpan);
+    buttonContainer.appendChild(pinSpan);
+    buttonContainer.appendChild(deleteSpan);
+    li.appendChild(buttonContainer);
     noteList.appendChild(li);
   });
+}
+
+function togglePin(noteId) {
+    const note = notes.find(n => n.id === noteId);
+    if (note) {
+        note.isPinned = !note.isPinned;
+        if (note.isPinned) {
+            note.pinnedAt = Date.now();
+        } else {
+            delete note.pinnedAt;
+        }
+        sortNotes();
+        saveNotes();
+        renderNoteList();
+    }
 }
 
 function deleteNote(noteId) {
@@ -363,6 +402,7 @@ function openNote(noteId, inEditMode = false) {
     applyFontSize(fontSize);
     updateAutoLineBreakButton();
     updateTildeReplacementButton();
+    updatePinNoteButton();
     renderMarkdown();
     showEditorView();
     isPreview = !inEditMode;
@@ -631,7 +671,8 @@ newNoteButton.addEventListener('click', () => {
     metadata: {
       createdAt: now,
       lastModified: now
-    }
+    },
+    isPinned: false
   };
   notes.unshift(newNote);
   saveNotes();
@@ -1062,6 +1103,29 @@ tildeReplacementButton.addEventListener('click', () => {
   saveGlobalSettings();
 });
 
+function updatePinNoteButton() {
+    const note = notes.find(n => n.id === activeNoteId);
+    if (note) {
+        pinNoteButton.textContent = note.isPinned ? '📌' : '📎';
+        pinNoteButton.title = note.isPinned ? 'Unpin Note' : 'Pin Note';
+    }
+}
+
+pinNoteButton.addEventListener('click', () => {
+    const note = notes.find(n => n.id === activeNoteId);
+    if (note) {
+        note.isPinned = !note.isPinned;
+        if (note.isPinned) {
+            note.pinnedAt = Date.now();
+        } else {
+            delete note.pinnedAt;
+        }
+        sortNotes();
+        saveNotes();
+        updatePinNoteButton();
+    }
+});
+
 autoAddSpacesCheckbox.addEventListener('change', () => {
   globalSettings.autoAddSpaces = autoAddSpacesCheckbox.checked;
   saveGlobalSettings();
@@ -1266,7 +1330,8 @@ async function processSnote(zip) {
     metadata: {
       createdAt: metadata.metadata?.createdAt || now,
       lastModified: metadata.metadata?.lastModified || now
-    }
+    },
+    isPinned: false
   };
 }
 

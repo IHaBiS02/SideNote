@@ -164,12 +164,12 @@ body {
   padding: 5px;
 }
 
-.delete-note-icon, .restore-note-icon {
+.delete-note-icon, .restore-note-icon, .pin-note-icon {
   cursor: pointer;
   padding: 5px;
 }
 
-.delete-note-icon:hover, .restore-note-icon:hover {
+.delete-note-icon:hover, .restore-note-icon:hover, .pin-note-icon:hover {
   background-color: #ddd;
   border-radius: 50%;
 }

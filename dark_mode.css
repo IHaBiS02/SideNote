@@ -21,7 +21,7 @@ body.dark-mode {
     background-color: #333;
 }
 
-.dark-mode .delete-note-icon:hover, .dark-mode .restore-note-icon:hover {
+.dark-mode .delete-note-icon:hover, .dark-mode .restore-note-icon:hover, .dark-mode .pin-note-icon:hover {
     background-color: #444;
 }
 
