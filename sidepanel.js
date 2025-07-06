@@ -38,7 +38,6 @@ const imageManagementBackButton = document.getElementById('image-management-back
 const imageList = document.getElementById('image-list');
 const deletedItemsList = document.getElementById('deleted-items-list');
 const preventUsedImageDeletionCheckbox = document.getElementById('prevent-used-image-deletion-checkbox');
-const pinNoteButton = document.getElementById('pin-note-button');
 
 let notes = [];
 let deletedNotes = [];
@@ -402,7 +401,6 @@ function openNote(noteId, inEditMode = false) {
     applyFontSize(fontSize);
     updateAutoLineBreakButton();
     updateTildeReplacementButton();
-    updatePinNoteButton();
     renderMarkdown();
     showEditorView();
     isPreview = !inEditMode;
@@ -560,8 +558,6 @@ async function renderDeletedItemsList() {
       e.stopPropagation();
       if (item.type === 'note') {
         deleteNotePermanently(item.id);
-      } else {
-        deleteImagePermanently(item.id).then(renderDeletedItemsList);
       }
     });
 
@@ -1096,39 +1092,6 @@ function updateTildeReplacementButton() {
   tildeReplacementButton.textContent = globalSettings.tildeReplacement ? '~✅' : '~❌';
   tildeReplacementButton.title = globalSettings.tildeReplacement ? 'Tilde Replacement Enabled' : 'Tilde Replacement Disabled';
 }
-
-tildeReplacementButton.addEventListener('click', () => {
-  globalSettings.tildeReplacement = !globalSettings.tildeReplacement;
-  updateTildeReplacementButton();
-  saveGlobalSettings();
-});
-
-function updatePinNoteButton() {
-    const note = notes.find(n => n.id === activeNoteId);
-    if (note) {
-        pinNoteButton.textContent = note.isPinned ? '📌' : '📎';
-        pinNoteButton.title = note.isPinned ? 'Unpin Note' : 'Pin Note';
-    }
-}
-
-pinNoteButton.addEventListener('click', () => {
-    const note = notes.find(n => n.id === activeNoteId);
-    if (note) {
-        note.isPinned = !note.isPinned;
-        if (note.isPinned) {
-            note.pinnedAt = Date.now();
-        } else {
-            delete note.pinnedAt;
-        }
-        sortNotes();
-        saveNotes();
-        updatePinNoteButton();
-    }
-});
-
-autoAddSpacesCheckbox.addEventListener('change', () => {
-  globalSettings.autoAddSpaces = autoAddSpacesCheckbox.checked;
-  saveGlobalSettings();
 });
 
 preventUsedImageDeletionCheckbox.addEventListener('change', () => {
