@@ -1429,7 +1429,6 @@ async function renderImagesList() {
       deleteIcon.onclick = async (e) => {
         e.stopPropagation();
         if (globalSettings.preventUsedImageDeletion && isUsed) {
-            alert('This image is currently used in a note and cannot be deleted.');
             return;
         }
         try {
