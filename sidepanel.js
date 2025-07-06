@@ -558,6 +558,8 @@ async function renderDeletedItemsList() {
       e.stopPropagation();
       if (item.type === 'note') {
         deleteNotePermanently(item.id);
+      } else {
+        deleteImagePermanently(item.id).then(renderDeletedItemsList);
       }
     });
 
@@ -1092,7 +1094,7 @@ function updateTildeReplacementButton() {
   tildeReplacementButton.textContent = globalSettings.tildeReplacement ? '~✅' : '~❌';
   tildeReplacementButton.title = globalSettings.tildeReplacement ? 'Tilde Replacement Enabled' : 'Tilde Replacement Disabled';
 }
-});
+
 
 preventUsedImageDeletionCheckbox.addEventListener('change', () => {
     globalSettings.preventUsedImageDeletion = preventUsedImageDeletionCheckbox.checked;
