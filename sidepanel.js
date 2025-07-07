@@ -1095,6 +1095,11 @@ function updateTildeReplacementButton() {
   tildeReplacementButton.title = globalSettings.tildeReplacement ? 'Tilde Replacement Enabled' : 'Tilde Replacement Disabled';
 }
 
+tildeReplacementButton.addEventListener('click', () => {
+  globalSettings.tildeReplacement = !globalSettings.tildeReplacement;
+  updateTildeReplacementButton();
+  saveGlobalSettings();
+});
 
 preventUsedImageDeletionCheckbox.addEventListener('change', () => {
     globalSettings.preventUsedImageDeletion = preventUsedImageDeletionCheckbox.checked;
