@@ -448,7 +448,8 @@ blockquote {
 /* 체크박스 스타일 */
 input[type="checkbox"] {
   margin-right: 5px;
-  accent-color: grey;
+  accent-color: #007bff;
+  vertical-align: middle;
 }
 
 /* 리스트 스타일 */
