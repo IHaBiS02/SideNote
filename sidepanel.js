@@ -696,15 +696,20 @@ markdownEditor.addEventListener('input', () => {
     note.content = markdownEditor.value;
     note.metadata.lastModified = Date.now();
     const titleSource = note.settings.title || globalSettings.title;
+    let titleChanged = false;
     if (titleSource === 'default') {
-      const firstLine = note.content.trim().split('\n')[0];
-      note.title = firstLine.substring(0, 30) || 'New Note';
-      editorTitle.textContent = note.title;
+      const newTitle = note.content.trim().split('\n')[0].substring(0, 30) || 'New Note';
+      if (note.title !== newTitle) {
+        note.title = newTitle;
+        editorTitle.textContent = note.title;
+        titleChanged = true;
+      }
     }
     sortNotes();
     saveNotes();
-    renderMarkdown();
-    renderNoteList();
+    if (titleChanged) {
+      renderNoteList();
+    }
   }
 });
 
@@ -746,23 +751,6 @@ markdownEditor.addEventListener('paste', async (e) => {
       }
     }
     document.execCommand('insertText', false, text);
-  }
-
-  // Common logic to update note after paste
-  const note = notes.find(n => n.id === activeNoteId);
-  if (note) {
-    note.content = markdownEditor.value;
-    note.metadata.lastModified = Date.now();
-    const titleSource = note.settings.title || globalSettings.title;
-    if (titleSource === 'default') {
-      const firstLine = note.content.trim().split('\n')[0];
-      note.title = firstLine.substring(0, 30) || 'New Note';
-      editorTitle.textContent = note.title;
-    }
-    sortNotes();
-    saveNotes();
-    renderMarkdown();
-    renderNoteList();
   }
 });
 
