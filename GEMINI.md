@@ -5,7 +5,15 @@ Here is the list of files and folders you need to work :
 
 1. manifest.json : json file contains manifest information  
 2. sidepanel.html : html file which used on the sidepanel on the browser  
-3. sidepanel.js : js file which have codes need to run browser extension  
+3. src/ : folder which contains javascript files for the extension
+    - database.js : functions for interacting with IndexedDB.
+    - notes_view.js : functions for managing notes and rendering views.
+    - settings.js : functions for managing global and note-specific settings.
+    - import_export.js : functions for importing and exporting notes.
+    - utils.js : utility functions.
+    - dom.js : DOM element references.
+    - events.js : event listeners.
+    - main.js : the main script that ties everything together.
 4. sidepanel.css : css file which used to set design of the extension  
 5. dark_mode.css : css file which has css values for dark mode  
 6. background.js : js file used for opening extensions  
@@ -24,4 +32,4 @@ When committing changes, follow these steps:
 3. Propose a commit message.  
 4. Write the message to a temporary file named `commit_message.txt`.  
 5. Use `git commit -F commit_message.txt` to commit the changes.  
-6. Use `del commit_message.txt` to remove the temporary file.  
+6. Use `del commit_message.txt` to remove the temporary file.
