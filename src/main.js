@@ -4,6 +4,9 @@ initDB().then(() => {
   cleanupDeletedImages();
 }).catch(err => console.error("Failed to initialize DB:", err));
 
+/**
+ * Loads data from storage and migrates it to IndexedDB if necessary.
+ */
 async function loadAndMigrateData() {
   // Load settings from storage
   chrome.storage.local.get(['globalSettings', 'notes', 'deletedNotes'], async (data) => {
@@ -52,6 +55,9 @@ async function loadAndMigrateData() {
   });
 }
 
+/**
+ * Deletes images that have been in the recycle bin for more than 30 days.
+ */
 async function cleanupDeletedImages() {
     const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
     const imageObjects = await getAllImageObjectsFromDB();
@@ -61,6 +67,9 @@ async function cleanupDeletedImages() {
     }
 }
 
+/**
+ * Deletes notes that have been in the recycle bin for more than 30 days.
+ */
 async function cleanupDeletedNotes() {
     const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
     const notesToDelete = deletedNotes.filter(note => note.metadata.deletedAt < thirtyDaysAgo);

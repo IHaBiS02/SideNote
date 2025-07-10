@@ -1,6 +1,9 @@
 let notes = [];
 let deletedNotes = [];
 
+/**
+ * Sorts the notes array.
+ */
 function sortNotes() {
   notes.sort((a, b) => {
     if (a.isPinned && !b.isPinned) return -1;
@@ -12,6 +15,10 @@ function sortNotes() {
   });
 }
 
+/**
+ * Deletes a note.
+ * @param {string} noteId The ID of the note to delete.
+ */
 async function deleteNote(noteId) {
   const noteIndex = notes.findIndex(n => n.id === noteId);
   if (noteIndex > -1) {
@@ -23,6 +30,10 @@ async function deleteNote(noteId) {
   }
 }
 
+/**
+ * Toggles the pin status of a note.
+ * @param {string} noteId The ID of the note to toggle.
+ */
 async function togglePin(noteId) {
     const note = notes.find(n => n.id === noteId);
     if (note) {
@@ -38,6 +49,10 @@ async function togglePin(noteId) {
     }
 }
 
+/**
+ * Restores a deleted note.
+ * @param {string} noteId The ID of the note to restore.
+ */
 async function restoreNote(noteId) {
   const noteIndex = deletedNotes.findIndex(n => n.id === noteId);
   if (noteIndex > -1) {
@@ -51,6 +66,10 @@ async function restoreNote(noteId) {
   }
 }
 
+/**
+ * Permanently deletes a note.
+ * @param {string} noteId The ID of the note to delete permanently.
+ */
 async function deleteNotePermanently(noteId) {
   deletedNotes = deletedNotes.filter(n => n.id !== noteId);
   await deleteNotePermanentlyDB(noteId);

@@ -1,3 +1,8 @@
+/**
+ * Processes a .snote or .snotes file.
+ * @param {JSZip} zip The JSZip object representing the zip file.
+ * @returns {Promise<object>} A promise that resolves with the new note object.
+ */
 async function processSnote(zip) {
   const metadataFile = zip.file('metadata.json');
   const noteFile = zip.file('note.md');

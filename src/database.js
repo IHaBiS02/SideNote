@@ -1,5 +1,9 @@
 let db;
 
+/**
+ * Initializes the IndexedDB database.
+ * @returns {Promise<IDBDatabase>} A promise that resolves with the database object.
+ */
 function initDB() {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open('SimpleNotesDB', 2);
@@ -27,6 +31,11 @@ function initDB() {
   });
 }
 
+/**
+ * Retrieves a note object from the database by its ID.
+ * @param {string} id The ID of the note to retrieve.
+ * @returns {Promise<object>} A promise that resolves with the note object.
+ */
 function _getNoteObject(id) {
     return new Promise((resolve, reject) => {
         if (!db) {
@@ -47,6 +56,11 @@ function _getNoteObject(id) {
     });
 }
 
+/**
+ * Saves a note object to the database.
+ * @param {object} note The note object to save.
+ * @returns {Promise<void>} A promise that resolves when the note is saved.
+ */
 function saveNote(note) {
     return new Promise((resolve, reject) => {
         if (!db) {
@@ -67,6 +81,10 @@ function saveNote(note) {
     });
 }
 
+/**
+ * Retrieves all note objects from the database.
+ * @returns {Promise<Array<object>>} A promise that resolves with an array of note objects.
+ */
 function getAllNotes() {
     return new Promise((resolve, reject) => {
         if (!db) {
@@ -87,6 +105,11 @@ function getAllNotes() {
     });
 }
 
+/**
+ * Marks a note as deleted in the database.
+ * @param {string} id The ID of the note to delete.
+ * @returns {Promise<void>} A promise that resolves when the note is marked as deleted.
+ */
 function deleteNoteDB(id) {
     return new Promise(async (resolve, reject) => {
         if (!db) {
@@ -111,6 +134,11 @@ function deleteNoteDB(id) {
     });
 }
 
+/**
+ * Restores a deleted note in the database.
+ * @param {string} id The ID of the note to restore.
+ * @returns {Promise<void>} A promise that resolves when the note is restored.
+ */
 function restoreNoteDB(id) {
     return new Promise(async (resolve, reject) => {
         if (!db) {
@@ -135,6 +163,11 @@ function restoreNoteDB(id) {
     });
 }
 
+/**
+ * Permanently deletes a note from the database.
+ * @param {string} id The ID of the note to delete permanently.
+ * @returns {Promise<void>} A promise that resolves when the note is deleted.
+ */
 function deleteNotePermanentlyDB(id) {
     return new Promise((resolve, reject) => {
         if (!db) {
@@ -155,6 +188,11 @@ function deleteNotePermanentlyDB(id) {
     });
 }
 
+/**
+ * Retrieves an image object from the database by its ID.
+ * @param {string} id The ID of the image to retrieve.
+ * @returns {Promise<object>} A promise that resolves with the image object.
+ */
 function _getImageObject(id) {
   return new Promise((resolve, reject) => {
     if (!db) {
@@ -175,6 +213,12 @@ function _getImageObject(id) {
   });
 }
 
+/**
+ * Saves an image to the database.
+ * @param {string} id The ID of the image.
+ * @param {Blob} blob The image blob to save.
+ * @returns {Promise<void>} A promise that resolves when the image is saved.
+ */
 function saveImage(id, blob) {
   return new Promise((resolve, reject) => {
     if (!db) {
@@ -195,6 +239,11 @@ function saveImage(id, blob) {
   });
 }
 
+/**
+ * Retrieves an image blob from the database.
+ * @param {string} id The ID of the image to retrieve.
+ * @returns {Promise<Blob>} A promise that resolves with the image blob.
+ */
 function getImage(id) {
   return new Promise((resolve, reject) => {
     _getImageObject(id).then(imageObject => {
@@ -207,6 +256,11 @@ function getImage(id) {
   });
 }
 
+/**
+ * Marks an image as deleted in the database.
+ * @param {string} id The ID of the image to delete.
+ * @returns {Promise<void>} A promise that resolves when the image is marked as deleted.
+ */
 function deleteImage(id) {
   return new Promise(async (resolve, reject) => {
     if (!db) {
@@ -231,6 +285,11 @@ function deleteImage(id) {
   });
 }
 
+/**
+ * Restores a deleted image in the database.
+ * @param {string} id The ID of the image to restore.
+ * @returns {Promise<void>} A promise that resolves when the image is restored.
+ */
 function restoreImage(id) {
   return new Promise(async (resolve, reject) => {
     if (!db) {
@@ -255,6 +314,11 @@ function restoreImage(id) {
   });
 }
 
+/**
+ * Permanently deletes an image from the database.
+ * @param {string} id The ID of the image to delete permanently.
+ * @returns {Promise<void>} A promise that resolves when the image is deleted.
+ */
 function deleteImagePermanently(id) {
   return new Promise((resolve, reject) => {
     if (!db) {
@@ -275,6 +339,10 @@ function deleteImagePermanently(id) {
   });
 }
 
+/**
+ * Retrieves all image objects from the database.
+ * @returns {Promise<Array<object>>} A promise that resolves with an array of image objects.
+ */
 function getAllImageObjectsFromDB() {
   return new Promise((resolve, reject) => {
     if (!db) {

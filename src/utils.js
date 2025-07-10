@@ -1,3 +1,7 @@
+/**
+ * Gets a timestamp string.
+ * @returns {string} The timestamp string.
+ */
 function getTimestamp() {
   const now = new Date();
   const year = now.getFullYear();
@@ -9,10 +13,20 @@ function getTimestamp() {
   return `${year}_${month}_${day}_${hours}_${minutes}_${seconds}`;
 }
 
+/**
+ * Sanitizes a filename.
+ * @param {string} filename The filename to sanitize.
+ * @returns {string} The sanitized filename.
+ */
 function sanitizeFilename(filename) {
-  return filename.replace(/[\\/\\?%*:|"<>]/g, '_');
+  return filename.replace(/[/\\?%*:|"<>]/g, '_');
 }
 
+/**
+ * Downloads a file.
+ * @param {Blob} blob The blob to download.
+ * @param {string} fileName The name of the file.
+ */
 function downloadFile(blob, fileName) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -21,6 +35,11 @@ function downloadFile(blob, fileName) {
   URL.revokeObjectURL(a.href);
 }
 
+/**
+ * Extracts image IDs from a string of content.
+ * @param {string} content The content to extract image IDs from.
+ * @returns {Array<string>} An array of image IDs.
+ */
 function extractImageIds(content) {
   const imageRegex = /!\[.*?\]\(images\/(.*?)\.png\)/g;
   const ids = new Set();

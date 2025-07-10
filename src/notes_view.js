@@ -2,6 +2,9 @@ let activeNoteId = null;
 let originalNoteContent = '';
 let isPreview = false;
 
+/**
+ * Renders the list of notes.
+ */
 function renderNoteList() {
   noteList.innerHTML = '';
   if (!Array.isArray(notes)) return;
@@ -42,6 +45,11 @@ function renderNoteList() {
   });
 }
 
+/**
+ * Opens a note in the editor.
+ * @param {string} noteId The ID of the note to open.
+ * @param {boolean} inEditMode Whether to open the note in edit mode.
+ */
 function openNote(noteId, inEditMode = false) {
   const note = notes.find(n => n.id === noteId);
   if (note) {
@@ -69,6 +77,9 @@ function openNote(noteId, inEditMode = false) {
   }
 }
 
+/**
+ * Shows the list view.
+ */
 function showListView() {
   activeNoteId = null;
   listView.style.display = 'block';
@@ -79,6 +90,9 @@ function showListView() {
   renderNoteList();
 }
 
+/**
+ * Shows the editor view.
+ */
 function showEditorView() {
   listView.style.display = 'none';
   editorView.style.display = 'block';
@@ -87,6 +101,9 @@ function showEditorView() {
   imageManagementView.style.display = 'none';
 }
 
+/**
+ * Shows the settings view.
+ */
 function showSettingsView() {
   listView.style.display = 'none';
   editorView.style.display = 'none';
@@ -96,6 +113,9 @@ function showSettingsView() {
   imageManagementView.style.display = 'none';
 }
 
+/**
+ * Shows the license view.
+ */
 function showLicenseView() {
   listView.style.display = 'none';
   editorView.style.display = 'none';
@@ -105,6 +125,9 @@ function showLicenseView() {
   imageManagementView.style.display = 'none';
 }
 
+/**
+ * Shows the recycle bin view.
+ */
 function showRecycleBinView() {
   listView.style.display = 'none';
   editorView.style.display = 'none';
@@ -115,6 +138,9 @@ function showRecycleBinView() {
   renderDeletedItemsList();
 }
 
+/**
+ * Shows the image management view.
+ */
 function showImageManagementView() {
   listView.style.display = 'none';
   editorView.style.display = 'none';
@@ -125,6 +151,9 @@ function showImageManagementView() {
   renderImagesList();
 }
 
+/**
+ * Renders the list of deleted items.
+ */
 async function renderDeletedItemsList() {
   deletedItemsList.innerHTML = '';
 
@@ -223,6 +252,9 @@ async function renderDeletedItemsList() {
   });
 }
 
+/**
+ * Renders the markdown content as HTML.
+ */
 function renderMarkdown() {
   const renderer = new marked.Renderer();
   renderer.listitem = function(text, task, checked) {
@@ -266,6 +298,9 @@ function renderMarkdown() {
   renderImages();
 }
 
+/**
+ * Renders images in the preview.
+ */
 async function renderImages() {
   const images = htmlPreview.querySelectorAll('img');
   for (const img of images) {
@@ -289,6 +324,9 @@ async function renderImages() {
   }
 }
 
+/**
+ * Toggles between the editor and preview modes.
+ */
 function togglePreview() {
   isPreview = !isPreview;
   if (isPreview) {
@@ -304,6 +342,10 @@ function togglePreview() {
   }
 }
 
+/**
+ * Shows an image in a modal.
+ * @param {string} blobUrl The blob URL of the image to show.
+ */
 function showImageModal(blobUrl) {
   const modal = document.createElement('div');
   modal.classList.add('image-preview-modal');
@@ -360,6 +402,9 @@ function showImageModal(blobUrl) {
   document.body.appendChild(modal);
 }
 
+/**
+ * Renders the list of images.
+ */
 async function renderImagesList() {
   imageList.innerHTML = '';
   try {
