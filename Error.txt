@@ -1,5 +1,5 @@
 오류
-Uncaught SyntaxError: Identifier 'notes' has already been declared
+Uncaught SyntaxError: Identifier 'activeNoteId' has already been declared
 컨텍스트
 sidepanel.html
 스택 추적
@@ -470,10 +470,6 @@ src/notes_view.js:1 (익명의 함수)
 464
 465
 466
-467
-468
-let notes = [];
-let deletedNotes = [];
 let activeNoteId = null;
 let originalNoteContent = '';
 let isPreview = false;
@@ -945,7 +941,7 @@ Uncaught ReferenceError: showListView is not defined
 Uncaught (in promise) ReferenceError: renderNoteList is not defined
 
 오류
-Uncaught SyntaxError: Identifier 'notes' has already been declared
+Uncaught SyntaxError: Identifier 'activeNoteId' has already been declared
 Uncaught ReferenceError: togglePreview is not defined
 컨텍스트
 sidepanel.html
@@ -2000,8 +1996,9 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
 Uncaught ReferenceError: showListView is not defined
 Uncaught (in promise) ReferenceError: renderNoteList is not defined
 
+
 오류
-Uncaught SyntaxError: Identifier 'notes' has already been declared
+Uncaught SyntaxError: Identifier 'activeNoteId' has already been declared
 Uncaught ReferenceError: togglePreview is not defined
 Uncaught ReferenceError: showListView is not defined
 컨텍스트
@@ -2174,8 +2171,9 @@ renderNoteList();
  
 Uncaught (in promise) ReferenceError: renderNoteList is not defined
 
+
 오류
-Uncaught SyntaxError: Identifier 'notes' has already been declared
+Uncaught SyntaxError: Identifier 'activeNoteId' has already been declared
 Uncaught ReferenceError: togglePreview is not defined
 Uncaught ReferenceError: showListView is not defined
 Uncaught (in promise) ReferenceError: renderNoteList is not defined

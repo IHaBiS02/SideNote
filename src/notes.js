@@ -1,7 +1,5 @@
 let notes = [];
 let deletedNotes = [];
-let activeNoteId = null;
-let originalNoteContent = '';
 
 function sortNotes() {
   notes.sort((a, b) => {
