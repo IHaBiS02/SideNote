@@ -1,9 +1,2188 @@
 오류
-Uncaught (in promise) ReferenceError: sortNotes is not defined
+Uncaught SyntaxError: Identifier 'notes' has already been declared
 컨텍스트
 sidepanel.html
 스택 추적
-src/main.js:48 (익명의 함수)
+src/notes_view.js:1 (익명의 함수)
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465
+466
+467
+468
+let notes = [];
+let deletedNotes = [];
+let activeNoteId = null;
+let originalNoteContent = '';
+let isPreview = false;
+
+function renderNoteList() {
+  noteList.innerHTML = '';
+  if (!Array.isArray(notes)) return;
+  notes.forEach(note => {
+    const li = document.createElement('li');
+    li.dataset.noteId = note.id;
+    li.addEventListener('click', () => openNote(note.id));
+
+    const titleSpan = document.createElement('span');
+    titleSpan.textContent = note.title;
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.classList.add('button-container');
+
+    const pinSpan = document.createElement('span');
+    pinSpan.textContent = note.isPinned ? '📌' : '📎';
+    pinSpan.title = note.isPinned ? 'Unpin Note' : 'Pin Note';
+    pinSpan.classList.add('pin-note-icon');
+    pinSpan.addEventListener('click', (e) => {
+        e.stopPropagation();
+        togglePin(note.id);
+    });
+
+    const deleteSpan = document.createElement('span');
+    deleteSpan.textContent = '🗑️';
+    deleteSpan.title = 'Delete Note';
+    deleteSpan.classList.add('delete-note-icon');
+    deleteSpan.addEventListener('click', (e) => {
+      e.stopPropagation();
+      deleteNote(note.id);
+    });
+
+    li.appendChild(titleSpan);
+    buttonContainer.appendChild(pinSpan);
+    buttonContainer.appendChild(deleteSpan);
+    li.appendChild(buttonContainer);
+    noteList.appendChild(li);
+  });
+}
+
+function openNote(noteId, inEditMode = false) {
+  const note = notes.find(n => n.id === noteId);
+  if (note) {
+    activeNoteId = noteId;
+    originalNoteContent = note.content; // Store original content
+    editorTitle.textContent = note.title;
+    markdownEditor.value = note.content;
+    const fontSize = note.settings.fontSize || globalSettings.fontSize || 12;
+    applyFontSize(fontSize);
+    updateAutoLineBreakButton();
+    updateTildeReplacementButton();
+    renderMarkdown();
+    showEditorView();
+    isPreview = !inEditMode;
+    if (isPreview) {
+      htmlPreview.style.display = 'block';
+      markdownEditor.style.display = 'none';
+      toggleViewButton.textContent = 'Edit';
+    } else {
+      htmlPreview.style.display = 'none';
+      markdownEditor.style.display = 'block';
+      toggleViewButton.textContent = 'Preview';
+      markdownEditor.focus();
+    }
+  }
+}
+
+function showListView() {
+  activeNoteId = null;
+  listView.style.display = 'block';
+  editorView.style.display = 'none';
+  settingsView.style.display = 'none';
+  recycleBinView.style.display = 'none';
+  imageManagementView.style.display = 'none';
+  renderNoteList();
+}
+
+function showEditorView() {
+  listView.style.display = 'none';
+  editorView.style.display = 'block';
+  settingsView.style.display = 'none';
+  recycleBinView.style.display = 'none';
+  imageManagementView.style.display = 'none';
+}
+
+function showSettingsView() {
+  listView.style.display = 'none';
+  editorView.style.display = 'none';
+  settingsView.style.display = 'block';
+  licenseView.style.display = 'none';
+  recycleBinView.style.display = 'none';
+  imageManagementView.style.display = 'none';
+}
+
+function showLicenseView() {
+  listView.style.display = 'none';
+  editorView.style.display = 'none';
+  settingsView.style.display = 'none';
+  licenseView.style.display = 'block';
+  recycleBinView.style.display = 'none';
+  imageManagementView.style.display = 'none';
+}
+
+function showRecycleBinView() {
+  listView.style.display = 'none';
+  editorView.style.display = 'none';
+  settingsView.style.display = 'none';
+  licenseView.style.display = 'none';
+  recycleBinView.style.display = 'block';
+  imageManagementView.style.display = 'none';
+  renderDeletedItemsList();
+}
+
+function showImageManagementView() {
+  listView.style.display = 'none';
+  editorView.style.display = 'none';
+  settingsView.style.display = 'none';
+  licenseView.style.display = 'none';
+  recycleBinView.style.display = 'none';
+  imageManagementView.style.display = 'block';
+  renderImagesList();
+}
+
+async function renderDeletedItemsList() {
+  deletedItemsList.innerHTML = '';
+
+  // 1. Get deleted notes and images
+  const deletedImageObjects = (await getAllImageObjectsFromDB()).filter(img => img.deletedAt);
+  
+  // 2. Combine and sort
+  const deletedItems = [
+    ...deletedNotes.map(n => ({ ...n, type: 'note', deletedAt: n.metadata.deletedAt })),
+    ...deletedImageObjects.map(i => ({ ...i, type: 'image', deletedAt: i.deletedAt }))
+  ];
+  deletedItems.sort((a, b) => b.deletedAt - a.deletedAt);
+
+  // 3. Render list
+  deletedItems.forEach(item => {
+    const li = document.createElement('li');
+    li.dataset.itemId = item.id;
+    li.dataset.itemType = item.type;
+
+    const itemInfo = document.createElement('div');
+    itemInfo.classList.add('item-info');
+
+    if (item.type === 'note') {
+      itemInfo.classList.add('note-info');
+      const titleSpan = document.createElement('span');
+      titleSpan.textContent = item.title;
+      itemInfo.appendChild(titleSpan);
+
+      const deletionDate = new Date(item.deletedAt + 30 * 24 * 60 * 60 * 1000);
+      const deletionDateSpan = document.createElement('span');
+      deletionDateSpan.textContent = `Deletes on: ${deletionDate.toLocaleString()}`;
+      deletionDateSpan.classList.add('deletion-date');
+      itemInfo.appendChild(deletionDateSpan);
+    } else { // type === 'image'
+      itemInfo.classList.add('image-info');
+      const img = document.createElement('img');
+      const imageBlob = item.blob;
+      if (imageBlob) {
+          const blobUrl = URL.createObjectURL(imageBlob);
+          img.src = blobUrl;
+          img.onclick = () => showImageModal(blobUrl);
+      }
+      itemInfo.appendChild(img);
+
+      const textContainer = document.createElement('div');
+      textContainer.classList.add('text-container');
+
+      const imageName = document.createElement('span');
+      imageName.classList.add('image-name');
+      imageName.textContent = `image_${item.id.substring(0, 8)}.png`;
+      textContainer.appendChild(imageName);
+
+      const deletionDate = new Date(item.deletedAt + 30 * 24 * 60 * 60 * 1000);
+      const deletionDateSpan = document.createElement('span');
+      deletionDateSpan.textContent = `Deletes on: ${deletionDate.toLocaleString()}`;
+      deletionDateSpan.classList.add('deletion-date');
+      textContainer.appendChild(deletionDateSpan);
+
+      itemInfo.appendChild(textContainer);
+    }
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.classList.add('button-container');
+
+    const restoreSpan = document.createElement('span');
+    restoreSpan.textContent = '♻️';
+    restoreSpan.title = `Restore ${item.type === 'note' ? 'Note' : 'Image'}`;
+    restoreSpan.classList.add('restore-item-icon');
+    restoreSpan.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (item.type === 'note') {
+        restoreNote(item.id);
+      } else {
+        restoreImage(item.id).then(renderDeletedItemsList);
+      }
+    });
+
+    const deleteSpan = document.createElement('span');
+    deleteSpan.textContent = '🗑️';
+    deleteSpan.title = `Delete ${item.type === 'note' ? 'Note' : 'Image'} Permanently`;
+    deleteSpan.classList.add('delete-item-icon');
+    deleteSpan.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (item.type === 'note') {
+        deleteNotePermanently(item.id);
+      } else {
+        deleteImagePermanently(item.id).then(renderDeletedItemsList);
+      }
+    });
+
+    li.appendChild(itemInfo);
+    buttonContainer.appendChild(restoreSpan);
+    buttonContainer.appendChild(deleteSpan);
+    li.appendChild(buttonContainer);
+    deletedItemsList.appendChild(li);
+  });
+}
+
+function renderMarkdown() {
+  const renderer = new marked.Renderer();
+  renderer.listitem = function(text, task, checked) {
+    if (task) {
+      return '<li class="task-list-item">' + text + '</li>';
+    }
+    return '<li>' + text + '</li>';
+  };
+  renderer.checkbox = function(checked) {
+    return `<input type="checkbox" ${checked ? 'checked' : ''}>`;
+  };
+
+  marked.setOptions({
+    gfm: true,
+    renderer: renderer,
+    highlight: function(code, lang) {
+      const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+      return hljs.highlight(code, { language }).value;
+    }
+  });
+
+  const dirtyHtml = marked.parse(markdownEditor.value);
+  htmlPreview.innerHTML = DOMPurify.sanitize(dirtyHtml, {
+    ADD_TAGS: ['pre', 'code', 'span'],
+    ADD_ATTR: ['class']
+  });
+  htmlPreview.querySelectorAll('pre code').forEach((block) => {
+    // block(<code>)의 텍스트 컨텐츠를 가져와 줄바꿈(\n)으로 분리하여 줄 수를 계산합니다.
+    const lineCount = block.textContent.split('\n').length;
+    // 줄 수에 따라 부모 요소인 <pre> 태그에 클래스를 추가합니다.
+    if (lineCount === 2) {
+      block.parentElement.classList.add('single-line-code');
+    } else {
+      block.parentElement.classList.add('multi-line-code');
+    }
+
+    // 기존 라인 넘버 기능은 그대로 호출합니다.
+    hljs.lineNumbersBlock(block);
+  });
+
+  renderImages();
+}
+
+async function renderImages() {
+  const images = htmlPreview.querySelectorAll('img');
+  for (const img of images) {
+    const src = img.getAttribute('src');
+    if (src && src.startsWith('images/')) {
+      const imageId = src.substring(7, src.lastIndexOf('.'));
+      img.dataset.imageId = imageId; // Add data-id for scrolling
+      try {
+        const imageBlob = await getImage(imageId);
+        if (imageBlob) {
+          const blobUrl = URL.createObjectURL(imageBlob);
+          img.src = blobUrl;
+        } else {
+          img.alt = `Image not found: ${imageId}`;
+        }
+      } catch (err) {
+        console.error(`Failed to load image ${imageId} from DB:`, err);
+        img.alt = `Error loading image: ${imageId}`;
+      }
+    }
+  }
+}
+
+function togglePreview() {
+  isPreview = !isPreview;
+  if (isPreview) {
+    renderMarkdown();
+    htmlPreview.style.display = 'block';
+    markdownEditor.style.display = 'none';
+    toggleViewButton.textContent = 'Edit';
+  } else {
+    htmlPreview.style.display = 'none';
+    markdownEditor.style.display = 'block';
+    toggleViewButton.textContent = 'Preview';
+    markdownEditor.focus();
+  }
+}
+
+function showImageModal(blobUrl) {
+  const modal = document.createElement('div');
+  modal.classList.add('image-preview-modal');
+  modal.style.position = 'fixed';
+  modal.style.left = '0';
+  modal.style.top = '0';
+  modal.style.width = '100%';
+  modal.style.height = '100%';
+  modal.style.backgroundColor = 'rgba(0,0,0,0.8)';
+  modal.style.display = 'flex';
+  modal.style.boxSizing = 'border-box';
+  modal.style.padding = '10%';
+  modal.style.zIndex = '1000';
+  modal.onclick = (event) => {
+      if (event.target === modal) {
+          document.body.removeChild(modal);
+      }
+  };
+
+  const modalImg = document.createElement('img');
+  modalImg.src = blobUrl;
+  
+  let zoomState = 0; // 0: fit-to-screen, 1: full-size
+  const setZoomState = (state) => {
+      if (state === 0) { // Fit-to-screen
+          modal.style.justifyContent = 'center';
+          modal.style.alignItems = 'center';
+          modal.style.overflow = 'hidden';
+          modalImg.style.cursor = 'zoom-in';
+          modalImg.style.maxWidth = '90%';
+          modalImg.style.maxHeight = '90%';
+          modalImg.style.width = 'auto';
+          modalImg.style.height = 'auto';
+      } else { // state === 1, Full-size
+          modal.style.justifyContent = 'flex-start';
+          modal.style.alignItems = 'flex-start';
+          modal.style.overflow = 'auto';
+          modalImg.style.cursor = 'zoom-out';
+          modalImg.style.maxWidth = 'none';
+          modalImg.style.maxHeight = 'none';
+          modalImg.style.width = 'auto';
+          modalImg.style.height = 'auto';
+      }
+  };
+
+  setZoomState(zoomState);
+  
+  modalImg.onclick = () => {
+      zoomState = (zoomState + 1) % 2;
+      setZoomState(zoomState);
+  };
+
+  modal.appendChild(modalImg);
+  document.body.appendChild(modal);
+}
+
+async function renderImagesList() {
+  imageList.innerHTML = '';
+  try {
+    const imageObjects = await getAllImageObjectsFromDB();
+    const allNoteContent = notes.map(n => n.content).join('\n');
+
+    const activeImages = imageObjects.filter(img => !img.deletedAt);
+
+    for (const imageObject of activeImages) {
+      const imageId = imageObject.id;
+      const li = document.createElement('li');
+      li.dataset.imageId = imageId;
+
+      const imageInfo = document.createElement('div');
+      imageInfo.classList.add('image-info');
+
+      const img = document.createElement('img');
+      const imageBlob = imageObject.blob;
+      if (imageBlob) {
+        const blobUrl = URL.createObjectURL(imageBlob);
+        img.src = blobUrl;
+        img.onclick = () => showImageModal(blobUrl);
+      }
+      imageInfo.appendChild(img);
+
+      const imageName = document.createElement('span');
+      imageName.classList.add('image-name');
+      imageName.textContent = `image_${imageId.substring(0, 8)}.png`;
+      imageInfo.appendChild(imageName);
+
+      li.appendChild(imageInfo);
+
+      const usageIcon = document.createElement('span');
+      usageIcon.classList.add('usage-icon');
+      const isUsed = allNoteContent.includes(imageId);
+      const notesUsingImage = isUsed ? notes.filter(n => n.content.includes(imageId)) : [];
+      
+      usageIcon.textContent = isUsed ? '✅' : '❌';
+      usageIcon.title = isUsed ? 'Image is used in one or more notes' : 'Image is not used in any note';
+      
+      if (isUsed) {
+        usageIcon.onclick = (e) => {
+          e.stopPropagation();
+          const existingDropdown = e.currentTarget.querySelector('.notes-dropdown');
+          if (existingDropdown) {
+            existingDropdown.remove();
+            return;
+          }
+
+          const dropdown = document.createElement('div');
+          dropdown.classList.add('notes-dropdown');
+          notesUsingImage.forEach(note => {
+            const noteItem = document.createElement('div');
+            noteItem.textContent = note.title;
+            noteItem.onclick = () => {
+              openNote(note.id, false);
+              setTimeout(() => {
+                const imageInNote = htmlPreview.querySelector(`img[data-image-id="${imageId}"]`);
+                if (imageInNote) {
+                  imageInNote.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+              }, 200); // Delay to allow rendering
+            };
+            dropdown.appendChild(noteItem);
+          });
+          e.currentTarget.appendChild(dropdown);
+        };
+        
+        document.addEventListener('click', (e) => {
+            const dropdown = usageIcon.querySelector('.notes-dropdown');
+            if (dropdown && !usageIcon.contains(e.target)) {
+                dropdown.remove();
+            }
+        }, { once: true });
+      }
+
+      li.appendChild(usageIcon);
+
+      const deleteIcon = document.createElement('span');
+      deleteIcon.textContent = '🗑️';
+      deleteIcon.classList.add('delete-image-icon');
+      deleteIcon.title = 'Move Image to Recycle Bin';
+      deleteIcon.onclick = async (e) => {
+        e.stopPropagation();
+        if (globalSettings.preventUsedImageDeletion && isUsed) {
+            return;
+        }
+        try {
+          await deleteImage(imageId);
+          renderImagesList(); // Refresh the list
+        } catch (err) {
+          console.error('Failed to delete image:', err);
+        }
+      };
+      li.appendChild(deleteIcon);
+
+      imageList.appendChild(li);
+    }
+  } catch (err) {
+    console.error('Failed to render image list:', err);
+    imageList.innerHTML = '<li>Error loading images. See console for details.</li>';
+  }
+}
+ 
+Uncaught ReferenceError: togglePreview is not defined
+Uncaught ReferenceError: showListView is not defined
+Uncaught (in promise) ReferenceError: renderNoteList is not defined
+
+오류
+Uncaught SyntaxError: Identifier 'notes' has already been declared
+Uncaught ReferenceError: togglePreview is not defined
+컨텍스트
+sidepanel.html
+스택 추적
+src/events.js:98 (익명의 함수)
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465
+466
+467
+468
+469
+470
+471
+472
+473
+474
+475
+476
+477
+478
+479
+480
+481
+482
+483
+484
+485
+486
+487
+488
+489
+490
+491
+492
+493
+494
+495
+496
+497
+498
+499
+500
+501
+502
+503
+504
+505
+506
+507
+508
+509
+510
+511
+512
+513
+514
+515
+516
+517
+518
+519
+520
+521
+522
+523
+newNoteButton.addEventListener('click', async () => {
+  const now = Date.now();
+  const newNote = {
+    id: crypto.randomUUID(),
+    title: 'New Note',
+    content: '',
+    settings: {
+      fontSize: globalSettings.fontSize || 12
+    },
+    metadata: {
+      createdAt: now,
+      lastModified: now
+    },
+    isPinned: false
+  };
+  notes.unshift(newNote);
+  await saveNote(newNote);
+  openNote(newNote.id, true);
+});
+
+backButton.addEventListener('click', async () => {
+  const note = notes.find(n => n.id === activeNoteId);
+  if (note) {
+    if (markdownEditor.value !== originalNoteContent) {
+      note.content = markdownEditor.value;
+      note.metadata.lastModified = Date.now();
+      sortNotes();
+      await saveNote(note);
+    }
+  }
+  showListView();
+});
+
+markdownEditor.addEventListener('input', async () => {
+  const note = notes.find(n => n.id === activeNoteId);
+  if (note) {
+    note.content = markdownEditor.value;
+    note.metadata.lastModified = Date.now();
+    const titleSource = note.settings.title || globalSettings.title;
+    let titleChanged = false;
+    if (titleSource === 'default') {
+      const newTitle = note.content.trim().split('\n')[0].substring(0, 30) || 'New Note';
+      if (note.title !== newTitle) {
+        note.title = newTitle;
+        editorTitle.textContent = note.title;
+        titleChanged = true;
+      }
+    }
+    sortNotes();
+    await saveNote(note);
+    if (titleChanged) {
+      renderNoteList();
+    }
+  }
+});
+
+markdownEditor.addEventListener('paste', async (e) => {
+  e.preventDefault();
+
+  const items = Array.from(e.clipboardData.items);
+  const imageItem = items.find(item => item.kind === 'file' && item.type.startsWith('image/'));
+
+  if (imageItem) {
+    const imageFile = imageItem.getAsFile();
+    const imageId = crypto.randomUUID();
+    
+    try {
+      await saveImage(imageId, imageFile);
+      const markdownImageText = `![Image](images/${imageId}.png)`;
+      document.execCommand('insertText', false, markdownImageText);
+    } catch (err) {
+      console.error('Failed to save image:', err);
+      return; 
+    }
+  } else {
+    let text = e.clipboardData.getData('text/plain');
+
+    if (globalSettings.tildeReplacement) {
+      text = text.replace(/~/g, '\~');
+    }
+
+    if (globalSettings.autoLineBreak) {
+      const lines = text.split(/\r?\n/);
+      if (lines.length > 1) {
+        const processedText = lines.map((line, index) => {
+          if (index < lines.length - 1 && line.trim().length > 0) {
+            return line.trimEnd() + '  ';
+          }
+          return line;
+        }).join('\n');
+        text = processedText;
+      }
+    }
+    document.execCommand('insertText', false, text);
+  }
+});
+
+toggleViewButton.addEventListener('click', togglePreview);
+
+markdownEditor.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.isComposing && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
+    if (globalSettings.autoAddSpaces) {
+      const start = markdownEditor.selectionStart;
+      const end = markdownEditor.selectionEnd;
+      const currentLine = markdownEditor.value.substring(0, start).split('\n').pop();
+      if (currentLine.trim().length > 0) {
+        e.preventDefault();
+        document.execCommand('insertText', false, '  \n');
+      }
+    }
+  }
+
+
+  if (e.shiftKey && e.key === 'Enter') {
+    e.preventDefault();
+    togglePreview();
+  }
+});
+
+htmlPreview.addEventListener('dblclick', togglePreview);
+
+htmlPreview.addEventListener('click', async (e) => {
+  if (e.target.tagName === 'INPUT' && e.target.type === 'checkbox') {
+    const checkboxes = Array.from(htmlPreview.querySelectorAll('input[type="checkbox"]'));
+    const checkboxIndex = checkboxes.indexOf(e.target);
+
+    const markdown = markdownEditor.value;
+    const regex = /\[[x ]\]/g;
+    let match;
+    const matches = [];
+    while ((match = regex.exec(markdown)) !== null) {
+      matches.push(match);
+    }
+
+    if (checkboxIndex < matches.length) {
+      const matchToUpdate = matches[checkboxIndex];
+      const charIndex = matchToUpdate.index;
+      const originalText = matchToUpdate[0];
+      const newText = originalText === '[ ]' ? '[x]' : '[ ]';
+
+      const newMarkdown = markdown.substring(0, charIndex) +
+                          newText +
+                          markdown.substring(charIndex + 3);
+
+      markdownEditor.value = newMarkdown;
+
+      // Trigger update and save
+      const note = notes.find(n => n.id === activeNoteId);
+      if (note) {
+        note.content = markdownEditor.value;
+        note.metadata.lastModified = Date.now();
+        sortNotes();
+        await saveNote(note);
+        renderMarkdown(); // Re-render to show the change immediately
+        renderNoteList(); // Update note list if title changes
+      }
+    }
+  } else if (e.target.tagName === 'IMG') {
+    showImageModal(e.target.src);
+  }
+});
+
+editorTitle.addEventListener('dblclick', () => {
+  const note = notes.find(n => n.id === activeNoteId);
+  if (note) {
+    let titleSource = note.settings.title || globalSettings.title;
+    if (titleSource === 'default') {
+      note.settings.title = 'custom';
+      titleSource = 'custom';
+      saveNote(note);
+    }
+
+    if (titleSource === 'custom') {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = note.title;
+      input.classList.add('title-input');
+
+      let editingFinished = false;
+
+      const finishEditing = async () => {
+        if (editingFinished) return;
+        editingFinished = true;
+
+        note.title = input.value;
+        note.metadata.lastModified = Date.now();
+        editorTitle.textContent = note.title;
+        sortNotes();
+        await saveNote(note);
+        renderNoteList();
+        input.replaceWith(editorTitle);
+      };
+
+      const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && !e.isComposing) {
+          e.preventDefault();
+          finishEditing();
+        } else if (e.key === 'Escape') {
+          finishEditing();
+        }
+      };
+
+      input.addEventListener('keydown', handleKeyDown);
+      input.addEventListener('blur', finishEditing);
+
+      editorTitle.replaceWith(input);
+      input.focus();
+    }
+  }
+});
+
+settingsButton.addEventListener('click', () => {
+  isGlobalSettings = false;
+  const note = notes.find(n => n.id === activeNoteId);
+  titleSetting.value = note.settings.title || 'default';
+  fontSizeSetting.value = note.settings.fontSize || globalSettings.fontSize || 12;
+  modeSetting.value = globalSettings.mode || 'system';
+  autoAddSpacesCheckbox.checked = globalSettings.autoAddSpaces;
+  preventUsedImageDeletionCheckbox.checked = globalSettings.preventUsedImageDeletion;
+  showSettingsView();
+});
+
+globalSettingsButton.addEventListener('click', () => {
+  isGlobalSettings = true;
+  titleSetting.value = globalSettings.title || 'default';
+  fontSizeSetting.value = globalSettings.fontSize || 12;
+  modeSetting.value = globalSettings.mode || 'system';
+  autoAddSpacesCheckbox.checked = globalSettings.autoAddSpaces;
+  preventUsedImageDeletionCheckbox.checked = globalSettings.preventUsedImageDeletion;
+  showSettingsView();
+});
+
+settingsBackButton.addEventListener('click', () => {
+  if (isGlobalSettings) {
+    showListView();
+  } else {
+    showEditorView();
+  }
+});
+
+licensesButton.addEventListener('click', async () => {
+  const response = await fetch('LIBRARY_LICENSES.md');
+  const text = await response.text();
+  const dirtyHtml = marked.parse(text);
+  licenseContent.innerHTML = DOMPurify.sanitize(dirtyHtml);
+  showLicenseView();
+});
+
+licenseBackButton.addEventListener('click', () => {
+  showSettingsView();
+});
+
+recycleBinButton.addEventListener('click', () => {
+  showRecycleBinView();
+});
+
+recycleBinBackButton.addEventListener('click', () => {
+  showSettingsView();
+});
+
+imageManagementButton.addEventListener('click', () => {
+  showImageManagementView();
+});
+
+imageManagementBackButton.addEventListener('click', () => {
+  showSettingsView();
+});
+
+modeSetting.addEventListener('change', () => {
+  const value = modeSetting.value;
+  globalSettings.mode = value;
+  saveGlobalSettings();
+  applyMode(value);
+});
+
+titleSetting.addEventListener('change', async () => {
+  const value = titleSetting.value;
+  if (isGlobalSettings) {
+    globalSettings.title = value;
+    saveGlobalSettings();
+  } else {
+    const note = notes.find(n => n.id === activeNoteId);
+    if (note) {
+      note.settings.title = value;
+      note.metadata.lastModified = Date.now();
+      if (value === 'default') {
+        const firstLine = note.content.trim().split('\n')[0];
+        note.title = firstLine.substring(0, 30) || 'New Note';
+        editorTitle.textContent = note.title;
+      }
+      sortNotes();
+      await saveNote(note);
+    }
+  }
+});
+
+fontSizeSetting.addEventListener('input', async () => {
+  const value = parseInt(fontSizeSetting.value, 10);
+  if (isNaN(value) || value < 1) {
+    return;
+  }
+
+  if (isGlobalSettings) {
+    globalSettings.fontSize = value;
+    saveGlobalSettings();
+  } else {
+    const note = notes.find(n => n.id === activeNoteId);
+    if (note) {
+      note.settings.fontSize = value;
+      note.metadata.lastModified = Date.now();
+      applyFontSize(value);
+      sortNotes();
+      await saveNote(note);
+    }
+  }
+});
+
+autoLineBreakButton.addEventListener('click', () => {
+  globalSettings.autoLineBreak = !globalSettings.autoLineBreak;
+  updateAutoLineBreakButton();
+  saveGlobalSettings();
+});
+
+tildeReplacementButton.addEventListener('click', () => {
+  globalSettings.tildeReplacement = !globalSettings.tildeReplacement;
+  updateTildeReplacementButton();
+  saveGlobalSettings();
+});
+
+preventUsedImageDeletionCheckbox.addEventListener('change', () => {
+    globalSettings.preventUsedImageDeletion = preventUsedImageDeletionCheckbox.checked;
+    saveGlobalSettings();
+});
+
+globalExportButton.addEventListener('click', async () => {
+  const zip = new JSZip();
+  const timestamp = getTimestamp();
+
+  for (const note of notes) {
+    const noteFolder = zip.folder(note.id);
+    
+    const metadata = {
+      title: note.title,
+      settings: note.settings,
+      metadata: note.metadata
+    };
+    noteFolder.file('metadata.json', JSON.stringify(metadata, null, 2));
+    noteFolder.file('note.md', note.content);
+
+    const imageIds = extractImageIds(note.content);
+    if (imageIds.length > 0) {
+      const imagesFolder = noteFolder.folder('images');
+      for (const imageId of imageIds) {
+        try {
+          const imageBlob = await getImage(imageId);
+          if (imageBlob) {
+            imagesFolder.file(`${imageId}.png`, imageBlob);
+          }
+        } catch (err) {
+          console.error(`Failed to get image ${imageId} for export:`, err);
+        }
+      }
+    }
+  }
+
+  zip.generateAsync({ type: 'blob' }).then(blob => {
+    downloadFile(blob, `notes_${timestamp}.snotes`);
+  });
+});
+
+exportNoteButton.addEventListener('click', async () => {
+  const note = notes.find(n => n.id === activeNoteId);
+  if (note) {
+    const zip = new JSZip();
+    const sanitizedTitle = sanitizeFilename(note.title);
+
+    const metadata = {
+      title: note.title,
+      settings: note.settings,
+      metadata: note.metadata
+    };
+    zip.file('metadata.json', JSON.stringify(metadata, null, 2));
+    zip.file('note.md', note.content);
+
+    const imageIds = extractImageIds(note.content);
+    if (imageIds.length > 0) {
+      const imagesFolder = zip.folder('images');
+      for (const imageId of imageIds) {
+        try {
+          const imageBlob = await getImage(imageId);
+          if (imageBlob) {
+            imagesFolder.file(`${imageId}.png`, imageBlob);
+          }
+        } catch (err) {
+          console.error(`Failed to get image ${imageId} for export:`, err);
+        }
+      }
+    }
+
+    zip.generateAsync({ type: 'blob' }).then(blob => {
+      downloadFile(blob, `${sanitizedTitle}.snote`);
+    });
+  }
+});
+
+globalImportButton.addEventListener('click', () => {
+  globalImportInput.click();
+});
+
+importNoteButton.addEventListener('click', () => {
+  importNoteInput.click();
+});
+
+globalImportInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) {
+    return;
+  }
+
+  try {
+    const zip = await JSZip.loadAsync(file);
+    if (file.name.endsWith('.snote')) {
+      const newNote = await processSnote(zip);
+      newNote.metadata.lastModified = Date.now();
+      notes.push(newNote);
+      await saveNote(newNote);
+    } else if (file.name.endsWith('.snotes')) {
+      const newNotes = [];
+      const topLevelFolders = new Set();
+      
+      for (const path in zip.files) {
+        if (path.endsWith('/') && path.split('/').length === 2) {
+          topLevelFolders.add(path);
+        }
+      }
+
+      for (const noteFolder of topLevelFolders) {
+        const newNote = await processSnote(zip.folder(noteFolder));
+        newNotes.push(newNote);
+      }
+
+      newNotes.sort((a, b) => a.metadata.lastModified - b.metadata.lastModified);
+      
+      const now = Date.now();
+      newNotes.forEach(async (note, index) => {
+        note.metadata.lastModified = now + index;
+        notes.push(note);
+        await saveNote(note);
+      });
+      
+    }
+    sortNotes();
+    renderNoteList();
+  } catch (error) {
+    console.error('Error importing file:', error);
+    alert('Failed to import file. It may be corrupted or in the wrong format.');
+  }
+
+  globalImportInput.value = '';
+});
+
+importNoteInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) {
+    return;
+  }
+  
+  try {
+    const zip = await JSZip.loadAsync(file);
+    const importedNote = await processSnote(zip);
+    const note = notes.find(n => n.id === activeNoteId);
+    if (note) {
+      note.title = importedNote.title;
+      note.content = importedNote.content;
+      note.settings = importedNote.settings;
+      note.metadata.lastModified = Date.now();
+      editorTitle.textContent = note.title;
+      markdownEditor.value = note.content;
+      sortNotes();
+      await saveNote(note);
+      renderMarkdown();
+    }
+  } catch (error) {
+    console.error('Error importing note:', error);
+    alert('Failed to import note. It may be corrupted or in the wrong format.');
+  }
+
+  importNoteInput.value = '';
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const imagePreviewModal = document.querySelector('.image-preview-modal');
+    if (imagePreviewModal) {
+      document.body.removeChild(imagePreviewModal);
+      return;
+    }
+
+    if (imageManagementView.style.display === 'block') {
+      imageManagementBackButton.click();
+    } else if (recycleBinView.style.display === 'block') {
+      recycleBinBackButton.click();
+    } else if (licenseView.style.display === 'block') {
+      licenseBackButton.click();
+    } else if (settingsView.style.display === 'block') {
+      settingsBackButton.click();
+    } else if (editorView.style.display === 'block') {
+      if (isPreview) {
+        showListView();
+      }
+      else {
+        togglePreview();
+      }
+    }
+  }
+});
+
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (globalSettings.mode === 'system') {
+        applyMode('system');
+    }
+});
+ 
+Uncaught ReferenceError: showListView is not defined
+Uncaught (in promise) ReferenceError: renderNoteList is not defined
+
+오류
+Uncaught SyntaxError: Identifier 'notes' has already been declared
+Uncaught ReferenceError: togglePreview is not defined
+Uncaught ReferenceError: showListView is not defined
+컨텍스트
+sidepanel.html
+스택 추적
+src/main.js:73 (익명의 함수)
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+// Initialize the database when the script loads
+initDB().then(() => {
+  loadAndMigrateData();
+  cleanupDeletedImages();
+}).catch(err => console.error("Failed to initialize DB:", err));
+
+async function loadAndMigrateData() {
+  // Load settings from storage
+  chrome.storage.local.get(['globalSettings', 'notes', 'deletedNotes'], async (data) => {
+    const loadedSettings = data.globalSettings;
+    if (loadedSettings) {
+      globalSettings = loadedSettings;
+    } else {
+      globalSettings = {
+        title: 'default',
+        fontSize: 12,
+        autoLineBreak: true,
+        tildeReplacement: true,
+        autoAddSpaces: true,
+        preventUsedImageDeletion: true,
+        mode: 'system'
+      };
+    }
+
+    const loadedNotes = data.notes;
+    const loadedDeletedNotes = data.deletedNotes;
+
+    // One-time migration from chrome.storage.local to IndexedDB
+    if (loadedNotes || loadedDeletedNotes) {
+      const allNotesToMigrate = (loadedNotes || []).concat(loadedDeletedNotes || []);
+      if (allNotesToMigrate.length > 0) {
+        try {
+          for (const note of allNotesToMigrate) {
+            await saveNote(note);
+          }
+          chrome.storage.local.remove(['notes', 'deletedNotes']);
+        } catch (err) {
+          console.error("Failed to migrate notes to IndexedDB:", err);
+        }
+      }
+    }
+
+    // Load all notes from IndexedDB
+    const allNotesFromDB = await getAllNotes();
+    notes = allNotesFromDB.filter(note => !note.metadata.deletedAt);
+    deletedNotes = allNotesFromDB.filter(note => note.metadata.deletedAt);
+
+    sortNotes();
+    renderNoteList();
+    applyMode(globalSettings.mode);
+    cleanupDeletedNotes();
+  });
+}
+
+async function cleanupDeletedImages() {
+    const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    const imageObjects = await getAllImageObjectsFromDB();
+    const imagesToDelete = imageObjects.filter(img => img.deletedAt && img.deletedAt < thirtyDaysAgo);
+    for (const image of imagesToDelete) {
+        await deleteImagePermanently(image.id);
+    }
+}
+
+async function cleanupDeletedNotes() {
+    const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    const notesToDelete = deletedNotes.filter(note => note.metadata.deletedAt < thirtyDaysAgo);
+    for (const note of notesToDelete) {
+        await deleteNotePermanentlyDB(note.id);
+    }
+    deletedNotes = deletedNotes.filter(note => note.metadata.deletedAt >= thirtyDaysAgo);
+}
+
+showListView();
+
+
+// Initial setup
+updateAutoLineBreakButton();
+updateTildeReplacementButton();
+applyFontSize(globalSettings.fontSize || 12);
+applyMode(globalSettings.mode || 'system');
+renderNoteList();
+ 
+Uncaught (in promise) ReferenceError: renderNoteList is not defined
+
+오류
+Uncaught SyntaxError: Identifier 'notes' has already been declared
+Uncaught ReferenceError: togglePreview is not defined
+Uncaught ReferenceError: showListView is not defined
+Uncaught (in promise) ReferenceError: renderNoteList is not defined
+컨텍스트
+sidepanel.html
+스택 추적
+src/main.js:49 (익명의 함수)
 1
 2
 3

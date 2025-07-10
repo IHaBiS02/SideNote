@@ -1,5 +1,3 @@
-let notes = [];
-let deletedNotes = [];
 let activeNoteId = null;
 let originalNoteContent = '';
 let isPreview = false;
