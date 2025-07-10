@@ -206,6 +206,7 @@ body {
   resize: none;
   font-family: sans-serif;
   line-height: inherit;
+  word-wrap: break-word;
 }
 
 #html-preview {
