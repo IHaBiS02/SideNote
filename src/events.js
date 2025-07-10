@@ -1,4 +1,4 @@
-newNoteButton.addEventListener('click', () => {
+newNoteButton.addEventListener('click', async () => {
   const now = Date.now();
   const newNote = {
     id: crypto.randomUUID(),
@@ -14,24 +14,24 @@ newNoteButton.addEventListener('click', () => {
     isPinned: false
   };
   notes.unshift(newNote);
-  saveNotes();
+  await saveNote(newNote);
   openNote(newNote.id, true);
 });
 
-backButton.addEventListener('click', () => {
+backButton.addEventListener('click', async () => {
   const note = notes.find(n => n.id === activeNoteId);
   if (note) {
     if (markdownEditor.value !== originalNoteContent) {
       note.content = markdownEditor.value;
       note.metadata.lastModified = Date.now();
       sortNotes();
-      saveNotes();
+      await saveNote(note);
     }
   }
   showListView();
 });
 
-markdownEditor.addEventListener('input', () => {
+markdownEditor.addEventListener('input', async () => {
   const note = notes.find(n => n.id === activeNoteId);
   if (note) {
     note.content = markdownEditor.value;
@@ -47,7 +47,7 @@ markdownEditor.addEventListener('input', () => {
       }
     }
     sortNotes();
-    saveNotes();
+    await saveNote(note);
     if (titleChanged) {
       renderNoteList();
     }
@@ -76,7 +76,7 @@ markdownEditor.addEventListener('paste', async (e) => {
     let text = e.clipboardData.getData('text/plain');
 
     if (globalSettings.tildeReplacement) {
-      text = text.replace(/~/g, '\\~');
+      text = text.replace(/~/g, '\~');
     }
 
     if (globalSettings.autoLineBreak) {
@@ -119,7 +119,7 @@ markdownEditor.addEventListener('keydown', (e) => {
 
 htmlPreview.addEventListener('dblclick', togglePreview);
 
-htmlPreview.addEventListener('click', (e) => {
+htmlPreview.addEventListener('click', async (e) => {
   if (e.target.tagName === 'INPUT' && e.target.type === 'checkbox') {
     const checkboxes = Array.from(htmlPreview.querySelectorAll('input[type="checkbox"]'));
     const checkboxIndex = checkboxes.indexOf(e.target);
@@ -150,7 +150,7 @@ htmlPreview.addEventListener('click', (e) => {
         note.content = markdownEditor.value;
         note.metadata.lastModified = Date.now();
         sortNotes();
-        saveNotes();
+        await saveNote(note);
         renderMarkdown(); // Re-render to show the change immediately
         renderNoteList(); // Update note list if title changes
       }
@@ -167,7 +167,7 @@ editorTitle.addEventListener('dblclick', () => {
     if (titleSource === 'default') {
       note.settings.title = 'custom';
       titleSource = 'custom';
-      saveNotes();
+      saveNote(note);
     }
 
     if (titleSource === 'custom') {
@@ -178,7 +178,7 @@ editorTitle.addEventListener('dblclick', () => {
 
       let editingFinished = false;
 
-      const finishEditing = () => {
+      const finishEditing = async () => {
         if (editingFinished) return;
         editingFinished = true;
 
@@ -186,7 +186,7 @@ editorTitle.addEventListener('dblclick', () => {
         note.metadata.lastModified = Date.now();
         editorTitle.textContent = note.title;
         sortNotes();
-        saveNotes();
+        await saveNote(note);
         renderNoteList();
         input.replaceWith(editorTitle);
       };
@@ -273,7 +273,7 @@ modeSetting.addEventListener('change', () => {
   applyMode(value);
 });
 
-titleSetting.addEventListener('change', () => {
+titleSetting.addEventListener('change', async () => {
   const value = titleSetting.value;
   if (isGlobalSettings) {
     globalSettings.title = value;
@@ -289,12 +289,12 @@ titleSetting.addEventListener('change', () => {
         editorTitle.textContent = note.title;
       }
       sortNotes();
-      saveNotes();
+      await saveNote(note);
     }
   }
 });
 
-fontSizeSetting.addEventListener('input', () => {
+fontSizeSetting.addEventListener('input', async () => {
   const value = parseInt(fontSizeSetting.value, 10);
   if (isNaN(value) || value < 1) {
     return;
@@ -310,7 +310,7 @@ fontSizeSetting.addEventListener('input', () => {
       note.metadata.lastModified = Date.now();
       applyFontSize(value);
       sortNotes();
-      saveNotes();
+      await saveNote(note);
     }
   }
 });
@@ -423,6 +423,7 @@ globalImportInput.addEventListener('change', async (e) => {
       const newNote = await processSnote(zip);
       newNote.metadata.lastModified = Date.now();
       notes.push(newNote);
+      await saveNote(newNote);
     } else if (file.name.endsWith('.snotes')) {
       const newNotes = [];
       const topLevelFolders = new Set();
@@ -441,14 +442,14 @@ globalImportInput.addEventListener('change', async (e) => {
       newNotes.sort((a, b) => a.metadata.lastModified - b.metadata.lastModified);
       
       const now = Date.now();
-      newNotes.forEach((note, index) => {
+      newNotes.forEach(async (note, index) => {
         note.metadata.lastModified = now + index;
+        notes.push(note);
+        await saveNote(note);
       });
       
-      notes.push(...newNotes);
     }
     sortNotes();
-    saveNotes();
     renderNoteList();
   } catch (error) {
     console.error('Error importing file:', error);
@@ -476,7 +477,7 @@ importNoteInput.addEventListener('change', async (e) => {
       editorTitle.textContent = note.title;
       markdownEditor.value = note.content;
       sortNotes();
-      saveNotes();
+      await saveNote(note);
       renderMarkdown();
     }
   } catch (error) {

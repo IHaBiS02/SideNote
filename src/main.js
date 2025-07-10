@@ -1,84 +1,56 @@
 // Initialize the database when the script loads
 initDB().then(() => {
-  cleanupDeletedNotes();
+  loadAndMigrateData();
   cleanupDeletedImages();
 }).catch(err => console.error("Failed to initialize DB:", err));
 
-// Load notes and settings from storage
-chrome.storage.local.get(['notes', 'deletedNotes', 'globalSettings'], (data) => {
-  const loadedNotes = data.notes;
-  const loadedDeletedNotes = data.deletedNotes;
-  const loadedSettings = data.globalSettings;
-
-  if (loadedSettings) {
-    globalSettings = loadedSettings;
-  } else {
-    globalSettings = {
-      title: 'default',
-      fontSize: 12,
-      autoLineBreak: true,
-      tildeReplacement: true,
-      autoAddSpaces: true,
-      preventUsedImageDeletion: true,
-      mode: 'system'
-    };
-  }
-
-  if (loadedDeletedNotes) {
-    deletedNotes = loadedDeletedNotes;
-  } else {
-    deletedNotes = [];
-  }
-  
-  if (!loadedNotes) {
-    notes = [];
-  } else if (typeof loadedNotes === 'string') {
-    const now = Date.now();
-    const content = loadedNotes;
-    const title = content.trim().split('\n')[0].substring(0, 30) || 'Imported Note';
-    notes = [{
-      id: crypto.randomUUID(),
-      title: title,
-      content: content,
-      settings: {},
-      metadata: {
-        createdAt: now,
-        lastModified: now
-      },
-      isPinned: false
-    }];
-  } else if (Array.isArray(loadedNotes)) {
-    notes = loadedNotes.map(note => {
-      note.isPinned = note.isPinned || false;
-      if (note.metadata && note.metadata.createdAt && note.metadata.lastModified) {
-        return note;
-      }
-      const now = Date.now();
-      let timestamp = now;
-      if (typeof note.id === 'string') {
-        const idNumber = parseInt(note.id.replace('migrated-', ''));
-        if (!isNaN(idNumber)) {
-          timestamp = idNumber;
-        }
-      }
-      return {
-        ...note,
-        id: note.id || crypto.randomUUID(),
-        settings: note.settings || {},
-        metadata: {
-          createdAt: timestamp,
-          lastModified: timestamp
-        }
+async function loadAndMigrateData() {
+  // Load settings from storage
+  chrome.storage.local.get(['globalSettings', 'notes', 'deletedNotes'], async (data) => {
+    const loadedSettings = data.globalSettings;
+    if (loadedSettings) {
+      globalSettings = loadedSettings;
+    } else {
+      globalSettings = {
+        title: 'default',
+        fontSize: 12,
+        autoLineBreak: true,
+        tildeReplacement: true,
+        autoAddSpaces: true,
+        preventUsedImageDeletion: true,
+        mode: 'system'
       };
-    });
-  } else {
-    notes = [];
-  }
-  sortNotes();
-  renderNoteList();
-  applyMode(globalSettings.mode);
-  cleanupDeletedNotes();
-});
+    }
+
+    const loadedNotes = data.notes;
+    const loadedDeletedNotes = data.deletedNotes;
+
+    // One-time migration from chrome.storage.local to IndexedDB
+    if (loadedNotes || loadedDeletedNotes) {
+      const allNotesToMigrate = (loadedNotes || []).concat(loadedDeletedNotes || []);
+      if (allNotesToMigrate.length > 0) {
+        try {
+          for (const note of allNotesToMigrate) {
+            await saveNote(note);
+          }
+          chrome.storage.local.remove(['notes', 'deletedNotes']);
+        } catch (err) {
+          console.error("Failed to migrate notes to IndexedDB:", err);
+        }
+      }
+    }
+
+    // Load all notes from IndexedDB
+    const allNotesFromDB = await getAllNotes();
+    notes = allNotesFromDB.filter(note => !note.metadata.deletedAt);
+    deletedNotes = allNotesFromDB.filter(note => note.metadata.deletedAt);
+
+    sortNotes();
+    renderNoteList();
+    applyMode(globalSettings.mode);
+    cleanupDeletedNotes();
+  });
+}
 
 async function cleanupDeletedImages() {
     const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
@@ -87,6 +59,15 @@ async function cleanupDeletedImages() {
     for (const image of imagesToDelete) {
         await deleteImagePermanently(image.id);
     }
+}
+
+async function cleanupDeletedNotes() {
+    const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    const notesToDelete = deletedNotes.filter(note => note.metadata.deletedAt < thirtyDaysAgo);
+    for (const note of notesToDelete) {
+        await deleteNotePermanentlyDB(note.id);
+    }
+    deletedNotes = deletedNotes.filter(note => note.metadata.deletedAt >= thirtyDaysAgo);
 }
 
 showListView();

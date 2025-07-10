@@ -14,27 +14,18 @@ function sortNotes() {
   });
 }
 
-function saveNotes() {
-  chrome.storage.local.set({ notes });
-}
-
-function saveDeletedNotes() {
-  chrome.storage.local.set({ deletedNotes });
-}
-
-function deleteNote(noteId) {
+async function deleteNote(noteId) {
   const noteIndex = notes.findIndex(n => n.id === noteId);
   if (noteIndex > -1) {
     const [deletedNote] = notes.splice(noteIndex, 1);
     deletedNote.metadata.deletedAt = Date.now();
     deletedNotes.push(deletedNote);
-    saveNotes();
-    saveDeletedNotes();
+    await deleteNoteDB(noteId);
     renderNoteList();
   }
 }
 
-function togglePin(noteId) {
+async function togglePin(noteId) {
     const note = notes.find(n => n.id === noteId);
     if (note) {
         note.isPinned = !note.isPinned;
@@ -44,12 +35,12 @@ function togglePin(noteId) {
             delete note.pinnedAt;
         }
         sortNotes();
-        saveNotes();
+        await saveNote(note);
         renderNoteList();
     }
 }
 
-function restoreNote(noteId) {
+async function restoreNote(noteId) {
   const noteIndex = deletedNotes.findIndex(n => n.id === noteId);
   if (noteIndex > -1) {
     const [restoredNote] = deletedNotes.splice(noteIndex, 1);
@@ -57,20 +48,13 @@ function restoreNote(noteId) {
     delete restoredNote.metadata.deletedAt;
     notes.push(restoredNote);
     sortNotes();
-    saveNotes();
-    saveDeletedNotes();
+    await restoreNoteDB(noteId);
     renderDeletedItemsList();
   }
 }
 
-function deleteNotePermanently(noteId) {
+async function deleteNotePermanently(noteId) {
   deletedNotes = deletedNotes.filter(n => n.id !== noteId);
-  saveDeletedNotes();
+  await deleteNotePermanentlyDB(noteId);
   renderDeletedItemsList();
-}
-
-function cleanupDeletedNotes() {
-  const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
-  deletedNotes = deletedNotes.filter(note => note.metadata.deletedAt > thirtyDaysAgo);
-  saveDeletedNotes();
 }
