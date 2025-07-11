@@ -19,7 +19,6 @@
     "highlight.js": "^11.9.0",
     "highlightjs-line-numbers.js": "^2.8.0",
     "jszip": "^3.10.1",
-    "license-checker": "^25.0.1",
     "marked": "^10.0.0",
     "normalize.css": "^8.0.1",
     "reset-css": "^5.0.2",

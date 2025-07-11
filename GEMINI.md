@@ -28,8 +28,6 @@ Also, make sure the version in package.json fits with it too, and then run `npm 
 
 After all changes, read STRUCTURE.md file and if there are any changes which makes difference with the information on STRUCTURE.md, then write changes in STRUCTURE.md and update the documents.
 
-When you add new npm library on this project, you should gather licenses by using shell command 'npx license-checker --json > licenses.json ' and update LIBRARY_LICENSES.md file.
-
 After all changes, you should commit changes on git.
 
 When committing changes, follow these steps:  
