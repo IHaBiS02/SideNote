@@ -1,0 +1,7 @@
+feat: unify browser styles with normalize.css
+
+This commit introduces normalize.css to create a consistent visual baseline across different browsers, specifically addressing rendering differences between Chrome and Firefox.
+
+- Added `normalize.css` as a project dependency.
+- Included `normalize.css` in `sidepanel.html` before other stylesheets to ensure proper style overriding.
+- Bumped the version to 3.0.2 in `manifest.json` and `package.json`.

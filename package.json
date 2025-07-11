@@ -1,6 +1,6 @@
 {
   "name": "simple-notes-extension",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "A simple notes extension using the side panel.",
   "scripts": {
     "build": "node build.js",
@@ -19,6 +19,7 @@
     "highlightjs-line-numbers.js": "^2.8.0",
     "jszip": "^3.10.1",
     "marked": "^10.0.0",
+    "normalize.css": "^8.0.1",
     "webextension-polyfill": "^0.10.0"
   }
 }
