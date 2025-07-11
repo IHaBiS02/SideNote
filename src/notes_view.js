@@ -294,6 +294,7 @@ function renderMarkdown() {
     // 기존 라인 넘버 기능은 그대로 호출합니다.
     hljs.lineNumbersBlock(block);
   });
+  hljs.highlightAll();
 
   renderImages();
 }

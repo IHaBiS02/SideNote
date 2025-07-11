@@ -5,7 +5,7 @@ let isGlobalSettings = false;
  * Saves the global settings to storage.
  */
 function saveGlobalSettings() {
-  chrome.storage.local.set({ globalSettings });
+  browser.storage.local.set({ globalSettings });
 }
 
 /**

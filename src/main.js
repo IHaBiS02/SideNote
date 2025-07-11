@@ -9,50 +9,49 @@ initDB().then(() => {
  */
 async function loadAndMigrateData() {
   // Load settings from storage
-  chrome.storage.local.get(['globalSettings', 'notes', 'deletedNotes'], async (data) => {
-    const loadedSettings = data.globalSettings;
-    if (loadedSettings) {
-      globalSettings = loadedSettings;
-    } else {
-      globalSettings = {
-        title: 'default',
-        fontSize: 12,
-        autoLineBreak: true,
-        tildeReplacement: true,
-        autoAddSpaces: true,
-        preventUsedImageDeletion: true,
-        mode: 'system'
-      };
-    }
+  const data = await browser.storage.local.get(['globalSettings', 'notes', 'deletedNotes']);
+  const loadedSettings = data.globalSettings;
+  if (loadedSettings) {
+    globalSettings = loadedSettings;
+  } else {
+    globalSettings = {
+      title: 'default',
+      fontSize: 12,
+      autoLineBreak: true,
+      tildeReplacement: true,
+      autoAddSpaces: true,
+      preventUsedImageDeletion: true,
+      mode: 'system'
+    };
+  }
 
-    const loadedNotes = data.notes;
-    const loadedDeletedNotes = data.deletedNotes;
+  const loadedNotes = data.notes;
+  const loadedDeletedNotes = data.deletedNotes;
 
-    // One-time migration from chrome.storage.local to IndexedDB
-    if (loadedNotes || loadedDeletedNotes) {
-      const allNotesToMigrate = (loadedNotes || []).concat(loadedDeletedNotes || []);
-      if (allNotesToMigrate.length > 0) {
-        try {
-          for (const note of allNotesToMigrate) {
-            await saveNote(note);
-          }
-          chrome.storage.local.remove(['notes', 'deletedNotes']);
-        } catch (err) {
-          console.error("Failed to migrate notes to IndexedDB:", err);
+  // One-time migration from chrome.storage.local to IndexedDB
+  if (loadedNotes || loadedDeletedNotes) {
+    const allNotesToMigrate = (loadedNotes || []).concat(loadedDeletedNotes || []);
+    if (allNotesToMigrate.length > 0) {
+      try {
+        for (const note of allNotesToMigrate) {
+          await saveNote(note);
         }
+        await browser.storage.local.remove(['notes', 'deletedNotes']);
+      } catch (err) {
+        console.error("Failed to migrate notes to IndexedDB:", err);
       }
     }
+  }
 
-    // Load all notes from IndexedDB
-    const allNotesFromDB = await getAllNotes();
-    notes = allNotesFromDB.filter(note => !note.metadata.deletedAt);
-    deletedNotes = allNotesFromDB.filter(note => note.metadata.deletedAt);
+  // Load all notes from IndexedDB
+  const allNotesFromDB = await getAllNotes();
+  notes = allNotesFromDB.filter(note => !note.metadata.deletedAt);
+  deletedNotes = allNotesFromDB.filter(note => note.metadata.deletedAt);
 
-    sortNotes();
-    renderNoteList();
-    applyMode(globalSettings.mode);
-    cleanupDeletedNotes();
-  });
+  sortNotes();
+  renderNoteList();
+  applyMode(globalSettings.mode);
+  cleanupDeletedNotes();
 }
 
 /**
