@@ -11,14 +11,13 @@ const buildDir = 'build';
 const chromeDir = path.join(buildDir, 'chrome');
 const firefoxDir = path.join(buildDir, 'firefox');
 
-// Clean up previous builds
-if (fs.existsSync(buildDir)) {
-    exec(`${rimraf} ${buildDir}`);
+// Create build directories if they don't exist
+if (!fs.existsSync(chromeDir)) {
+    exec(`${mkdirp} ${chromeDir}`);
 }
-
-// Create build directories
-exec(`${mkdirp} ${chromeDir}`);
-exec(`${mkdirp} ${firefoxDir}`);
+if (!fs.existsSync(firefoxDir)) {
+    exec(`${mkdirp} ${firefoxDir}`);
+}
 
 // Copy common files
 const commonFiles = [

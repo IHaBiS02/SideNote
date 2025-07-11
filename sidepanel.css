@@ -367,11 +367,11 @@ pre code {
   font-family: monospace;
 }
 
-pre.multi-line-code code {
+pre.multi-line-code code.hljs {
   padding: 0px;
 }
 
-pre.single-line-code code {
+pre.single-line-code code.hljs {
   padding: 5px;
 }
 
