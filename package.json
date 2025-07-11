@@ -1,6 +1,6 @@
 {
   "name": "simple-notes-extension",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "A simple notes extension using the side panel.",
   "scripts": {
     "build": "node build.js",
