@@ -93,4 +93,36 @@ if (firefoxManifest.commands && firefoxManifest.commands._execute_action) {
 
 fs.writeFileSync(path.join(firefoxDir, 'manifest.json'), JSON.stringify(firefoxManifest, null, 2));
 
-console.log('Build finished successfully!');
+
+const archiver = require('archiver');
+const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
+const version = packageJson.version.replace(/\./g, '_');
+
+function createZip(sourceDir, outPath) {
+    const archive = archiver('zip', { zlib: { level: 9 } });
+    const stream = fs.createWriteStream(outPath);
+
+    return new Promise((resolve, reject) => {
+        archive
+            .directory(sourceDir, false)
+            .on('error', err => reject(err))
+            .pipe(stream);
+
+        stream.on('close', () => resolve());
+        archive.finalize();
+    });
+}
+
+async function main() {
+    console.log('Creating zip archives...');
+    await createZip(chromeDir, path.join(buildDir, `chrome-${version}.zip`));
+    await createZip(firefoxDir, path.join(buildDir, `firefox-${version}.zip`));
+    console.log('Zip archives created successfully!');
+}
+
+main().then(() => {
+    console.log('Build finished successfully!');
+}).catch(err => {
+    console.error('Error during build:', err);
+    process.exit(1);
+});

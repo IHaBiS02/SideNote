@@ -39,6 +39,8 @@ When committing changes, follow these steps:
 5. Use `git commit -F commit_message.txt` to commit the changes.  
 6. Use `del commit_message.txt` to remove the temporary file.
 
+You should use file-based method when you write commit message and commit the changes.
+
 ## Build Process
 
 To build the extension for both Chrome and Firefox, run the following command:
