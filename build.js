@@ -4,7 +4,6 @@ const { execSync } = require('child_process');
 
 const exec = (command) => execSync(command, { stdio: 'inherit' });
 
-const rimraf = 'rimraf';
 const mkdirp = 'mkdirp';
 
 const buildDir = 'build';
@@ -114,9 +113,30 @@ function createZip(sourceDir, outPath) {
 }
 
 async function main() {
+    console.log('Deleting old zip files if they exist...');
+    const chromeZipPath = path.join(buildDir, `chrome-${version}.zip`);
+    const firefoxZipPath = path.join(buildDir, `firefox-${version}.zip`);
+
+    if (fs.existsSync(chromeZipPath)) {
+        try {
+            exec(`del ${chromeZipPath}`);
+            console.log(`Deleted ${chromeZipPath}`);
+        } catch (err) {
+            console.error(`Could not delete ${chromeZipPath}:`, err.message);
+        }
+    }
+    if (fs.existsSync(firefoxZipPath)) {
+        try {
+            exec(`del ${firefoxZipPath}`);
+            console.log(`Deleted ${firefoxZipPath}`);
+        } catch (err) {
+            console.error(`Could not delete ${firefoxZipPath}:`, err.message);
+        }
+    }
+
     console.log('Creating zip archives...');
-    await createZip(chromeDir, path.join(buildDir, `chrome-${version}.zip`));
-    await createZip(firefoxDir, path.join(buildDir, `firefox-${version}.zip`));
+    await createZip(chromeDir, chromeZipPath);
+    await createZip(firefoxDir, firefoxZipPath);
     console.log('Zip archives created successfully!');
 }
 
