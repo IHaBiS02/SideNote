@@ -4,12 +4,20 @@ try {
   console.error(e);
 }
 
-browser.sidePanel
-  .setPanelBehavior({ openPanelOnActionClick: true })
-  .catch((error) => console.error(error));
+if (browser.sidePanel) {
+  browser.sidePanel
+    .setPanelBehavior({ openPanelOnActionClick: true })
+    .catch((error) => console.error(error));
+}
 
 browser.commands.onCommand.addListener((command, tab) => {
   if (command === '_execute_action') {
-    browser.sidePanel.open({ windowId: tab.windowId });
+    if (browser.sidePanel) {
+      browser.sidePanel.open({ windowId: tab.windowId });
+    }
+  } else if (command === '_execute_sidebar_action') {
+    if (browser.sidebarAction) {
+      browser.sidebarAction.toggle();
+    }
   }
 });

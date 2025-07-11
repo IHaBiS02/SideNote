@@ -85,6 +85,12 @@ firefoxManifest.browser_specific_settings = {
         id: 'sidenote@example.com'
     }
 };
+
+if (firefoxManifest.commands && firefoxManifest.commands._execute_action) {
+    firefoxManifest.commands._execute_sidebar_action = firefoxManifest.commands._execute_action;
+    delete firefoxManifest.commands._execute_action;
+}
+
 fs.writeFileSync(path.join(firefoxDir, 'manifest.json'), JSON.stringify(firefoxManifest, null, 2));
 
 console.log('Build finished successfully!');

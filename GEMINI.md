@@ -24,6 +24,7 @@ Here is the list of files and folders you need to work :
 9. vendor/ : folder which contain all external library used in this project  
 
 For every changes, Change version number on the manifest.json, based on the amount of edit you write.  
+Also, make sure the version in package.json fits with it too, and then run `npm install` to update `package-lock.json`.
 
 After all changes, read STRUCTURE.md file and if there are any changes which makes difference with the information on STRUCTURE.md, then write changes in STRUCTURE.md and update the documents.
 
