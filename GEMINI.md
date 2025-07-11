@@ -28,6 +28,8 @@ Also, make sure the version in package.json fits with it too, and then run `npm 
 
 After all changes, read STRUCTURE.md file and if there are any changes which makes difference with the information on STRUCTURE.md, then write changes in STRUCTURE.md and update the documents.
 
+When you add new npm library on this project, you should gather licenses by using shell command 'npx license-checker --json > licenses.json ' and update LIBRARY_LICENSES.md file.
+
 After all changes, you should commit changes on git.
 
 When committing changes, follow these steps:  
@@ -41,7 +43,7 @@ When committing changes, follow these steps:
 
 You should use file-based method when you write commit message and commit the changes.
 
-## Build Process
+After you commit all changes, you should build extension for test.
 
 To build the extension for both Chrome and Firefox, run the following command:
 

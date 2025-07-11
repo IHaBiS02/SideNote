@@ -1,0 +1,2142 @@
+{
+  "@highlightjs/cdn-assets@11.11.1": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/highlightjs/highlight.js",
+    "publisher": "Josh Goebel",
+    "email": "hello@joshgoebel.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\@highlightjs\\cdn-assets",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\@highlightjs\\cdn-assets\\LICENSE"
+  },
+  "@isaacs/cliui@8.0.2": {
+    "licenses": "ISC",
+    "repository": "https://github.com/yargs/cliui",
+    "publisher": "Ben Coe",
+    "email": "ben@npmjs.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\@isaacs\\cliui",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\@isaacs\\cliui\\LICENSE.txt"
+  },
+  "@pkgjs/parseargs@0.11.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/pkgjs/parseargs",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\@pkgjs\\parseargs",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\@pkgjs\\parseargs\\LICENSE"
+  },
+  "@types/trusted-types@2.0.7": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\@types\\trusted-types",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\@types\\trusted-types\\LICENSE"
+  },
+  "abbrev@1.1.1": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/abbrev-js",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\abbrev",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\abbrev\\LICENSE"
+  },
+  "abort-controller@3.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/mysticatea/abort-controller",
+    "publisher": "Toru Nagashima",
+    "url": "https://github.com/mysticatea",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\abort-controller",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\abort-controller\\LICENSE"
+  },
+  "ansi-regex@5.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/chalk/ansi-regex",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\string-width-cjs\\node_modules\\ansi-regex",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\string-width-cjs\\node_modules\\ansi-regex\\license"
+  },
+  "ansi-regex@6.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/chalk/ansi-regex",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\ansi-regex",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\ansi-regex\\license"
+  },
+  "ansi-styles@3.2.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/chalk/ansi-styles",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\chalk\\node_modules\\ansi-styles",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\chalk\\node_modules\\ansi-styles\\license"
+  },
+  "ansi-styles@4.3.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/chalk/ansi-styles",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\wrap-ansi-cjs\\node_modules\\ansi-styles",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\wrap-ansi-cjs\\node_modules\\ansi-styles\\license"
+  },
+  "ansi-styles@6.2.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/chalk/ansi-styles",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\ansi-styles",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\ansi-styles\\license"
+  },
+  "anymatch@1.3.2": {
+    "licenses": "ISC",
+    "repository": "https://github.com/es128/anymatch",
+    "publisher": "Elan Shanker",
+    "url": "http://github.com/es128",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\anymatch",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\anymatch\\LICENSE"
+  },
+  "archiver-utils@5.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/archiverjs/archiver-utils",
+    "publisher": "Chris Talkington",
+    "url": "http://christalkington.com/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\archiver-utils",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\archiver-utils\\LICENSE"
+  },
+  "archiver@7.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/archiverjs/node-archiver",
+    "publisher": "Chris Talkington",
+    "url": "http://christalkington.com/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\archiver",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\archiver\\LICENSE"
+  },
+  "arr-diff@2.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/arr-diff",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\arr-diff",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\arr-diff\\LICENSE"
+  },
+  "arr-diff@4.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/arr-diff",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\arr-diff",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\arr-diff\\LICENSE"
+  },
+  "arr-flatten@1.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/arr-flatten",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\arr-flatten",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\arr-flatten\\LICENSE"
+  },
+  "arr-union@3.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/arr-union",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\arr-union",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\arr-union\\LICENSE"
+  },
+  "array-find-index@1.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/array-find-index",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\array-find-index",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\array-find-index\\license"
+  },
+  "array-unique@0.2.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/array-unique",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\array-unique",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\array-unique\\LICENSE"
+  },
+  "array-unique@0.3.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/array-unique",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\array-unique",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\array-unique\\LICENSE"
+  },
+  "asap@2.0.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/kriskowal/asap",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\asap",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\asap\\LICENSE.md"
+  },
+  "assign-symbols@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/assign-symbols",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\assign-symbols",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\assign-symbols\\LICENSE"
+  },
+  "async-each@1.0.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/paulmillr/async-each",
+    "publisher": "Paul Miller",
+    "url": "https://paulmillr.com/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\async-each",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\async-each\\LICENSE"
+  },
+  "async@3.2.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/caolan/async",
+    "publisher": "Caolan McMahon",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\async",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\async\\LICENSE"
+  },
+  "atob@2.1.2": {
+    "licenses": "(MIT OR Apache-2.0)",
+    "repository": "git://git.coolaj86.com/coolaj86/atob.js",
+    "publisher": "AJ ONeal",
+    "email": "coolaj86@gmail.com",
+    "url": "https://coolaj86.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\atob",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\atob\\LICENSE"
+  },
+  "b4a@1.6.7": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/holepunchto/b4a",
+    "publisher": "Holepunch",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\b4a",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\b4a\\LICENSE"
+  },
+  "babel-runtime@6.26.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel/tree/master/packages/babel-runtime",
+    "publisher": "Sebastian McKenzie",
+    "email": "sebmck@gmail.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\babel-runtime",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\babel-runtime\\README.md"
+  },
+  "balanced-match@1.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/juliangruber/balanced-match",
+    "publisher": "Julian Gruber",
+    "email": "mail@juliangruber.com",
+    "url": "http://juliangruber.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\balanced-match",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\balanced-match\\LICENSE.md"
+  },
+  "bare-events@2.6.0": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/holepunchto/bare-events",
+    "publisher": "Holepunch",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\bare-events",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\bare-events\\LICENSE"
+  },
+  "base64-js@1.5.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/beatgammit/base64-js",
+    "publisher": "T. Jameson Little",
+    "email": "t.jameson.little@gmail.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\base64-js",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\base64-js\\LICENSE"
+  },
+  "base@0.11.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/node-base/base",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\base",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\base\\LICENSE"
+  },
+  "binary-extensions@1.13.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/binary-extensions",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\binary-extensions",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\binary-extensions\\license"
+  },
+  "brace-expansion@1.1.12": {
+    "licenses": "MIT",
+    "repository": "https://github.com/juliangruber/brace-expansion",
+    "publisher": "Julian Gruber",
+    "email": "mail@juliangruber.com",
+    "url": "http://juliangruber.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\brace-expansion",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\brace-expansion\\LICENSE"
+  },
+  "brace-expansion@2.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/juliangruber/brace-expansion",
+    "publisher": "Julian Gruber",
+    "email": "mail@juliangruber.com",
+    "url": "http://juliangruber.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\archiver-utils\\node_modules\\brace-expansion",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\archiver-utils\\node_modules\\brace-expansion\\LICENSE"
+  },
+  "braces@1.8.5": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/braces",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\braces",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\braces\\LICENSE"
+  },
+  "braces@2.3.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/micromatch/braces",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\braces",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\braces\\LICENSE"
+  },
+  "buffer-crc32@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/brianloveswords/buffer-crc32",
+    "publisher": "Brian J. Brennan",
+    "email": "brianloveswords@gmail.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\buffer-crc32",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\buffer-crc32\\LICENSE"
+  },
+  "buffer@6.0.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/feross/buffer",
+    "publisher": "Feross Aboukhadijeh",
+    "email": "feross@feross.org",
+    "url": "https://feross.org",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\buffer",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\buffer\\LICENSE"
+  },
+  "cache-base@1.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/cache-base",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\cache-base",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\cache-base\\LICENSE"
+  },
+  "chalk@2.4.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/chalk/chalk",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\chalk",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\chalk\\license"
+  },
+  "chokidar@1.7.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/paulmillr/chokidar",
+    "publisher": "Paul Miller",
+    "url": "http://paulmillr.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\chokidar",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\chokidar\\README.md"
+  },
+  "class-utils@0.3.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/class-utils",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\class-utils",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\class-utils\\LICENSE"
+  },
+  "collection-visit@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/collection-visit",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\collection-visit",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\collection-visit\\LICENSE"
+  },
+  "color-convert@1.9.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Qix-/color-convert",
+    "publisher": "Heather Arthur",
+    "email": "fayearthur@gmail.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\chalk\\node_modules\\color-convert",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\chalk\\node_modules\\color-convert\\LICENSE"
+  },
+  "color-convert@2.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Qix-/color-convert",
+    "publisher": "Heather Arthur",
+    "email": "fayearthur@gmail.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\color-convert",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\color-convert\\LICENSE"
+  },
+  "color-name@1.1.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/dfcreative/color-name",
+    "publisher": "DY",
+    "email": "dfcreative@gmail.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\chalk\\node_modules\\color-name",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\chalk\\node_modules\\color-name\\LICENSE"
+  },
+  "color-name@1.1.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/colorjs/color-name",
+    "publisher": "DY",
+    "email": "dfcreative@gmail.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\color-name",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\color-name\\LICENSE"
+  },
+  "component-emitter@1.3.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/component-emitter",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\component-emitter",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\component-emitter\\LICENSE"
+  },
+  "compress-commons@6.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/archiverjs/node-compress-commons",
+    "publisher": "Chris Talkington",
+    "url": "http://christalkington.com/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\compress-commons",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\compress-commons\\LICENSE"
+  },
+  "concat-map@0.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/substack/node-concat-map",
+    "publisher": "James Halliday",
+    "email": "mail@substack.net",
+    "url": "http://substack.net",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\concat-map",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\concat-map\\LICENSE"
+  },
+  "copy-descriptor@0.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/copy-descriptor",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\copy-descriptor",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\copy-descriptor\\LICENSE"
+  },
+  "core-js@2.6.12": {
+    "licenses": "MIT",
+    "repository": "https://github.com/zloirock/core-js",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\core-js",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\core-js\\LICENSE"
+  },
+  "core-util-is@1.0.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/isaacs/core-util-is",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\core-util-is",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\core-util-is\\LICENSE"
+  },
+  "cpx@1.5.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/mysticatea/cpx",
+    "publisher": "Toru Nagashima",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\cpx",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\cpx\\LICENSE"
+  },
+  "crc-32@1.2.2": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/SheetJS/js-crc32",
+    "publisher": "sheetjs",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\crc-32",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\crc-32\\LICENSE"
+  },
+  "crc32-stream@6.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/archiverjs/node-crc32-stream",
+    "publisher": "Chris Talkington",
+    "url": "http://christalkington.com/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\crc32-stream",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\crc32-stream\\LICENSE"
+  },
+  "cross-spawn@7.0.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/moxystudio/node-cross-spawn",
+    "publisher": "André Cruz",
+    "email": "andre@moxy.studio",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\cross-spawn",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\cross-spawn\\LICENSE"
+  },
+  "debug@2.6.9": {
+    "licenses": "MIT",
+    "repository": "https://github.com/visionmedia/debug",
+    "publisher": "TJ Holowaychuk",
+    "email": "tj@vision-media.ca",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\debug",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\debug\\LICENSE"
+  },
+  "debug@3.2.7": {
+    "licenses": "MIT",
+    "repository": "https://github.com/visionmedia/debug",
+    "publisher": "TJ Holowaychuk",
+    "email": "tj@vision-media.ca",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\license-checker\\node_modules\\debug",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\license-checker\\node_modules\\debug\\LICENSE"
+  },
+  "debuglog@1.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sam-github/node-debuglog",
+    "publisher": "Sam Roberts",
+    "email": "sam@strongloop.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\debuglog",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\debuglog\\LICENSE"
+  },
+  "decode-uri-component@0.2.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/SamVerschueren/decode-uri-component",
+    "publisher": "Sam Verschueren",
+    "email": "sam.verschueren@gmail.com",
+    "url": "github.com/SamVerschueren",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\decode-uri-component",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\decode-uri-component\\license"
+  },
+  "define-property@0.2.5": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/define-property",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\class-utils\\node_modules\\define-property",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\class-utils\\node_modules\\define-property\\LICENSE"
+  },
+  "define-property@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/define-property",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\base\\node_modules\\define-property",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\base\\node_modules\\define-property\\LICENSE"
+  },
+  "define-property@2.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/define-property",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\define-property",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\define-property\\LICENSE"
+  },
+  "dezalgo@1.0.4": {
+    "licenses": "ISC",
+    "repository": "https://github.com/npm/dezalgo",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\dezalgo",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\dezalgo\\LICENSE"
+  },
+  "dompurify@3.2.6": {
+    "licenses": "(MPL-2.0 OR Apache-2.0)",
+    "repository": "https://github.com/cure53/DOMPurify",
+    "publisher": "Dr.-Ing. Mario Heiderich, Cure53",
+    "email": "mario@cure53.de",
+    "url": "https://cure53.de/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\dompurify",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\dompurify\\LICENSE"
+  },
+  "duplexer@0.1.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Raynos/duplexer",
+    "publisher": "Raynos",
+    "email": "raynos2@gmail.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\duplexer",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\duplexer\\LICENCE"
+  },
+  "eastasianwidth@0.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/komagata/eastasianwidth",
+    "publisher": "Masaki Komagata",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\eastasianwidth",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\eastasianwidth\\README.md"
+  },
+  "emoji-regex@8.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/mathiasbynens/emoji-regex",
+    "publisher": "Mathias Bynens",
+    "url": "https://mathiasbynens.be/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\string-width-cjs\\node_modules\\emoji-regex",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\string-width-cjs\\node_modules\\emoji-regex\\LICENSE-MIT.txt"
+  },
+  "emoji-regex@9.2.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/mathiasbynens/emoji-regex",
+    "publisher": "Mathias Bynens",
+    "url": "https://mathiasbynens.be/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\emoji-regex",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\emoji-regex\\LICENSE-MIT.txt"
+  },
+  "escape-string-regexp@1.0.5": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/escape-string-regexp",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\escape-string-regexp",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\escape-string-regexp\\license"
+  },
+  "event-target-shim@5.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/mysticatea/event-target-shim",
+    "publisher": "Toru Nagashima",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\event-target-shim",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\event-target-shim\\LICENSE"
+  },
+  "events@3.3.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Gozala/events",
+    "publisher": "Irakli Gozalishvili",
+    "email": "rfobic@gmail.com",
+    "url": "http://jeditoolkit.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\events",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\events\\LICENSE"
+  },
+  "expand-brackets@0.1.5": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/expand-brackets",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\expand-brackets",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\expand-brackets\\LICENSE"
+  },
+  "expand-brackets@2.1.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/expand-brackets",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\expand-brackets",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\expand-brackets\\LICENSE"
+  },
+  "expand-range@1.8.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/expand-range",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\expand-range",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\expand-range\\LICENSE"
+  },
+  "extend-shallow@2.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/extend-shallow",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\braces\\node_modules\\extend-shallow",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\braces\\node_modules\\extend-shallow\\LICENSE"
+  },
+  "extend-shallow@3.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/extend-shallow",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\extend-shallow",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\extend-shallow\\LICENSE"
+  },
+  "extglob@0.3.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/extglob",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\extglob",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\extglob\\LICENSE"
+  },
+  "extglob@2.0.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/micromatch/extglob",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\extglob",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\extglob\\LICENSE"
+  },
+  "fast-fifo@1.3.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/mafintosh/fast-fifo",
+    "publisher": "Mathias Buus",
+    "url": "@mafintosh",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\fast-fifo",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\fast-fifo\\LICENSE"
+  },
+  "filename-regex@2.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/regexhq/filename-regex",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\filename-regex",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\filename-regex\\LICENSE"
+  },
+  "fill-range@2.2.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/fill-range",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\fill-range",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\fill-range\\LICENSE"
+  },
+  "fill-range@4.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/fill-range",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\fill-range",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\fill-range\\LICENSE"
+  },
+  "find-index@0.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jsdf/find-index",
+    "publisher": "James Friend",
+    "email": "james@jsdf.co",
+    "url": "http://jsdf.co/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\find-index",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\find-index\\README.md"
+  },
+  "for-in@1.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/for-in",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\for-in",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\for-in\\LICENSE"
+  },
+  "for-own@0.1.5": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/for-own",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\for-own",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\for-own\\LICENSE"
+  },
+  "foreground-child@3.3.1": {
+    "licenses": "ISC",
+    "repository": "https://github.com/tapjs/foreground-child",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\foreground-child",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\foreground-child\\LICENSE"
+  },
+  "fragment-cache@0.2.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/fragment-cache",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\fragment-cache",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\fragment-cache\\LICENSE"
+  },
+  "fs.realpath@1.0.0": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/fs.realpath",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\fs.realpath",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\fs.realpath\\LICENSE"
+  },
+  "function-bind@1.1.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Raynos/function-bind",
+    "publisher": "Raynos",
+    "email": "raynos2@gmail.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\function-bind",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\function-bind\\LICENSE"
+  },
+  "get-value@2.0.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/get-value",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\get-value",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\get-value\\LICENSE"
+  },
+  "glob-base@0.3.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/glob-base",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\glob-base",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\glob-base\\LICENSE"
+  },
+  "glob-parent@2.0.0": {
+    "licenses": "ISC",
+    "repository": "https://github.com/es128/glob-parent",
+    "publisher": "Elan Shanker",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\glob-parent",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\glob-parent\\LICENSE"
+  },
+  "glob2base@0.0.12": {
+    "licenses": "MIT",
+    "repository": "https://github.com/wearefractal/glob2base",
+    "publisher": "Fractal",
+    "email": "contact@wearefractal.com",
+    "url": "http://wearefractal.com/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\glob2base",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\glob2base\\LICENSE"
+  },
+  "glob@10.4.5": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/node-glob",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "https://blog.izs.me/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\archiver-utils\\node_modules\\glob",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\archiver-utils\\node_modules\\glob\\LICENSE"
+  },
+  "glob@7.2.3": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/node-glob",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\glob",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\glob\\LICENSE"
+  },
+  "graceful-fs@4.2.11": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/node-graceful-fs",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\graceful-fs",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\graceful-fs\\LICENSE"
+  },
+  "has-flag@3.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/has-flag",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\has-flag",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\has-flag\\license"
+  },
+  "has-value@0.3.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/has-value",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\unset-value\\node_modules\\has-value",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\unset-value\\node_modules\\has-value\\LICENSE"
+  },
+  "has-value@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/has-value",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\has-value",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\has-value\\LICENSE"
+  },
+  "has-values@0.1.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/has-values",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\unset-value\\node_modules\\has-values",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\unset-value\\node_modules\\has-values\\LICENSE"
+  },
+  "has-values@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/has-values",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\has-values",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\has-values\\LICENSE"
+  },
+  "hasown@2.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/inspect-js/hasOwn",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\hasown",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\hasown\\LICENSE"
+  },
+  "highlight.js@11.11.1": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/highlightjs/highlight.js",
+    "publisher": "Josh Goebel",
+    "email": "hello@joshgoebel.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\highlight.js",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\highlight.js\\LICENSE"
+  },
+  "highlightjs-line-numbers.js@2.9.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/wcoder/highlightjs-line-numbers.js",
+    "publisher": "Yauheni Pakala",
+    "email": "evgeniy.pakalo@gmail.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\highlightjs-line-numbers.js",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\highlightjs-line-numbers.js\\LICENSE"
+  },
+  "hosted-git-info@2.8.9": {
+    "licenses": "ISC",
+    "repository": "https://github.com/npm/hosted-git-info",
+    "publisher": "Rebecca Turner",
+    "email": "me@re-becca.org",
+    "url": "http://re-becca.org",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\hosted-git-info",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\hosted-git-info\\LICENSE"
+  },
+  "ieee754@1.2.1": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/feross/ieee754",
+    "publisher": "Feross Aboukhadijeh",
+    "email": "feross@feross.org",
+    "url": "https://feross.org",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\ieee754",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\ieee754\\LICENSE"
+  },
+  "immediate@3.0.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/calvinmetcalf/immediate",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\immediate",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\immediate\\LICENSE.txt"
+  },
+  "inflight@1.0.6": {
+    "licenses": "ISC",
+    "repository": "https://github.com/npm/inflight",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\inflight",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\inflight\\LICENSE"
+  },
+  "inherits@2.0.4": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/inherits",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\inherits",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\inherits\\LICENSE"
+  },
+  "is-accessor-descriptor@1.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/inspect-js/is-accessor-descriptor",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-accessor-descriptor",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-accessor-descriptor\\LICENSE"
+  },
+  "is-binary-path@1.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/is-binary-path",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-binary-path",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-binary-path\\license"
+  },
+  "is-buffer@1.1.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/feross/is-buffer",
+    "publisher": "Feross Aboukhadijeh",
+    "email": "feross@feross.org",
+    "url": "http://feross.org/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-buffer",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-buffer\\LICENSE"
+  },
+  "is-core-module@2.16.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/inspect-js/is-core-module",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-core-module",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-core-module\\LICENSE"
+  },
+  "is-data-descriptor@1.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/inspect-js/is-data-descriptor",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-data-descriptor",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-data-descriptor\\LICENSE"
+  },
+  "is-descriptor@0.1.7": {
+    "licenses": "MIT",
+    "repository": "https://github.com/inspect-js/is-descriptor",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\class-utils\\node_modules\\is-descriptor",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\class-utils\\node_modules\\is-descriptor\\LICENSE"
+  },
+  "is-descriptor@1.0.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/inspect-js/is-descriptor",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-descriptor",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-descriptor\\LICENSE"
+  },
+  "is-dotfile@1.0.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/is-dotfile",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-dotfile",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-dotfile\\LICENSE"
+  },
+  "is-equal-shallow@0.1.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/is-equal-shallow",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-equal-shallow",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-equal-shallow\\LICENSE"
+  },
+  "is-extendable@0.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/is-extendable",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-extendable",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-extendable\\LICENSE"
+  },
+  "is-extendable@1.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/is-extendable",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\extend-shallow\\node_modules\\is-extendable",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\extend-shallow\\node_modules\\is-extendable\\LICENSE"
+  },
+  "is-extglob@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/is-extglob",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-extglob",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-extglob\\LICENSE"
+  },
+  "is-fullwidth-code-point@3.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/is-fullwidth-code-point",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-fullwidth-code-point",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-fullwidth-code-point\\license"
+  },
+  "is-glob@2.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/is-glob",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-glob",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-glob\\LICENSE"
+  },
+  "is-number@2.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/is-number",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-number",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-number\\LICENSE"
+  },
+  "is-number@3.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/is-number",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\is-number",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\is-number\\LICENSE"
+  },
+  "is-number@4.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/is-number",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\randomatic\\node_modules\\is-number",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\randomatic\\node_modules\\is-number\\LICENSE"
+  },
+  "is-plain-object@2.0.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/is-plain-object",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-plain-object",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-plain-object\\LICENSE"
+  },
+  "is-posix-bracket@0.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/is-posix-bracket",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-posix-bracket",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-posix-bracket\\LICENSE"
+  },
+  "is-primitive@2.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/is-primitive",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-primitive",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-primitive\\LICENSE"
+  },
+  "is-stream@2.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/is-stream",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-stream",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-stream\\license"
+  },
+  "is-windows@1.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/is-windows",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-windows",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\is-windows\\LICENSE"
+  },
+  "isarray@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/juliangruber/isarray",
+    "publisher": "Julian Gruber",
+    "email": "mail@juliangruber.com",
+    "url": "http://juliangruber.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\isarray",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\isarray\\README.md"
+  },
+  "isexe@2.0.0": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/isexe",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\isexe",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\isexe\\LICENSE"
+  },
+  "isobject@2.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/isobject",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\isobject",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\isobject\\LICENSE"
+  },
+  "isobject@3.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/isobject",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\isobject",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\isobject\\LICENSE"
+  },
+  "jackspeak@3.4.3": {
+    "licenses": "BlueOak-1.0.0",
+    "repository": "https://github.com/isaacs/jackspeak",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\jackspeak",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\jackspeak\\LICENSE.md"
+  },
+  "json-parse-even-better-errors@2.3.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/npm/json-parse-even-better-errors",
+    "publisher": "Kat Marchán",
+    "email": "kzm@zkat.tech",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\json-parse-even-better-errors",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\json-parse-even-better-errors\\LICENSE.md"
+  },
+  "jszip@3.10.1": {
+    "licenses": "(MIT OR GPL-3.0-or-later)",
+    "repository": "https://github.com/Stuk/jszip",
+    "publisher": "Stuart Knightley",
+    "email": "stuart@stuartk.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\jszip",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\jszip\\LICENSE.markdown"
+  },
+  "kind-of@3.2.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/kind-of",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\kind-of",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\kind-of\\LICENSE"
+  },
+  "kind-of@4.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/kind-of",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\has-values\\node_modules\\kind-of",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\has-values\\node_modules\\kind-of\\LICENSE"
+  },
+  "kind-of@6.0.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/kind-of",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\randomatic\\node_modules\\kind-of",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\randomatic\\node_modules\\kind-of\\LICENSE"
+  },
+  "lazystream@1.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jpommerening/node-lazystream",
+    "publisher": "Jonas Pommerening",
+    "email": "jonas.pommerening@gmail.com",
+    "url": "https://npmjs.org/~jpommerening",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\lazystream",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\lazystream\\LICENSE"
+  },
+  "license-checker@25.0.1": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/davglass/license-checker",
+    "publisher": "Dav Glass",
+    "email": "davglass@gmail.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\license-checker",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\license-checker\\LICENSE"
+  },
+  "lie@3.3.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/calvinmetcalf/lie",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\lie",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\lie\\license.md"
+  },
+  "lodash@4.17.21": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lodash/lodash",
+    "publisher": "John-David Dalton",
+    "email": "john.david.dalton@gmail.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\lodash",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\lodash\\LICENSE"
+  },
+  "lru-cache@10.4.3": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/node-lru-cache",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\lru-cache",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\lru-cache\\LICENSE"
+  },
+  "map-cache@0.2.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/map-cache",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\map-cache",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\map-cache\\LICENSE"
+  },
+  "map-visit@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/map-visit",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\map-visit",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\map-visit\\LICENSE"
+  },
+  "marked@10.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/markedjs/marked",
+    "publisher": "Christopher Jeffrey",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\marked",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\marked\\LICENSE.md"
+  },
+  "math-random@1.0.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/michaelrhodes/math-random",
+    "publisher": "Michael Rhodes",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\math-random",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\math-random\\readme.md"
+  },
+  "micromatch@2.3.11": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/micromatch",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\micromatch",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\micromatch\\LICENSE"
+  },
+  "micromatch@3.1.10": {
+    "licenses": "MIT",
+    "repository": "https://github.com/micromatch/micromatch",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\micromatch",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\node_modules\\micromatch\\LICENSE"
+  },
+  "minimatch@3.1.2": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/minimatch",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\minimatch",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\minimatch\\LICENSE"
+  },
+  "minimatch@5.1.6": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/minimatch",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdir-glob\\node_modules\\minimatch",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdir-glob\\node_modules\\minimatch\\LICENSE"
+  },
+  "minimatch@9.0.5": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/minimatch",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\archiver-utils\\node_modules\\minimatch",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\archiver-utils\\node_modules\\minimatch\\LICENSE"
+  },
+  "minimist@1.2.8": {
+    "licenses": "MIT",
+    "repository": "https://github.com/minimistjs/minimist",
+    "publisher": "James Halliday",
+    "email": "mail@substack.net",
+    "url": "http://substack.net",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\minimist",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\minimist\\LICENSE"
+  },
+  "minipass@7.1.2": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/minipass",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\minipass",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\minipass\\LICENSE"
+  },
+  "mixin-deep@1.3.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/mixin-deep",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\mixin-deep",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\mixin-deep\\LICENSE"
+  },
+  "mkdirp@0.5.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/substack/node-mkdirp",
+    "publisher": "James Halliday",
+    "email": "mail@substack.net",
+    "url": "http://substack.net",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\license-checker\\node_modules\\mkdirp",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\license-checker\\node_modules\\mkdirp\\LICENSE"
+  },
+  "mkdirp@3.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/isaacs/node-mkdirp",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\mkdirp",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\mkdirp\\LICENSE"
+  },
+  "ms@2.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/zeit/ms",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\ms",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\ms\\license.md"
+  },
+  "ms@2.1.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/vercel/ms",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\license-checker\\node_modules\\ms",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\license-checker\\node_modules\\ms\\license.md"
+  },
+  "nanomatch@1.2.13": {
+    "licenses": "MIT",
+    "repository": "https://github.com/micromatch/nanomatch",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\nanomatch",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\nanomatch\\LICENSE"
+  },
+  "nopt@4.0.3": {
+    "licenses": "ISC",
+    "repository": "https://github.com/npm/nopt",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\nopt",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\nopt\\LICENSE"
+  },
+  "normalize-package-data@2.5.0": {
+    "licenses": "BSD-2-Clause",
+    "repository": "https://github.com/npm/normalize-package-data",
+    "publisher": "Meryn Stol",
+    "email": "merynstol@gmail.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\normalize-package-data",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\normalize-package-data\\LICENSE"
+  },
+  "normalize-path@2.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/normalize-path",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\normalize-path",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\normalize-path\\LICENSE"
+  },
+  "normalize-path@3.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/normalize-path",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\archiver-utils\\node_modules\\normalize-path",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\archiver-utils\\node_modules\\normalize-path\\LICENSE"
+  },
+  "normalize.css@8.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/necolas/normalize.css",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\normalize.css",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\normalize.css\\LICENSE.md"
+  },
+  "npm-normalize-package-bin@1.0.1": {
+    "licenses": "ISC",
+    "repository": "https://github.com/npm/npm-normalize-package-bin",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "https://izs.me",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\npm-normalize-package-bin",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\npm-normalize-package-bin\\LICENSE"
+  },
+  "object-copy@0.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/object-copy",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\object-copy",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\object-copy\\LICENSE"
+  },
+  "object-visit@1.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/object-visit",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\object-visit",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\object-visit\\LICENSE"
+  },
+  "object.omit@2.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/object.omit",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\object.omit",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\object.omit\\LICENSE"
+  },
+  "object.pick@1.3.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/object.pick",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\object.pick",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\object.pick\\LICENSE"
+  },
+  "once@1.4.0": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/once",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\once",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\once\\LICENSE"
+  },
+  "os-homedir@1.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/os-homedir",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\os-homedir",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\os-homedir\\license"
+  },
+  "os-tmpdir@1.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/os-tmpdir",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\os-tmpdir",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\os-tmpdir\\license"
+  },
+  "osenv@0.1.5": {
+    "licenses": "ISC",
+    "repository": "https://github.com/npm/osenv",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\osenv",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\osenv\\LICENSE"
+  },
+  "package-json-from-dist@1.0.1": {
+    "licenses": "BlueOak-1.0.0",
+    "repository": "https://github.com/isaacs/package-json-from-dist",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "https://izs.me",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\package-json-from-dist",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\package-json-from-dist\\LICENSE.md"
+  },
+  "pako@1.0.11": {
+    "licenses": "(MIT AND Zlib)",
+    "repository": "https://github.com/nodeca/pako",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\pako",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\pako\\LICENSE"
+  },
+  "parse-glob@3.0.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/parse-glob",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\parse-glob",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\parse-glob\\LICENSE"
+  },
+  "pascalcase@0.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/pascalcase",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\pascalcase",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\pascalcase\\LICENSE"
+  },
+  "path-is-absolute@1.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/path-is-absolute",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\path-is-absolute",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\path-is-absolute\\license"
+  },
+  "path-key@3.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/path-key",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\path-key",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\path-key\\license"
+  },
+  "path-parse@1.0.7": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jbgutierrez/path-parse",
+    "publisher": "Javier Blanco",
+    "email": "http://jbgutierrez.info",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\path-parse",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\path-parse\\LICENSE"
+  },
+  "path-scurry@1.11.1": {
+    "licenses": "BlueOak-1.0.0",
+    "repository": "https://github.com/isaacs/path-scurry",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "https://blog.izs.me",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\path-scurry",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\path-scurry\\LICENSE.md"
+  },
+  "posix-character-classes@0.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/posix-character-classes",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\posix-character-classes",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\posix-character-classes\\LICENSE"
+  },
+  "preserve@0.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/preserve",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\preserve",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\preserve\\LICENSE"
+  },
+  "process-nextick-args@2.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/calvinmetcalf/process-nextick-args",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\process-nextick-args",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\process-nextick-args\\license.md"
+  },
+  "process@0.11.10": {
+    "licenses": "MIT",
+    "repository": "https://github.com/shtylman/node-process",
+    "publisher": "Roman Shtylman",
+    "email": "shtylman@gmail.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\process",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\process\\LICENSE"
+  },
+  "randomatic@3.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/randomatic",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\randomatic",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\randomatic\\LICENSE"
+  },
+  "read-installed@4.0.3": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/read-installed",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\read-installed",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\read-installed\\LICENSE"
+  },
+  "read-package-json@2.1.2": {
+    "licenses": "ISC",
+    "repository": "https://github.com/npm/read-package-json",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\read-package-json",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\read-package-json\\LICENSE"
+  },
+  "readable-stream@2.3.8": {
+    "licenses": "MIT",
+    "repository": "https://github.com/nodejs/readable-stream",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readable-stream",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readable-stream\\LICENSE"
+  },
+  "readable-stream@4.7.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/nodejs/readable-stream",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\archiver-utils\\node_modules\\readable-stream",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\archiver-utils\\node_modules\\readable-stream\\LICENSE"
+  },
+  "readdir-glob@1.1.3": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/Yqnn/node-readdir-glob",
+    "publisher": "Yann Armelin",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdir-glob",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdir-glob\\LICENSE"
+  },
+  "readdir-scoped-modules@1.1.0": {
+    "licenses": "ISC",
+    "repository": "https://github.com/npm/readdir-scoped-modules",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdir-scoped-modules",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdir-scoped-modules\\LICENSE"
+  },
+  "readdirp@2.2.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/paulmillr/readdirp",
+    "publisher": "Thorsten Lorenz",
+    "email": "thlorenz@gmx.de",
+    "url": "thlorenz.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readdirp\\LICENSE"
+  },
+  "regenerator-runtime@0.11.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/regenerator/tree/master/packages/regenerator-runtime",
+    "publisher": "Ben Newman",
+    "email": "bn@cs.stanford.edu",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\regenerator-runtime",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\regenerator-runtime\\README.md"
+  },
+  "regex-cache@0.4.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/regex-cache",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\regex-cache",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\regex-cache\\LICENSE"
+  },
+  "regex-not@1.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/regex-not",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\regex-not",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\regex-not\\LICENSE"
+  },
+  "remove-trailing-separator@1.1.0": {
+    "licenses": "ISC",
+    "repository": "https://github.com/darsain/remove-trailing-separator",
+    "publisher": "darsain",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\remove-trailing-separator",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\remove-trailing-separator\\license"
+  },
+  "repeat-element@1.1.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/repeat-element",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\repeat-element",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\repeat-element\\LICENSE"
+  },
+  "repeat-string@1.6.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/repeat-string",
+    "publisher": "Jon Schlinkert",
+    "url": "http://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\repeat-string",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\repeat-string\\LICENSE"
+  },
+  "resolve-url@0.2.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lydell/resolve-url",
+    "publisher": "Simon Lydell",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\resolve-url",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\resolve-url\\LICENSE"
+  },
+  "resolve@1.22.10": {
+    "licenses": "MIT",
+    "repository": "https://github.com/browserify/resolve",
+    "publisher": "James Halliday",
+    "email": "mail@substack.net",
+    "url": "http://substack.net",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\resolve",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\resolve\\LICENSE"
+  },
+  "ret@0.1.15": {
+    "licenses": "MIT",
+    "repository": "https://github.com/fent/ret.js",
+    "publisher": "Roly Fentanes",
+    "url": "https://github.com/fent",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\ret",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\ret\\LICENSE"
+  },
+  "rimraf@5.0.10": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/rimraf",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\rimraf",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\rimraf\\LICENSE"
+  },
+  "safe-buffer@5.1.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/feross/safe-buffer",
+    "publisher": "Feross Aboukhadijeh",
+    "email": "feross@feross.org",
+    "url": "http://feross.org",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readable-stream\\node_modules\\safe-buffer",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\readable-stream\\node_modules\\safe-buffer\\LICENSE"
+  },
+  "safe-buffer@5.2.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/feross/safe-buffer",
+    "publisher": "Feross Aboukhadijeh",
+    "email": "feross@feross.org",
+    "url": "https://feross.org",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\safe-buffer",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\safe-buffer\\LICENSE"
+  },
+  "safe-regex@1.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/substack/safe-regex",
+    "publisher": "James Halliday",
+    "email": "mail@substack.net",
+    "url": "http://substack.net",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\safe-regex",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\safe-regex\\LICENSE"
+  },
+  "semver@5.7.2": {
+    "licenses": "ISC",
+    "repository": "https://github.com/npm/node-semver",
+    "publisher": "GitHub Inc.",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\semver",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\semver\\LICENSE"
+  },
+  "set-value@2.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/set-value",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\set-value",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\set-value\\LICENSE"
+  },
+  "setimmediate@1.0.5": {
+    "licenses": "MIT",
+    "repository": "https://github.com/YuzuJS/setImmediate",
+    "publisher": "YuzuJS",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\setimmediate",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\setimmediate\\LICENSE.txt"
+  },
+  "shebang-command@2.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/kevva/shebang-command",
+    "publisher": "Kevin Mårtensson",
+    "email": "kevinmartensson@gmail.com",
+    "url": "github.com/kevva",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\shebang-command",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\shebang-command\\license"
+  },
+  "shebang-regex@3.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/shebang-regex",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\shebang-regex",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\shebang-regex\\license"
+  },
+  "shell-quote@1.8.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/ljharb/shell-quote",
+    "publisher": "James Halliday",
+    "email": "mail@substack.net",
+    "url": "http://substack.net",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\shell-quote",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\shell-quote\\LICENSE"
+  },
+  "signal-exit@4.1.0": {
+    "licenses": "ISC",
+    "repository": "https://github.com/tapjs/signal-exit",
+    "publisher": "Ben Coe",
+    "email": "ben@npmjs.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\signal-exit",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\signal-exit\\LICENSE.txt"
+  },
+  "simple-notes-extension@3.0.2": {
+    "licenses": "MIT*",
+    "path": "C:\\Users\\justp\\Documents\\simple_note",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\LICENSE"
+  },
+  "slide@1.1.6": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/slide-flow-control",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\slide",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\slide\\LICENSE"
+  },
+  "snapdragon-node@2.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/snapdragon-node",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\snapdragon-node",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\snapdragon-node\\LICENSE"
+  },
+  "snapdragon-util@3.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/snapdragon-util",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\snapdragon-util",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\snapdragon-util\\LICENSE"
+  },
+  "snapdragon@0.8.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/snapdragon",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\snapdragon",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\snapdragon\\LICENSE"
+  },
+  "source-map-resolve@0.5.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lydell/source-map-resolve",
+    "publisher": "Simon Lydell",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\source-map-resolve",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\source-map-resolve\\LICENSE"
+  },
+  "source-map-url@0.4.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lydell/source-map-url",
+    "publisher": "Simon Lydell",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\source-map-url",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\source-map-url\\LICENSE"
+  },
+  "source-map@0.5.7": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/mozilla/source-map",
+    "publisher": "Nick Fitzgerald",
+    "email": "nfitzgerald@mozilla.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\source-map",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\source-map\\LICENSE"
+  },
+  "spdx-compare@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/kemitchell/spdx-compare.js",
+    "publisher": "Kyle E. Mitchell",
+    "email": "kyle@kemitchell.com",
+    "url": "https://kemitchell.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\spdx-compare",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\spdx-compare\\LICENSE.md"
+  },
+  "spdx-correct@3.2.0": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/jslicense/spdx-correct.js",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\spdx-correct",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\spdx-correct\\LICENSE"
+  },
+  "spdx-exceptions@2.5.0": {
+    "licenses": "CC-BY-3.0",
+    "repository": "https://github.com/kemitchell/spdx-exceptions.json",
+    "publisher": "The Linux Foundation",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\spdx-exceptions",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\spdx-exceptions\\README.md"
+  },
+  "spdx-expression-parse@3.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jslicense/spdx-expression-parse.js",
+    "publisher": "Kyle E. Mitchell",
+    "email": "kyle@kemitchell.com",
+    "url": "https://kemitchell.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\spdx-expression-parse",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\spdx-expression-parse\\LICENSE"
+  },
+  "spdx-license-ids@3.0.21": {
+    "licenses": "CC0-1.0",
+    "repository": "https://github.com/jslicense/spdx-license-ids",
+    "publisher": "Shinnosuke Watanabe",
+    "url": "https://github.com/shinnn",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\spdx-license-ids",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\spdx-license-ids\\README.md"
+  },
+  "spdx-ranges@2.1.1": {
+    "licenses": "(MIT AND CC-BY-3.0)",
+    "repository": "https://github.com/kemitchell/spdx-ranges.js",
+    "publisher": "The Linux Foundation",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\spdx-ranges",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\spdx-ranges\\LICENSE.md"
+  },
+  "spdx-satisfies@4.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/kemitchell/spdx-satisfies.js",
+    "publisher": "Kyle E. Mitchell",
+    "email": "kyle@kemitchell.com",
+    "url": "https://kemitchell.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\spdx-satisfies",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\spdx-satisfies\\LICENSE"
+  },
+  "split-string@3.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/split-string",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\split-string",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\split-string\\LICENSE"
+  },
+  "static-extend@0.1.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/static-extend",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\static-extend",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\static-extend\\LICENSE"
+  },
+  "streamx@2.22.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/mafintosh/streamx",
+    "publisher": "Mathias Buus",
+    "url": "@mafintosh",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\streamx",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\streamx\\LICENSE"
+  },
+  "string-width@4.2.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/string-width",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\string-width-cjs",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\string-width-cjs\\license"
+  },
+  "string-width@5.1.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/string-width",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\string-width",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\string-width\\license"
+  },
+  "string_decoder@1.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/nodejs/string_decoder",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\string_decoder",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\string_decoder\\LICENSE"
+  },
+  "string_decoder@1.3.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/nodejs/string_decoder",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\archiver-utils\\node_modules\\string_decoder",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\archiver-utils\\node_modules\\string_decoder\\LICENSE"
+  },
+  "strip-ansi@6.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/chalk/strip-ansi",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\string-width-cjs\\node_modules\\strip-ansi",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\string-width-cjs\\node_modules\\strip-ansi\\license"
+  },
+  "strip-ansi@7.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/chalk/strip-ansi",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\strip-ansi",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\strip-ansi\\license"
+  },
+  "subarg@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/substack/subarg",
+    "publisher": "James Halliday",
+    "email": "mail@substack.net",
+    "url": "http://substack.net",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\subarg",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\subarg\\LICENSE"
+  },
+  "supports-color@5.5.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/chalk/supports-color",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\supports-color",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\supports-color\\license"
+  },
+  "supports-preserve-symlinks-flag@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/inspect-js/node-supports-preserve-symlinks-flag",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\supports-preserve-symlinks-flag",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\supports-preserve-symlinks-flag\\LICENSE"
+  },
+  "tar-stream@3.1.7": {
+    "licenses": "MIT",
+    "repository": "https://github.com/mafintosh/tar-stream",
+    "publisher": "Mathias Buus",
+    "email": "mathiasbuus@gmail.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\tar-stream",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\tar-stream\\LICENSE"
+  },
+  "text-decoder@1.2.3": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/holepunchto/text-decoder",
+    "publisher": "Holepunch",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\text-decoder",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\text-decoder\\LICENSE"
+  },
+  "to-object-path@0.3.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/to-object-path",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\to-object-path",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\to-object-path\\LICENSE"
+  },
+  "to-regex-range@2.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/micromatch/to-regex-range",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\to-regex-range",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\to-regex-range\\LICENSE"
+  },
+  "to-regex@3.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/to-regex",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\to-regex",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\to-regex\\LICENSE"
+  },
+  "treeify@1.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/notatestuser/treeify",
+    "publisher": "Luke Plaster",
+    "email": "notatestuser@gmail.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\treeify",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\treeify\\LICENSE"
+  },
+  "union-value@1.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/union-value",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\union-value",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\union-value\\LICENSE"
+  },
+  "unset-value@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/unset-value",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\unset-value",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\unset-value\\LICENSE"
+  },
+  "urix@0.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lydell/urix",
+    "publisher": "Simon Lydell",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\urix",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\urix\\LICENSE"
+  },
+  "use@3.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/use",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\use",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\use\\LICENSE"
+  },
+  "util-deprecate@1.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/TooTallNate/util-deprecate",
+    "publisher": "Nathan Rajlich",
+    "email": "nathan@tootallnate.net",
+    "url": "http://n8.io/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\util-deprecate",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\util-deprecate\\LICENSE"
+  },
+  "util-extend@1.0.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/isaacs/util-extend",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\util-extend",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\util-extend\\LICENSE"
+  },
+  "validate-npm-package-license@3.0.4": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/kemitchell/validate-npm-package-license.js",
+    "publisher": "Kyle E. Mitchell",
+    "email": "kyle@kemitchell.com",
+    "url": "https://kemitchell.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\validate-npm-package-license",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\validate-npm-package-license\\LICENSE"
+  },
+  "webextension-polyfill@0.10.0": {
+    "licenses": "MPL-2.0",
+    "repository": "https://github.com/mozilla/webextension-polyfill",
+    "publisher": "Mozilla",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\webextension-polyfill",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\webextension-polyfill\\LICENSE"
+  },
+  "which@2.0.2": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/node-which",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\which",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\which\\LICENSE"
+  },
+  "wrap-ansi@7.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/chalk/wrap-ansi",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\wrap-ansi-cjs",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\wrap-ansi-cjs\\license"
+  },
+  "wrap-ansi@8.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/chalk/wrap-ansi",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\wrap-ansi",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\wrap-ansi\\license"
+  },
+  "wrappy@1.0.2": {
+    "licenses": "ISC",
+    "repository": "https://github.com/npm/wrappy",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\wrappy",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\wrappy\\LICENSE"
+  },
+  "zip-stream@6.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/archiverjs/node-zip-stream",
+    "publisher": "Chris Talkington",
+    "url": "http://christalkington.com/",
+    "path": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\zip-stream",
+    "licenseFile": "C:\\Users\\justp\\Documents\\simple_note\\node_modules\\zip-stream\\LICENSE"
+  }
+}
+
