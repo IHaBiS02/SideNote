@@ -24,15 +24,20 @@ function applyFontSize(size) {
  * @param {string} mode The color mode to apply.
  */
 function applyMode(mode) {
+  const themeStylesheet = document.getElementById('theme-stylesheet');
   if (mode === 'dark') {
     document.body.classList.add('dark-mode');
+    themeStylesheet.href = 'vendor/atom-one-dark.css';
   } else if (mode === 'light') {
     document.body.classList.remove('dark-mode');
+    themeStylesheet.href = 'vendor/atom-one-light.css';
   } else {
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       document.body.classList.add('dark-mode');
+      themeStylesheet.href = 'vendor/atom-one-dark.css';
     } else {
       document.body.classList.remove('dark-mode');
+      themeStylesheet.href = 'vendor/atom-one-light.css';
     }
   }
 }

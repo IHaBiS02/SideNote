@@ -40,8 +40,9 @@ for (const file of commonFiles) {
 const vendorFiles = {
     'dompurify/dist/purify.min.js': 'dompurify.min.js',
     'marked/marked.min.js': 'marked.min.js',
-    'highlight.js/styles/atom-one-dark.min.css': 'atom-one-dark.min.css',
-        '@highlightjs/cdn-assets/highlight.min.js': 'highlight.min.js',
+    'highlight.js/styles/atom-one-dark.css': 'atom-one-dark.css',
+    'highlight.js/styles/atom-one-light.css': 'atom-one-light.css',
+    '@highlightjs/cdn-assets/highlight.min.js': 'highlight.min.js',
     'highlightjs-line-numbers.js/dist/highlightjs-line-numbers.min.js': 'highlightjs-line-numbers.min.js',
     'jszip/dist/jszip.min.js': 'jszip.min.js',
     'webextension-polyfill/dist/browser-polyfill.min.js': 'browser-polyfill.min.js'
