@@ -79,7 +79,7 @@ body {
   flex-direction: column;
 }
 
-.image-info .image-name, .note-info .deletion-date, .image-info .deletion-date {
+.note-info .deletion-date, .image-info .deletion-date {
   font-size: 0.8em;
   color: #888;
 }
@@ -101,7 +101,7 @@ body {
   object-fit: cover;
 }
 
-#image-list li .image-info .image-name {
+#image-list li .image-info {
   font-size: 0.9em;
 }
 
