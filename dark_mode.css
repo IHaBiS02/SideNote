@@ -113,7 +113,7 @@ body.dark-mode {
   border-radius: 5px; /* 핸들의 모서리를 둥글게 */
 }
 
-/* 막대에 ���우스를 올렸을 때 */
+/* 막대에 마우스를 올렸을 때 */
 .dark-mode ::-webkit-scrollbar-thumb:hover {
   background: #777; /* 호버 시 더 밝은 색상으로 변경 */
 }
