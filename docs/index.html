@@ -1,14 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SideNote</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>SideNote - Simple Notes in your Browser</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>SideNote</h1>
-    <p>Your simple and convenient note-taking extension.</p>
-    <script src="script.js"></script>
+  <div id="list-view">
+    <div class="header">
+      <h1 id="notes-list-title">SideNote</h1>
+      <a href="https://chrome.google.com/webstore/detail/sidenote/your-extension-id" target="_blank" class="button">Get Extension</a>
+    </div>
+    <div class="main-content">
+        <h2>A simple note-taking extension for your browser's side panel.</h2>
+        <p>SideNote allows you to quickly jot down notes, ideas, and to-do lists without leaving your current tab. It's perfect for students, researchers, and anyone who needs a simple way to stay organized.</p>
+        <h3>Features:</h3>
+        <ul>
+            <li>📝 Create and manage multiple notes</li>
+            <li>🌗 Light and dark mode</li>
+            <li>💾 Export and import your notes</li>
+            <li>⌨️ Markdown support</li>
+        </ul>
+    </div>
+    <div class="toolbar">
+      <button id="theme-toggle-button" title="Toggle Theme">🌓</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
