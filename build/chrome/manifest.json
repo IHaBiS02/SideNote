@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "SideNote",
+  "version": "3.0.5",
+  "description": "A simple notes app in the browser sidebar.",
+  "permissions": [
+    "sidePanel",
+    "storage",
+    "unlimitedStorage"
+  ],
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "action": {
+    "default_icon": {
+      "16": "images/icon16.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Shift+Alt+W"
+      },
+      "description": "Toggle the notes panel"
+    }
+  }
+}

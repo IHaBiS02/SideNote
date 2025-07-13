@@ -1,0 +1,152 @@
+body.dark-mode {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+.dark-mode .header {
+    background-color: #1e1e1e;
+    border-bottom: 1px solid #333;
+}
+
+.dark-mode h1 {
+    color: #e0e0e0;
+}
+
+.dark-mode #note-list li, .dark-mode #deleted-items-list li, .dark-mode #image-list li {
+    background-color: #1e1e1e;
+    border-bottom: 1px solid #333;
+}
+
+.dark-mode #note-list li:hover, .dark-mode #deleted-items-list li:hover, .dark-mode #image-list li:hover {
+    background-color: #333;
+}
+
+.dark-mode .delete-note-icon:hover, .dark-mode .restore-note-icon:hover, .dark-mode .pin-note-icon:hover {
+    background-color: #444;
+}
+
+.dark-mode .delete-item-icon:hover, .dark-mode .restore-item-icon:hover {
+    background-color: #444;
+}
+
+.dark-mode .delete-image-icon:hover {
+    background-color: #444;
+}
+
+.dark-mode #markdown-editor, .dark-mode #html-preview {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+.dark-mode .toolbar {
+    background-color: #1e1e1e;
+    border-top: 1px solid #333;
+}
+
+.dark-mode button {
+    color: #e0e0e0;
+}
+
+.dark-mode #recycle-bin-button,
+.dark-mode #licenses-button,
+.dark-mode #image-management-button {
+  background-color: #333;
+}
+
+.dark-mode .notes-dropdown {
+    background-color: #2d2d2d;
+    border-color: #444;
+}
+
+.dark-mode .notes-dropdown div:hover {
+    background-color: #444;
+}
+
+.dark-mode .title-input {
+    background-color: #333;
+    color: #e0e0e0;
+    border: 1px solid #555;
+}
+
+.dark-mode button:hover {
+    background-color: #444;
+}
+
+.dark-mode #settings-view, .dark-mode #license-view, .dark-mode #recycle-bin-view, .dark-mode #image-management-view {
+    background-color: #1e1e1e;
+}
+
+.dark-mode .setting label, .dark-mode #settings-title, .dark-mode #license-title, .dark-mode #recycle-bin-title, .dark-mode #image-management-title {
+    color: #e0e0e0;
+}
+
+.dark-mode select, .dark-mode input[type="number"] {
+    background-color: #333;
+    color: #e0e0e0;
+    border: 1px solid #555;
+}
+
+.dark-mode pre code {
+    background-color: #2d2d2d;
+    border: 1px solid #444;
+}
+
+.dark-mode .hljs-ln-numbers {
+    color: #ccc;
+    border-right: 1px solid #444;
+}
+
+/* 전체 스크롤바의 영역 */
+.dark-mode ::-webkit-scrollbar {
+  width: 10px; /* 스크롤바의 너비 */
+  height: 10px; /* 스크롤바의 높이 */
+}
+
+/* 스크롤바의 배경 (트랙) */
+.dark-mode ::-webkit-scrollbar-track {
+  background: #1e1e1e; /* 어두운 배경색 */
+}
+
+/* 움직이는 막대 (썸) */
+.dark-mode ::-webkit-scrollbar-thumb {
+  background: #555; /* 트랙보다 밝은 핸들 색상 */
+  border-radius: 5px; /* 핸들의 모서리를 둥글게 */
+}
+
+/* 막대에 마우스를 올렸을 때 */
+.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: #777; /* 호버 시 더 밝은 색상으로 변경 */
+}
+
+/* 기본 링크 스타일 (방문 전) */
+.dark-mode a {
+  color: #82aaff; /* 가독성 좋은 밝은 파란색 */
+  text-decoration: none; /* 취향에 따라 밑줄 제거 */
+}
+
+/* 이미 방문한 링크 스타일 */
+.dark-mode a:visited {
+  color: #c792ea; /* 가독성 좋은 밝은 보라색 */
+}
+
+/* 마우스를 올렸을 때 스타일 */
+.dark-mode a:hover {
+  color: #add8e6; /* 더 밝은 하늘색으로 변경 */
+  text-decoration: underline; /* 마우스를 올리면 밑줄 표시 */
+}
+
+/* 링크를 클릭하고 있을 때 스타일 */
+.dark-mode a:active {
+  color: #ffffff; /* 클릭 시 흰색으로 강조 */
+}
+
+/* 인용구 스타일 */
+.dark-mode blockquote {
+  border-left: 4px solid #444;
+  padding-left: 10px;
+  margin-left: 0;
+}
+
+.dark-mode input[type="checkbox"] {
+  accent-color: #82aaff;
+}

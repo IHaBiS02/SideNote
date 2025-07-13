@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Notes</title>
+  <link rel="stylesheet" href="node_modules/reset-css/reset.css">
+  <link rel="stylesheet" href="sidepanel.css">
+  <link rel="stylesheet" href="dark_mode.css">
+  <link id="theme-stylesheet" rel="stylesheet" href="vendor/atom-one-light.css">
+</head>
+<body>
+  <div id="list-view">
+    <div class="header">
+      <h1 id="notes-list-title">Notes</h1>
+      <button id="new-note-button">+</button>
+    </div>
+    <ul id="note-list"></ul>
+    <div class="toolbar">
+      <button id="global-import-button" title="Import Notes">📂</button>
+      <button id="global-export-button" title="Export Notes">💾</button>
+      <input type="file" id="global-import-input" style="display: none;" accept=".snotes,.snote" />
+      <button id="global-settings-button" title="Settings">⚙️</button>
+    </div>
+  </div>
+
+  <div id="editor-view" style="display: none;">
+    <div class="header">
+      <button id="back-button"><</button>
+      <h1 id="editor-title"></h1>
+    </div>
+    <div id="editor-container">
+      <textarea id="markdown-editor"></textarea>
+      <div id="html-preview"></div>
+    </div>
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <button id="toggle-view-button">Preview</button>
+        <button id="auto-line-break-button" title="Auto Line Break">↩</button>
+        <button id="tilde-replacement-button" title="Tilde Replacement">~</button>
+      </div>
+      <div class="toolbar-right">
+        <button id="import-note-button" title="Import Single Note">📂</button>
+        <button id="export-note-button" title="Export Single Note">💾</button>
+        <input type="file" id="import-note-input" style="display: none;" accept=".snote" />
+        <button id="settings-button" title="Settings">⚙️</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="settings-view" style="display: none;">
+    <div class="header">
+      <button id="settings-back-button"><</button>
+      <h1 id="settings-title">Settings</h1>
+    </div>
+    <div id="settings-container">
+      <div class="setting">
+        <label for="mode-setting">Mode</label>
+        <select id="mode-setting">
+          <option value="system">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+      <div class="setting">
+        <label for="title-setting">Title</label>
+        <select id="title-setting">
+          <option value="default">Default (First line)</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+      <div class="setting">
+        <label for="font-size-setting">Font Size</label>
+        <input type="number" id="font-size-setting" min="1" value="12">
+      </div>
+      <div class="setting" id="auto-add-spaces-setting">
+        <label for="auto-add-spaces-checkbox">Auto Add Two Spaces on Enter</label>
+        <input type="checkbox" id="auto-add-spaces-checkbox">
+      </div>
+      <div class="setting" id="prevent-used-image-deletion-setting">
+        <label for="prevent-used-image-deletion-checkbox">Prevent deletion of used images</label>
+        <input type="checkbox" id="prevent-used-image-deletion-checkbox">
+      </div>
+      <div class="setting">
+        <button id="image-management-button" title="Images 🖼️">Images 🖼️</button>
+      </div>
+      <div class="setting">
+        <button id="recycle-bin-button" title="Recycle Bin 🗑️">Recycle Bin 🗑️</button>
+      </div>
+      <div class="setting">
+        <button id="licenses-button" title="Licenses 📝">Licenses 📝</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="license-view" style="display: none;">
+    <div class="header">
+      <button id="license-back-button"><</button>
+      <h1 id="license-title">Licenses</h1>
+    </div>
+    <div id="license-content"></div>
+  </div>
+
+  <div id="recycle-bin-view" style="display: none;">
+    <div class="header">
+      <button id="recycle-bin-back-button"><</button>
+      <h1 id="recycle-bin-title">Recycle Bin</h1>
+    </div>
+    <ul id="deleted-items-list"></ul>
+  </div>
+
+  <div id="image-management-view" style="display: none;">
+    <div class="header">
+      <button id="image-management-back-button"><</button>
+      <h1 id="image-management-title">Image Management</h1>
+    </div>
+    <ul id="image-list"></ul>
+  </div>
+
+  <script src="vendor/browser-polyfill.min.js"></script>
+  <script src="vendor/marked.min.js"></script>
+  <script src="vendor/dompurify.min.js"></script>
+  <script src="vendor/highlight.min.js"></script>
+  <script src="vendor/highlightjs-line-numbers.min.js"></script>
+  <script src="vendor/jszip.min.js"></script>
+  <script src="src/database.js"></script>
+  <script src="src/dom.js"></script>
+  <script src="src/utils.js"></script>
+  <script src="src/settings.js"></script>
+  <script src="src/notes.js"></script>
+  <script src="src/notes_view.js"></script>
+  <script src="src/import_export.js"></script>
+  <script src="src/events.js"></script>
+  <script src="src/main.js"></script>
+</body>
+</html>

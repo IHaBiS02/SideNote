@@ -1,0 +1,463 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+  overflow-x: hidden;
+  font-size: 75%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  position: relative;
+}
+
+#editor-view .header {
+  justify-content: flex-start;
+}
+
+#notes-list-title,
+#editor-title,
+#settings-title,
+#license-title,
+#recycle-bin-title,
+#image-management-title,
+#image-recycle-bin-title {
+  margin: 0;
+  font-size: 18px;
+}
+
+#note-list, #deleted-items-list, #image-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: 51px;
+  bottom: 36px;
+  left: 0;
+  right: 0;
+  overflow-y: auto;
+}
+
+#note-list li, #deleted-items-list li, #image-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+#deleted-items-list li {
+  align-items: center;
+}
+
+.item-info {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  gap: 10px;
+}
+
+#deleted-items-list .note-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-grow: 1;
+}
+
+.image-info img {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+  object-fit: cover;
+}
+
+.image-info .text-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.note-info .deletion-date, .image-info .deletion-date {
+  font-size: 0.8em;
+  color: #888;
+}
+
+.button-container {
+  display: flex;
+  align-items: center;
+}
+
+#image-list li .image-info {
+  display: flex;
+  align-items: center;
+}
+
+#image-list li .image-info img {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+  object-fit: cover;
+}
+
+#image-list li .image-info {
+  font-size: 0.9em;
+}
+
+#image-list li .usage-icon {
+  font-size: 1.2em;
+  cursor: pointer;
+  position: relative;
+}
+
+.notes-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  z-index: 10;
+  width: max-content;
+  max-width: 200px;
+}
+
+.notes-dropdown div {
+  padding: 8px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notes-dropdown div:hover {
+  background-color: #f5f5f5;
+}
+
+#image-list li .delete-image-icon {
+  cursor: pointer;
+  padding: 5px;
+}
+
+#image-list li .delete-image-icon:hover {
+  background-color: #ddd;
+  border-radius: 50%;
+}
+
+#note-list li {
+  cursor: pointer;
+}
+
+#note-list li:hover, #deleted-items-list li:hover, #image-list li:hover {
+  background-color: #f5f5f5;
+}
+
+#settings-view, #license-view, #recycle-bin-view, #image-management-view {
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.delete-item-icon, .restore-item-icon {
+  cursor: pointer;
+  padding: 5px;
+}
+
+.delete-note-icon, .restore-note-icon, .pin-note-icon {
+  cursor: pointer;
+  padding: 5px;
+}
+
+.delete-note-icon:hover, .restore-note-icon:hover, .pin-note-icon:hover {
+  background-color: #ddd;
+  border-radius: 50%;
+}
+
+.delete-item-icon:hover, .restore-item-icon:hover {
+  background-color: #ddd;
+  border-radius: 50%;
+}
+
+#editor-view {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: relative; /* Add relative positioning */
+}
+
+#editor-container {
+  position: absolute;
+  top: 50px;
+  bottom: 40px;
+  left: 0;
+  right: 0;
+  display: flex;
+}
+
+#markdown-editor, #html-preview {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  overflow-y: auto;
+  resize: none;
+  font-family: sans-serif;
+  line-height: inherit;
+  word-wrap: break-word;
+}
+
+#html-preview {
+  display: none;
+}
+
+#html-preview > *:first-child {
+  margin-top: 0;
+}
+
+#html-preview > *:last-child {
+  margin-bottom: 0;
+}
+
+#html-preview img {
+  max-width: 100%;
+  height: auto;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  border-top: 1px solid #ccc;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background-color: white;
+}
+
+.toolbar-left, .toolbar-right {
+  display: flex;
+  align-items: center;
+}
+
+#list-view .toolbar {
+  justify-content: flex-end;
+}
+
+button {
+  background: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 3px;
+}
+
+button:hover {
+  background-color: #eee;
+}
+
+#editor-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  flex-grow: 1;
+  width: 75%;
+}
+
+#settings-title, #license-title, #recycle-bin-title, #image-management-title, #image-recycle-bin-title {
+  text-align: center;
+  flex-grow: 1;
+}
+
+#settings-view .header, #license-view .header, #recycle-bin-view .header, #image-management-view .header, #image-recycle-bin-view .header {
+  justify-content: center;
+}
+
+#settings-back-button, #license-back-button, #recycle-bin-back-button, #image-management-back-button, #image-recycle-bin-back-button {
+  position: absolute;
+  left: 10px;
+}
+
+
+
+#license-content pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+#settings-container {
+  padding: 15px;
+}
+
+.setting {
+  margin-bottom: 15px;
+}
+
+#recycle-bin-button {
+  background-color: #f0f0f0;
+}
+
+#licenses-button {
+  background-color: #f0f0f0;
+}
+
+#image-management-button,
+#image-recycle-bin-button {
+  background-color: #f0f0f0;
+}
+
+#settings-button,
+#global-settings-button {
+  margin-right: 10px;
+}
+
+
+
+
+.title-input {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  width: 60%;
+}
+
+/* For line numbers */
+.hljs-ln-numbers {
+  text-align: right;
+  color: black;
+  border-right: 1px solid #ccc;
+  vertical-align: top;
+  padding-right: 15px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  word-break: keep-all;
+}
+
+.hljs-ln table {
+  padding: 20px;
+}
+
+.hljs-ln td.hljs-ln-numbers {
+  padding-right: 5px;
+  padding-left: 5px;
+  text-align: left;
+}
+
+.hljs-ln td.hljs-ln-code {
+	padding-left: 5px;
+  text-align: left;
+}
+
+/* For line-breaking */
+pre code {
+  white-space: pre-wrap;
+  word-break: break-all;
+  border: 1px solid #ccc;
+  display: block;
+  font-family: monospace;
+}
+
+pre.multi-line-code code.hljs {
+  padding: 0px;
+}
+
+pre.single-line-code code.hljs {
+  padding: 5px;
+}
+
+.hljs {
+  display: flex;
+}
+
+.hljs-ln {
+  width: auto;
+}
+
+.hljs-ln-n {
+  text-align: right;
+}
+
+.hljs-ln tr:first-child td {
+  padding-top: 5px;
+}
+
+.hljs-ln tr:last-child td {
+  padding-bottom: 5px;
+}
+
+/* 전체 스크롤바의 영역 */
+::-webkit-scrollbar {
+  width: 10px; /* 스크롤바의 너비 */
+  height: 10px; /* 스크롤바의 높이 */
+}
+
+/* 스크롤바의 배경 (트랙) */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* 밝은 회색 배경 */
+}
+
+/* 움직이는 막대 (썸) */
+::-webkit-scrollbar-thumb {
+  background: #bbb; /* 트랙보다 어두운 핸들 색상 */
+  border-radius: 5px; /* 핸들의 모서리를 둥글게 */
+}
+
+/* 막대에 마우스를 올렸을 때 */
+::-webkit-scrollbar-thumb:hover {
+  background: #999; /* 호버 시 더 어두운 색상으로 변경 */
+}
+
+/* 기본 링크 스타일 (방문 전) */
+a {
+  color: #007bff; /* 선명하고 가독성 좋은 파란색 */
+  text-decoration: none; /* 취향에 따라 밑줄 제거 */
+}
+
+/* 이미 방문한 링크 스타일 */
+a:visited {
+  color: #551a8b; /* 웹 표준 방문 링크 보라색 */
+}
+
+/* 마우스를 올렸을 때 스타일 */
+a:hover {
+  color: #0056b3; /* 기존보다 약간 어두운 파란색 */
+  text-decoration: underline; /* 마우스를 올리면 밑줄 표시 */
+}
+
+/* 링크를 클릭하고 있을 때 스타일 */
+a:active {
+  color: #0056b3; /* 클릭 시 색상 유지 */
+}
+
+/* 인용구 스타일 */
+blockquote {
+  border-left: 4px solid #ccc;
+  padding-left: 10px;
+  margin-left: 0;
+}
+
+/* 체크박스 스타일 */
+input[type="checkbox"] {
+  margin-right: 5px;
+  accent-color: #007bff;
+  vertical-align: middle;
+}
+
+/* 리스트 스타일 */
+ul, ol {
+  padding-left: 15px;
+}
+
+li.task-list-item {
+  list-style-type: none;
+}
