@@ -19,7 +19,6 @@ body {
 
 #side-note-layout {
     width: 250px;
-    flex-shrink: 0;
     border-right: 1px solid #ccc;
     display: flex;
     flex-direction: column;
@@ -60,6 +59,7 @@ body {
     flex-grow: 1;
     padding: 20px;
     overflow-y: auto;
+    max-width: 600px;
 }
 
 .toolbar {
