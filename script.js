@@ -5,46 +5,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeSelect = document.getElementById('theme-select');
     const body = document.body;
 
+    const setActiveItem = (item) => {
+        noteItems.forEach(i => i.classList.remove('active'));
+        if (item) {
+            item.classList.add('active');
+        }
+    };
+
+    const showContent = (contentId) => {
+        contentSections.forEach(section => {
+            section.style.display = 'none';
+        });
+        const contentToShow = document.getElementById(contentId);
+        if (contentToShow) {
+            contentToShow.style.display = 'block';
+        }
+    };
+
     noteItems.forEach(item => {
         item.addEventListener('click', (e) => {
             if (e.target.classList.contains('pin-button') || e.target.classList.contains('delete-button')) {
                 return;
             }
-
-            // Remove active class from all items
-            noteItems.forEach(i => i.classList.remove('active'));
-            // Add active class to clicked item
-            item.classList.add('active');
-
-            const contentId = item.dataset.content;
-
-            // Hide all content sections
-            contentSections.forEach(section => {
-                section.style.display = 'none';
-            });
-
-            // Show the corresponding content section
-            const contentToShow = document.getElementById(contentId);
-            if (contentToShow) {
-                contentToShow.style.display = 'block';
-            }
+            setActiveItem(item);
+            showContent(item.dataset.content);
         });
     });
 
     settingsButton.addEventListener('click', () => {
-        // Remove active class from all items
-        noteItems.forEach(i => i.classList.remove('active'));
-
-        // Hide all content sections
-        contentSections.forEach(section => {
-            section.style.display = 'none';
-        });
-
-        // Show the settings section
-        const settingsSection = document.getElementById('settings');
-        if (settingsSection) {
-            settingsSection.style.display = 'block';
-        }
+        setActiveItem(null);
+        showContent('settings');
     });
 
     const applyTheme = (theme) => {

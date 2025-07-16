@@ -18,7 +18,7 @@ body {
 }
 
 #side-note-layout {
-    width: 200px;
+    width: 220px;
     border-right: 1px solid #ccc;
     display: flex;
     flex-direction: column;
@@ -60,7 +60,8 @@ body {
 }
 
 .note-item:hover .note-actions {
-    display: block;
+    display: flex;
+    gap: 5px;
 }
 
 .note-actions button {
@@ -68,6 +69,7 @@ body {
     border: none;
     cursor: pointer;
     padding: 2px;
+    font-size: 16px;
 }
 
 .note-actions button:hover {
