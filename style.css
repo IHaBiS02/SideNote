@@ -56,10 +56,6 @@ body {
 }
 
 .note-actions {
-    display: none;
-}
-
-.note-item:hover .note-actions {
     display: flex;
     gap: 5px;
 }
