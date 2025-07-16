@@ -13,5 +13,6 @@ When committing changes, follow these steps:
 4. Write the message to a temporary file named `commit_message.txt`.  
 5. Use `git commit -F commit_message.txt` to commit the changes.  
 6. Use `del commit_message.txt` to remove the temporary file.
+7. Use `git push origin gh-pages` to push the changes to github.
 
 You should use file-based method when you write commit message and commit the changes.

@@ -19,6 +19,7 @@ body {
 
 #side-note-layout {
     width: 250px;
+    flex-shrink: 0;
     border-right: 1px solid #ccc;
     display: flex;
     flex-direction: column;
