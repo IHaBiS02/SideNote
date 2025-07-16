@@ -14,9 +14,27 @@
             <button class="add-note-button">+</button>
         </div>
         <ul class="notes-list">
-            <li class="note-item active" data-content="intro">Introduction</li>
-            <li class="note-item" data-content="how-to-use">How to use</li>
-            <li class="note-item" data-content="blog">Blog</li>
+            <li class="note-item active" data-content="intro">
+                <span>Introduction</span>
+                <div class="note-actions">
+                    <button class="pin-button" title="Pin">📌</button>
+                    <button class="delete-button" title="Delete">🗑️</button>
+                </div>
+            </li>
+            <li class="note-item" data-content="how-to-use">
+                <span>How to use</span>
+                <div class="note-actions">
+                    <button class="pin-button" title="Pin">📌</button>
+                    <button class="delete-button" title="Delete">🗑️</button>
+                </div>
+            </li>
+            <li class="note-item" data-content="blog">
+                <span>Blog</span>
+                <div class="note-actions">
+                    <button class="pin-button" title="Pin">📌</button>
+                    <button class="delete-button" title="Delete">🗑️</button>
+                </div>
+            </li>
         </ul>
         <div class="toolbar">
             <button id="settings-button" title="Settings">⚙️</button>
@@ -45,25 +63,17 @@
             <h2>Blog</h2>
             <p>Blog posts and updates will go here.</p>
         </div>
-    </div>
-  </div>
-
-  <div id="settings-popup" class="settings-popup" style="display: none;">
-    <div class="settings-popup-content">
-      <div class="settings-popup-header">
-        <h2>Settings</h2>
-        <button id="close-settings-popup">&times;</button>
-      </div>
-      <div class="settings-popup-body">
-        <div class="setting-option">
-          <label for="theme-select">Theme</label>
-          <select id="theme-select">
-            <option value="system">System</option>
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-          </select>
+        <div id="settings" class="content-section" style="display: none;">
+            <h2>Settings</h2>
+            <div class="setting-option">
+              <label for="theme-select">Theme</label>
+              <select id="theme-select">
+                <option value="system">System</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+              </select>
+            </div>
         </div>
-      </div>
     </div>
   </div>
 

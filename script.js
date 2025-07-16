@@ -2,22 +2,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const noteItems = document.querySelectorAll('.note-item');
     const contentSections = document.querySelectorAll('.content-section');
     const settingsButton = document.getElementById('settings-button');
-    const settingsPopup = document.getElementById('settings-popup');
-    const closeSettingsPopup = document.getElementById('close-settings-popup');
     const themeSelect = document.getElementById('theme-select');
     const body = document.body;
 
     noteItems.forEach(item => {
-        item.addEventListener('click', () => {
+        item.addEventListener('click', (e) => {
+            if (e.target.classList.contains('pin-button') || e.target.classList.contains('delete-button')) {
+                return;
+            }
+
+            // Remove active class from all items
             noteItems.forEach(i => i.classList.remove('active'));
+            // Add active class to clicked item
             item.classList.add('active');
 
             const contentId = item.dataset.content;
 
+            // Hide all content sections
             contentSections.forEach(section => {
                 section.style.display = 'none';
             });
 
+            // Show the corresponding content section
             const contentToShow = document.getElementById(contentId);
             if (contentToShow) {
                 contentToShow.style.display = 'block';
@@ -26,11 +32,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     settingsButton.addEventListener('click', () => {
-        settingsPopup.style.display = 'flex';
-    });
+        // Remove active class from all items
+        noteItems.forEach(i => i.classList.remove('active'));
 
-    closeSettingsPopup.addEventListener('click', () => {
-        settingsPopup.style.display = 'none';
+        // Hide all content sections
+        contentSections.forEach(section => {
+            section.style.display = 'none';
+        });
+
+        // Show the settings section
+        const settingsSection = document.getElementById('settings');
+        if (settingsSection) {
+            settingsSection.style.display = 'block';
+        }
     });
 
     const applyTheme = (theme) => {
