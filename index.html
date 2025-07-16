@@ -6,24 +6,43 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="list-view">
-    <div class="header">
-      <h1 id="notes-list-title">SideNote</h1>
-      <a href="https://chromewebstore.google.com/detail/sidenote/jdgobmepjpcgfcjmocndbbhhigogafak" target="_blank" class="button">Get Extension</a>
-    </div>
-    <div class="main-content">
-        <h2>A simple note-taking extension for your browser's side panel.</h2>
-        <p>SideNote allows you to quickly jot down notes, ideas, and to-do lists without leaving your current tab. It's perfect for students, researchers, and anyone who needs a simple way to stay organized.</p>
-        <h3>Features:</h3>
-        <ul>
-            <li>📝 Create and manage multiple notes</li>
-            <li>🌗 Light and dark mode</li>
-            <li>💾 Export and import your notes</li>
-            <li>⌨️ Markdown support</li>
+  <div class="browser-top-bar"></div>
+  <div class="main-container">
+    <div id="side-note-layout">
+        <div class="header">
+            <h1 id="notes-list-title">Notes</h1>
+            <button class="add-note-button">+</button>
+        </div>
+        <ul class="notes-list">
+            <li class="note-item active" data-content="intro">Introduction</li>
+            <li class="note-item" data-content="how-to-use">How to use</li>
+            <li class="note-item" data-content="blog">Blog</li>
         </ul>
+        <div class="toolbar">
+            <button id="settings-button" title="Settings">⚙️</button>
+        </div>
     </div>
-    <div class="toolbar">
-      <button id="theme-toggle-button" title="Toggle Theme">🌓</button>
+    <div id="main-content-area">
+        <div id="intro" class="content-section">
+            <h2>A simple note-taking extension for your browser's side panel.</h2>
+            <p>SideNote allows you to quickly jot down notes, ideas, and to-do lists without leaving your current tab. It's perfect for students, researchers, and anyone who needs a simple way to stay organized.</p>
+            <h3>Features:</h3>
+            <ul>
+                <li>📝 Create and manage multiple notes</li>
+                <li>🌗 Light and dark mode</li>
+                <li>💾 Export and import your notes</li>
+                <li>⌨️ Markdown support</li>
+            </ul>
+            <a href="https://chromewebstore.google.com/detail/sidenote/jdgobmepjpcgfcjmocndbbhhigogafak" target="_blank" class="button">Get Extension</a>
+        </div>
+        <div id="how-to-use" class="content-section" style="display: none;">
+            <h2>How to use</h2>
+            <p>Instructions on how to use the SideNote extension will go here.</p>
+        </div>
+        <div id="blog" class="content-section" style="display: none;">
+            <h2>Blog</h2>
+            <p>Blog posts and updates will go here.</p>
+        </div>
     </div>
   </div>
 

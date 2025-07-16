@@ -6,6 +6,24 @@ body {
   transition: background-color 0.3s, color 0.3s;
 }
 
+.browser-top-bar {
+    height: 30px;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #ccc;
+}
+
+.main-container {
+    display: flex;
+    height: calc(100vh - 31px);
+}
+
+#side-note-layout {
+    width: 250px;
+    border-right: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -16,11 +34,31 @@ body {
 
 #notes-list-title {
   margin: 0;
-  font-size: 24px;
+  font-size: 20px;
 }
 
-.main-content {
+.notes-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.note-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.note-item.active, .note-item:hover {
+    background-color: #eee;
+}
+
+#main-content-area {
+    flex-grow: 1;
     padding: 20px;
+    overflow-y: auto;
 }
 
 .toolbar {
@@ -29,9 +67,6 @@ body {
   align-items: center;
   padding: 5px;
   border-top: 1px solid #ccc;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
 }
 
 button, .button {
@@ -54,8 +89,25 @@ body.dark-mode {
     color: #e0e0e0;
 }
 
+.dark-mode .browser-top-bar {
+    background-color: #2c2c2c;
+    border-bottom: 1px solid #333;
+}
+
+.dark-mode #side-note-layout {
+    border-right: 1px solid #333;
+}
+
 .dark-mode .header {
     border-bottom: 1px solid #333;
+}
+
+.dark-mode .note-item {
+    border-bottom: 1px solid #333;
+}
+
+.dark-mode .note-item.active, .dark-mode .note-item:hover {
+    background-color: #444;
 }
 
 .dark-mode .toolbar {
