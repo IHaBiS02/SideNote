@@ -16,6 +16,7 @@ The extension provides a simple note-taking interface within the browser's side 
     -   `notes.js`: Contains the core logic for managing notes (sorting, deleting, pinning, etc.).
     -   `notes_view.js`: Handles rendering the notes list and other UI components. It contains the logic for creating and managing the image usage dropdown.
     -   `events.js`: Contains all the event listeners for the UI elements, including a global click handler for closing the image usage dropdown.
+    -   `history.js`: Manages the view navigation history, allowing for "back" functionality.
     -   `settings.js`: Manages global and note-specific settings.
     -   `import_export.js`: Contains the logic for importing and exporting notes.
 -   **`sidepanel.css`**: The primary stylesheet for the extension's UI.
@@ -53,6 +54,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   `activeNoteId`: Stores the `id` of the note currently being edited.
     -   `globalSettings`: An object holding all global application settings.
     -   `isPreview`: A boolean flag to track if the editor is in "Preview" or "Edit" mode.
+    -   `navigationHistory`: An array of state objects representing the user's navigation path through the different views.
 -   **Data Persistence**:
     -   All data (`notes`, `images`, and `globalSettings`) is now stored in `IndexedDB`. `chrome.storage.local` is only used for `globalSettings` and for the one-time migration of old notes.
 
@@ -67,9 +69,11 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **`sortNotes()`**: Sorts the `notes` array based on the `lastModified` timestamp.
 -   **`cleanupDeletedNotes()` / `cleanupDeletedImages()`**: Automatically and permanently deletes items from the recycle bin that are older than 30 days.
 
-#### View Management (`notes_view.js`)
+#### View Management (`notes_view.js`, `history.js`, `events.js`)
 
--   **`showListView()` / `showEditorView()` / `showSettingsView()` / etc.**: A set of functions that control UI visibility by changing the `display` style of the different view containers.
+-   **`showListView()` / `showEditorView()` / `showSettingsView()` / etc.**: A set of functions that control UI visibility. They now accept an `addToHistory` parameter and will call `pushToHistory` to record the navigation change.
+-   **`pushToHistory()` / `popFromHistory()` / etc.**: Functions in `history.js` for managing the `navigationHistory` stack.
+-   **`goBack()`**: A function in `events.js` that is triggered by back buttons or the Escape key. It uses the `navigationHistory` to return the user to the previously visited view.
 
 #### Note List (`notes_view.js`, `events.js`)
 
@@ -79,14 +83,14 @@ The UI is a single-page application with several distinct "views" that are shown
 
 #### Editor (`notes_view.js`, `events.js`)
 
--   **`openNote(noteId)`**: Sets the `activeNoteId` and populates the editor with the note's content.
+-   **`openNote(noteId)`**: Sets the `activeNoteId` and populates the editor with the note's content. It now also records the action in the navigation history.
 -   **`markdownEditor` (Event Listeners)**:
     -   `input`: Updates the note content and metadata on every keystroke.
     -   `paste`: Intercepts pasted content. If it's an image, it saves it to IndexedDB and inserts the corresponding Markdown tag. If it's text, it applies formatting.
     -   `keydown`: Handles keyboard shortcuts.
 -   **`renderMarkdown()`**: Converts Markdown to HTML, sanitizes it, and applies syntax highlighting. It also calls `renderImages()`.
 -   **`renderImages()`**: Finds all `<img>` tags in the preview and loads their `src` from IndexedDB blob URLs.
--   **`togglePreview()`**: Switches between the raw text editor and the rendered view.
+-   **`togglePreview()`**: Switches between the raw text editor and the rendered view, and records the change in the navigation history.
 
 #### Settings & Recycle Bin (`settings.js`, `notes_view.js`, `events.js`)
 

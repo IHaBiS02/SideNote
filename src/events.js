@@ -1,3 +1,68 @@
+async function goBack() {
+    const currentState = getCurrentHistoryState();
+    if (currentState && currentState.view === 'editor') {
+        const note = notes.find(n => n.id === currentState.params.noteId);
+        if (note && markdownEditor.value !== originalNoteContent) {
+            note.content = markdownEditor.value;
+            note.metadata.lastModified = Date.now();
+            sortNotes();
+            await saveNote(note);
+            renderNoteList();
+        }
+    }
+
+    popFromHistory(); // Pop current view
+    const previousState = getCurrentHistoryState();
+
+    if (previousState) {
+        switch (previousState.view) {
+            case 'list':
+                showListView(false);
+                break;
+            case 'editor':
+                openNote(previousState.params.noteId, previousState.params.inEditMode, false);
+                break;
+            case 'settings':
+                isGlobalSettings = previousState.params.isGlobal;
+                if (isGlobalSettings) {
+                    titleSetting.value = globalSettings.title || 'default';
+                    fontSizeSetting.value = globalSettings.fontSize || 12;
+                    modeSetting.value = globalSettings.mode || 'system';
+                    autoAddSpacesCheckbox.checked = globalSettings.autoAddSpaces;
+                    preventUsedImageDeletionCheckbox.checked = globalSettings.preventUsedImageDeletion;
+                } else {
+                    const note = notes.find(n => n.id === previousState.params.noteId);
+                    if (note) {
+                        activeNoteId = note.id;
+                        titleSetting.value = note.settings.title || 'default';
+                        fontSizeSetting.value = note.settings.fontSize || globalSettings.fontSize || 12;
+                        modeSetting.value = globalSettings.mode || 'system';
+                        autoAddSpacesCheckbox.checked = globalSettings.autoAddSpaces;
+                        preventUsedImageDeletionCheckbox.checked = globalSettings.preventUsedImageDeletion;
+                    } else {
+                        showListView(false);
+                        return;
+                    }
+                }
+                showSettingsView(false);
+                break;
+            case 'license':
+                showLicenseView(false);
+                break;
+            case 'recycleBin':
+                showRecycleBinView(false);
+                break;
+            case 'imageManagement':
+                showImageManagementView(false);
+                break;
+            default:
+                showListView(false);
+        }
+    } else {
+        showListView(false);
+    }
+}
+
 newNoteButton.addEventListener('click', async () => {
   const now = Date.now();
   const newNote = {
@@ -18,18 +83,7 @@ newNoteButton.addEventListener('click', async () => {
   openNote(newNote.id, true);
 });
 
-backButton.addEventListener('click', async () => {
-  const note = notes.find(n => n.id === activeNoteId);
-  if (note) {
-    if (markdownEditor.value !== originalNoteContent) {
-      note.content = markdownEditor.value;
-      note.metadata.lastModified = Date.now();
-      sortNotes();
-      await saveNote(note);
-    }
-  }
-  showListView();
-});
+backButton.addEventListener('click', goBack);
 
 markdownEditor.addEventListener('input', async () => {
   const note = notes.find(n => n.id === activeNoteId);
@@ -230,13 +284,7 @@ globalSettingsButton.addEventListener('click', () => {
   showSettingsView();
 });
 
-settingsBackButton.addEventListener('click', () => {
-  if (isGlobalSettings) {
-    showListView();
-  } else {
-    showEditorView();
-  }
-});
+settingsBackButton.addEventListener('click', goBack);
 
 licensesButton.addEventListener('click', async () => {
   const response = await fetch('LIBRARY_LICENSES.md');
@@ -246,25 +294,19 @@ licensesButton.addEventListener('click', async () => {
   showLicenseView();
 });
 
-licenseBackButton.addEventListener('click', () => {
-  showSettingsView();
-});
+licenseBackButton.addEventListener('click', goBack);
 
 recycleBinButton.addEventListener('click', () => {
   showRecycleBinView();
 });
 
-recycleBinBackButton.addEventListener('click', () => {
-  showSettingsView();
-});
+recycleBinBackButton.addEventListener('click', goBack);
 
 imageManagementButton.addEventListener('click', () => {
   showImageManagementView();
 });
 
-imageManagementBackButton.addEventListener('click', () => {
-  showSettingsView();
-});
+imageManagementBackButton.addEventListener('click', goBack);
 
 modeSetting.addEventListener('change', () => {
   const value = modeSetting.value;
@@ -495,23 +537,7 @@ document.addEventListener('keydown', (e) => {
       document.body.removeChild(imagePreviewModal);
       return;
     }
-
-    if (imageManagementView.style.display === 'block') {
-      imageManagementBackButton.click();
-    } else if (recycleBinView.style.display === 'block') {
-      recycleBinBackButton.click();
-    } else if (licenseView.style.display === 'block') {
-      licenseBackButton.click();
-    } else if (settingsView.style.display === 'block') {
-      settingsBackButton.click();
-    } else if (editorView.style.display === 'block') {
-      if (isPreview) {
-        showListView();
-      }
-      else {
-        togglePreview();
-      }
-    }
+    goBack();
   }
 });
 

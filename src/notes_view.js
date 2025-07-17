@@ -49,8 +49,9 @@ function renderNoteList() {
  * Opens a note in the editor.
  * @param {string} noteId The ID of the note to open.
  * @param {boolean} inEditMode Whether to open the note in edit mode.
+ * @param {boolean} addToHistory Whether to add this action to the history.
  */
-function openNote(noteId, inEditMode = false) {
+function openNote(noteId, inEditMode = false, addToHistory = true) {
   const note = notes.find(n => n.id === noteId);
   if (note) {
     activeNoteId = noteId;
@@ -62,7 +63,7 @@ function openNote(noteId, inEditMode = false) {
     updateAutoLineBreakButton();
     updateTildeReplacementButton();
     renderMarkdown();
-    showEditorView();
+    showEditorView(false);
     isPreview = !inEditMode;
     if (isPreview) {
       htmlPreview.style.display = 'block';
@@ -74,80 +75,110 @@ function openNote(noteId, inEditMode = false) {
       toggleViewButton.textContent = 'Preview';
       markdownEditor.focus();
     }
+    if (addToHistory) {
+        pushToHistory({ view: 'editor', params: { noteId, inEditMode } });
+    }
   }
 }
 
 /**
  * Shows the list view.
+ * @param {boolean} addToHistory Whether to add this action to the history.
  */
-function showListView() {
+function showListView(addToHistory = true) {
   activeNoteId = null;
   listView.style.display = 'block';
   editorView.style.display = 'none';
   settingsView.style.display = 'none';
   recycleBinView.style.display = 'none';
   imageManagementView.style.display = 'none';
+  licenseView.style.display = 'none';
+  if (addToHistory) {
+    clearHistory();
+    pushToHistory({ view: 'list' });
+  }
   renderNoteList();
 }
 
 /**
  * Shows the editor view.
+ * @param {boolean} addToHistory Whether to add this action to the history.
  */
-function showEditorView() {
+function showEditorView(addToHistory = true) {
   listView.style.display = 'none';
   editorView.style.display = 'block';
   settingsView.style.display = 'none';
   recycleBinView.style.display = 'none';
   imageManagementView.style.display = 'none';
+  licenseView.style.display = 'none';
+  if (addToHistory) {
+    pushToHistory({ view: 'editor', params: { noteId: activeNoteId, isPreview } });
+  }
 }
 
 /**
  * Shows the settings view.
+ * @param {boolean} addToHistory Whether to add this action to the history.
  */
-function showSettingsView() {
+function showSettingsView(addToHistory = true) {
   listView.style.display = 'none';
   editorView.style.display = 'none';
   settingsView.style.display = 'block';
   licenseView.style.display = 'none';
   recycleBinView.style.display = 'none';
   imageManagementView.style.display = 'none';
+  if (addToHistory) {
+    pushToHistory({ view: 'settings', params: { isGlobal: isGlobalSettings, noteId: activeNoteId } });
+  }
 }
 
 /**
  * Shows the license view.
+ * @param {boolean} addToHistory Whether to add this action to the history.
  */
-function showLicenseView() {
+function showLicenseView(addToHistory = true) {
   listView.style.display = 'none';
   editorView.style.display = 'none';
   settingsView.style.display = 'none';
   licenseView.style.display = 'block';
   recycleBinView.style.display = 'none';
   imageManagementView.style.display = 'none';
+  if (addToHistory) {
+    pushToHistory({ view: 'license' });
+  }
 }
 
 /**
  * Shows the recycle bin view.
+ * @param {boolean} addToHistory Whether to add this action to the history.
  */
-function showRecycleBinView() {
+function showRecycleBinView(addToHistory = true) {
   listView.style.display = 'none';
   editorView.style.display = 'none';
   settingsView.style.display = 'none';
   licenseView.style.display = 'none';
   recycleBinView.style.display = 'block';
   imageManagementView.style.display = 'none';
+  if (addToHistory) {
+    pushToHistory({ view: 'recycleBin' });
+  }
   renderDeletedItemsList();
 }
 
 /**
  * Shows the image management view.
+ * @param {boolean} addToHistory Whether to add this action to the history.
  */
-function showImageManagementView() {
+function showImageManagementView(addToHistory = true) {
   listView.style.display = 'none';
   editorView.style.display = 'none';
   settingsView.style.display = 'none';
   licenseView.style.display = 'none';
   recycleBinView.style.display = 'none';
   imageManagementView.style.display = 'block';
+  if (addToHistory) {
+    pushToHistory({ view: 'imageManagement' });
+  }
   renderImagesList();
 }
 
@@ -282,16 +313,16 @@ function renderMarkdown() {
     ADD_ATTR: ['class']
   });
   htmlPreview.querySelectorAll('pre code').forEach((block) => {
-    // block(<code>)의 텍스트 컨텐츠를 가져와 줄바꿈(\n)으로 분리하여 줄 수를 계산합니다.
+    // block(<code>)의 텍스트 컨텐츠를 가져와 줄바꿈(\n)으로 분리하여 줄 수를 계산합니다。
     const lineCount = block.textContent.split('\n').length;
-    // 줄 수에 따라 부모 요소인 <pre> 태그에 클래스를 추가합니다.
+    // 줄 수에 따라 부모 요소인 <pre> 태그에 클래스를 추가합니다。
     if (lineCount === 2) {
       block.parentElement.classList.add('single-line-code');
     } else {
       block.parentElement.classList.add('multi-line-code');
     }
 
-    // 기존 라인 넘버 기능은 그대로 호출합니다.
+    // 기존 라인 넘버 기능은 그대로 호출합니다。
     hljs.lineNumbersBlock(block);
   });
   hljs.highlightAll();
@@ -341,6 +372,7 @@ function togglePreview() {
     toggleViewButton.textContent = 'Preview';
     markdownEditor.focus();
   }
+  pushToHistory({ view: 'editor', params: { noteId: activeNoteId, inEditMode: !isPreview } });
 }
 
 /**

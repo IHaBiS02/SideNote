@@ -79,6 +79,7 @@ async function cleanupDeletedNotes() {
 }
 
 showListView();
+pushToHistory({ view: 'list' });
 
 
 // Initial setup

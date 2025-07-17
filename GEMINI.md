@@ -26,7 +26,7 @@ Here is the list of files and folders you need to work :
 For every changes, you should change version number on the manifest.json, based on the amount of edit you write before you commit changes.  
 Also, make sure the version in package.json fits with it too, and then run `npm install` to update `package-lock.json`.
 
-After all changes, read STRUCTURE.md file and if there are any changes which makes difference with the information on STRUCTURE.md, then write changes in STRUCTURE.md and update the documents.
+After all changes, read STRUCTURE.md and Functions.md file and if there are any changes which makes difference with the information on STRUCTURE.md and/or Functions.md, then write changes in STRUCTURE.md and/or Functions.md and update the documents.
 
 After all changes, you should commit changes on git.
 

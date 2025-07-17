@@ -19,6 +19,13 @@ This file documents the functions used in the Simple Notes extension.
 - `deleteImagePermanently(id)`: Permanently deletes an image from the database.
 - `getAllImageObjectsFromDB()`: Retrieves all image objects from the database.
 
+## src/history.js
+
+- `pushToHistory(state)`: Pushes a new state to the navigation history.
+- `popFromHistory()`: Pops the last state from the navigation history.
+- `getCurrentHistoryState()`: Gets the current state from the navigation history without removing it.
+- `clearHistory()`: Clears the navigation history.
+
 ## src/import_export.js
 
 - `processSnote(zip)`: Processes a .snote or .snotes file.
