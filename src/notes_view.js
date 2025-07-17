@@ -479,7 +479,7 @@ async function renderImagesList() {
             if (dropdown && !usageIcon.contains(e.target)) {
                 dropdown.remove();
             }
-        }, { once: true });
+        });
       }
 
       li.appendChild(usageIcon);
