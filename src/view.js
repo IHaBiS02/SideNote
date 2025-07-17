@@ -401,37 +401,34 @@ async function renderImagesList() {
       if (isUsed) {
         usageIcon.onclick = (e) => {
           e.stopPropagation();
-          const existingDropdown = e.currentTarget.querySelector('.notes-dropdown');
-          if (existingDropdown) {
-            existingDropdown.remove();
-            return;
-          }
+          const currentTarget = e.currentTarget;
+          const isAlreadyOpen = currentTarget.querySelector('.notes-dropdown');
 
-          const dropdown = document.createElement('div');
-          dropdown.classList.add('notes-dropdown');
-          notesUsingImage.forEach(note => {
-            const noteItem = document.createElement('div');
-            noteItem.textContent = note.title;
-            noteItem.onclick = () => {
-              openNote(note.id, false);
-              setTimeout(() => {
-                const imageInNote = htmlPreview.querySelector(`img[data-image-id="${imageId}"]`);
-                if (imageInNote) {
-                  imageInNote.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-              }, 200); // Delay to allow rendering
-            };
-            dropdown.appendChild(noteItem);
-          });
-          e.currentTarget.appendChild(dropdown);
+          // Close all dropdowns
+          const allDropdowns = document.querySelectorAll('.notes-dropdown');
+          allDropdowns.forEach(d => d.remove());
+
+          if (!isAlreadyOpen) {
+            // Create and show the new dropdown.
+            const dropdown = document.createElement('div');
+            dropdown.classList.add('notes-dropdown');
+            notesUsingImage.forEach(note => {
+              const noteItem = document.createElement('div');
+              noteItem.textContent = note.title;
+              noteItem.onclick = () => {
+                openNote(note.id, false);
+                setTimeout(() => {
+                  const imageInNote = htmlPreview.querySelector(`img[data-image-id="${imageId}"]`);
+                  if (imageInNote) {
+                    imageInNote.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }
+                }, 200); // Delay to allow rendering
+              };
+              dropdown.appendChild(noteItem);
+            });
+            currentTarget.appendChild(dropdown);
+          }
         };
-        
-        document.addEventListener('click', (e) => {
-            const dropdown = usageIcon.querySelector('.notes-dropdown');
-            if (dropdown && !usageIcon.contains(e.target)) {
-                dropdown.remove();
-            }
-        }, { once: true });
       }
 
       li.appendChild(usageIcon);

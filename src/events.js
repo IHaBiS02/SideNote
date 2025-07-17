@@ -125,7 +125,7 @@ htmlPreview.addEventListener('click', async (e) => {
     const checkboxIndex = checkboxes.indexOf(e.target);
 
     const markdown = markdownEditor.value;
-    const regex = /\[[x ]\]/g;
+    const regex = /\\[x ]\\]/g;
     let match;
     const matches = [];
     while ((match = regex.exec(markdown)) !== null) {
@@ -518,5 +518,14 @@ document.addEventListener('keydown', (e) => {
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
     if (globalSettings.mode === 'system') {
         applyMode('system');
+    }
+});
+
+document.addEventListener('click', (e) => {
+    if (imageManagementView.style.display === 'block') {
+        const openDropdown = document.querySelector('.notes-dropdown');
+        if (openDropdown && !e.target.closest('.usage-icon')) {
+            openDropdown.remove();
+        }
     }
 });

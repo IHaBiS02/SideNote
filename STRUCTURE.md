@@ -14,8 +14,8 @@ The extension provides a simple note-taking interface within the browser's side 
     -   `main.js`: The main entry point. It initializes the application, loads data, and handles the one-time migration of notes from `chrome.storage` to `IndexedDB`.
     -   `database.js`: Contains all functions for interacting with the `IndexedDB` database, for both notes and images.
     -   `notes.js`: Contains the core logic for managing notes (sorting, deleting, pinning, etc.).
-    -   `notes_view.js`: Handles rendering the notes list and other UI components, including logic for closing the image usage dropdown when clicking outside.
-    -   `events.js`: Contains all the event listeners for the UI elements.
+    -   `notes_view.js`: Handles rendering the notes list and other UI components. It contains the logic for creating and managing the image usage dropdown.
+    -   `events.js`: Contains all the event listeners for the UI elements, including a global click handler for closing the image usage dropdown.
     -   `settings.js`: Manages global and note-specific settings.
     -   `import_export.js`: Contains the logic for importing and exporting notes.
 -   **`sidepanel.css`**: The primary stylesheet for the extension's UI.
