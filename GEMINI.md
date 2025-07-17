@@ -9,13 +9,15 @@ Here is the list of files and folders you need to work :
 2. sidepanel.html : html file which used on the sidepanel on the browser  
 3. src/ : folder which contains javascript files for the extension
     - database.js : functions for interacting with IndexedDB.
-    - notes_view.js : functions for managing notes and rendering views.
-    - settings.js : functions for managing global and note-specific settings.
-    - import_export.js : functions for importing and exporting notes.
-    - utils.js : utility functions.
     - dom.js : DOM element references.
     - events.js : event listeners.
+    - history.js : functions for managing navigation history.
+    - import_export.js : functions for importing and exporting notes.
     - main.js : the main script that ties everything together.
+    - notes.js : functions for managing notes (sorting, deleting, pinning, etc.).
+    - notes_view.js : functions for managing notes and rendering views.
+    - settings.js : functions for managing global and note-specific settings.
+    - utils.js : utility functions.
 4. sidepanel.css : css file which used to set design of the extension  
 5. dark_mode.css : css file which has css values for dark mode  
 6. background.js : js file used for opening extensions  
