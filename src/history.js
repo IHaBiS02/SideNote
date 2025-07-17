@@ -41,3 +41,22 @@ function getCurrentHistoryState() {
 function clearHistory() {
     navigationHistory = [];
 }
+
+/**
+ * Returns the entire navigation history stack.
+ * @returns {Array} The navigation history.
+ */
+function getHistory() {
+    return [...navigationHistory];
+}
+
+/**
+ * Navigates to a specific index in the history.
+ * This will remove all history states after the specified index.
+ * @param {number} index The index to navigate to.
+ */
+function goToHistoryState(index) {
+    if (index >= 0 && index < navigationHistory.length - 1) {
+        navigationHistory = navigationHistory.slice(0, index + 1);
+    }
+}

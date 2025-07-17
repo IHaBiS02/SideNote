@@ -1,3 +1,54 @@
+async function navigateToState(state) {
+    if (!state) {
+        showListView(false);
+        return;
+    }
+
+    switch (state.view) {
+        case 'list':
+            showListView(false);
+            break;
+        case 'editor':
+            openNote(state.params.noteId, state.params.inEditMode, false);
+            break;
+        case 'settings':
+            isGlobalSettings = state.params.isGlobal;
+            if (isGlobalSettings) {
+                titleSetting.value = globalSettings.title || 'default';
+                fontSizeSetting.value = globalSettings.fontSize || 12;
+                modeSetting.value = globalSettings.mode || 'system';
+                autoAddSpacesCheckbox.checked = globalSettings.autoAddSpaces;
+                preventUsedImageDeletionCheckbox.checked = globalSettings.preventUsedImageDeletion;
+            } else {
+                const note = notes.find(n => n.id === state.params.noteId);
+                if (note) {
+                    activeNoteId = note.id;
+                    titleSetting.value = note.settings.title || 'default';
+                    fontSizeSetting.value = note.settings.fontSize || globalSettings.fontSize || 12;
+                    modeSetting.value = globalSettings.mode || 'system';
+                    autoAddSpacesCheckbox.checked = globalSettings.autoAddSpaces;
+                    preventUsedImageDeletionCheckbox.checked = globalSettings.preventUsedImageDeletion;
+                } else {
+                    showListView(false); // Fallback
+                    return;
+                }
+            }
+            showSettingsView(false);
+            break;
+        case 'license':
+            showLicenseView(false);
+            break;
+        case 'recycleBin':
+            showRecycleBinView(false);
+            break;
+        case 'imageManagement':
+            showImageManagementView(false);
+            break;
+        default:
+            showListView(false);
+    }
+}
+
 async function goBack() {
     const currentState = getCurrentHistoryState();
     if (currentState && currentState.view === 'editor') {
@@ -13,54 +64,7 @@ async function goBack() {
 
     popFromHistory(); // Pop current view
     const previousState = getCurrentHistoryState();
-
-    if (previousState) {
-        switch (previousState.view) {
-            case 'list':
-                showListView(false);
-                break;
-            case 'editor':
-                openNote(previousState.params.noteId, previousState.params.inEditMode, false);
-                break;
-            case 'settings':
-                isGlobalSettings = previousState.params.isGlobal;
-                if (isGlobalSettings) {
-                    titleSetting.value = globalSettings.title || 'default';
-                    fontSizeSetting.value = globalSettings.fontSize || 12;
-                    modeSetting.value = globalSettings.mode || 'system';
-                    autoAddSpacesCheckbox.checked = globalSettings.autoAddSpaces;
-                    preventUsedImageDeletionCheckbox.checked = globalSettings.preventUsedImageDeletion;
-                } else {
-                    const note = notes.find(n => n.id === previousState.params.noteId);
-                    if (note) {
-                        activeNoteId = note.id;
-                        titleSetting.value = note.settings.title || 'default';
-                        fontSizeSetting.value = note.settings.fontSize || globalSettings.fontSize || 12;
-                        modeSetting.value = globalSettings.mode || 'system';
-                        autoAddSpacesCheckbox.checked = globalSettings.autoAddSpaces;
-                        preventUsedImageDeletionCheckbox.checked = globalSettings.preventUsedImageDeletion;
-                    } else {
-                        showListView(false);
-                        return;
-                    }
-                }
-                showSettingsView(false);
-                break;
-            case 'license':
-                showLicenseView(false);
-                break;
-            case 'recycleBin':
-                showRecycleBinView(false);
-                break;
-            case 'imageManagement':
-                showImageManagementView(false);
-                break;
-            default:
-                showListView(false);
-        }
-    } else {
-        showListView(false);
-    }
+    navigateToState(previousState);
 }
 
 newNoteButton.addEventListener('click', async () => {
@@ -84,6 +88,75 @@ newNoteButton.addEventListener('click', async () => {
 });
 
 backButton.addEventListener('click', goBack);
+
+backButton.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+
+    // Close any existing dropdown
+    const existingDropdown = document.querySelector('.history-dropdown');
+    if (existingDropdown) {
+        existingDropdown.remove();
+    }
+
+    const history = getHistory().slice(0, -1).reverse(); // Don't include current page
+    if (history.length === 0) return;
+
+    const dropdown = document.createElement('div');
+    dropdown.classList.add('history-dropdown');
+
+    history.forEach((state, index) => {
+        const item = document.createElement('div');
+        let title = state.view;
+        if (state.view === 'editor' && state.params && state.params.noteId) {
+            const note = notes.find(n => n.id === state.params.noteId);
+            title = note ? `Editor: ${note.title}` : 'Editor: Untitled';
+        } else {
+            title = state.view.charAt(0).toUpperCase() + state.view.slice(1);
+        }
+        item.textContent = title;
+        item.title = title;
+
+        item.addEventListener('click', async () => {
+            const historyIndex = getHistory().length - 2 - index;
+            const targetState = getHistory()[historyIndex];
+
+            const currentState = getCurrentHistoryState();
+            if (currentState && currentState.view === 'editor') {
+                const note = notes.find(n => n.id === currentState.params.noteId);
+                if (note && markdownEditor.value !== originalNoteContent) {
+                    note.content = markdownEditor.value;
+                    note.metadata.lastModified = Date.now();
+                    sortNotes();
+                    await saveNote(note);
+                    renderNoteList();
+                }
+            }
+            
+            goToHistoryState(historyIndex);
+            navigateToState(targetState);
+            dropdown.remove();
+        });
+        dropdown.appendChild(item);
+    });
+    
+    const currentItem = document.createElement('div');
+    currentItem.textContent = "Current Page";
+    currentItem.classList.add('current-history-item');
+    dropdown.prepend(currentItem);
+
+
+    document.body.appendChild(dropdown);
+
+    // Close dropdown when clicking outside
+    setTimeout(() => {
+        document.addEventListener('click', function closeDropdown(event) {
+            if (!dropdown.contains(event.target) && event.target !== backButton) {
+                dropdown.remove();
+                document.removeEventListener('click', closeDropdown);
+            }
+        });
+    }, 0);
+});
 
 markdownEditor.addEventListener('input', async () => {
   const note = notes.find(n => n.id === activeNoteId);

@@ -25,6 +25,8 @@ This file documents the functions used in the Simple Notes extension.
 - `popFromHistory()`: Pops the last state from the navigation history.
 - `getCurrentHistoryState()`: Gets the current state from the navigation history without removing it.
 - `clearHistory()`: Clears the navigation history.
+- `getHistory()`: Returns the entire navigation history stack.
+- `goToHistoryState(index)`: Navigates to a specific index in the history.
 
 ## src/import_export.js
 
@@ -75,3 +77,8 @@ This file documents the functions used in the Simple Notes extension.
 - `sanitizeFilename(filename)`: Sanitizes a filename.
 - `downloadFile(blob, fileName)`: Downloads a file.
 - `extractImageIds(content)`: Extracts image IDs from a string of content.
+
+## src/events.js
+
+- `goBack()`: Navigates to the previous view in the history.
+- `navigateToState(state)`: Navigates to a specific view state.

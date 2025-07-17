@@ -74,6 +74,7 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **`showListView()` / `showEditorView()` / `showSettingsView()` / etc.**: A set of functions that control UI visibility. They now accept an `addToHistory` parameter and will call `pushToHistory` to record the navigation change.
 -   **`pushToHistory()` / `popFromHistory()` / etc.**: Functions in `history.js` for managing the `navigationHistory` stack.
 -   **`goBack()`**: A function in `events.js` that is triggered by back buttons or the Escape key. It uses the `navigationHistory` to return the user to the previously visited view.
+-   **`backButton` (Context Menu)**: Right-clicking the back button opens a custom dropdown menu displaying the navigation history, allowing the user to jump to a specific previous view.
 
 #### Note List (`notes_view.js`, `events.js`)
 
