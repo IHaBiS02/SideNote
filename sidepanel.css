@@ -307,9 +307,12 @@ button:hover {
 }
 
 #image-management-button,
-#image-recycle-bin-button,
-#empty-recycle-bin-button {
+#image-recycle-bin-button {
   background-color: #f0f0f0;
+}
+
+#recycle-bin-view .toolbar {
+    justify-content: flex-end;
 }
 
 #settings-button,
