@@ -302,7 +302,7 @@ htmlPreview.addEventListener('click', async (e) => {
     const checkboxIndex = checkboxes.indexOf(e.target);
 
     const markdown = markdownEditor.value;
-    const regex = /\\[x ]\\]/g;
+    const regex = /\[[x ]\]/g;
     let match;
     const matches = [];
     while ((match = regex.exec(markdown)) !== null) {
