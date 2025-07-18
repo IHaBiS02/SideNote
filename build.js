@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+const glob = require('glob');
 
 const exec = (command) => execSync(command, { stdio: 'inherit' });
 
@@ -115,25 +116,22 @@ function createZip(sourceDir, outPath) {
 
 async function main() {
     console.log('Deleting old zip files if they exist...');
+    const oldChromeZips = await glob.glob('build/chrome-*.zip');
+    const oldFirefoxZips = await glob.glob('build/firefox-*.zip');
+
+    for (const file of [...oldChromeZips, ...oldFirefoxZips]) {
+        try {
+            fs.unlinkSync(file);
+            console.log(`Deleted ${file}`);
+        } catch (err) {
+            console.error(`Could not delete ${file}:`, err.message);
+        }
+    }
+
+    const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
+    const version = packageJson.version.replace(/\./g, '_');
     const chromeZipPath = path.join(buildDir, `chrome-${version}.zip`);
     const firefoxZipPath = path.join(buildDir, `firefox-${version}.zip`);
-
-    if (fs.existsSync(chromeZipPath)) {
-        try {
-            exec(`del ${chromeZipPath}`);
-            console.log(`Deleted ${chromeZipPath}`);
-        } catch (err) {
-            console.error(`Could not delete ${chromeZipPath}:`, err.message);
-        }
-    }
-    if (fs.existsSync(firefoxZipPath)) {
-        try {
-            exec(`del ${firefoxZipPath}`);
-            console.log(`Deleted ${firefoxZipPath}`);
-        } catch (err) {
-            console.error(`Could not delete ${firefoxZipPath}:`, err.message);
-        }
-    }
 
     console.log('Creating zip archives...');
     await createZip(chromeDir, chromeZipPath);
