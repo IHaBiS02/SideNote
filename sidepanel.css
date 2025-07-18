@@ -366,6 +366,7 @@ pre code {
   word-break: break-all;
   display: block;
   font-family: monospace;
+  border: 1px solid #ccc;
 }
 
 pre.multi-line-code code.hljs {
@@ -453,6 +454,7 @@ blockquote {
   padding: 2px 4px;
   border-radius: 4px;
   font-family: monospace;
+  border: 1px solid #ccc;
 }
 
 /* 체크박스 스타일 */
