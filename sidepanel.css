@@ -15,14 +15,6 @@ body {
   height: 30px;
 }
 
-.header h1 {
-    margin: 0;
-}
-
-#editor-view .header {
-  justify-content: flex-start;
-}
-
 #notes-list-title,
 #editor-title,
 #settings-title,
@@ -199,6 +191,7 @@ body {
   left: 0;
   right: 0;
   display: flex;
+  border-top: 1px solid #ccc;
 }
 
 #markdown-editor, #html-preview {
@@ -372,7 +365,6 @@ button:hover {
 pre code {
   white-space: pre-wrap;
   word-break: break-all;
-  border: 1px solid #ccc;
   display: block;
   font-family: monospace;
 }
