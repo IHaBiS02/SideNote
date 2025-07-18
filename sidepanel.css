@@ -14,6 +14,10 @@ body {
   position: relative;
 }
 
+.header h1 {
+    margin: 0;
+}
+
 #editor-view .header {
   justify-content: flex-start;
 }
