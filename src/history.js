@@ -18,6 +18,7 @@ function pushToHistory(state) {
     // If we've gone back and are now creating a new path, truncate the future history
     if (historyIndex < navigationHistory.length - 1) {
         navigationHistory = navigationHistory.slice(0, historyIndex + 1);
+        document.dispatchEvent(new CustomEvent('historytruncated'));
     }
 
     navigationHistory.push(state);

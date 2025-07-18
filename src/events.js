@@ -120,19 +120,14 @@ backButtons.forEach(button => {
     });
 });
 
-function showHistoryDropdown(targetButton) {
-    // Close any existing dropdown
-    const existingDropdown = document.querySelector('.history-dropdown');
-    if (existingDropdown) {
-        existingDropdown.remove();
-    }
-
+function populateHistoryDropdown(dropdown) {
+    dropdown.innerHTML = ''; // Clear existing items
     const history = getHistory();
     const currentIndex = getHistoryIndex();
-    if (history.length === 0) return;
-
-    const dropdown = document.createElement('div');
-    dropdown.classList.add('history-dropdown');
+    if (history.length === 0) {
+        dropdown.remove();
+        return;
+    }
 
     // The history is displayed from most recent to oldest, so we reverse it for display
     [...history].reverse().forEach((state, reversedIndex) => {
@@ -174,6 +169,22 @@ function showHistoryDropdown(targetButton) {
         });
         dropdown.appendChild(item);
     });
+}
+
+function showHistoryDropdown(targetButton) {
+    // Close any existing dropdown
+    const existingDropdown = document.querySelector('.history-dropdown');
+    if (existingDropdown) {
+        existingDropdown.remove();
+    }
+
+    const history = getHistory();
+    if (history.length === 0) return;
+
+    const dropdown = document.createElement('div');
+    dropdown.classList.add('history-dropdown');
+
+    populateHistoryDropdown(dropdown);
 
     document.body.appendChild(dropdown);
 
@@ -187,6 +198,15 @@ function showHistoryDropdown(targetButton) {
         });
     }, 0);
 }
+
+function refreshHistoryDropdown() {
+    const existingDropdown = document.querySelector('.history-dropdown');
+    if (existingDropdown) {
+        populateHistoryDropdown(existingDropdown);
+    }
+}
+
+document.addEventListener('historytruncated', refreshHistoryDropdown);
 
 markdownEditor.addEventListener('input', async () => {
   const note = notes.find(n => n.id === activeNoteId);
