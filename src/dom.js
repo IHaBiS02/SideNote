@@ -37,4 +37,5 @@ const imageManagementView = document.getElementById('image-management-view');
 const imageManagementBackButton = document.getElementById('image-management-back-button');
 const imageList = document.getElementById('image-list');
 const deletedItemsList = document.getElementById('deleted-items-list');
+const emptyRecycleBinButton = document.getElementById('empty-recycle-bin-button');
 const preventUsedImageDeletionCheckbox = document.getElementById('prevent-used-image-deletion-checkbox');

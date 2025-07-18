@@ -429,7 +429,11 @@ imageManagementButton.addEventListener('click', () => {
   showImageManagementView();
 });
 
-
+emptyRecycleBinButton.addEventListener('click', () => {
+    if (confirm('Are you sure you want to permanently delete all items in the recycle bin?')) {
+        emptyRecycleBin();
+    }
+});
 
 modeSetting.addEventListener('change', () => {
   const value = modeSetting.value;

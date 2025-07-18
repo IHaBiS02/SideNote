@@ -75,3 +75,21 @@ async function deleteNotePermanently(noteId) {
   await deleteNotePermanentlyDB(noteId);
   renderDeletedItemsList();
 }
+
+/**
+ * Empties the recycle bin.
+ */
+async function emptyRecycleBin() {
+    for (const note of deletedNotes) {
+        await deleteNotePermanentlyDB(note.id);
+    }
+    deletedNotes = [];
+
+    const imageObjects = await getAllImageObjectsFromDB();
+    const deletedImages = imageObjects.filter(img => img.deletedAt);
+    for (const image of deletedImages) {
+        await deleteImagePermanently(image.id);
+    }
+
+    renderDeletedItemsList();
+}
