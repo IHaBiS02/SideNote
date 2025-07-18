@@ -62,9 +62,10 @@ async function goBack() {
         }
     }
 
-    popFromHistory(); // Pop current view
-    const previousState = getCurrentHistoryState();
-    navigateToState(previousState);
+    const previousState = moveBack();
+    if (previousState) {
+        navigateToState(previousState);
+    }
 }
 
 newNoteButton.addEventListener('click', async () => {
@@ -98,13 +99,16 @@ backButton.addEventListener('contextmenu', (e) => {
         existingDropdown.remove();
     }
 
-    const history = getHistory().slice(0, -1).reverse(); // Don't include current page
+    const history = getHistory();
+    const currentIndex = getHistoryIndex();
     if (history.length === 0) return;
 
     const dropdown = document.createElement('div');
     dropdown.classList.add('history-dropdown');
 
-    history.forEach((state, index) => {
+    // The history is displayed from most recent to oldest, so we reverse it for display
+    [...history].reverse().forEach((state, reversedIndex) => {
+        const originalIndex = history.length - 1 - reversedIndex;
         const item = document.createElement('div');
         let title = state.view;
         if (state.view === 'editor' && state.params && state.params.noteId) {
@@ -116,9 +120,12 @@ backButton.addEventListener('contextmenu', (e) => {
         item.textContent = title;
         item.title = title;
 
+        if (originalIndex === currentIndex) {
+            item.classList.add('current-history-item');
+        }
+
         item.addEventListener('click', async () => {
-            const historyIndex = getHistory().length - 2 - index;
-            const targetState = getHistory()[historyIndex];
+            const targetState = history[originalIndex];
 
             const currentState = getCurrentHistoryState();
             if (currentState && currentState.view === 'editor') {
@@ -132,18 +139,12 @@ backButton.addEventListener('contextmenu', (e) => {
                 }
             }
             
-            goToHistoryState(historyIndex);
+            goToHistoryState(originalIndex);
             navigateToState(targetState);
             dropdown.remove();
         });
         dropdown.appendChild(item);
     });
-    
-    const currentItem = document.createElement('div');
-    currentItem.textContent = "Current Page";
-    currentItem.classList.add('current-history-item');
-    dropdown.prepend(currentItem);
-
 
     document.body.appendChild(dropdown);
 

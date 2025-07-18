@@ -22,10 +22,14 @@ This file documents the functions used in the Simple Notes extension.
 ## src/history.js
 
 - `pushToHistory(state)`: Pushes a new state to the navigation history.
-- `popFromHistory()`: Pops the last state from the navigation history.
-- `getCurrentHistoryState()`: Gets the current state from the navigation history without removing it.
+- `moveBack()`: Moves to the previous state in the navigation history.
+- `moveForward()`: Moves to the next state in the navigation history.
+- `canMoveBack()`: Checks if it is possible to go back.
+- `canMoveForward()`: Checks if it is possible to go forward.
+- `getCurrentHistoryState()`: Gets the current state from the navigation history without moving it.
 - `clearHistory()`: Clears the navigation history.
 - `getHistory()`: Returns the entire navigation history stack.
+- `getHistoryIndex()`: Returns the current index in the history.
 - `goToHistoryState(index)`: Navigates to a specific index in the history.
 
 ## src/import_export.js
