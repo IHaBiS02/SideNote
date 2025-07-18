@@ -316,7 +316,8 @@ button:hover {
 }
 
 #settings-button,
-#global-settings-button {
+#global-settings-button,
+#empty-recycle-bin-button {
   margin-right: 10px;
 }
 
