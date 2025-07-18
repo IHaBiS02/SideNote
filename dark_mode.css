@@ -147,6 +147,10 @@ body.dark-mode {
   margin-left: 0;
 }
 
+.dark-mode :not(pre) > code {
+  background-color: #333;
+}
+
 .dark-mode input[type="checkbox"] {
   accent-color: #82aaff;
 }

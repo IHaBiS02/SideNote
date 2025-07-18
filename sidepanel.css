@@ -446,6 +446,14 @@ blockquote {
   margin-left: 0;
 }
 
+/* 인라인 코드 스타일 */
+:not(pre) > code {
+  background-color: #f0f0f0;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
 /* 체크박스 스타일 */
 input[type="checkbox"] {
   margin-right: 5px;
