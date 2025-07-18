@@ -65,6 +65,22 @@ async function goBack() {
     const previousState = moveBack();
     if (previousState) {
         navigateToState(previousState);
+
+        const existingDropdown = document.querySelector('.history-dropdown');
+        if (existingDropdown) {
+            const currentIndex = getHistoryIndex();
+            const items = existingDropdown.querySelectorAll('div');
+            const history = getHistory();
+            
+            items.forEach((item, reversedIndex) => {
+                const originalIndex = history.length - 1 - reversedIndex;
+                if (originalIndex === currentIndex) {
+                    item.classList.add('current-history-item');
+                } else {
+                    item.classList.remove('current-history-item');
+                }
+            });
+        }
     }
 }
 
