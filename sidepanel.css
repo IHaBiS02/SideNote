@@ -34,15 +34,8 @@ body {
   font-size: 18px;
 }
 
-#note-list, #deleted-items-list, #image-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  position: absolute;
-  top: 51px;
-  bottom: 36px;
-  left: 0;
-  right: 0;
+#note-list, #deleted-items-list, #image-list, #editor-container {
+  flex-grow: 1;
   overflow-y: auto;
 }
 
@@ -160,8 +153,14 @@ body {
   background-color: #f5f5f5;
 }
 
-#settings-view, #license-view, #recycle-bin-view, #image-management-view {
+#list-view, #editor-view, #recycle-bin-view, #image-management-view, #settings-view, #license-view {
+    display: flex;
+    flex-direction: column;
     height: 100vh;
+}
+
+#settings-container, #license-content {
+    flex-grow: 1;
     overflow-y: auto;
 }
 
@@ -238,9 +237,6 @@ body {
   align-items: center;
   padding: 5px;
   border-top: 1px solid #ccc;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
   background-color: white;
 }
 
