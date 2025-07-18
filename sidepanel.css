@@ -530,5 +530,9 @@ li.task-list-item {
 }
 
 .confirmation-dropdown .delete-action {
+    color: black;
+}
+
+.confirmation-dropdown .delete-action.confirm {
     color: red;
 }

@@ -184,5 +184,9 @@ body.dark-mode {
 }
 
 .dark-mode .confirmation-dropdown .delete-action {
+    color: #e0e0e0;
+}
+
+.dark-mode .confirmation-dropdown .delete-action.confirm {
     color: #ff6b6b;
 }
