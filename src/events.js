@@ -88,11 +88,23 @@ newNoteButton.addEventListener('click', async () => {
   openNote(newNote.id, true);
 });
 
-backButton.addEventListener('click', goBack);
+const backButtons = [
+    backButton,
+    settingsBackButton,
+    licenseBackButton,
+    recycleBinBackButton,
+    imageManagementBackButton
+];
 
-backButton.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
+backButtons.forEach(button => {
+    button.addEventListener('click', goBack);
+    button.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        showHistoryDropdown(e.currentTarget);
+    });
+});
 
+function showHistoryDropdown(targetButton) {
     // Close any existing dropdown
     const existingDropdown = document.querySelector('.history-dropdown');
     if (existingDropdown) {
@@ -115,6 +127,7 @@ backButton.addEventListener('contextmenu', (e) => {
             const note = notes.find(n => n.id === state.params.noteId);
             title = note ? `Editor: ${note.title}` : 'Editor: Untitled';
         } else {
+            // Capitalize first letter
             title = state.view.charAt(0).toUpperCase() + state.view.slice(1);
         }
         item.textContent = title;
@@ -151,13 +164,13 @@ backButton.addEventListener('contextmenu', (e) => {
     // Close dropdown when clicking outside
     setTimeout(() => {
         document.addEventListener('click', function closeDropdown(event) {
-            if (!dropdown.contains(event.target) && event.target !== backButton) {
+            if (!dropdown.contains(event.target) && event.target !== targetButton) {
                 dropdown.remove();
                 document.removeEventListener('click', closeDropdown);
             }
         });
     }, 0);
-});
+}
 
 markdownEditor.addEventListener('input', async () => {
   const note = notes.find(n => n.id === activeNoteId);
@@ -358,7 +371,7 @@ globalSettingsButton.addEventListener('click', () => {
   showSettingsView();
 });
 
-settingsBackButton.addEventListener('click', goBack);
+
 
 licensesButton.addEventListener('click', async () => {
   const response = await fetch('LIBRARY_LICENSES.md');
@@ -368,19 +381,19 @@ licensesButton.addEventListener('click', async () => {
   showLicenseView();
 });
 
-licenseBackButton.addEventListener('click', goBack);
+
 
 recycleBinButton.addEventListener('click', () => {
   showRecycleBinView();
 });
 
-recycleBinBackButton.addEventListener('click', goBack);
+
 
 imageManagementButton.addEventListener('click', () => {
   showImageManagementView();
 });
 
-imageManagementBackButton.addEventListener('click', goBack);
+
 
 modeSetting.addEventListener('change', () => {
   const value = modeSetting.value;
