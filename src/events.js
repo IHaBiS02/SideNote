@@ -441,21 +441,29 @@ emptyRecycleBinButton.addEventListener('click', (e) => {
     const dropdown = document.createElement('div');
     dropdown.classList.add('confirmation-dropdown');
 
-    const deleteAction = document.createElement('div');
-    deleteAction.textContent = 'Erase All Notes';
-    deleteAction.classList.add('delete-action');
+    const eraseAction = document.createElement('div');
+    eraseAction.textContent = 'Erase All Notes';
+    eraseAction.classList.add('delete-action');
 
-    deleteAction.addEventListener('click', () => {
-        if (deleteAction.classList.contains('confirm')) {
+    const handleFirstClick = (event) => {
+        event.stopPropagation();
+
+        const confirmAction = document.createElement('div');
+        confirmAction.textContent = 'Are you sure?';
+        confirmAction.classList.add('delete-action', 'confirm');
+
+        confirmAction.addEventListener('click', () => {
             emptyRecycleBin();
             dropdown.remove();
-        } else {
-            deleteAction.textContent = 'Are you sure?';
-            deleteAction.classList.add('confirm');
-        }
-    });
+        });
 
-    dropdown.appendChild(deleteAction);
+        dropdown.insertBefore(confirmAction, eraseAction);
+        eraseAction.removeEventListener('click', handleFirstClick);
+    };
+
+    eraseAction.addEventListener('click', handleFirstClick);
+
+    dropdown.appendChild(eraseAction);
     document.body.appendChild(dropdown);
 
     setTimeout(() => {
