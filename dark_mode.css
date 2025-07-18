@@ -150,3 +150,21 @@ body.dark-mode {
 .dark-mode input[type="checkbox"] {
   accent-color: #82aaff;
 }
+
+.dark-mode .history-dropdown {
+    background-color: #2d2d2d;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+.dark-mode .history-dropdown div {
+    border-bottom: 1px solid #444;
+}
+
+.dark-mode .history-dropdown div:hover {
+    background-color: #444;
+}
+
+.dark-mode .history-dropdown .current-history-item {
+    color: #82aaff;
+}
