@@ -429,10 +429,41 @@ imageManagementButton.addEventListener('click', () => {
   showImageManagementView();
 });
 
-emptyRecycleBinButton.addEventListener('click', () => {
-    if (confirm('Are you sure you want to permanently delete all items in the recycle bin?')) {
-        emptyRecycleBin();
+emptyRecycleBinButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+
+    const existingDropdown = document.querySelector('.confirmation-dropdown');
+    if (existingDropdown) {
+        existingDropdown.remove();
+        return;
     }
+
+    const dropdown = document.createElement('div');
+    dropdown.classList.add('confirmation-dropdown');
+
+    const confirmationText = document.createElement('div');
+    confirmationText.textContent = 'Are you sure?';
+    dropdown.appendChild(confirmationText);
+
+    const deleteAction = document.createElement('div');
+    deleteAction.textContent = 'Erase All Notes';
+    deleteAction.classList.add('delete-action');
+    deleteAction.addEventListener('click', () => {
+        emptyRecycleBin();
+        dropdown.remove();
+    });
+    dropdown.appendChild(deleteAction);
+
+    document.body.appendChild(dropdown);
+
+    setTimeout(() => {
+        document.addEventListener('click', function closeDropdown(event) {
+            if (!dropdown.contains(event.target)) {
+                dropdown.remove();
+                document.removeEventListener('click', closeDropdown);
+            }
+        });
+    }, 0);
 });
 
 modeSetting.addEventListener('change', () => {

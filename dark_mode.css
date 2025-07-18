@@ -173,3 +173,16 @@ body.dark-mode {
 .dark-mode .history-dropdown .current-history-item {
     color: #82aaff;
 }
+
+.dark-mode .confirmation-dropdown {
+    background-color: #2d2d2d;
+    border-color: #444;
+}
+
+.dark-mode .confirmation-dropdown div:hover {
+    background-color: #444;
+}
+
+.dark-mode .confirmation-dropdown .delete-action {
+    color: #ff6b6b;
+}
