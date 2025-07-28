@@ -1,4 +1,7 @@
 {
+  "env": {
+    "MAX_THINKING_TOKENS": "20000"
+  },
   "permissions": {
     "allow": [
       "Bash(dir:*)",
@@ -6,12 +9,9 @@
       "Bash(npm run build:*)",
       "Bash(git commit:*)",
       "Bash(del commit_message.txt)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
-  },
-  "env": {
-    "MAX_THINKING_TOKENS": "20000"
   }
-
 }
