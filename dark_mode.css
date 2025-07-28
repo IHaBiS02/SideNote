@@ -62,6 +62,15 @@ body.dark-mode {
     background-color: #444;
 }
 
+.dark-mode .image-title-dropdown {
+    background-color: #2d2d2d;
+    border-color: #444;
+}
+
+.dark-mode .image-title-dropdown div:hover {
+    background-color: #444;
+}
+
 .dark-mode .title-input {
     background-color: #333;
     color: #e0e0e0;
