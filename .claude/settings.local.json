@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(git commit:*)",
+      "Bash(del commit_message.txt)",
+      "Bash(git add:*)"
+    ],
+    "deny": []
+  },
+  "env": {
+    "MAX_THINKING_TOKENS": "20000"
+  }
+
+}

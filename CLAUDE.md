@@ -8,6 +8,8 @@ SideNote is a Chrome/Firefox browser extension that provides a simple note-takin
 
 ## Development Commands
 
+All developing command should run on windows environment, as the development environment is on windows 11.
+
 ### Build
 ```bash
 npm run build
@@ -55,7 +57,7 @@ When making changes:
 1. Update version in `manifest.json`
 2. Update version in `package.json` to match
 3. Run `npm install` to update `package-lock.json`
-4. commit to git
+4. commit changes to git
 
 ### Documentation Updates
 After significant changes, update:
@@ -71,6 +73,13 @@ git log -n 5
 git commit -F commit_message.txt
 del commit_message.txt
 ```
+When you commit to git, do not write 
+```
+🤖 Generated with Claude Code
+
+Co-Authored-By: Claude noreply@anthropic.com
+```
+on the commit message.
 
 ### Testing
 After changes:
