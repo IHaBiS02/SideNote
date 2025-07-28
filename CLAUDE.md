@@ -55,6 +55,7 @@ When making changes:
 1. Update version in `manifest.json`
 2. Update version in `package.json` to match
 3. Run `npm install` to update `package-lock.json`
+4. commit to git
 
 ### Documentation Updates
 After significant changes, update:

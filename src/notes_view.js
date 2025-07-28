@@ -402,33 +402,80 @@ function showImageModal(blobUrl) {
   modalImg.src = blobUrl;
   
   let zoomState = 0; // 0: fit-to-screen, 1: full-size
-  const setZoomState = (state) => {
-      if (state === 0) { // Fit-to-screen
-          modal.style.justifyContent = 'center';
-          modal.style.alignItems = 'center';
-          modal.style.overflow = 'hidden';
-          modalImg.style.cursor = 'zoom-in';
-          modalImg.style.maxWidth = '90%';
-          modalImg.style.maxHeight = '90%';
-          modalImg.style.width = 'auto';
-          modalImg.style.height = 'auto';
-      } else { // state === 1, Full-size
-          modal.style.justifyContent = 'flex-start';
-          modal.style.alignItems = 'flex-start';
-          modal.style.overflow = 'auto';
-          modalImg.style.cursor = 'zoom-out';
-          modalImg.style.maxWidth = 'none';
-          modalImg.style.maxHeight = 'none';
-          modalImg.style.width = 'auto';
-          modalImg.style.height = 'auto';
-      }
-  };
-
-  setZoomState(zoomState);
   
-  modalImg.onclick = () => {
-      zoomState = (zoomState + 1) % 2;
+  modalImg.onload = () => {
+      const naturalWidth = modalImg.naturalWidth;
+      const naturalHeight = modalImg.naturalHeight;
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const paddingPercent = 0.1; // 10% padding
+      const availableWidth = viewportWidth * (1 - 2 * paddingPercent);
+      const availableHeight = viewportHeight * (1 - 2 * paddingPercent);
+      
+      const setZoomState = (state) => {
+          if (state === 0) { // Fit with 10% L/R padding, minimum 10% T/B padding
+              modal.style.justifyContent = 'center';
+              modal.style.alignItems = 'center';
+              modal.style.overflow = 'auto';
+              modalImg.style.cursor = 'zoom-in';
+              
+              // Try to fit to width with 10% left/right margins
+              const scaleWidth = availableWidth / naturalWidth;
+              const scaledHeight = naturalHeight * scaleWidth;
+              
+              // Check if scaled height fits within available height (10% top/bottom margins)
+              let finalScale;
+              if (scaledHeight <= availableHeight) {
+                  // Image fits with width-based scaling
+                  finalScale = scaleWidth;
+              } else {
+                  // Image is too tall, scale down to maintain 10% top/bottom margins
+                  finalScale = availableHeight / naturalHeight;
+              }
+              
+              modalImg.style.width = (naturalWidth * finalScale) + 'px';
+              modalImg.style.height = (naturalHeight * finalScale) + 'px';
+              modalImg.style.maxWidth = 'none';
+              modalImg.style.maxHeight = 'none';
+          } else { // state === 1, Enlarge with 10% padding on all sides
+              modal.style.overflow = 'auto';
+              modalImg.style.cursor = 'zoom-out';
+              
+              // Calculate scale to fit with 10% margins on all sides
+              const scaleWidth = availableWidth / naturalWidth;
+              const scaleHeight = availableHeight / naturalHeight;
+              const scale = Math.min(scaleWidth, scaleHeight);
+              
+              // For small images: scale up to use available space with 10% margins
+              // For large images: show at natural size (never scale down below 1.0)
+              const finalScale = Math.max(1.0, scale);
+              
+              const finalWidth = naturalWidth * finalScale;
+              const finalHeight = naturalHeight * finalScale;
+              
+              // If scaled image fits within available space: center it
+              // If scaled image is larger: align to top-left for proper scrolling
+              if (finalWidth <= availableWidth && finalHeight <= availableHeight) {
+                  modal.style.justifyContent = 'center';
+                  modal.style.alignItems = 'center';
+              } else {
+                  modal.style.justifyContent = 'flex-start';
+                  modal.style.alignItems = 'flex-start';
+              }
+              
+              modalImg.style.width = finalWidth + 'px';
+              modalImg.style.height = finalHeight + 'px';
+              modalImg.style.maxWidth = 'none';
+              modalImg.style.maxHeight = 'none';
+          }
+      };
+
       setZoomState(zoomState);
+      
+      modalImg.onclick = () => {
+          zoomState = (zoomState + 1) % 2;
+          setZoomState(zoomState);
+      };
   };
 
   modal.appendChild(modalImg);

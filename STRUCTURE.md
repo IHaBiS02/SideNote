@@ -1,10 +1,10 @@
-# Simple Notes Extension Structure
+# SideNote Extension Structure
 
-This document outlines the internal structure of the Simple Notes Chrome extension, detailing the architecture, file organization, and the role of each major component and function.
+This document outlines the internal structure of the SideNote browser extension, detailing the architecture, file organization, and the role of each major component and function.
 
 ## 1. Project Overview
 
-The extension provides a simple note-taking interface within the browser's side panel. Users can create, edit, and manage notes written in Markdown. It supports features like a live preview, syntax highlighting, dark/light modes, and data import/export.
+SideNote is a browser extension that provides a simple note-taking interface within the browser's side panel. Users can create, edit, and manage notes written in Markdown. It supports features like a live preview, syntax highlighting, dark/light modes, image embedding, and data import/export.
 
 ## 2. File Structure
 
@@ -13,12 +13,14 @@ The extension provides a simple note-taking interface within the browser's side 
 -   **`src/`**: This directory contains all the JavaScript logic for the extension, broken down into modules.
     -   `main.js`: The main entry point. It initializes the application, loads data, and handles the one-time migration of notes from `chrome.storage` to `IndexedDB`.
     -   `database.js`: Contains all functions for interacting with the `IndexedDB` database, for both notes and images.
-    -   `notes.js`: Contains the core logic for managing notes (sorting, deleting, pinning, etc.).
+    -   `dom.js`: Contains DOM element references as constants for all UI elements used throughout the extension.
+    -   `notes.js`: Contains the core logic for managing notes (sorting, deleting, pinning, restoring, etc.).
     -   `notes_view.js`: Handles rendering the notes list and other UI components. It contains the logic for creating and managing the image usage dropdown.
-    -   `events.js`: Contains all the event listeners for the UI elements, including a global click handler for closing the image usage dropdown.
-    -   `history.js`: Manages the view navigation history, allowing for "back" functionality.
+    -   `events.js`: Contains all the event listeners for the UI elements, including navigation history management and dropdown controls.
+    -   `history.js`: Manages the view navigation history stack, allowing for "back" functionality.
     -   `settings.js`: Manages global and note-specific settings.
     -   `import_export.js`: Contains the logic for importing and exporting notes.
+    -   `utils.js`: Utility functions for timestamps, filename sanitization, file downloads, and image ID extraction.
 -   **`sidepanel.css`**: The primary stylesheet for the extension's UI.
 -   **`dark_mode.css`**: A supplementary stylesheet containing CSS variables and rules specifically for the dark mode theme.
 -   **`background.js`**: A service worker script that handles the initial opening of the side panel when the extension icon is clicked.
@@ -40,9 +42,11 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **`#settings-view`**: The screen for configuring settings.
     -   Can be accessed globally (from list view) or for a specific note (from editor view).
     -   Controls for UI Mode (Light/Dark), Title behavior, Font Size, and other options.
-    -   Buttons to navigate to the Recycle Bin and Licenses page.
+    -   Checkbox for "Auto Add Two Spaces on Enter" and "Prevent deletion of used images".
+    -   Buttons to navigate to Image Management, Recycle Bin, and Licenses pages.
 -   **`#license-view`**: Displays the contents of `LIBRARY_LICENSES.md`.
--   **`#recycle-bin-view`**: Displays a list of deleted items (`#deleted-items-list`), both notes and images, with options to restore or delete them permanently.
+-   **`#recycle-bin-view`**: Displays a list of deleted items (`#deleted-items-list`), both notes and images, with options to restore or delete them permanently. Includes an "Empty Recycle Bin" button.
+-   **`#image-management-view`**: Displays a list of all images (`#image-list`) with usage information and deletion controls.
 
 ## 4. JavaScript Logic
 
@@ -54,7 +58,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   `activeNoteId`: Stores the `id` of the note currently being edited.
     -   `globalSettings`: An object holding all global application settings.
     -   `isPreview`: A boolean flag to track if the editor is in "Preview" or "Edit" mode.
-    -   `navigationHistory`: An array of state objects representing the user's navigation path through the different views.
+    -   Navigation history is managed through the `history.js` module.
 -   **Data Persistence**:
     -   All data (`notes`, `images`, and `globalSettings`) is now stored in `IndexedDB`. `chrome.storage.local` is only used for `globalSettings` and for the one-time migration of old notes.
 
@@ -75,16 +79,20 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **`pushToHistory()` / `popFromHistory()` / etc.**: Functions in `history.js` for managing the `navigationHistory` stack.
 -   **`goBack()`**: A function in `events.js` that is triggered by back buttons or the Escape key. It uses the `navigationHistory` to return the user to the previously visited view.
 -   **`backButton` (Context Menu)**: Right-clicking the back button opens a custom dropdown menu displaying the navigation history, allowing the user to jump to a specific previous view.
+-   **`navigateToState(state)`**: Navigates to a specific view state based on the provided state object.
+-   **History Dropdown Management**: Functions to show, populate, and refresh the navigation history dropdown.
 
 #### Note List (`notes_view.js`, `events.js`)
 
 -   **`renderNoteList()`**: Populates the `#note-list` with items from the `notes` array.
 -   **`newNoteButton` (Event Listener)**: Creates a new, empty note object and opens it.
 -   **`deleteNote(noteId)`**: Moves a note to the recycle bin by adding a `deletedAt` timestamp.
+-   **`togglePin(noteId)`**: Toggles the pin status of a note.
+-   **`emptyRecycleBin()`**: Empties the recycle bin after two-step confirmation.
 
 #### Editor (`notes_view.js`, `events.js`)
 
--   **`openNote(noteId)`**: Sets the `activeNoteId` and populates the editor with the note's content. It now also records the action in the navigation history.
+-   **`openNote(noteId, inEditMode, addToHistory)`**: Sets the `activeNoteId` and populates the editor with the note's content. It now also records the action in the navigation history.
 -   **`markdownEditor` (Event Listeners)**:
     -   `input`: Updates the note content and metadata on every keystroke.
     -   `paste`: Intercepts pasted content. If it's an image, it saves it to IndexedDB and inserts the corresponding Markdown tag. If it's text, it applies formatting.
@@ -98,6 +106,7 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **Settings Listeners**: Update `globalSettings` or note-specific settings.
 -   **`applyMode(mode)`**: Toggles the `dark-mode` class on the `<body>`.
 -   **`renderDeletedItemsList()`**: Fetches all deleted notes and images from `IndexedDB`. It combines them into a single array, sorts them by deletion date, and renders them in the `#deleted-items-list`. Each item has controls to be restored or permanently deleted.
+-   **`renderImagesList()`**: Renders the list of images in the image management view, showing usage information and delete controls.
 -   **`restoreNote(noteId)` / `restoreImage(id)`**: Moves an item from the recycle bin back to the active state.
 -   **`deleteNotePermanently(noteId)` / `deleteImagePermanently(id)`**: Removes an item permanently from storage.
 
@@ -113,3 +122,5 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **`highlight.min.js`**: A syntax highlighter that can parse and style code blocks in many different languages.
 -   **`highlightjs-line-numbers.min.js`**: A plugin for `highlight.js` that adds line numbers to the highlighted code blocks.
 -   **`jszip.min.js`**: A library for creating, reading, and editing `.zip` files, used for the import/export functionality.
+-   **`browser-polyfill.min.js`**: WebExtension browser API Polyfill for cross-browser compatibility.
+-   **`atom-one-light.css`**: Light theme for syntax highlighting (additional dark theme available).

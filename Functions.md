@@ -1,6 +1,6 @@
 # Functions
 
-This file documents the functions used in the Simple Notes extension.
+This file documents the functions used in the SideNote extension.
 
 ## src/database.js
 
@@ -18,6 +18,18 @@ This file documents the functions used in the Simple Notes extension.
 - `restoreImage(id)`: Restores a deleted image in the database.
 - `deleteImagePermanently(id)`: Permanently deletes an image from the database.
 - `getAllImageObjectsFromDB()`: Retrieves all image objects from the database.
+
+## src/dom.js
+
+- This file contains DOM element references (constants) for all UI elements used throughout the extension.
+
+## src/events.js
+
+- `navigateToState(state)`: Navigates to a specific view state.
+- `goBack()`: Navigates to the previous view in the history.
+- `populateHistoryDropdown(dropdown)`: Populates the history dropdown with navigation history items.
+- `showHistoryDropdown(targetButton)`: Shows the history dropdown menu.
+- `refreshHistoryDropdown()`: Refreshes the history dropdown if it's currently open.
 
 ## src/history.js
 
@@ -49,17 +61,18 @@ This file documents the functions used in the Simple Notes extension.
 - `togglePin(noteId)`: Toggles the pin status of a note.
 - `restoreNote(noteId)`: Restores a deleted note.
 - `deleteNotePermanently(noteId)`: Permanently deletes a note.
+- `emptyRecycleBin()`: Empties the recycle bin by permanently deleting all items.
 
 ## src/notes_view.js
 
 - `renderNoteList()`: Renders the list of notes.
-- `openNote(noteId, inEditMode)`: Opens a note in the editor.
-- `showListView()`: Shows the list view.
-- `showEditorView()`: Shows the editor view.
-- `showSettingsView()`: Shows the settings view.
-- `showLicenseView()`: Shows the license view.
-- `showRecycleBinView()`: Shows the recycle bin view.
-- `showImageManagementView()`: Shows the image management view.
+- `openNote(noteId, inEditMode, addToHistory)`: Opens a note in the editor.
+- `showListView(addToHistory)`: Shows the list view.
+- `showEditorView(addToHistory)`: Shows the editor view.
+- `showSettingsView(addToHistory)`: Shows the settings view.
+- `showLicenseView(addToHistory)`: Shows the license view.
+- `showRecycleBinView(addToHistory)`: Shows the recycle bin view.
+- `showImageManagementView(addToHistory)`: Shows the image management view.
 - `renderDeletedItemsList()`: Renders the list of deleted items.
 - `renderMarkdown()`: Renders the markdown content as HTML.
 - `renderImages()`: Renders images in the preview.
@@ -81,8 +94,3 @@ This file documents the functions used in the Simple Notes extension.
 - `sanitizeFilename(filename)`: Sanitizes a filename.
 - `downloadFile(blob, fileName)`: Downloads a file.
 - `extractImageIds(content)`: Extracts image IDs from a string of content.
-
-## src/events.js
-
-- `goBack()`: Navigates to the previous view in the history.
-- `navigateToState(state)`: Navigates to a specific view state.
