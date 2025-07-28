@@ -134,6 +134,38 @@ body {
   background-color: #f5f5f5;
 }
 
+.image-title-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  z-index: 10;
+  width: max-content;
+  min-width: 150px;
+}
+
+.image-title-dropdown div {
+  padding: 8px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.image-title-dropdown div:hover {
+  background-color: #f5f5f5;
+}
+
+.image-name {
+  cursor: pointer;
+  position: relative;
+}
+
+.image-name:hover {
+  text-decoration: underline;
+}
+
 #image-list li .delete-image-icon {
   cursor: pointer;
   padding: 5px;

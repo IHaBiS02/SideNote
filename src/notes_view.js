@@ -513,6 +513,57 @@ async function renderImagesList() {
       const imageName = document.createElement('span');
       imageName.classList.add('image-name');
       imageName.textContent = `image_${imageId.substring(0, 8)}.png`;
+      
+      // Add click handler for image title dropdown
+      imageName.onclick = (e) => {
+        e.stopPropagation();
+        const currentTarget = e.currentTarget;
+        const isAlreadyOpen = currentTarget.querySelector('.image-title-dropdown');
+
+        // Close all dropdowns (both image title and notes dropdowns)
+        const allImageDropdowns = document.querySelectorAll('.image-title-dropdown');
+        const allNotesDropdowns = document.querySelectorAll('.notes-dropdown');
+        allImageDropdowns.forEach(d => d.remove());
+        allNotesDropdowns.forEach(d => d.remove());
+
+        if (!isAlreadyOpen) {
+          // Create and show the new dropdown
+          const dropdown = document.createElement('div');
+          dropdown.classList.add('image-title-dropdown');
+          
+          // Close dropdown when clicking on empty area of dropdown
+          dropdown.onclick = (e) => {
+            if (e.target === dropdown) {
+              dropdown.remove();
+            }
+          };
+          
+          const copyMarkdownItem = document.createElement('div');
+          copyMarkdownItem.textContent = 'Copy Image Markdown';
+          copyMarkdownItem.onclick = async (e) => {
+            e.stopPropagation();
+            const markdownText = `![Image](images/${imageId}.png)`;
+            try {
+              await navigator.clipboard.writeText(markdownText);
+              dropdown.remove();
+            } catch (err) {
+              console.error('Failed to copy to clipboard:', err);
+              // Fallback for older browsers
+              const textArea = document.createElement('textarea');
+              textArea.value = markdownText;
+              document.body.appendChild(textArea);
+              textArea.select();
+              document.execCommand('copy');
+              document.body.removeChild(textArea);
+              dropdown.remove();
+            }
+          };
+          
+          dropdown.appendChild(copyMarkdownItem);
+          currentTarget.appendChild(dropdown);
+        }
+      };
+      
       imageInfo.appendChild(imageName);
 
       li.appendChild(imageInfo);
@@ -531,9 +582,11 @@ async function renderImagesList() {
           const currentTarget = e.currentTarget;
           const isAlreadyOpen = currentTarget.querySelector('.notes-dropdown');
 
-          // Close all dropdowns
-          const allDropdowns = document.querySelectorAll('.notes-dropdown');
-          allDropdowns.forEach(d => d.remove());
+          // Close all dropdowns (both notes and image title dropdowns)
+          const allNotesDropdowns = document.querySelectorAll('.notes-dropdown');
+          const allImageDropdowns = document.querySelectorAll('.image-title-dropdown');
+          allNotesDropdowns.forEach(d => d.remove());
+          allImageDropdowns.forEach(d => d.remove());
 
           if (!isAlreadyOpen) {
             // Create and show the new dropdown.

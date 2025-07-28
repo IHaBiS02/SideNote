@@ -717,9 +717,16 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
 
 document.addEventListener('click', (e) => {
     if (imageManagementView.style.display === 'block') {
-        const openDropdown = document.querySelector('.notes-dropdown');
-        if (openDropdown && !e.target.closest('.usage-icon')) {
-            openDropdown.remove();
+        // Close notes dropdown if clicking outside of usage icon
+        const openNotesDropdown = document.querySelector('.notes-dropdown');
+        if (openNotesDropdown && !e.target.closest('.usage-icon')) {
+            openNotesDropdown.remove();
+        }
+        
+        // Close image title dropdown if clicking outside of image name
+        const openImageTitleDropdown = document.querySelector('.image-title-dropdown');
+        if (openImageTitleDropdown && !e.target.closest('.image-name')) {
+            openImageTitleDropdown.remove();
         }
     }
 });
