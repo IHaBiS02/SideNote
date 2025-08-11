@@ -16,16 +16,34 @@ Central state management for shared variables:
   - `setOriginalNoteContent(content)`: Sets original note content for change detection
   - `setIsPreview(value)`: Sets preview mode state
 
-## src/database.js
+## src/database/
 
-IndexedDB operations (all functions exported):
+IndexedDB operations are now modularized into separate files for better organization:
 
-- `initDB()`: Initializes the IndexedDB database
+### src/database/init.js
+
+Database initialization and shared instance management:
+
+- `initDB()`: Initializes the IndexedDB database and creates object stores
+- `getDB()`: Gets the shared database instance for other modules
+
+### src/database/notes.js
+
+Note-related database operations:
+
 - `saveNote(note)`: Saves a note object to the database
 - `getAllNotes()`: Retrieves all note objects from the database
 - `deleteNoteDB(id)`: Marks a note as deleted in the database
 - `restoreNoteDB(id)`: Restores a deleted note in the database
 - `deleteNotePermanentlyDB(id)`: Permanently deletes a note from the database
+
+**Internal functions** (not exported):
+- `_getNoteObject(id)`: Retrieves a note object from the database by its ID
+
+### src/database/images.js
+
+Image-related database operations:
+
 - `saveImage(id, blob)`: Saves an image to the database
 - `getImage(id)`: Retrieves an image blob from the database
 - `deleteImage(id)`: Marks an image as deleted in the database
@@ -34,8 +52,14 @@ IndexedDB operations (all functions exported):
 - `getAllImageObjectsFromDB()`: Retrieves all image objects from the database
 
 **Internal functions** (not exported):
-- `_getNoteObject(id)`: Retrieves a note object from the database by its ID
 - `_getImageObject(id)`: Retrieves an image object from the database by its ID
+
+### src/database/index.js
+
+Unified entry point for backward compatibility:
+
+- Re-exports all functions from the sub-modules for seamless integration
+- Maintains backward compatibility with existing imports
 
 ## src/dom.js
 

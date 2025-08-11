@@ -12,7 +12,11 @@ SideNote is a browser extension that provides a simple note-taking interface wit
 -   **`sidepanel.html`**: The main HTML file that defines the structure of the user interface, including all views (note list, editor, settings, etc.).
 -   **`src/`**: This directory contains all the JavaScript logic for the extension, broken down into modules.
     -   `main.js`: The main entry point. It initializes the application, loads data, handles the one-time migration of notes from `chrome.storage` to `IndexedDB`, and calls `initializeAllEvents()` to set up all event listeners.
-    -   `database.js`: Contains all functions for interacting with the `IndexedDB` database, for both notes and images.
+    -   `database/`: Directory containing modularized IndexedDB operations:
+        -   `init.js`: Database initialization and shared instance management
+        -   `notes.js`: Note-related database operations and CRUD functions
+        -   `images.js`: Image-related database operations and blob management
+        -   `index.js`: Unified entry point for backward compatibility
     -   `dom.js`: Contains DOM element references as constants for all UI elements used throughout the extension.
     -   `notes.js`: Contains the core logic for managing notes (sorting, deleting, pinning, restoring, etc.).
     -   `notes_view/`: Directory containing modularized UI rendering and view management:
@@ -76,12 +80,12 @@ The UI is a single-page application with several distinct "views" that are shown
 
 ### Function Breakdown
 
-#### Initialization & Data Management (`main.js`, `database.js`)
+#### Initialization & Data Management (`main.js`, `src/database/`)
 
--   **`initDB()`**: Initializes the IndexedDB database and creates the `images` and `notes` object stores.
+-   **`initDB()`**: Initializes the IndexedDB database and creates the `images` and `notes` object stores (located in `src/database/init.js`).
 -   **`loadAndMigrateData()`**: On startup, this function loads all data from `IndexedDB`. It also handles the one-time migration of notes from `chrome.storage.local` to `IndexedDB`.
--   **`saveNote()` / `getAllNotes()` / `deleteNoteDB()` / etc.**: A set of async functions in `database.js` to perform CRUD operations on note data in IndexedDB.
--   **`saveImage()` / `getImage()` / `deleteImage()` / etc.**: A set of async functions to perform CRUD operations on image data in IndexedDB.
+-   **`saveNote()` / `getAllNotes()` / `deleteNoteDB()` / etc.**: A set of async functions in `src/database/notes.js` to perform CRUD operations on note data in IndexedDB.
+-   **`saveImage()` / `getImage()` / `deleteImage()` / etc.**: A set of async functions in `src/database/images.js` to perform CRUD operations on image data in IndexedDB.
 -   **`sortNotes()`**: Sorts the `notes` array based on the `lastModified` timestamp.
 -   **`cleanupDeletedNotes()` / `cleanupDeletedImages()`**: Automatically and permanently deletes items from the recycle bin that are older than 30 days.
 
