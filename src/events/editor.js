@@ -8,12 +8,13 @@ import {
 } from '../dom.js';
 
 // Import functions from other modules
-import { sortNotes, renderNoteList } from '../notes.js';
+import { sortNotes } from '../notes.js';
 import { 
   openNote,
   renderMarkdown,
   togglePreview,
-  showImageModal
+  showImageModal,
+  renderNoteList
 } from '../notes_view.js';
 import { saveNote, saveImage } from '../database.js';
 import { pushToHistory } from '../history.js';

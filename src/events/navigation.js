@@ -14,7 +14,7 @@ import {
 } from '../dom.js';
 
 // Import functions from other modules
-import { sortNotes, renderNoteList } from '../notes.js';
+import { sortNotes } from '../notes.js';
 import { 
   showListView,
   showEditorView,
@@ -22,7 +22,8 @@ import {
   showLicenseView,
   showRecycleBinView,
   showImageManagementView,
-  openNote 
+  openNote,
+  renderNoteList
 } from '../notes_view.js';
 import { saveNote } from '../database.js';
 
