@@ -102,24 +102,55 @@ File processing (functions exported):
 
 - `processSnote(zip)`: Processes a .snote or .snotes file and imports the note with images
 
-## src/notes_view.js
+## src/notes_view/
 
-UI rendering and view management (functions exported):
+UI rendering and view management is now modularized into separate files for better organization:
 
-- `renderNoteList()`: Renders the list of notes in the main view
-- `openNote(noteId, inEditMode, addToHistory)`: Opens a note in the editor
+### src/notes_view/view-manager.js
+
+View switching and navigation management:
+
 - `showListView(addToHistory)`: Shows the main notes list view
 - `showEditorView(addToHistory)`: Shows the note editor view
 - `showSettingsView(addToHistory)`: Shows the settings view
 - `showLicenseView(addToHistory)`: Shows the license information view
 - `showRecycleBinView(addToHistory)`: Shows the recycle bin view
 - `showImageManagementView(addToHistory)`: Shows the image management view
-- `renderDeletedItemsList()`: Renders the list of deleted items in recycle bin
+
+### src/notes_view/note-renderer.js
+
+Note list and editor functionality:
+
+- `renderNoteList()`: Renders the list of notes in the main view
+- `openNote(noteId, inEditMode, addToHistory)`: Opens a note in the editor
+
+### src/notes_view/markdown-renderer.js
+
+Markdown and image rendering functionality:
+
 - `renderMarkdown()`: Renders markdown content as HTML in preview
 - `renderImages()`: Renders images in the markdown preview
 - `togglePreview()`: Toggles between editor and preview modes
+
+### src/notes_view/recycle-bin-renderer.js
+
+Recycle bin rendering and management:
+
+- `renderDeletedItemsList()`: Renders the list of deleted items in recycle bin
+
+### src/notes_view/image-manager.js
+
+Image modal and management functionality:
+
 - `showImageModal(blobUrl)`: Shows an image in a modal dialog
 - `renderImagesList()`: Renders the list of images in image management
+
+### src/notes_view/index.js
+
+Unified entry point for backward compatibility:
+
+- Re-exports all functions from the sub-modules for seamless integration
+- Maintains backward compatibility with existing imports
 
 ## src/events/
 
