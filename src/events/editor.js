@@ -66,7 +66,8 @@ function initializeEditorEvents() {
       },
       isPinned: false
     };
-    notes.unshift(newNote);  // Add to top of list
+    notes.push(newNote);  // Add to notes array
+    sortNotes();  // Sort to proper position (pinned notes first, then by lastModified)
     await saveNote(newNote);
     const inEditMode = false;
     const noteId = newNote.id;
