@@ -18,12 +18,13 @@ import {
 } from '../dom.js';
 
 // Import functions from other modules
-import { emptyRecycleBin, sortNotes, renderNoteList } from '../notes.js';
+import { emptyRecycleBin, sortNotes } from '../notes.js';
 import {
   showSettingsView,
   showLicenseView,
   showRecycleBinView,
-  showImageManagementView
+  showImageManagementView,
+  renderNoteList
 } from '../notes_view.js';
 import {
   saveGlobalSettings,
