@@ -6,7 +6,7 @@ import {
 } from '../dom.js';
 
 // Import required functions from other modules
-import { pushToHistory } from '../history.js';
+import { pushToHistory, getHistory, getHistoryIndex, moveBack } from '../history.js';
 import { getImage } from '../database/index.js';
 
 // Import state from state module
@@ -103,7 +103,9 @@ async function renderImages() {
  */
 // 편집/미리보기 모드 전환
 function togglePreview() {
+  const wasEditMode = !isPreview; // 전환 전 edit 모드 여부 저장
   setIsPreview(!isPreview);
+  
   if (isPreview) {
     // 미리보기 모드로 전환
     renderMarkdown();
@@ -117,6 +119,28 @@ function togglePreview() {
     toggleViewButton.textContent = 'Preview';
     markdownEditor.focus();
   }
+
+  // History 처리: edit -> preview 전환 시 이전 노드가 preview면 돌아가기
+  if (wasEditMode && isPreview) {
+    // edit에서 preview로 전환하는 경우
+    const history = getHistory();
+    const currentIndex = getHistoryIndex();
+    
+    // 이전 history node가 존재하고, 같은 노트의 preview 모드인지 확인
+    if (currentIndex > 0 && history[currentIndex - 1]) {
+      const previousNode = history[currentIndex - 1];
+      if (previousNode.view === 'editor' && 
+          previousNode.params && 
+          previousNode.params.noteId === activeNoteId && 
+          !previousNode.params.inEditMode) {
+        // 이전 노드가 같은 노트의 preview 모드면 뒤로 가기
+        moveBack();
+        return;
+      }
+    }
+  }
+
+  // 일반적인 경우: 새 history 항목 추가
   pushToHistory({ view: 'editor', params: { noteId: activeNoteId, inEditMode: !isPreview } });
 }
 
