@@ -2,7 +2,7 @@
 // 네비게이션 히스토리를 관리하는 모듈
 let navigationHistory = [];  // 네비게이션 히스토리 스택
 let historyIndex = -1; // 현재 히스토리 상태를 가리키는 인덱스
-const HISTORY_STACK_LIMIT = 20;  // 히스토리 최대 크기 제한
+const HISTORY_STACK_LIMIT = 512;  // 히스토리 최대 크기 제한
 
 /**
  * Pushes a new state to the navigation history.

@@ -127,7 +127,10 @@ newNoteButton.addEventListener('click', async () => {
   };
   notes.unshift(newNote);  // 리스트 맨 위에 추가
   await saveNote(newNote);
-  openNote(newNote.id, true);  // 편집 모드로 열기
+  inEditMode = false;
+  noteId = newNote.id;
+  pushToHistory({ view: 'editor', params: { noteId, inEditMode } });
+  openNote(noteId, true);  // 편집 모드로 열기
 });
 
 const backButtons = [
