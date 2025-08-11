@@ -37,12 +37,17 @@ npm install
 - **chrome.storage.local**: Global settings only (migrated from for notes)
 
 ### Core Modules
-- **src/main.js**: Entry point, handles initialization and data migration
+- **src/main.js**: Entry point and application initialization (ES6 module)
+- **src/state.js**: Centralized state management for shared variables
 - **src/database.js**: IndexedDB operations for notes and images
-- **src/notes_view.js**: UI rendering and view management
-- **src/events.js**: Event listeners and user interactions
+- **src/dom.js**: DOM element references and selections
+- **src/utils.js**: Utility functions (timestamps, file handling, etc.)
+- **src/settings.js**: Global settings management and UI theme functions
+- **src/notes.js**: Note data operations (CRUD, sorting, pin/unpin)
+- **src/notes_view.js**: UI rendering and view management functions
 - **src/history.js**: Navigation history management
-- **src/import_export.js**: .snote/.snotes file handling
+- **src/import_export.js**: .snote/.snotes file processing
+- **src/events.js**: Event listeners and user interaction handlers
 
 ### Key Features Implementation
 - **Markdown Rendering**: Uses `marked.js` with `DOMPurify` sanitization

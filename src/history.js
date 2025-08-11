@@ -120,3 +120,17 @@ function goToHistoryState(index) {
         historyIndex = index;
     }
 }
+
+// Export all functions
+export {
+  pushToHistory,
+  moveBack,
+  moveForward,
+  canMoveBack,
+  canMoveForward,
+  getCurrentHistoryState,
+  clearHistory,
+  getHistory,
+  getHistoryIndex,
+  goToHistoryState
+};

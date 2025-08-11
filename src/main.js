@@ -1,3 +1,13 @@
+// Import all required modules  
+import { initDB, saveNote, getAllNotes, getAllImageObjectsFromDB, deleteNotePermanentlyDB, deleteImagePermanently } from './database.js';
+import { sortNotes } from './notes.js';
+import { applyFontSize, applyMode, updateAutoLineBreakButton, updateTildeReplacementButton } from './settings.js';
+import { renderNoteList, showListView } from './notes_view.js';
+import { pushToHistory } from './history.js';
+import { notes, deletedNotes, globalSettings, setNotes, setDeletedNotes, setGlobalSettings } from './state.js';
+// Import events.js for side effects (event listeners)
+import './events.js';
+
 // === 애플리케이션 초기화 ===
 
 // 스크립트 로드 시 데이터베이스 초기화
@@ -14,10 +24,10 @@ async function loadAndMigrateData() {
   const data = await browser.storage.local.get(['globalSettings', 'notes', 'deletedNotes']);
   const loadedSettings = data.globalSettings;
   if (loadedSettings) {
-    globalSettings = loadedSettings;
+    setGlobalSettings(loadedSettings);
   } else {
     // 기본 전역 설정
-    globalSettings = {
+    setGlobalSettings({
       title: 'default',            // 노트 제목 설정
       fontSize: 12,                // 글꼴 크기
       autoLineBreak: true,         // 자동 줄바꿈
@@ -25,7 +35,7 @@ async function loadAndMigrateData() {
       autoAddSpaces: true,         // Enter 시 자동 공백 추가
       preventUsedImageDeletion: true, // 사용 중인 이미지 삭제 방지
       mode: 'system'               // 다크 모드 설정
-    };
+    });
   }
 
   const loadedNotes = data.notes;
@@ -51,8 +61,8 @@ async function loadAndMigrateData() {
   // IndexedDB에서 모든 노트 로드
   const allNotesFromDB = await getAllNotes();
   // 활성 노트와 삭제된 노트 분리
-  notes = allNotesFromDB.filter(note => !note.metadata.deletedAt);
-  deletedNotes = allNotesFromDB.filter(note => note.metadata.deletedAt);
+  setNotes(allNotesFromDB.filter(note => !note.metadata.deletedAt));
+  setDeletedNotes(allNotesFromDB.filter(note => note.metadata.deletedAt));
 
   sortNotes();              // 노트 정렬
   renderNoteList();         // 노트 목록 렌더링
@@ -88,7 +98,7 @@ async function cleanupDeletedNotes() {
         await deleteNotePermanentlyDB(note.id);
     }
     // 메모리에서도 제거
-    deletedNotes = deletedNotes.filter(note => note.metadata.deletedAt >= thirtyDaysAgo);
+    setDeletedNotes(deletedNotes.filter(note => note.metadata.deletedAt >= thirtyDaysAgo));
 }
 
 // === 초기 화면 설정 ===

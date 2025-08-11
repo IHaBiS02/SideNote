@@ -1,3 +1,6 @@
+// Import required functions from database
+import { saveImage, saveNote } from './database.js';
+
 /**
  * Processes a .snote or .snotes file.
  * @param {JSZip} zip The JSZip object representing the zip file.
@@ -54,3 +57,6 @@ async function processSnote(zip) {
   await saveNote(newNote);
   return newNote;
 }
+
+// Export the function
+export { processSnote };
