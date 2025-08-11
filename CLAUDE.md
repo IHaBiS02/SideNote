@@ -76,7 +76,7 @@ git diff
 git log -n 5
 # Write commit message to commit_message.txt
 git commit -F commit_message.txt
-del commit_message.txt
+rm commit_message.txt
 ```
 When you commit to git, do not write 
 ```

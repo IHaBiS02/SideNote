@@ -10,7 +10,9 @@
       "Bash(git commit:*)",
       "Bash(del commit_message.txt)",
       "Bash(git add:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(mkdir:*)",
+      "Bash(del \"C:\\Users\\justp\\Documents\\SideNote\\src\\notes_view.js\")"
     ],
     "deny": []
   }

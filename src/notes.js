@@ -9,7 +9,7 @@ import {
 } from './database.js';
 
 // Import required functions from notes_view
-import { renderNoteList, renderDeletedItemsList } from './notes_view.js';
+import { renderNoteList, renderDeletedItemsList } from './notes_view/index.js';
 
 // Import state from state module
 import { notes, deletedNotes, setNotes, setDeletedNotes } from './state.js';

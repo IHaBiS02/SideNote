@@ -24,7 +24,7 @@ import {
   showImageManagementView,
   openNote,
   renderNoteList
-} from '../notes_view.js';
+} from '../notes_view/index.js';
 import { saveNote } from '../database.js';
 
 // Import state from state module
