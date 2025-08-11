@@ -1,16 +1,20 @@
-let notes = [];
-let deletedNotes = [];
+// === 노트 데이터 배열 ===
+let notes = [];         // 활성 노트 목록
+let deletedNotes = [];  // 삭제된 노트 목록 (휴지통)
 
 /**
  * Sorts the notes array.
  */
 function sortNotes() {
   notes.sort((a, b) => {
+    // 고정된 노트는 항상 위에 표시
     if (a.isPinned && !b.isPinned) return -1;
     if (!a.isPinned && b.isPinned) return 1;
+    // 둘 다 고정된 경우 고정된 시간 순서대로
     if (a.isPinned && b.isPinned) {
         return (a.pinnedAt || 0) - (b.pinnedAt || 0);
     }
+    // 일반 노트는 최근 수정 시간 순서대로
     return b.metadata.lastModified - a.metadata.lastModified;
   });
 }
@@ -22,8 +26,11 @@ function sortNotes() {
 async function deleteNote(noteId) {
   const noteIndex = notes.findIndex(n => n.id === noteId);
   if (noteIndex > -1) {
+    // 활성 목록에서 제거
     const [deletedNote] = notes.splice(noteIndex, 1);
+    // 삭제 시간 기록 (소프트 삭제)
     deletedNote.metadata.deletedAt = Date.now();
+    // 휴지통으로 이동
     deletedNotes.push(deletedNote);
     await deleteNoteDB(noteId);
     renderNoteList();
@@ -37,10 +44,13 @@ async function deleteNote(noteId) {
 async function togglePin(noteId) {
     const note = notes.find(n => n.id === noteId);
     if (note) {
+        // 고정 상태 토글
         note.isPinned = !note.isPinned;
         if (note.isPinned) {
+            // 고정 시간 기록
             note.pinnedAt = Date.now();
         } else {
+            // 고정 해제 시 시간 정보 삭제
             delete note.pinnedAt;
         }
         sortNotes();
@@ -56,9 +66,13 @@ async function togglePin(noteId) {
 async function restoreNote(noteId) {
   const noteIndex = deletedNotes.findIndex(n => n.id === noteId);
   if (noteIndex > -1) {
+    // 휴지통에서 제거
     const [restoredNote] = deletedNotes.splice(noteIndex, 1);
+    // 복원 시간으로 업데이트
     restoredNote.metadata.lastModified = Date.now();
+    // 삭제 타임스탬프 제거
     delete restoredNote.metadata.deletedAt;
+    // 활성 목록으로 이동
     notes.push(restoredNote);
     sortNotes();
     await restoreNoteDB(noteId);
@@ -80,11 +94,13 @@ async function deleteNotePermanently(noteId) {
  * Empties the recycle bin.
  */
 async function emptyRecycleBin() {
+    // 모든 삭제된 노트 영구 삭제
     for (const note of deletedNotes) {
         await deleteNotePermanentlyDB(note.id);
     }
     deletedNotes = [];
 
+    // 모든 삭제된 이미지 영구 삭제
     const imageObjects = await getAllImageObjectsFromDB();
     const deletedImages = imageObjects.filter(img => img.deletedAt);
     for (const image of deletedImages) {

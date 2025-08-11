@@ -1,7 +1,8 @@
 // src/history.js
-let navigationHistory = [];
-let historyIndex = -1; // Points to the current state in the history
-const HISTORY_STACK_LIMIT = 20;
+// 네비게이션 히스토리를 관리하는 모듈
+let navigationHistory = [];  // 네비게이션 히스토리 스택
+let historyIndex = -1; // 현재 히스토리 상태를 가리키는 인덱스
+const HISTORY_STACK_LIMIT = 20;  // 히스토리 최대 크기 제한
 
 /**
  * Pushes a new state to the navigation history.
@@ -10,23 +11,26 @@ const HISTORY_STACK_LIMIT = 20;
  */
 function pushToHistory(state) {
     const currentState = getCurrentHistoryState();
-    // Avoid pushing identical consecutive states
+    // 동일한 상태가 연속적으로 추가되는 것 방지
     if (currentState && currentState.view === state.view && JSON.stringify(currentState.params || {}) === JSON.stringify(state.params || {})) {
         return;
     }
 
-    // If we've gone back and are now creating a new path, truncate the future history
+    // 뒤로 간 상태에서 새로운 경로를 만들면 미래 히스토리 삭제
     if (historyIndex < navigationHistory.length - 1) {
         navigationHistory = navigationHistory.slice(0, historyIndex + 1);
+        // 히스토리가 잘렸음을 알리는 이벤트 발생
         document.dispatchEvent(new CustomEvent('historytruncated'));
     }
 
+    // 새 상태를 히스토리에 추가
     navigationHistory.push(state);
     historyIndex++;
 
+    // 히스토리 크기 제한 초과 시 가장 오래된 항목 제거
     if (navigationHistory.length > HISTORY_STACK_LIMIT) {
         navigationHistory.shift();
-        historyIndex--; // Adjust index because we shifted the array
+        historyIndex--; // 배열 shift로 인한 인덱스 조정
     }
 }
 
@@ -36,7 +40,7 @@ function pushToHistory(state) {
  */
 function moveBack() {
     if (canMoveBack()) {
-        historyIndex--;
+        historyIndex--;  // 인덱스를 하나 감소
         return getCurrentHistoryState();
     }
     return undefined;
@@ -111,6 +115,7 @@ function getHistoryIndex() {
  * @param {number} index The index to navigate to.
  */
 function goToHistoryState(index) {
+    // 유효한 인덱스 범위 확인 후 이동
     if (index >= 0 && index < navigationHistory.length) {
         historyIndex = index;
     }

@@ -1,10 +1,13 @@
-let activeNoteId = null;
-let originalNoteContent = '';
-let isPreview = false;
+// === 전역 상태 변수 ===
+let activeNoteId = null;        // 현재 편집 중인 노트 ID
+let originalNoteContent = '';   // 노트의 원래 내용 (뒤로가기 시 저장 확인용)
+let isPreview = false;          // 미리보기 모드 여부
 
 /**
  * Renders the list of notes.
  */
+// === 노트 목록 렌더링 ===
+
 function renderNoteList() {
   noteList.innerHTML = '';
   if (!Array.isArray(notes)) return;
@@ -51,19 +54,23 @@ function renderNoteList() {
  * @param {boolean} inEditMode Whether to open the note in edit mode.
  * @param {boolean} addToHistory Whether to add this action to the history.
  */
+// === 노트 열기 및 편집 ===
+
 function openNote(noteId, inEditMode = false, addToHistory = true) {
   const note = notes.find(n => n.id === noteId);
   if (note) {
     activeNoteId = noteId;
-    originalNoteContent = note.content; // Store original content
+    originalNoteContent = note.content; // 원본 내용 저장 (변경 감지용)
     editorTitle.textContent = note.title;
     markdownEditor.value = note.content;
+    // 노트 설정 적용 (폰트 크기 등)
     const fontSize = note.settings.fontSize || globalSettings.fontSize || 12;
     applyFontSize(fontSize);
     updateAutoLineBreakButton();
     updateTildeReplacementButton();
     renderMarkdown();
     showEditorView(false);
+    // 모드 설정 (편집/미리보기)
     isPreview = !inEditMode;
     if (isPreview) {
       htmlPreview.style.display = 'block';
@@ -81,12 +88,15 @@ function openNote(noteId, inEditMode = false, addToHistory = true) {
   }
 }
 
+// === 뷰 전환 함수들 ===
+
 /**
  * Shows the list view.
  * @param {boolean} addToHistory Whether to add this action to the history.
  */
 function showListView(addToHistory = true) {
   activeNoteId = null;
+  // 모든 뷰 숨기고 노트 목록만 표시
   listView.style.display = 'block';
   editorView.style.display = 'none';
   settingsView.style.display = 'none';
@@ -94,7 +104,7 @@ function showListView(addToHistory = true) {
   imageManagementView.style.display = 'none';
   licenseView.style.display = 'none';
   if (addToHistory) {
-    clearHistory();
+    clearHistory();  // 리스트 뷰로 돌아오면 히스토리 초기화
     pushToHistory({ view: 'list' });
   }
   renderNoteList();
@@ -185,13 +195,15 @@ function showImageManagementView(addToHistory = true) {
 /**
  * Renders the list of deleted items.
  */
+// === 휴지통 항목 렌더링 ===
+
 async function renderDeletedItemsList() {
   deletedItemsList.innerHTML = '';
 
-  // 1. Get deleted notes and images
+  // 1. 삭제된 노트와 이미지 가져오기
   const deletedImageObjects = (await getAllImageObjectsFromDB()).filter(img => img.deletedAt);
   
-  // 2. Combine and sort
+  // 2. 노트와 이미지를 합쳐서 정렬
   const deletedItems = [
     ...deletedNotes.map(n => ({ ...n, type: 'note', deletedAt: n.metadata.deletedAt })),
     ...deletedImageObjects.map(i => ({ ...i, type: 'image', deletedAt: i.deletedAt }))
@@ -286,7 +298,10 @@ async function renderDeletedItemsList() {
 /**
  * Renders the markdown content as HTML.
  */
+// === 마크다운 렌더링 ===
+
 function renderMarkdown() {
+  // 커스텀 렌더러 설정 (체크박스 지원)
   const renderer = new marked.Renderer();
   renderer.listitem = function(text, task, checked) {
     if (task) {
@@ -298,10 +313,12 @@ function renderMarkdown() {
     return `<input type="checkbox" ${checked ? 'checked' : ''}>`;
   };
 
+  // marked 옵션 설정
   marked.setOptions({
-    gfm: true,
+    gfm: true,        // GitHub Flavored Markdown 사용
     renderer: renderer,
     highlight: function(code, lang) {
+      // 코드 하이라이팅 (highlight.js 사용)
       const language = hljs.getLanguage(lang) ? lang : 'plaintext';
       return hljs.highlight(code, { language }).value;
     }
@@ -312,17 +329,18 @@ function renderMarkdown() {
     ADD_TAGS: ['pre', 'code', 'span'],
     ADD_ATTR: ['class']
   });
+  // 코드 블록에 줄 번호 추가
   htmlPreview.querySelectorAll('pre code').forEach((block) => {
-    // block(<code>)의 텍스트 컨텐츠를 가져와 줄바꿈(\n)으로 분리하여 줄 수를 계산합니다。
+    // 줄 수 계산
     const lineCount = block.textContent.split('\n').length;
-    // 줄 수에 따라 부모 요소인 <pre> 태그에 클래스를 추가합니다。
+    // 줄 수에 따라 다른 스타일 적용
     if (lineCount === 2) {
       block.parentElement.classList.add('single-line-code');
     } else {
       block.parentElement.classList.add('multi-line-code');
     }
 
-    // 기존 라인 넘버 기능은 그대로 호출합니다。
+    // 줄 번호 추가
     hljs.lineNumbersBlock(block);
   });
   hljs.highlightAll();
@@ -333,13 +351,16 @@ function renderMarkdown() {
 /**
  * Renders images in the preview.
  */
+// === 이미지 렌더링 ===
+
 async function renderImages() {
   const images = htmlPreview.querySelectorAll('img');
   for (const img of images) {
     const src = img.getAttribute('src');
+    // images/[id].png 형식의 내부 이미지 처리
     if (src && src.startsWith('images/')) {
       const imageId = src.substring(7, src.lastIndexOf('.'));
-      img.dataset.imageId = imageId; // Add data-id for scrolling
+      img.dataset.imageId = imageId; // 스크롤용 data 속성 추가
       try {
         const imageBlob = await getImage(imageId);
         if (imageBlob) {
@@ -359,14 +380,17 @@ async function renderImages() {
 /**
  * Toggles between the editor and preview modes.
  */
+// 편집/미리보기 모드 전환
 function togglePreview() {
   isPreview = !isPreview;
   if (isPreview) {
+    // 미리보기 모드로 전환
     renderMarkdown();
     htmlPreview.style.display = 'block';
     markdownEditor.style.display = 'none';
     toggleViewButton.textContent = 'Edit';
   } else {
+    // 편집 모드로 전환
     htmlPreview.style.display = 'none';
     markdownEditor.style.display = 'block';
     toggleViewButton.textContent = 'Preview';
@@ -379,7 +403,10 @@ function togglePreview() {
  * Shows an image in a modal.
  * @param {string} blobUrl The blob URL of the image to show.
  */
+// === 이미지 모달 ===
+
 function showImageModal(blobUrl) {
+  // 모달 배경 생성
   const modal = document.createElement('div');
   modal.classList.add('image-preview-modal');
   modal.style.position = 'fixed';
@@ -392,6 +419,7 @@ function showImageModal(blobUrl) {
   modal.style.boxSizing = 'border-box';
   modal.style.padding = '10%';
   modal.style.zIndex = '1000';
+  // 배경 클릭 시 닫기
   modal.onclick = (event) => {
       if (event.target === modal) {
           document.body.removeChild(modal);
@@ -401,7 +429,7 @@ function showImageModal(blobUrl) {
   const modalImg = document.createElement('img');
   modalImg.src = blobUrl;
   
-  let zoomState = 0; // 0: fit-to-screen, 1: full-size
+  let zoomState = 0; // 0: 화면에 맞춤, 1: 원본 크기
   
   modalImg.onload = () => {
       const naturalWidth = modalImg.naturalWidth;
@@ -485,10 +513,13 @@ function showImageModal(blobUrl) {
 /**
  * Renders the list of images.
  */
+// === 이미지 관리 화면 렌더링 ===
+
 async function renderImagesList() {
   imageList.innerHTML = '';
   try {
     const imageObjects = await getAllImageObjectsFromDB();
+    // 모든 노트 내용을 합쳐서 이미지 사용 여부 확인
     const allNoteContent = notes.map(n => n.content).join('\n');
 
     const activeImages = imageObjects.filter(img => !img.deletedAt);
@@ -514,13 +545,13 @@ async function renderImagesList() {
       imageName.classList.add('image-name');
       imageName.textContent = `image_${imageId.substring(0, 8)}.png`;
       
-      // Add click handler for image title dropdown
+      // 이미지 이름 클릭 시 드롭다운 메뉴
       imageName.onclick = (e) => {
         e.stopPropagation();
         const currentTarget = e.currentTarget;
         const isAlreadyOpen = currentTarget.querySelector('.image-title-dropdown');
 
-        // Close all dropdowns (both image title and notes dropdowns)
+        // 모든 드롭다운 닫기
         const allImageDropdowns = document.querySelectorAll('.image-title-dropdown');
         const allNotesDropdowns = document.querySelectorAll('.notes-dropdown');
         allImageDropdowns.forEach(d => d.remove());
@@ -568,6 +599,7 @@ async function renderImagesList() {
 
       li.appendChild(imageInfo);
 
+      // 사용 여부 표시 아이콘
       const usageIcon = document.createElement('span');
       usageIcon.classList.add('usage-icon');
       const isUsed = allNoteContent.includes(imageId);
@@ -619,12 +651,13 @@ async function renderImagesList() {
       deleteIcon.title = 'Move Image to Recycle Bin';
       deleteIcon.onclick = async (e) => {
         e.stopPropagation();
+        // 사용 중인 이미지 삭제 방지 설정 확인
         if (globalSettings.preventUsedImageDeletion && isUsed) {
             return;
         }
         try {
           await deleteImage(imageId);
-          renderImagesList(); // Refresh the list
+          renderImagesList(); // 목록 새로고침
         } catch (err) {
           console.error('Failed to delete image:', err);
         }

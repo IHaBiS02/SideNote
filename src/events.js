@@ -1,3 +1,6 @@
+// === 네비게이션 관련 함수 ===
+
+// 주어진 상태로 네비게이션 (뷰 전환)
 async function navigateToState(state) {
     if (!state) {
         showListView(false);
@@ -49,8 +52,10 @@ async function navigateToState(state) {
     }
 }
 
+// 이전 화면으로 돌아가기
 async function goBack() {
     const currentState = getCurrentHistoryState();
+    // 현재 에디터 화면이면 변경사항 저장
     if (currentState && currentState.view === 'editor') {
         const note = notes.find(n => n.id === currentState.params.noteId);
         if (note && markdownEditor.value !== originalNoteContent) {
@@ -84,6 +89,9 @@ async function goBack() {
     }
 }
 
+// === 노트 생성/편집 이벤트 ===
+
+// 새 노트 생성
 newNoteButton.addEventListener('click', async () => {
   const now = Date.now();
   const newNote = {
@@ -99,9 +107,9 @@ newNoteButton.addEventListener('click', async () => {
     },
     isPinned: false
   };
-  notes.unshift(newNote);
+  notes.unshift(newNote);  // 리스트 맨 위에 추가
   await saveNote(newNote);
-  openNote(newNote.id, true);
+  openNote(newNote.id, true);  // 편집 모드로 열기
 });
 
 const backButtons = [
@@ -112,8 +120,10 @@ const backButtons = [
     imageManagementBackButton
 ];
 
+// 모든 뒤로가기 버튼에 이벤트 리스너 추가
 backButtons.forEach(button => {
     button.addEventListener('click', goBack);
+    // 오른쪽 클릭 시 히스토리 드롭다운 표시
     button.addEventListener('contextmenu', (e) => {
         e.preventDefault();
         showHistoryDropdown(e.currentTarget);
@@ -208,6 +218,7 @@ function refreshHistoryDropdown() {
 
 document.addEventListener('historytruncated', refreshHistoryDropdown);
 
+// 마크다운 에디터 입력 이벤트 (자동 저장)
 markdownEditor.addEventListener('input', async () => {
   const note = notes.find(n => n.id === activeNoteId);
   if (note) {
@@ -215,6 +226,7 @@ markdownEditor.addEventListener('input', async () => {
     note.metadata.lastModified = Date.now();
     const titleSource = note.settings.title || globalSettings.title;
     let titleChanged = false;
+    // 기본 제목 설정 시 첫 줄을 제목으로 사용
     if (titleSource === 'default') {
       const newTitle = note.content.trim().split('\n')[0].substring(0, 30) || 'New Note';
       if (note.title !== newTitle) {
@@ -231,12 +243,14 @@ markdownEditor.addEventListener('input', async () => {
   }
 });
 
+// 붙여넣기 이벤트 (이미지 및 텍스트 처리)
 markdownEditor.addEventListener('paste', async (e) => {
   e.preventDefault();
 
   const items = Array.from(e.clipboardData.items);
   const imageItem = items.find(item => item.kind === 'file' && item.type.startsWith('image/'));
 
+  // 이미지 붙여넣기 처리
   if (imageItem) {
     const imageFile = imageItem.getAsFile();
     const imageId = crypto.randomUUID();
@@ -250,12 +264,15 @@ markdownEditor.addEventListener('paste', async (e) => {
       return; 
     }
   } else {
+    // 텍스트 붙여넣기 처리
     let text = e.clipboardData.getData('text/plain');
 
+    // 틸던(~) 캐릭터 자동 이스케이프
     if (globalSettings.tildeReplacement) {
       text = text.replace(/~/g, '\~');
     }
 
+    // 자동 줄바꿈 처리 (Markdown 줄바꿈을 위해 두 공백 추가)
     if (globalSettings.autoLineBreak) {
       const lines = text.split(/\r?\n/);
       if (lines.length > 1) {
@@ -274,7 +291,10 @@ markdownEditor.addEventListener('paste', async (e) => {
 
 toggleViewButton.addEventListener('click', togglePreview);
 
+// === 키보드 단축키 이벤트 ===
+
 markdownEditor.addEventListener('keydown', (e) => {
+  // Enter 키 누를 때 자동으로 줄 끝에 두 공백 추가
   if (e.key === 'Enter' && !e.isComposing && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
     if (globalSettings.autoAddSpaces) {
       const start = markdownEditor.selectionStart;
@@ -288,6 +308,7 @@ markdownEditor.addEventListener('keydown', (e) => {
   }
 
 
+  // Shift+Enter로 미리보기 토글
   if (e.shiftKey && e.key === 'Enter') {
     e.preventDefault();
     togglePreview();
@@ -296,7 +317,9 @@ markdownEditor.addEventListener('keydown', (e) => {
 
 htmlPreview.addEventListener('dblclick', togglePreview);
 
+// 미리보기 영역 클릭 이벤트
 htmlPreview.addEventListener('click', async (e) => {
+  // 체크박스 클릭 처리
   if (e.target.tagName === 'INPUT' && e.target.type === 'checkbox') {
     const checkboxes = Array.from(htmlPreview.querySelectorAll('input[type="checkbox"]'));
     const checkboxIndex = checkboxes.indexOf(e.target);
@@ -333,14 +356,17 @@ htmlPreview.addEventListener('click', async (e) => {
       }
     }
   } else if (e.target.tagName === 'IMG') {
+    // 이미지 클릭 시 모달 표시
     showImageModal(e.target.src);
   }
 });
 
+// 제목 더블클릭 시 편집 모드
 editorTitle.addEventListener('dblclick', () => {
   const note = notes.find(n => n.id === activeNoteId);
   if (note) {
     let titleSource = note.settings.title || globalSettings.title;
+    // 기본 제목일 때 커스텀 제목으로 변경
     if (titleSource === 'default') {
       note.settings.title = 'custom';
       titleSource = 'custom';
@@ -386,6 +412,9 @@ editorTitle.addEventListener('dblclick', () => {
   }
 });
 
+// === 설정 관련 이벤트 ===
+
+// 노트 설정 열기
 settingsButton.addEventListener('click', () => {
   isGlobalSettings = false;
   const note = notes.find(n => n.id === activeNoteId);
@@ -542,10 +571,14 @@ preventUsedImageDeletionCheckbox.addEventListener('change', () => {
     saveGlobalSettings();
 });
 
+// === 가져오기/내보내기 이벤트 ===
+
+// 전체 노트 내보내기
 globalExportButton.addEventListener('click', async () => {
   const zip = new JSZip();
   const timestamp = getTimestamp();
 
+  // 모든 노트를 ZIP으로 압축
   for (const note of notes) {
     const noteFolder = zip.folder(note.id);
     
@@ -621,6 +654,7 @@ importNoteButton.addEventListener('click', () => {
   importNoteInput.click();
 });
 
+// 전체 가져오기 파일 선택 시
 globalImportInput.addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) {
@@ -629,15 +663,18 @@ globalImportInput.addEventListener('change', async (e) => {
 
   try {
     const zip = await JSZip.loadAsync(file);
+    // 단일 노트 파일 (.snote)
     if (file.name.endsWith('.snote')) {
       const newNote = await processSnote(zip);
       newNote.metadata.lastModified = Date.now();
       notes.push(newNote);
       await saveNote(newNote);
     } else if (file.name.endsWith('.snotes')) {
+      // 다중 노트 파일 (.snotes)
       const newNotes = [];
       const topLevelFolders = new Set();
       
+      // 최상위 폴더 찾기 (각 폴더가 하나의 노트)
       for (const path in zip.files) {
         if (path.endsWith('/') && path.split('/').length === 2) {
           topLevelFolders.add(path);
@@ -698,32 +735,39 @@ importNoteInput.addEventListener('change', async (e) => {
   importNoteInput.value = '';
 });
 
+// === 전역 키보드 이벤트 ===
+
+// ESC 키로 닫기/뒤로가기
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
+    // 이미지 모달이 열려있으면 먼저 닫기
     const imagePreviewModal = document.querySelector('.image-preview-modal');
     if (imagePreviewModal) {
       document.body.removeChild(imagePreviewModal);
       return;
     }
+    // 그렇지 않으면 뒤로가기
     goBack();
   }
 });
 
+// 시스템 테마 변경 감지
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
     if (globalSettings.mode === 'system') {
         applyMode('system');
     }
 });
 
+// 이미지 관리 화면 드롭다운 닫기
 document.addEventListener('click', (e) => {
     if (imageManagementView.style.display === 'block') {
-        // Close notes dropdown if clicking outside of usage icon
+        // 사용 아이콘 외부 클릭 시 노트 드롭다운 닫기
         const openNotesDropdown = document.querySelector('.notes-dropdown');
         if (openNotesDropdown && !e.target.closest('.usage-icon')) {
             openNotesDropdown.remove();
         }
         
-        // Close image title dropdown if clicking outside of image name
+        // 이미지 이름 외부 클릭 시 이미지 제목 드롭다운 닫기
         const openImageTitleDropdown = document.querySelector('.image-title-dropdown');
         if (openImageTitleDropdown && !e.target.closest('.image-name')) {
             openImageTitleDropdown.remove();
