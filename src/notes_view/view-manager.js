@@ -58,7 +58,7 @@ function showEditorView(addToHistory = true) {
   imageManagementView.style.display = 'none';
   licenseView.style.display = 'none';
   if (addToHistory) {
-    pushToHistory({ view: 'editor', params: { noteId: activeNoteId, isPreview } });
+    pushToHistory({ view: 'editor', params: { noteId: activeNoteId, inEditMode: !isPreview } });
   }
 }
 

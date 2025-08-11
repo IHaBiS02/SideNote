@@ -154,7 +154,9 @@ function populateHistoryDropdown(dropdown) {
         let title = state.view;
         if (state.view === 'editor' && state.params && state.params.noteId) {
             const note = notes.find(n => n.id === state.params.noteId);
-            title = note ? `Editor: ${note.title}` : 'Editor: Untitled';
+            const noteTitle = note ? note.title : 'Untitled';
+            const mode = state.params.inEditMode ? 'Edit' : 'Preview';
+            title = `${mode}: ${noteTitle}`;
         } else {
             // Capitalize first letter
             title = state.view.charAt(0).toUpperCase() + state.view.slice(1);
