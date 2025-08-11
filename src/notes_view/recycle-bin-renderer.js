@@ -9,7 +9,7 @@ import {
   deleteNotePermanently 
 } from '../notes.js';
 
-import { getAllImageObjectsFromDB, deleteImage } from '../database.js';
+import { getAllImageObjectsFromDB, deleteImage, restoreImage, deleteImagePermanently } from '../database/index.js';
 
 // Import state from state module
 import { 
@@ -122,17 +122,6 @@ async function renderDeletedItemsList() {
   });
 }
 
-// We need to import these functions that are not yet defined in database.js
-// These are placeholders - they should be imported from the correct module
-const restoreImage = async (id) => {
-  // This function should be imported from database.js or implemented there
-  console.warn('restoreImage function not implemented');
-};
-
-const deleteImagePermanently = async (id) => {
-  // This function should be imported from database.js or implemented there
-  console.warn('deleteImagePermanently function not implemented');
-};
 
 // Export functions
 export {

@@ -1,5 +1,5 @@
 // Import all required modules  
-import { initDB, saveNote, getAllNotes, getAllImageObjectsFromDB, deleteNotePermanentlyDB, deleteImagePermanently } from './database.js';
+import { initDB, saveNote, getAllNotes, getAllImageObjectsFromDB, deleteNotePermanentlyDB, deleteImagePermanently } from './database/index.js';
 import { sortNotes } from './notes.js';
 import { applyFontSize, applyMode, updateAutoLineBreakButton, updateTildeReplacementButton } from './settings.js';
 import { renderNoteList, showListView } from './notes_view/index.js';

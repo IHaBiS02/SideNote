@@ -16,7 +16,7 @@ import {
   showImageModal,
   renderNoteList
 } from '../notes_view/index.js';
-import { saveNote, saveImage } from '../database.js';
+import { saveNote, saveImage } from '../database/index.js';
 import { pushToHistory } from '../history.js';
 import { extractImageIds } from '../utils.js';
 

@@ -33,7 +33,7 @@ import {
   updateAutoLineBreakButton,
   updateTildeReplacementButton
 } from '../settings.js';
-import { saveNote } from '../database.js';
+import { saveNote } from '../database/index.js';
 
 // Import state from state module
 import {

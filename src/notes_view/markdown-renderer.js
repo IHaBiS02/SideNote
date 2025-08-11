@@ -7,7 +7,7 @@ import {
 
 // Import required functions from other modules
 import { pushToHistory } from '../history.js';
-import { getImage } from '../database.js';
+import { getImage } from '../database/index.js';
 
 // Import state from state module
 import { 
