@@ -5,8 +5,8 @@ import { applyFontSize, applyMode, updateAutoLineBreakButton, updateTildeReplace
 import { renderNoteList, showListView } from './notes_view.js';
 import { pushToHistory } from './history.js';
 import { notes, deletedNotes, globalSettings, setNotes, setDeletedNotes, setGlobalSettings } from './state.js';
-// Import events.js for side effects (event listeners)
-import './events.js';
+// Import events initialization function
+import { initializeAllEvents } from './events/index.js';
 
 // === 애플리케이션 초기화 ===
 
@@ -113,3 +113,6 @@ updateTildeReplacementButton();   // 틸데 대체 버튼 상태
 applyFontSize(globalSettings.fontSize || 12);  // 글꼴 크기 적용
 applyMode(globalSettings.mode || 'system');    // 다크 모드 적용
 renderNoteList();                  // 노트 목록 렌더링
+
+// 모든 이벤트 리스너 초기화
+initializeAllEvents();
