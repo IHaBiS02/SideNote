@@ -12,7 +12,7 @@ import {
 
 // Import functions from other modules
 import { sortNotes } from '../notes.js';
-import { renderMarkdown, renderNoteList } from '../notes_view.js';
+import { renderMarkdown, renderNoteList } from '../notes_view/index.js';
 import { saveNote, getImage } from '../database.js';
 import { 
   getTimestamp, 

@@ -2,7 +2,7 @@
 import { initDB, saveNote, getAllNotes, getAllImageObjectsFromDB, deleteNotePermanentlyDB, deleteImagePermanently } from './database.js';
 import { sortNotes } from './notes.js';
 import { applyFontSize, applyMode, updateAutoLineBreakButton, updateTildeReplacementButton } from './settings.js';
-import { renderNoteList, showListView } from './notes_view.js';
+import { renderNoteList, showListView } from './notes_view/index.js';
 import { pushToHistory } from './history.js';
 import { notes, deletedNotes, globalSettings, setNotes, setDeletedNotes, setGlobalSettings } from './state.js';
 // Import events initialization function

@@ -25,7 +25,7 @@ import {
   showRecycleBinView,
   showImageManagementView,
   renderNoteList
-} from '../notes_view.js';
+} from '../notes_view/index.js';
 import {
   saveGlobalSettings,
   applyFontSize,
