@@ -121,18 +121,60 @@ UI rendering and view management (functions exported):
 - `showImageModal(blobUrl)`: Shows an image in a modal dialog
 - `renderImagesList()`: Renders the list of images in image management
 
-## src/events.js
+## src/events/
 
-Event listeners and user interactions (utility functions exported):
+Event handling is now modularized into separate files for better organization:
 
-- `insertTextAtCursor(textarea, text)`: Inserts text at cursor position in textarea
+### src/events/navigation.js
+
+Navigation, history, and back button functionality:
+
 - `navigateToState(state)`: Navigates to a specific view state
 - `goBack()`: Navigates to the previous view in history
 - `populateHistoryDropdown(dropdown)`: Populates history dropdown with items
 - `showHistoryDropdown(targetButton)`: Shows the history dropdown menu
 - `refreshHistoryDropdown()`: Refreshes the history dropdown if open
+- `initializeNavigationEvents()`: Sets up all navigation-related event listeners
 
-**Note**: This module primarily contains event listeners that are executed on import (side effects)
+### src/events/editor.js
+
+Note creation, markdown editor, and paste handling:
+
+- `insertTextAtCursor(textarea, text)`: Inserts text at cursor position in textarea
+- `initializeEditorEvents()`: Sets up all editor-related event listeners
+
+Handles: new note creation, markdown input, image paste, keyboard shortcuts, preview toggle, checkbox interactions, title editing
+
+### src/events/settings-events.js
+
+Settings-related event listeners:
+
+- `initializeSettingsEvents()`: Sets up all settings-related event listeners
+
+Handles: note/global settings, licenses, recycle bin, image management, confirmation dropdowns
+
+### src/events/import-export-events.js
+
+Import/export functionality:
+
+- `initializeImportExportEvents()`: Sets up all import/export event listeners
+
+Handles: note/global export, file import, .snote/.snotes processing
+
+### src/events/global-events.js
+
+Global keyboard events and system theme detection:
+
+- `initializeGlobalEvents()`: Sets up global event listeners
+
+Handles: ESC key, system theme changes, dropdown closing
+
+### src/events/index.js
+
+Unified entry point for all event modules:
+
+- `initializeAllEvents()`: Initializes all event listeners from all modules
+- Re-exports utility functions: `navigateToState`, `goBack`, `populateHistoryDropdown`, `showHistoryDropdown`, `refreshHistoryDropdown`, `insertTextAtCursor`
 
 ## src/main.js
 
@@ -142,7 +184,7 @@ Application entry point and initialization:
 - `cleanupDeletedImages()`: Deletes images in recycle bin for more than 30 days
 - `cleanupDeletedNotes()`: Deletes notes in recycle bin for more than 30 days
 
-**Note**: Main entry point that imports all other modules and initializes the application
+**Note**: Main entry point that imports all other modules, calls `initializeAllEvents()` to set up all event listeners, and initializes the application
 
 ## Module Architecture
 
@@ -151,5 +193,5 @@ The extension now uses ES6 modules with explicit imports/exports:
 1. **State Management**: Centralized in `state.js` with getter/setter functions
 2. **Dependency Injection**: Modules import only what they need from other modules
 3. **Entry Point**: `main.js` is loaded as `type="module"` in HTML
-4. **Side Effects**: Event listeners in `events.js` are executed on module import
+4. **Event Initialization**: Event listeners are organized in `src/events/` modules and initialized via `initializeAllEvents()` call
 5. **Circular Dependencies**: Avoided through careful module structure and state centralization
