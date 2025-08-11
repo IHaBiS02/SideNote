@@ -1,3 +1,4 @@
+// 전역 데이터베이스 인스턴스
 let db;
 
 /**
@@ -6,24 +7,30 @@ let db;
  */
 function initDB() {
   return new Promise((resolve, reject) => {
+    // IndexedDB 열기 요청 (버전 2)
     const request = indexedDB.open('SimpleNotesDB', 2);
 
+    // 데이터베이스 버전 업그레이드 시 실행 (첫 실행 또는 버전 변경 시)
     request.onupgradeneeded = (event) => {
       const db = event.target.result;
+      // images 객체 저장소가 없으면 생성
       if (!db.objectStoreNames.contains('images')) {
         db.createObjectStore('images', { keyPath: 'id' });
       }
+      // notes 객체 저장소가 없으면 생성
       if (!db.objectStoreNames.contains('notes')) {
         db.createObjectStore('notes', { keyPath: 'id' });
       }
     };
 
+    // 데이터베이스 열기 성공 시
     request.onsuccess = (event) => {
       db = event.target.result;
       console.log('Database initialized');
       resolve(db);
     };
 
+    // 데이터베이스 열기 실패 시
     request.onerror = (event) => {
       console.error('Database error:', event.target.errorCode);
       reject(event.target.error);
@@ -36,12 +43,15 @@ function initDB() {
  * @param {string} id The ID of the note to retrieve.
  * @returns {Promise<object>} A promise that resolves with the note object.
  */
+// 내부 함수: 노트 객체 가져오기 (직접 호출하지 않음)
 function _getNoteObject(id) {
     return new Promise((resolve, reject) => {
+        // 데이터베이스 초기화 확인
         if (!db) {
             reject('DB not initialized');
             return;
         }
+        // 읽기 전용 트랜잭션 생성
         const transaction = db.transaction(['notes'], 'readonly');
         const store = transaction.objectStore('notes');
         const request = store.get(id);
@@ -119,6 +129,7 @@ function deleteNoteDB(id) {
         try {
             const noteObject = await _getNoteObject(id);
             if (noteObject) {
+                // 소프트 삭제: deletedAt 타임스탬프 추가
                 noteObject.metadata.deletedAt = Date.now();
                 const transaction = db.transaction(['notes'], 'readwrite');
                 const store = transaction.objectStore('notes');
@@ -126,6 +137,7 @@ function deleteNoteDB(id) {
                 request.onsuccess = () => resolve();
                 request.onerror = (event) => reject(event.target.error);
             } else {
+                // 노트가 없어도 성공으로 처리
                 resolve();
             }
         } catch (err) {
@@ -148,6 +160,7 @@ function restoreNoteDB(id) {
         try {
             const noteObject = await _getNoteObject(id);
             if (noteObject) {
+                // deletedAt 속성 제거하여 복원
                 delete noteObject.metadata.deletedAt;
                 const transaction = db.transaction(['notes'], 'readwrite');
                 const store = transaction.objectStore('notes');
@@ -247,6 +260,7 @@ function saveImage(id, blob) {
 function getImage(id) {
   return new Promise((resolve, reject) => {
     _getImageObject(id).then(imageObject => {
+      // 삭제되지 않은 이미지만 반환
       if (imageObject && !imageObject.deletedAt) {
         resolve(imageObject.blob);
       } else {
@@ -277,7 +291,7 @@ function deleteImage(id) {
         request.onsuccess = () => resolve();
         request.onerror = (event) => reject(event.target.error);
       } else {
-        resolve(); // Image not found, nothing to do
+        resolve(); // 이미지를 찾을 수 없음, 아무 작업도 하지 않음
       }
     } catch (err) {
       reject(err);
