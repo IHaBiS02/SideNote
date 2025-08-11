@@ -11,12 +11,18 @@ SideNote is a browser extension that provides a simple note-taking interface wit
 -   **`manifest.json`**: The core configuration file for the Chrome extension. It defines permissions, icons, and registers the side panel.
 -   **`sidepanel.html`**: The main HTML file that defines the structure of the user interface, including all views (note list, editor, settings, etc.).
 -   **`src/`**: This directory contains all the JavaScript logic for the extension, broken down into modules.
-    -   `main.js`: The main entry point. It initializes the application, loads data, and handles the one-time migration of notes from `chrome.storage` to `IndexedDB`.
+    -   `main.js`: The main entry point. It initializes the application, loads data, handles the one-time migration of notes from `chrome.storage` to `IndexedDB`, and calls `initializeAllEvents()` to set up all event listeners.
     -   `database.js`: Contains all functions for interacting with the `IndexedDB` database, for both notes and images.
     -   `dom.js`: Contains DOM element references as constants for all UI elements used throughout the extension.
     -   `notes.js`: Contains the core logic for managing notes (sorting, deleting, pinning, restoring, etc.).
     -   `notes_view.js`: Handles rendering the notes list and other UI components. It contains the logic for creating and managing the image usage dropdown.
-    -   `events.js`: Contains all the event listeners for the UI elements, including navigation history management and dropdown controls.
+    -   `events/`: Directory containing modularized event handling:
+        -   `navigation.js`: Navigation, history, and back button functionality
+        -   `editor.js`: Note creation, markdown editor, and paste handling
+        -   `settings-events.js`: Settings-related event listeners
+        -   `import-export-events.js`: Import/export functionality
+        -   `global-events.js`: Global keyboard events and system theme detection
+        -   `index.js`: Unified entry point that exports `initializeAllEvents()` function
     -   `history.js`: Manages the view navigation history stack, allowing for "back" functionality.
     -   `settings.js`: Manages global and note-specific settings.
     -   `import_export.js`: Contains the logic for importing and exporting notes.
@@ -73,47 +79,47 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **`sortNotes()`**: Sorts the `notes` array based on the `lastModified` timestamp.
 -   **`cleanupDeletedNotes()` / `cleanupDeletedImages()`**: Automatically and permanently deletes items from the recycle bin that are older than 30 days.
 
-#### View Management (`notes_view.js`, `history.js`, `events.js`)
+#### View Management (`notes_view.js`, `history.js`, `src/events/`)
 
 -   **`showListView()` / `showEditorView()` / `showSettingsView()` / etc.**: A set of functions that control UI visibility. They now accept an `addToHistory` parameter and will call `pushToHistory` to record the navigation change.
 -   **`pushToHistory()` / `popFromHistory()` / etc.**: Functions in `history.js` for managing the `navigationHistory` stack.
--   **`goBack()`**: A function in `events.js` that is triggered by back buttons or the Escape key. It uses the `navigationHistory` to return the user to the previously visited view.
+-   **`goBack()`**: A function in `src/events/navigation.js` that is triggered by back buttons or the Escape key. It uses the `navigationHistory` to return the user to the previously visited view.
 -   **`backButton` (Context Menu)**: Right-clicking the back button opens a custom dropdown menu displaying the navigation history, allowing the user to jump to a specific previous view.
 -   **`navigateToState(state)`**: Navigates to a specific view state based on the provided state object.
--   **History Dropdown Management**: Functions to show, populate, and refresh the navigation history dropdown.
+-   **History Dropdown Management**: Functions in `src/events/navigation.js` to show, populate, and refresh the navigation history dropdown.
 
-#### Note List (`notes_view.js`, `events.js`)
+#### Note List (`notes_view.js`, `src/events/`)
 
 -   **`renderNoteList()`**: Populates the `#note-list` with items from the `notes` array.
--   **`newNoteButton` (Event Listener)**: Creates a new, empty note object and opens it.
+-   **`newNoteButton` (Event Listener)**: Creates a new, empty note object and opens it (handled in `src/events/editor.js`).
 -   **`deleteNote(noteId)`**: Moves a note to the recycle bin by adding a `deletedAt` timestamp.
 -   **`togglePin(noteId)`**: Toggles the pin status of a note.
--   **`emptyRecycleBin()`**: Empties the recycle bin after two-step confirmation.
+-   **`emptyRecycleBin()`**: Empties the recycle bin after two-step confirmation (handled in `src/events/settings-events.js`).
 
-#### Editor (`notes_view.js`, `events.js`)
+#### Editor (`notes_view.js`, `src/events/`)
 
 -   **`openNote(noteId, inEditMode, addToHistory)`**: Sets the `activeNoteId` and populates the editor with the note's content. It now also records the action in the navigation history.
--   **`markdownEditor` (Event Listeners)**:
+-   **`markdownEditor` (Event Listeners)** (handled in `src/events/editor.js`):
     -   `input`: Updates the note content and metadata on every keystroke.
     -   `paste`: Intercepts pasted content. If it's an image, it saves it to IndexedDB and inserts the corresponding Markdown tag. If it's text, it applies formatting.
-    -   `keydown`: Handles keyboard shortcuts.
+    -   `keydown`: Handles keyboard shortcuts (Enter, Shift+Enter).
 -   **`renderMarkdown()`**: Converts Markdown to HTML, sanitizes it, and applies syntax highlighting. It also calls `renderImages()`.
 -   **`renderImages()`**: Finds all `<img>` tags in the preview and loads their `src` from IndexedDB blob URLs.
 -   **`togglePreview()`**: Switches between the raw text editor and the rendered view, and records the change in the navigation history.
 
-#### Settings & Recycle Bin (`settings.js`, `notes_view.js`, `events.js`)
+#### Settings & Recycle Bin (`settings.js`, `notes_view.js`, `src/events/`)
 
--   **Settings Listeners**: Update `globalSettings` or note-specific settings.
+-   **Settings Listeners**: Update `globalSettings` or note-specific settings (handled in `src/events/settings-events.js`).
 -   **`applyMode(mode)`**: Toggles the `dark-mode` class on the `<body>`.
 -   **`renderDeletedItemsList()`**: Fetches all deleted notes and images from `IndexedDB`. It combines them into a single array, sorts them by deletion date, and renders them in the `#deleted-items-list`. Each item has controls to be restored or permanently deleted.
 -   **`renderImagesList()`**: Renders the list of images in the image management view, showing usage information and delete controls.
 -   **`restoreNote(noteId)` / `restoreImage(id)`**: Moves an item from the recycle bin back to the active state.
 -   **`deleteNotePermanently(noteId)` / `deleteImagePermanently(id)`**: Removes an item permanently from storage.
 
-#### Import & Export (`import_export.js`, `events.js`)
+#### Import & Export (`import_export.js`, `src/events/`)
 
--   **Export Buttons**: Package one or all notes into a `.snote` or `.snotes` zip file. The zip includes the note content (`note.md`), metadata (`metadata.json`), and any associated images from IndexedDB.
--   **Import Buttons**: Unzip a `.snote` or `.snotes` file, read the metadata and content, save any included images to IndexedDB, and create new notes in the application.
+-   **Export Buttons**: Package one or all notes into a `.snote` or `.snotes` zip file. The zip includes the note content (`note.md`), metadata (`metadata.json`), and any associated images from IndexedDB (handled in `src/events/import-export-events.js`).
+-   **Import Buttons**: Unzip a `.snote` or `.snotes` file, read the metadata and content, save any included images to IndexedDB, and create new notes in the application (handled in `src/events/import-export-events.js`).
 
 ## 5. External Libraries (`vendor/`)
 
