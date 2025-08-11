@@ -1,3 +1,21 @@
+// === 유틸리티 함수 ===
+
+// textarea에 텍스트 삽입 (deprecated document.execCommand 대체)
+function insertTextAtCursor(textarea, text) {
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const value = textarea.value;
+  
+  // 텍스트 삽입
+  textarea.value = value.substring(0, start) + text + value.substring(end);
+  
+  // 커서 위치 조정
+  textarea.selectionStart = textarea.selectionEnd = start + text.length;
+  
+  // input 이벤트 발생시키기 (자동 저장 등을 위해)
+  textarea.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
 // === 네비게이션 관련 함수 ===
 
 // 주어진 상태로 네비게이션 (뷰 전환)
@@ -258,7 +276,7 @@ markdownEditor.addEventListener('paste', async (e) => {
     try {
       await saveImage(imageId, imageFile);
       const markdownImageText = `![Image](images/${imageId}.png)`;
-      document.execCommand('insertText', false, markdownImageText);
+      insertTextAtCursor(markdownEditor, markdownImageText);
     } catch (err) {
       console.error('Failed to save image:', err);
       return; 
@@ -285,7 +303,7 @@ markdownEditor.addEventListener('paste', async (e) => {
         text = processedText;
       }
     }
-    document.execCommand('insertText', false, text);
+    insertTextAtCursor(markdownEditor, text);
   }
 });
 
@@ -302,7 +320,7 @@ markdownEditor.addEventListener('keydown', (e) => {
       const currentLine = markdownEditor.value.substring(0, start).split('\n').pop();
       if (currentLine.trim().length > 0) {
         e.preventDefault();
-        document.execCommand('insertText', false, '  \n');
+        insertTextAtCursor(markdownEditor, '  \n');
       }
     }
   }
