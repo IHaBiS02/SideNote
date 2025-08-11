@@ -25,7 +25,7 @@ import {
   openNote,
   renderNoteList
 } from '../notes_view/index.js';
-import { saveNote } from '../database.js';
+import { saveNote } from '../database/index.js';
 
 // Import state from state module
 import {

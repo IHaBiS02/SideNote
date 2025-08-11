@@ -6,7 +6,7 @@ import {
   deleteNotePermanentlyDB,
   getAllImageObjectsFromDB,
   deleteImagePermanently
-} from './database.js';
+} from './database/index.js';
 
 // Import required functions from notes_view
 import { renderNoteList, renderDeletedItemsList } from './notes_view/index.js';

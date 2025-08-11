@@ -5,7 +5,7 @@ import {
 } from '../dom.js';
 
 // Import required functions from other modules
-import { getAllImageObjectsFromDB, deleteImage } from '../database.js';
+import { getAllImageObjectsFromDB, deleteImage } from '../database/index.js';
 
 // Import state from state module
 import { 

@@ -1,5 +1,5 @@
 // Import required functions from database
-import { saveImage, saveNote } from './database.js';
+import { saveImage, saveNote } from './database/index.js';
 
 /**
  * Processes a .snote or .snotes file.
