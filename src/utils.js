@@ -55,3 +55,11 @@ function extractImageIds(content) {
   }
   return Array.from(ids);  // Set을 배열로 변환하여 반환
 }
+
+// Export all functions
+export {
+  getTimestamp,
+  sanitizeFilename,
+  downloadFile,
+  extractImageIds
+};

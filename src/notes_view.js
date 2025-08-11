@@ -1,7 +1,58 @@
-// === 전역 상태 변수 ===
-let activeNoteId = null;        // 현재 편집 중인 노트 ID
-let originalNoteContent = '';   // 노트의 원래 내용 (뒤로가기 시 저장 확인용)
-let isPreview = false;          // 미리보기 모드 여부
+// Import required DOM elements
+import {
+  listView,
+  editorView,
+  noteList,
+  markdownEditor,
+  htmlPreview,
+  toggleViewButton,
+  settingsView,
+  licenseView,
+  licenseContent,
+  recycleBinView,
+  deletedItemsList,
+  imageManagementView,
+  imageList,
+  editorTitle,
+  titleSetting,
+  fontSizeSetting,
+  modeSetting,
+  autoAddSpacesCheckbox,
+  preventUsedImageDeletionCheckbox
+} from './dom.js';
+
+// Import required functions from other modules
+import { 
+  togglePin, 
+  deleteNote, 
+  restoreNote, 
+  deleteNotePermanently 
+} from './notes.js';
+
+import { 
+  applyFontSize, 
+  applyMode,
+  updateAutoLineBreakButton,
+  updateTildeReplacementButton 
+} from './settings.js';
+
+import { pushToHistory, clearHistory } from './history.js';
+import { extractImageIds } from './utils.js';
+import { saveNote, getImage, getAllImageObjectsFromDB, deleteImage } from './database.js';
+
+// Import state from state module
+import { 
+  notes, 
+  deletedNotes, 
+  globalSettings, 
+  isGlobalSettings, 
+  activeNoteId, 
+  originalNoteContent, 
+  isPreview,
+  setActiveNoteId,
+  setOriginalNoteContent,
+  setIsPreview
+} from './state.js';
 
 /**
  * Renders the list of notes.
@@ -59,8 +110,8 @@ function renderNoteList() {
 function openNote(noteId, inEditMode = false, addToHistory = true) {
   const note = notes.find(n => n.id === noteId);
   if (note) {
-    activeNoteId = noteId;
-    originalNoteContent = note.content; // 원본 내용 저장 (변경 감지용)
+    setActiveNoteId(noteId);
+    setOriginalNoteContent(note.content); // 원본 내용 저장 (변경 감지용)
     editorTitle.textContent = note.title;
     markdownEditor.value = note.content;
     // 노트 설정 적용 (폰트 크기 등)
@@ -71,7 +122,7 @@ function openNote(noteId, inEditMode = false, addToHistory = true) {
     renderMarkdown();
     showEditorView(false);
     // 모드 설정 (편집/미리보기)
-    isPreview = !inEditMode;
+    setIsPreview(!inEditMode);
     if (isPreview) {
       htmlPreview.style.display = 'block';
       markdownEditor.style.display = 'none';
@@ -95,7 +146,7 @@ function openNote(noteId, inEditMode = false, addToHistory = true) {
  * @param {boolean} addToHistory Whether to add this action to the history.
  */
 function showListView(addToHistory = true) {
-  activeNoteId = null;
+  setActiveNoteId(null);
   // 모든 뷰 숨기고 노트 목록만 표시
   listView.style.display = 'block';
   editorView.style.display = 'none';
@@ -382,7 +433,7 @@ async function renderImages() {
  */
 // 편집/미리보기 모드 전환
 function togglePreview() {
-  isPreview = !isPreview;
+  setIsPreview(!isPreview);
   if (isPreview) {
     // 미리보기 모드로 전환
     renderMarkdown();
@@ -671,3 +722,21 @@ async function renderImagesList() {
     imageList.innerHTML = '<li>Error loading images. See console for details.</li>';
   }
 }
+
+// Export functions
+export {
+  renderNoteList,
+  openNote,
+  showListView,
+  showEditorView,
+  showSettingsView,
+  showLicenseView,
+  showRecycleBinView,
+  showImageManagementView,
+  renderDeletedItemsList,
+  renderMarkdown,
+  renderImages,
+  togglePreview,
+  showImageModal,
+  renderImagesList
+};

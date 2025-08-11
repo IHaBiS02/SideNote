@@ -1,6 +1,13 @@
-// === 전역 설정 변수 ===
-let globalSettings = {};        // 전역 설정 객체 (모든 노트에 적용)
-let isGlobalSettings = false;   // 현재 전역 설정 편집 중인지 여부
+// Import required DOM elements
+import { 
+  markdownEditor, 
+  htmlPreview, 
+  autoLineBreakButton, 
+  tildeReplacementButton 
+} from './dom.js';
+
+// Import state from state module
+import { globalSettings } from './state.js';
 
 /**
  * Saves the global settings to storage.
@@ -71,3 +78,12 @@ function updateTildeReplacementButton() {
   tildeReplacementButton.textContent = globalSettings.tildeReplacement ? '~✅' : '~❌';
   tildeReplacementButton.title = globalSettings.tildeReplacement ? 'Tilde Replacement Enabled' : 'Tilde Replacement Disabled';
 }
+
+// Export functions
+export {
+  saveGlobalSettings,
+  applyFontSize,
+  applyMode,
+  updateAutoLineBreakButton,
+  updateTildeReplacementButton
+};

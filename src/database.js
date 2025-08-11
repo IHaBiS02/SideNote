@@ -376,3 +376,19 @@ function getAllImageObjectsFromDB() {
     };
   });
 }
+
+// Export all functions
+export {
+  initDB,
+  saveNote,
+  getAllNotes,
+  deleteNoteDB,
+  restoreNoteDB,
+  deleteNotePermanentlyDB,
+  saveImage,
+  getImage,
+  deleteImage,
+  restoreImage,
+  deleteImagePermanently,
+  getAllImageObjectsFromDB
+};

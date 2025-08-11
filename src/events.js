@@ -1,3 +1,119 @@
+// Import DOM elements
+import {
+  listView,
+  editorView,
+  noteList,
+  newNoteButton,
+  backButton,
+  editorTitle,
+  markdownEditor,
+  htmlPreview,
+  toggleViewButton,
+  settingsView,
+  settingsButton,
+  globalSettingsButton,
+  settingsBackButton,
+  licensesButton,
+  licenseView,
+  licenseBackButton,
+  licenseContent,
+  titleSetting,
+  fontSizeSetting,
+  modeSetting,
+  autoLineBreakButton,
+  tildeReplacementButton,
+  autoAddSpacesCheckbox,
+  globalExportButton,
+  globalImportButton,
+  globalImportInput,
+  exportNoteButton,
+  importNoteButton,
+  importNoteInput,
+  recycleBinButton,
+  recycleBinView,
+  recycleBinBackButton,
+  imageManagementButton,
+  imageManagementView,
+  imageManagementBackButton,
+  emptyRecycleBinButton,
+  preventUsedImageDeletionCheckbox
+} from './dom.js';
+
+// Import functions from other modules
+import {
+  sortNotes,
+  deleteNote,
+  restoreNote,
+  deleteNotePermanently,
+  emptyRecycleBin
+} from './notes.js';
+
+import {
+  renderNoteList,
+  openNote,
+  showListView,
+  showEditorView,
+  showSettingsView,
+  showLicenseView,
+  showRecycleBinView,
+  showImageManagementView,
+  renderDeletedItemsList,
+  renderMarkdown,
+  togglePreview,
+  renderImagesList
+} from './notes_view.js';
+
+import {
+  saveGlobalSettings,
+  applyFontSize,
+  applyMode,
+  updateAutoLineBreakButton,
+  updateTildeReplacementButton
+} from './settings.js';
+
+// Import state from state module
+import {
+  notes,
+  deletedNotes,
+  globalSettings,
+  isGlobalSettings,
+  activeNoteId,
+  originalNoteContent,
+  isPreview,
+  setActiveNoteId,
+  setOriginalNoteContent,
+  setIsGlobalSettings
+} from './state.js';
+
+import {
+  pushToHistory,
+  moveBack,
+  moveForward,
+  canMoveBack,
+  canMoveForward,
+  getCurrentHistoryState,
+  getHistory,
+  getHistoryIndex,
+  goToHistoryState
+} from './history.js';
+
+import {
+  getTimestamp,
+  sanitizeFilename,
+  downloadFile,
+  extractImageIds
+} from './utils.js';
+
+import {
+  saveNote,
+  getImage,
+  saveImage,
+  getAllNotes,
+  getAllImageObjectsFromDB
+} from './database.js';
+
+import { processSnote } from './import_export.js';
+
 // === 유틸리티 함수 ===
 
 // textarea에 텍스트 삽입 (deprecated document.execCommand 대체)
@@ -33,7 +149,7 @@ async function navigateToState(state) {
             openNote(state.params.noteId, state.params.inEditMode, false);
             break;
         case 'settings':
-            isGlobalSettings = state.params.isGlobal;
+            setIsGlobalSettings(state.params.isGlobal);
             if (isGlobalSettings) {
                 titleSetting.value = globalSettings.title || 'default';
                 fontSizeSetting.value = globalSettings.fontSize || 12;
@@ -43,7 +159,7 @@ async function navigateToState(state) {
             } else {
                 const note = notes.find(n => n.id === state.params.noteId);
                 if (note) {
-                    activeNoteId = note.id;
+                    setActiveNoteId(note.id);
                     titleSetting.value = note.settings.title || 'default';
                     fontSizeSetting.value = note.settings.fontSize || globalSettings.fontSize || 12;
                     modeSetting.value = globalSettings.mode || 'system';
@@ -437,7 +553,7 @@ editorTitle.addEventListener('dblclick', () => {
 
 // 노트 설정 열기
 settingsButton.addEventListener('click', () => {
-  isGlobalSettings = false;
+  setIsGlobalSettings(false);
   const note = notes.find(n => n.id === activeNoteId);
   titleSetting.value = note.settings.title || 'default';
   fontSizeSetting.value = note.settings.fontSize || globalSettings.fontSize || 12;
@@ -448,7 +564,7 @@ settingsButton.addEventListener('click', () => {
 });
 
 globalSettingsButton.addEventListener('click', () => {
-  isGlobalSettings = true;
+  setIsGlobalSettings(true);
   titleSetting.value = globalSettings.title || 'default';
   fontSizeSetting.value = globalSettings.fontSize || 12;
   modeSetting.value = globalSettings.mode || 'system';
@@ -795,3 +911,13 @@ document.addEventListener('click', (e) => {
         }
     }
 });
+
+// Export the utility functions (events.js contains mainly event listeners and is mostly side-effect based)
+export {
+  insertTextAtCursor,
+  navigateToState,
+  goBack,
+  populateHistoryDropdown,
+  showHistoryDropdown,
+  refreshHistoryDropdown
+};

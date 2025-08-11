@@ -1,6 +1,18 @@
-// === 노트 데이터 배열 ===
-let notes = [];         // 활성 노트 목록
-let deletedNotes = [];  // 삭제된 노트 목록 (휴지통)
+// Import required functions from database
+import {
+  saveNote,
+  deleteNoteDB,
+  restoreNoteDB,
+  deleteNotePermanentlyDB,
+  getAllImageObjectsFromDB,
+  deleteImagePermanently
+} from './database.js';
+
+// Import required functions from notes_view
+import { renderNoteList, renderDeletedItemsList } from './notes_view.js';
+
+// Import state from state module
+import { notes, deletedNotes, setNotes, setDeletedNotes } from './state.js';
 
 /**
  * Sorts the notes array.
@@ -31,7 +43,9 @@ async function deleteNote(noteId) {
     // 삭제 시간 기록 (소프트 삭제)
     deletedNote.metadata.deletedAt = Date.now();
     // 휴지통으로 이동
-    deletedNotes.push(deletedNote);
+    const newDeletedNotes = [...deletedNotes, deletedNote];
+    setNotes([...notes]); // Update state
+    setDeletedNotes(newDeletedNotes);
     await deleteNoteDB(noteId);
     renderNoteList();
   }
@@ -73,7 +87,9 @@ async function restoreNote(noteId) {
     // 삭제 타임스탬프 제거
     delete restoredNote.metadata.deletedAt;
     // 활성 목록으로 이동
-    notes.push(restoredNote);
+    const newNotes = [...notes, restoredNote];
+    setDeletedNotes([...deletedNotes]); // Update state
+    setNotes(newNotes);
     sortNotes();
     await restoreNoteDB(noteId);
     renderDeletedItemsList();
@@ -85,7 +101,7 @@ async function restoreNote(noteId) {
  * @param {string} noteId The ID of the note to delete permanently.
  */
 async function deleteNotePermanently(noteId) {
-  deletedNotes = deletedNotes.filter(n => n.id !== noteId);
+  setDeletedNotes(deletedNotes.filter(n => n.id !== noteId));
   await deleteNotePermanentlyDB(noteId);
   renderDeletedItemsList();
 }
@@ -98,7 +114,7 @@ async function emptyRecycleBin() {
     for (const note of deletedNotes) {
         await deleteNotePermanentlyDB(note.id);
     }
-    deletedNotes = [];
+    setDeletedNotes([]);
 
     // 모든 삭제된 이미지 영구 삭제
     const imageObjects = await getAllImageObjectsFromDB();
@@ -109,3 +125,13 @@ async function emptyRecycleBin() {
 
     renderDeletedItemsList();
 }
+
+// Export functions
+export {
+  sortNotes,
+  deleteNote,
+  togglePin,
+  restoreNote,
+  deleteNotePermanently,
+  emptyRecycleBin
+};

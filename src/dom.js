@@ -46,3 +46,48 @@ const imageList = document.getElementById('image-list');
 const deletedItemsList = document.getElementById('deleted-items-list');
 const emptyRecycleBinButton = document.getElementById('empty-recycle-bin-button');
 const preventUsedImageDeletionCheckbox = document.getElementById('prevent-used-image-deletion-checkbox');
+
+// Export all DOM elements
+export {
+  listView,
+  editorView,
+  noteList,
+  newNoteButton,
+  backButton,
+  deleteNoteButton,
+  editorTitle,
+  markdownEditor,
+  htmlPreview,
+  toggleViewButton,
+  settingsView,
+  settingsButton,
+  globalSettingsButton,
+  settingsBackButton,
+  licensesButton,
+  licenseView,
+  licenseBackButton,
+  licenseContent,
+  titleSetting,
+  fontSizeSetting,
+  modeSetting,
+  autoLineBreakButton,
+  tildeReplacementButton,
+  autoAddSpacesCheckbox,
+  globalExportButton,
+  globalImportButton,
+  globalImportInput,
+  exportNoteButton,
+  importNoteButton,
+  importNoteInput,
+  recycleBinButton,
+  recycleBinView,
+  recycleBinBackButton,
+  deletedNoteList,
+  imageManagementButton,
+  imageManagementView,
+  imageManagementBackButton,
+  imageList,
+  deletedItemsList,
+  emptyRecycleBinButton,
+  preventUsedImageDeletionCheckbox
+};
