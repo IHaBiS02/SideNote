@@ -159,7 +159,19 @@ function initializeEditorEvents() {
         const currentLine = markdownEditor.value.substring(0, start).split('\n').pop();
         if (currentLine.trim().length > 0) {
           e.preventDefault();
-          insertTextAtCursor(markdownEditor, '  \n');
+          
+          // Count trailing spaces in the current line
+          const trailingSpacesMatch = currentLine.match(/\s*$/);
+          const trailingSpaces = trailingSpacesMatch ? trailingSpacesMatch[0].length : 0;
+          
+          if (trailingSpaces < 2) {
+            // Add spaces to make it exactly 2
+            const spacesToAdd = 2 - trailingSpaces;
+            insertTextAtCursor(markdownEditor, ' '.repeat(spacesToAdd) + '\n');
+          } else {
+            // Already has 2 or more spaces, just add newline
+            insertTextAtCursor(markdownEditor, '\n');
+          }
         }
       }
     }
