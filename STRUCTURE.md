@@ -37,6 +37,7 @@ SideNote is a browser extension that provides a simple note-taking interface wit
     -   `settings.js`: Manages global and note-specific settings.
     -   `import_export.js`: Contains the logic for importing and exporting notes.
     -   `utils.js`: Utility functions for timestamps, filename sanitization, file downloads, and image ID extraction.
+    -   `text-processors.js`: Text processing utilities for markdown editing, including tilde escaping, auto line breaks, Enter key handling, and whitespace cleanup.
 -   **`sidepanel.css`**: The primary stylesheet for the extension's UI.
 -   **`dark_mode.css`**: A supplementary stylesheet containing CSS variables and rules specifically for the dark mode theme.
 -   **`background.js`**: A service worker script that handles the initial opening of the side panel when the extension icon is clicked.
