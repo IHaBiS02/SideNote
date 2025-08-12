@@ -203,6 +203,12 @@ function initializeSettingsEvents() {
     saveGlobalSettings();
   });
 
+  // Auto add spaces checkbox
+  autoAddSpacesCheckbox.addEventListener('change', () => {
+      globalSettings.autoAddSpaces = autoAddSpacesCheckbox.checked;
+      saveGlobalSettings();
+  });
+
   // Prevent used image deletion checkbox
   preventUsedImageDeletionCheckbox.addEventListener('change', () => {
       globalSettings.preventUsedImageDeletion = preventUsedImageDeletionCheckbox.checked;
