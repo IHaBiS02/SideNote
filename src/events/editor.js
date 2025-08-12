@@ -156,21 +156,55 @@ function initializeEditorEvents() {
       if (globalSettings.autoAddSpaces) {
         const start = markdownEditor.selectionStart;
         const end = markdownEditor.selectionEnd;
-        const currentLine = markdownEditor.value.substring(0, start).split('\n').pop();
-        if (currentLine.trim().length > 0) {
+        
+        // Find the current line boundaries
+        const textUpToCursor = markdownEditor.value.substring(0, start);
+        const textFromCursor = markdownEditor.value.substring(start);
+        
+        const currentLineStart = textUpToCursor.lastIndexOf('\n') + 1;
+        const currentLineEnd = textFromCursor.indexOf('\n');
+        const lineEndIndex = currentLineEnd === -1 ? markdownEditor.value.length : start + currentLineEnd;
+        
+        // Get the full current line and split it at cursor position
+        const fullCurrentLine = markdownEditor.value.substring(currentLineStart, lineEndIndex);
+        const cursorPositionInLine = start - currentLineStart;
+        const beforeCursor = fullCurrentLine.substring(0, cursorPositionInLine);
+        const afterCursor = fullCurrentLine.substring(cursorPositionInLine);
+        
+        // Check if text after cursor is only whitespace
+        const isAfterCursorOnlyWhitespace = afterCursor.trim() === '';
+        
+        if (beforeCursor.trim().length > 0) {
           e.preventDefault();
           
-          // Count trailing spaces in the current line
-          const trailingSpacesMatch = currentLine.match(/\s*$/);
-          const trailingSpaces = trailingSpacesMatch ? trailingSpacesMatch[0].length : 0;
-          
-          if (trailingSpaces < 2) {
-            // Add spaces to make it exactly 2
-            const spacesToAdd = 2 - trailingSpaces;
-            insertTextAtCursor(markdownEditor, ' '.repeat(spacesToAdd) + '\n');
+          if (isAfterCursorOnlyWhitespace && afterCursor.length > 0) {
+            // If after cursor is only whitespace, remove it and create empty line
+            // First remove the trailing whitespace
+            markdownEditor.setSelectionRange(start, lineEndIndex);
+            markdownEditor.setRangeText('', start, lineEndIndex);
+            
+            // Then process the before cursor part
+            const trailingSpacesMatch = beforeCursor.match(/\s*$/);
+            const trailingSpaces = trailingSpacesMatch ? trailingSpacesMatch[0].length : 0;
+            
+            if (trailingSpaces < 2) {
+              const spacesToAdd = 2 - trailingSpaces;
+              insertTextAtCursor(markdownEditor, ' '.repeat(spacesToAdd) + '\n');
+            } else {
+              insertTextAtCursor(markdownEditor, '\n');
+            }
           } else {
-            // Already has 2 or more spaces, just add newline
-            insertTextAtCursor(markdownEditor, '\n');
+            // Normal case: process the line up to cursor
+            const currentLine = beforeCursor;
+            const trailingSpacesMatch = currentLine.match(/\s*$/);
+            const trailingSpaces = trailingSpacesMatch ? trailingSpacesMatch[0].length : 0;
+            
+            if (trailingSpaces < 2) {
+              const spacesToAdd = 2 - trailingSpaces;
+              insertTextAtCursor(markdownEditor, ' '.repeat(spacesToAdd) + '\n');
+            } else {
+              insertTextAtCursor(markdownEditor, '\n');
+            }
           }
         }
       }
