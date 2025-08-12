@@ -79,6 +79,20 @@ Utility functions (all functions exported):
 - `downloadFile(blob, fileName)`: Downloads a file using blob URL
 - `extractImageIds(content)`: Extracts image IDs from markdown content
 
+## src/text-processors.js
+
+Text processing utilities for markdown editing (all functions exported):
+
+- `escapeTildes(text)`: Escapes tilde characters to prevent markdown strikethrough formatting
+- `addAutoLineBreaks(text)`: Adds two spaces at the end of each line for markdown line breaks
+- `processPastedText(text, settings)`: Processes pasted text according to user settings (tilde escape, auto line breaks)
+- `countTrailingSpaces(text)`: Counts trailing spaces in a text string
+- `normalizeTrailingSpaces(text, targetSpaces)`: Ensures text has exactly the specified number of trailing spaces
+- `handleEnterKeyInput(textarea, settings, insertTextFunction)`: Processes Enter key input for markdown line breaks with whitespace cleanup
+- `analyzeTextAtCursor(text, cursorPos)`: Analyzes text structure for cursor position and line information
+
+**Note**: Used by `src/events/editor.js` for consistent markdown text processing across different input methods
+
 ## src/settings.js
 
 Settings management (functions exported):

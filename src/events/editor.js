@@ -19,6 +19,10 @@ import {
 import { saveNote, saveImage } from '../database/index.js';
 import { pushToHistory } from '../history.js';
 import { extractImageIds } from '../utils.js';
+import { 
+  processPastedText, 
+  handleEnterKeyInput 
+} from '../text-processors.js';
 
 // Import state from state module
 import {
@@ -122,27 +126,9 @@ function initializeEditorEvents() {
       }
     } else {
       // Handle text paste
-      let text = e.clipboardData.getData('text/plain');
-
-      // Auto-escape tilde (~) characters
-      if (globalSettings.tildeReplacement) {
-        text = text.replace(/~/g, '\\~');
-      }
-
-      // Auto line break processing (add two spaces for Markdown line breaks)
-      if (globalSettings.autoLineBreak) {
-        const lines = text.split(/\r?\n/);
-        if (lines.length > 1) {
-          const processedText = lines.map((line, index) => {
-            if (index < lines.length - 1 && line.trim().length > 0) {
-              return line.trimEnd() + '  ';
-            }
-            return line;
-          }).join('\n');
-          text = processedText;
-        }
-      }
-      insertTextAtCursor(markdownEditor, text);
+      const rawText = e.clipboardData.getData('text/plain');
+      const processedText = processPastedText(rawText, globalSettings);
+      insertTextAtCursor(markdownEditor, processedText);
     }
   });
 
@@ -153,60 +139,9 @@ function initializeEditorEvents() {
   markdownEditor.addEventListener('keydown', (e) => {
     // Auto add two spaces at end of line when pressing Enter
     if (e.key === 'Enter' && !e.isComposing && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
-      if (globalSettings.autoAddSpaces) {
-        const start = markdownEditor.selectionStart;
-        const end = markdownEditor.selectionEnd;
-        
-        // Find the current line boundaries
-        const textUpToCursor = markdownEditor.value.substring(0, start);
-        const textFromCursor = markdownEditor.value.substring(start);
-        
-        const currentLineStart = textUpToCursor.lastIndexOf('\n') + 1;
-        const currentLineEnd = textFromCursor.indexOf('\n');
-        const lineEndIndex = currentLineEnd === -1 ? markdownEditor.value.length : start + currentLineEnd;
-        
-        // Get the full current line and split it at cursor position
-        const fullCurrentLine = markdownEditor.value.substring(currentLineStart, lineEndIndex);
-        const cursorPositionInLine = start - currentLineStart;
-        const beforeCursor = fullCurrentLine.substring(0, cursorPositionInLine);
-        const afterCursor = fullCurrentLine.substring(cursorPositionInLine);
-        
-        // Check if text after cursor is only whitespace
-        const isAfterCursorOnlyWhitespace = afterCursor.trim() === '';
-        
-        if (beforeCursor.trim().length > 0) {
-          e.preventDefault();
-          
-          if (isAfterCursorOnlyWhitespace && afterCursor.length > 0) {
-            // If after cursor is only whitespace, remove it and create empty line
-            // First remove the trailing whitespace
-            markdownEditor.setSelectionRange(start, lineEndIndex);
-            markdownEditor.setRangeText('', start, lineEndIndex);
-            
-            // Then process the before cursor part
-            const trailingSpacesMatch = beforeCursor.match(/\s*$/);
-            const trailingSpaces = trailingSpacesMatch ? trailingSpacesMatch[0].length : 0;
-            
-            if (trailingSpaces < 2) {
-              const spacesToAdd = 2 - trailingSpaces;
-              insertTextAtCursor(markdownEditor, ' '.repeat(spacesToAdd) + '\n');
-            } else {
-              insertTextAtCursor(markdownEditor, '\n');
-            }
-          } else {
-            // Normal case: process the line up to cursor
-            const currentLine = beforeCursor;
-            const trailingSpacesMatch = currentLine.match(/\s*$/);
-            const trailingSpaces = trailingSpacesMatch ? trailingSpacesMatch[0].length : 0;
-            
-            if (trailingSpaces < 2) {
-              const spacesToAdd = 2 - trailingSpaces;
-              insertTextAtCursor(markdownEditor, ' '.repeat(spacesToAdd) + '\n');
-            } else {
-              insertTextAtCursor(markdownEditor, '\n');
-            }
-          }
-        }
+      const result = handleEnterKeyInput(markdownEditor, globalSettings, insertTextAtCursor);
+      if (result.handled) {
+        e.preventDefault();
       }
     }
 
