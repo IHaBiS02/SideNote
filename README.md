@@ -120,5 +120,3 @@ See [LICENSE](LICENSE) file for details.
 5. Submit a pull request
 
 ---
-
-**Note**: This is a Windows 11 development environment. Development commands are optimized for Windows.
