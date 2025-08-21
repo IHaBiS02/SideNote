@@ -15,6 +15,11 @@ A simple notes browser extension that provides a note-taking interface in the br
 
 ## Installation
 
+### From Store
+
+[Chrome](https://chromewebstore.google.com/detail/sidenote/jdgobmepjpcgfcjmocndbbhhigogafak?authuser=0&hl=ko)  
+[Firefox](https://addons.mozilla.org/en-US/firefox/addon/sidenote1/)
+
 ### For Development
 
 1. Clone this repository:
@@ -39,11 +44,6 @@ A simple notes browser extension that provides a note-taking interface in the br
 4. Load the extension:
    - **Chrome**: Go to `chrome://extensions/`, enable Developer mode, click "Load unpacked", select `build/chrome/`
    - **Firefox**: Go to `about:debugging`, click "This Firefox", click "Load Temporary Add-on", select the built extension
-
-### From Store
-
-[Chrome](https://chromewebstore.google.com/detail/sidenote/jdgobmepjpcgfcjmocndbbhhigogafak?authuser=0&hl=ko)
-[Firefox](https://addons.mozilla.org/en-US/firefox/addon/sidenote1/)
 
 ## Usage
 
