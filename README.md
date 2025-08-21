@@ -10,7 +10,7 @@ A simple notes browser extension that provides a note-taking interface in the br
 - **Import/Export**: Save and load notes in `.snote` and `.snotes` formats
 - **Image Support**: Paste and embed images directly into notes
 - **Recycle Bin**: Soft delete with 30-day auto-cleanup
-- **Browser Integration**: Works in Chrome and Firefox side panels
+- **Browser Integration**: Works in Chrome (Firefox is in development)
 - **Keyboard Shortcut**: Quick access with `Shift+Alt+W`
 
 ## Installation
@@ -18,17 +18,20 @@ A simple notes browser extension that provides a note-taking interface in the br
 ### For Development
 
 1. Clone this repository:
+
    ```bash
    git clone https://github.com/IHaBiS02/SideNote
    cd SideNote
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
 
 3. Build the extension:
+
    ```bash
    npm run build
    ```
@@ -39,84 +42,36 @@ A simple notes browser extension that provides a note-taking interface in the br
 
 ### From Store
 
-*Extension store links will be added when available*
+[Chrome](https://chromewebstore.google.com/detail/sidenote/jdgobmepjpcgfcjmocndbbhhigogafak?authuser=0&hl=ko)
 
 ## Usage
 
 1. Click the SideNote icon in your browser toolbar or use `Shift+Alt+W`
 2. The side panel will open with the notes interface
-3. Start writing in Markdown - preview updates in real-time
-4. Use the toolbar for formatting, importing/exporting, and settings
+3. Make a new note and write notes
+4. Press ESC or Shift+Enter to save edit and return to preview
+
+You can paste image on the clipboard directly into notes by Ctrl+V  
+On the bottom, there are two buttons with ✅/❌ on it, the left one add two spaces on the pasted text, and the right one replace `~` to `\~` automatically.
+
+In settings, you can choose theme, Mode of Title (Default use first line as title, Custom let user type own title by double-click title in note), text size, and two settings on it.
+
+Images button show all images used in the notes, showing that which one is used in which note.
+Recycle bin shows all soft-deleted notes and images, and let user delete all at once.
+Licenses show license of libraries used in this project.
 
 ## Development
 
 ### Build Commands
 
 ```bash
-# Build for both Chrome and Firefox
-npm run build
-
-# Clean build directory
-npm run clean
-
 # Install dependencies
 npm install
+
+# Build for both Chrome and Firefox
+npm run build
 ```
-
-### Project Structure
-
-```
-├── src/                    # Source code
-│   ├── main.js            # Entry point and initialization
-│   ├── database.js        # IndexedDB operations
-│   ├── notes_view.js      # UI rendering and view management
-│   ├── events.js          # Event listeners and interactions
-│   ├── history.js         # Navigation history
-│   ├── import_export.js   # File handling
-│   ├── dom.js             # DOM utilities
-│   ├── notes.js           # Note management
-│   ├── settings.js        # Settings management
-│   └── utils.js           # General utilities
-├── images/                # Extension icons
-├── manifest.json          # Extension manifest
-├── sidepanel.html         # Main UI
-├── sidepanel.css          # Main styles
-├── dark_mode.css          # Dark mode styles
-└── build.js              # Build script
-```
-
-### Architecture
-
-- **Storage**: Uses IndexedDB for notes and images, chrome.storage.local for global settings
-- **Markdown**: Rendered with `marked.js` and sanitized with `DOMPurify`
-- **Images**: Stored as blobs in IndexedDB with custom `sidenote-image://` protocol
-- **Compatibility**: Manifest V3 for Chrome with Firefox support
-
-## Version Management
-
-When making changes:
-1. Update version in `manifest.json`
-2. Update version in `package.json`
-3. Run `npm install` to update lock file
-4. Test with `npm run build`
-
-## Testing
-
-No automated test suite exists. Manual testing required:
-1. Build the extension
-2. Load in browser
-3. Test functionality in browser side panel
 
 ## License
 
 See [LICENSE](LICENSE) file for details.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
----
