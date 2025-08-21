@@ -10,7 +10,7 @@ A simple notes browser extension that provides a note-taking interface in the br
 - **Import/Export**: Save and load notes in `.snote` and `.snotes` formats
 - **Image Support**: Paste and embed images directly into notes
 - **Recycle Bin**: Soft delete with 30-day auto-cleanup
-- **Browser Integration**: Works in Chrome (Firefox is in development)
+- **Browser Integration**: Works in Chrome **AND** Firefox ~~(Firefox is in development)~~
 - **Keyboard Shortcut**: Quick access with `Shift+Alt+W`
 
 ## Installation
@@ -43,6 +43,7 @@ A simple notes browser extension that provides a note-taking interface in the br
 ### From Store
 
 [Chrome](https://chromewebstore.google.com/detail/sidenote/jdgobmepjpcgfcjmocndbbhhigogafak?authuser=0&hl=ko)
+[Firefox](https://addons.mozilla.org/en-US/firefox/addon/sidenote1/)
 
 ## Usage
 
