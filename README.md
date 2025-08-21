@@ -17,7 +17,7 @@ A simple notes browser extension that provides a note-taking interface in the br
 
 ### From Store
 
-[Chrome](https://chromewebstore.google.com/detail/sidenote/jdgobmepjpcgfcjmocndbbhhigogafak?authuser=0&hl=ko)  
+[Chrome](https://chromewebstore.google.com/detail/sidenote/jdgobmepjpcgfcjmocndbbhhigogafak)  
 [Firefox](https://addons.mozilla.org/en-US/firefox/addon/sidenote1/) (Now in 'Awaiting Review' state, looks fine when I load it with debugging mode)
 
 ### For Development
