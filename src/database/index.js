@@ -1,7 +1,7 @@
 // Re-export all functions from sub-modules for backward compatibility
 
 // Database initialization
-export { initDB } from './init.js';
+export { initDB, closeDB } from './init.js';
 
 // Notes operations
 export {

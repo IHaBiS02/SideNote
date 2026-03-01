@@ -1,3 +1,47 @@
+// === Blob URL 추적 ===
+
+const trackedBlobUrls = new Set();
+
+/**
+ * Creates a blob URL and tracks it for later cleanup.
+ * @param {Blob} blob The blob to create a URL for.
+ * @returns {string} The created blob URL.
+ */
+function createTrackedBlobUrl(blob) {
+  const url = URL.createObjectURL(blob);
+  trackedBlobUrls.add(url);
+  return url;
+}
+
+/**
+ * Revokes all tracked blob URLs and clears the tracking set.
+ */
+function revokeAllBlobUrls() {
+  for (const url of trackedBlobUrls) {
+    URL.revokeObjectURL(url);
+  }
+  trackedBlobUrls.clear();
+}
+
+/**
+ * Revokes a single tracked blob URL.
+ * @param {string} url The blob URL to revoke.
+ */
+function revokeTrackedBlobUrl(url) {
+  if (trackedBlobUrls.has(url)) {
+    URL.revokeObjectURL(url);
+    trackedBlobUrls.delete(url);
+  }
+}
+
+/**
+ * Returns the current count of tracked blob URLs (for testing).
+ * @returns {number}
+ */
+function getTrackedBlobUrlCount() {
+  return trackedBlobUrls.size;
+}
+
 // === 유틸리티 함수들 ===
 
 /**
@@ -58,6 +102,10 @@ function extractImageIds(content) {
 
 // Export all functions
 export {
+  createTrackedBlobUrl,
+  revokeAllBlobUrls,
+  revokeTrackedBlobUrl,
+  getTrackedBlobUrlCount,
   getTimestamp,
   sanitizeFilename,
   downloadFile,

@@ -8,6 +8,7 @@ import {
 // Import required functions from other modules
 import { pushToHistory, getHistory, getHistoryIndex, moveBack } from '../history.js';
 import { getImage } from '../database/index.js';
+import { createTrackedBlobUrl, revokeAllBlobUrls } from '../utils.js';
 
 // Import state from state module
 import { 
@@ -75,6 +76,7 @@ function renderMarkdown() {
 // === 이미지 렌더링 ===
 
 async function renderImages() {
+  revokeAllBlobUrls();
   const images = htmlPreview.querySelectorAll('img');
   for (const img of images) {
     const src = img.getAttribute('src');
@@ -85,7 +87,7 @@ async function renderImages() {
       try {
         const imageBlob = await getImage(imageId);
         if (imageBlob) {
-          const blobUrl = URL.createObjectURL(imageBlob);
+          const blobUrl = createTrackedBlobUrl(imageBlob);
           img.src = blobUrl;
         } else {
           img.alt = `Image not found: ${imageId}`;

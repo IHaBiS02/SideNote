@@ -12,7 +12,7 @@ import {
 import { renderNoteList, renderDeletedItemsList } from './notes_view/index.js';
 
 // Import state from state module
-import { notes, deletedNotes, setNotes, setDeletedNotes } from './state.js';
+import { notes, deletedNotes, setDeletedNotes } from './state.js';
 
 /**
  * Sorts the notes array.
@@ -38,14 +38,9 @@ function sortNotes() {
 async function deleteNote(noteId) {
   const noteIndex = notes.findIndex(n => n.id === noteId);
   if (noteIndex > -1) {
-    // 활성 목록에서 제거
     const [deletedNote] = notes.splice(noteIndex, 1);
-    // 삭제 시간 기록 (소프트 삭제)
     deletedNote.metadata.deletedAt = Date.now();
-    // 휴지통으로 이동
-    const newDeletedNotes = [...deletedNotes, deletedNote];
-    setNotes([...notes]); // Update state
-    setDeletedNotes(newDeletedNotes);
+    deletedNotes.push(deletedNote);
     await deleteNoteDB(noteId);
     renderNoteList();
   }
@@ -80,16 +75,10 @@ async function togglePin(noteId) {
 async function restoreNote(noteId) {
   const noteIndex = deletedNotes.findIndex(n => n.id === noteId);
   if (noteIndex > -1) {
-    // 휴지통에서 제거
     const [restoredNote] = deletedNotes.splice(noteIndex, 1);
-    // 복원 시간으로 업데이트
     restoredNote.metadata.lastModified = Date.now();
-    // 삭제 타임스탬프 제거
     delete restoredNote.metadata.deletedAt;
-    // 활성 목록으로 이동
-    const newNotes = [...notes, restoredNote];
-    setDeletedNotes([...deletedNotes]); // Update state
-    setNotes(newNotes);
+    notes.push(restoredNote);
     sortNotes();
     await restoreNoteDB(noteId);
     renderDeletedItemsList();

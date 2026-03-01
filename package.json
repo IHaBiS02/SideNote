@@ -1,17 +1,22 @@
 {
   "name": "simple-notes-extension",
-  "version": "3.10.1",
+  "version": "4.0.0",
   "description": "A simple notes extension using the side panel.",
   "scripts": {
     "build": "node build.js",
-    "clean": "rimraf build"
+    "clean": "rimraf build",
+    "test": "vitest",
+    "test:run": "vitest run"
   },
   "devDependencies": {
     "archiver": "^7.0.1",
     "cpx": "^1.2.1",
+    "fake-indexeddb": "^6.2.5",
+    "glob": "^10.4.1",
+    "jsdom": "^28.1.0",
     "mkdirp": "^3.0.1",
     "rimraf": "^5.0.5",
-    "glob": "^10.4.1"
+    "vitest": "^4.0.18"
   },
   "dependencies": {
     "@highlightjs/cdn-assets": "^11.11.1",

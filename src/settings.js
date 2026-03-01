@@ -1,13 +1,18 @@
 // Import required DOM elements
-import { 
-  markdownEditor, 
-  htmlPreview, 
-  autoLineBreakButton, 
-  tildeReplacementButton 
+import {
+  markdownEditor,
+  htmlPreview,
+  autoLineBreakButton,
+  tildeReplacementButton,
+  titleSetting,
+  fontSizeSetting,
+  modeSetting,
+  autoAddSpacesCheckbox,
+  preventUsedImageDeletionCheckbox
 } from './dom.js';
 
 // Import state from state module
-import { globalSettings } from './state.js';
+import { notes, globalSettings, activeNoteId, setActiveNoteId } from './state.js';
 
 /**
  * Saves the global settings to storage.
@@ -79,11 +84,34 @@ function updateTildeReplacementButton() {
   tildeReplacementButton.title = globalSettings.tildeReplacement ? 'Tilde Replacement Enabled' : 'Tilde Replacement Disabled';
 }
 
+/**
+ * Populates the settings form fields based on global or note-specific settings.
+ * @param {boolean} isGlobal Whether to show global settings.
+ * @param {object} [note] The note object (required when isGlobal is false).
+ * @returns {boolean} True if form was populated, false if note not found.
+ */
+function populateSettingsForm(isGlobal, note) {
+  if (isGlobal) {
+    titleSetting.value = globalSettings.title || 'default';
+    fontSizeSetting.value = globalSettings.fontSize || 12;
+  } else {
+    if (!note) return false;
+    setActiveNoteId(note.id);
+    titleSetting.value = note.settings.title || 'default';
+    fontSizeSetting.value = note.settings.fontSize || globalSettings.fontSize || 12;
+  }
+  modeSetting.value = globalSettings.mode || 'system';
+  autoAddSpacesCheckbox.checked = globalSettings.autoAddSpaces;
+  preventUsedImageDeletionCheckbox.checked = globalSettings.preventUsedImageDeletion;
+  return true;
+}
+
 // Export functions
 export {
   saveGlobalSettings,
   applyFontSize,
   applyMode,
   updateAutoLineBreakButton,
-  updateTildeReplacementButton
+  updateTildeReplacementButton,
+  populateSettingsForm
 };

@@ -180,6 +180,32 @@ function analyzeTextAtCursor(text, cursorPos) {
   };
 }
 
+/**
+ * Toggles a markdown checkbox at the given index.
+ * @param {string} markdown - The full markdown text.
+ * @param {number} checkboxIndex - The 0-based index of the checkbox to toggle.
+ * @returns {string|null} The updated markdown, or null if index is invalid.
+ */
+function toggleMarkdownCheckbox(markdown, checkboxIndex) {
+  if (checkboxIndex < 0) return null;
+
+  const regex = /\[[x ]\]/g;
+  let match;
+  const matches = [];
+  while ((match = regex.exec(markdown)) !== null) {
+    matches.push(match);
+  }
+
+  if (checkboxIndex >= matches.length) return null;
+
+  const matchToUpdate = matches[checkboxIndex];
+  const charIndex = matchToUpdate.index;
+  const originalText = matchToUpdate[0];
+  const newText = originalText === '[ ]' ? '[x]' : '[ ]';
+
+  return markdown.substring(0, charIndex) + newText + markdown.substring(charIndex + 3);
+}
+
 // Export all functions
 export {
   escapeTildes,
@@ -188,5 +214,6 @@ export {
   countTrailingSpaces,
   normalizeTrailingSpaces,
   handleEnterKeyInput,
-  analyzeTextAtCursor
+  analyzeTextAtCursor,
+  toggleMarkdownCheckbox
 };

@@ -19,9 +19,10 @@ import {
 import { saveNote, saveImage } from '../database/index.js';
 import { pushToHistory } from '../history.js';
 import { extractImageIds } from '../utils.js';
-import { 
-  processPastedText, 
-  handleEnterKeyInput 
+import {
+  processPastedText,
+  handleEnterKeyInput,
+  toggleMarkdownCheckbox
 } from '../text-processors.js';
 
 // Import state from state module
@@ -162,24 +163,8 @@ function initializeEditorEvents() {
       const checkboxes = Array.from(htmlPreview.querySelectorAll('input[type="checkbox"]'));
       const checkboxIndex = checkboxes.indexOf(e.target);
 
-      const markdown = markdownEditor.value;
-      const regex = /\[[x ]\]/g;
-      let match;
-      const matches = [];
-      while ((match = regex.exec(markdown)) !== null) {
-        matches.push(match);
-      }
-
-      if (checkboxIndex < matches.length) {
-        const matchToUpdate = matches[checkboxIndex];
-        const charIndex = matchToUpdate.index;
-        const originalText = matchToUpdate[0];
-        const newText = originalText === '[ ]' ? '[x]' : '[ ]';
-
-        const newMarkdown = markdown.substring(0, charIndex) +
-                            newText +
-                            markdown.substring(charIndex + 3);
-
+      const newMarkdown = toggleMarkdownCheckbox(markdownEditor.value, checkboxIndex);
+      if (newMarkdown !== null) {
         markdownEditor.value = newMarkdown;
 
         // Trigger update and save
@@ -189,8 +174,8 @@ function initializeEditorEvents() {
           note.metadata.lastModified = Date.now();
           sortNotes();
           await saveNote(note);
-          renderMarkdown(); // Re-render to show the change immediately
-          renderNoteList(); // Update note list if title changes
+          renderMarkdown();
+          renderNoteList();
         }
       }
     } else if (e.target.tagName === 'IMG') {

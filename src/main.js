@@ -1,5 +1,6 @@
 // Import all required modules  
 import { initDB, saveNote, getAllNotes, getAllImageObjectsFromDB, deleteNotePermanentlyDB, deleteImagePermanently } from './database/index.js';
+import { THIRTY_DAYS_MS } from './constants.js';
 import { sortNotes } from './notes.js';
 import { applyFontSize, applyMode, updateAutoLineBreakButton, updateTildeReplacementButton } from './settings.js';
 import { renderNoteList, showListView } from './notes_view/index.js';
@@ -76,7 +77,7 @@ async function loadAndMigrateData() {
 // === 정리 함수 ===
 
 async function cleanupDeletedImages() {
-    const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000; // 30일 전 타임스탬프
+    const thirtyDaysAgo = Date.now() - THIRTY_DAYS_MS; // 30일 전 타임스탬프
     const imageObjects = await getAllImageObjectsFromDB();
     // 30일 이상 오래된 삭제 이미지 찾기
     const imagesToDelete = imageObjects.filter(img => img.deletedAt && img.deletedAt < thirtyDaysAgo);
@@ -90,7 +91,7 @@ async function cleanupDeletedImages() {
  * Deletes notes that have been in the recycle bin for more than 30 days.
  */
 async function cleanupDeletedNotes() {
-    const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000; // 30일 전 타임스탬프
+    const thirtyDaysAgo = Date.now() - THIRTY_DAYS_MS; // 30일 전 타임스탬프
     // 30일 이상 오래된 삭제 노트 찾기
     const notesToDelete = deletedNotes.filter(note => note.metadata.deletedAt < thirtyDaysAgo);
     // 영구 삭제

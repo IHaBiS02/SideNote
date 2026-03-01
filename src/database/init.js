@@ -46,8 +46,41 @@ function getDB() {
   return db;
 }
 
+/**
+ * Closes the database connection.
+ */
+function closeDB() {
+  if (db) {
+    db.close();
+    db = undefined;
+  }
+}
+
+/**
+ * Executes an operation within a database transaction.
+ * @param {string} storeName The object store name.
+ * @param {string} mode The transaction mode ('readonly' or 'readwrite').
+ * @param {function(IDBObjectStore): IDBRequest} operation A function that receives the object store and returns an IDBRequest.
+ * @returns {Promise<*>} A promise that resolves with the request result.
+ */
+function dbTransaction(storeName, mode, operation) {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject(new Error('DB not initialized'));
+      return;
+    }
+    const transaction = db.transaction([storeName], mode);
+    const store = transaction.objectStore(storeName);
+    const request = operation(store);
+    request.onsuccess = (event) => resolve(event.target.result);
+    request.onerror = (event) => reject(event.target.error);
+  });
+}
+
 // Export functions
 export {
   initDB,
-  getDB
+  getDB,
+  closeDB,
+  dbTransaction
 };

@@ -5,11 +5,6 @@ import {
   licenseBackButton,
   recycleBinBackButton,
   imageManagementBackButton,
-  titleSetting,
-  fontSizeSetting,
-  modeSetting,
-  autoAddSpacesCheckbox,
-  preventUsedImageDeletionCheckbox,
   markdownEditor
 } from '../dom.js';
 
@@ -26,15 +21,14 @@ import {
   renderNoteList
 } from '../notes_view/index.js';
 import { saveNote } from '../database/index.js';
+import { populateSettingsForm } from '../settings.js';
+import { createDropdown } from '../ui-helpers.js';
 
 // Import state from state module
 import {
   notes,
-  globalSettings,
   isGlobalSettings,
-  activeNoteId,
   originalNoteContent,
-  setActiveNoteId,
   setIsGlobalSettings
 } from '../state.js';
 
@@ -48,6 +42,21 @@ import {
 } from '../history.js';
 
 // === Navigation utility functions ===
+
+// Save editor content if changed before navigating away
+async function saveCurrentEditorIfChanged() {
+    const currentState = getCurrentHistoryState();
+    if (currentState && currentState.view === 'editor') {
+        const note = notes.find(n => n.id === currentState.params.noteId);
+        if (note && markdownEditor.value !== originalNoteContent) {
+            note.content = markdownEditor.value;
+            note.metadata.lastModified = Date.now();
+            sortNotes();
+            await saveNote(note);
+            renderNoteList();
+        }
+    }
+}
 
 // Navigate to a given state (view switching)
 async function navigateToState(state) {
@@ -66,22 +75,11 @@ async function navigateToState(state) {
         case 'settings':
             setIsGlobalSettings(state.params.isGlobal);
             if (isGlobalSettings) {
-                titleSetting.value = globalSettings.title || 'default';
-                fontSizeSetting.value = globalSettings.fontSize || 12;
-                modeSetting.value = globalSettings.mode || 'system';
-                autoAddSpacesCheckbox.checked = globalSettings.autoAddSpaces;
-                preventUsedImageDeletionCheckbox.checked = globalSettings.preventUsedImageDeletion;
+                populateSettingsForm(true);
             } else {
                 const note = notes.find(n => n.id === state.params.noteId);
-                if (note) {
-                    setActiveNoteId(note.id);
-                    titleSetting.value = note.settings.title || 'default';
-                    fontSizeSetting.value = note.settings.fontSize || globalSettings.fontSize || 12;
-                    modeSetting.value = globalSettings.mode || 'system';
-                    autoAddSpacesCheckbox.checked = globalSettings.autoAddSpaces;
-                    preventUsedImageDeletionCheckbox.checked = globalSettings.preventUsedImageDeletion;
-                } else {
-                    showListView(false); // Fallback
+                if (!note || !populateSettingsForm(false, note)) {
+                    showListView(false);
                     return;
                 }
             }
@@ -103,18 +101,7 @@ async function navigateToState(state) {
 
 // Go back to previous screen
 async function goBack() {
-    const currentState = getCurrentHistoryState();
-    // If currently in editor, save changes
-    if (currentState && currentState.view === 'editor') {
-        const note = notes.find(n => n.id === currentState.params.noteId);
-        if (note && markdownEditor.value !== originalNoteContent) {
-            note.content = markdownEditor.value;
-            note.metadata.lastModified = Date.now();
-            sortNotes();
-            await saveNote(note);
-            renderNoteList();
-        }
-    }
+    await saveCurrentEditorIfChanged();
 
     const previousState = moveBack();
     if (previousState) {
@@ -171,18 +158,8 @@ function populateHistoryDropdown(dropdown) {
         item.addEventListener('click', async () => {
             const targetState = history[originalIndex];
 
-            const currentState = getCurrentHistoryState();
-            if (currentState && currentState.view === 'editor') {
-                const note = notes.find(n => n.id === currentState.params.noteId);
-                if (note && markdownEditor.value !== originalNoteContent) {
-                    note.content = markdownEditor.value;
-                    note.metadata.lastModified = Date.now();
-                    sortNotes();
-                    await saveNote(note);
-                    renderNoteList();
-                }
-            }
-            
+            await saveCurrentEditorIfChanged();
+
             goToHistoryState(originalIndex);
             navigateToState(targetState);
             dropdown.remove();
@@ -192,31 +169,14 @@ function populateHistoryDropdown(dropdown) {
 }
 
 function showHistoryDropdown(targetButton) {
-    // Close any existing dropdown
-    const existingDropdown = document.querySelector('.history-dropdown');
-    if (existingDropdown) {
-        existingDropdown.remove();
-    }
-
     const history = getHistory();
     if (history.length === 0) return;
 
-    const dropdown = document.createElement('div');
-    dropdown.classList.add('history-dropdown');
-
-    populateHistoryDropdown(dropdown);
-
-    document.body.appendChild(dropdown);
-
-    // Close dropdown when clicking outside
-    setTimeout(() => {
-        document.addEventListener('click', function closeDropdown(event) {
-            if (!dropdown.contains(event.target) && event.target !== targetButton) {
-                dropdown.remove();
-                document.removeEventListener('click', closeDropdown);
-            }
-        });
-    }, 0);
+    createDropdown({
+        className: 'history-dropdown',
+        populate: (dropdown) => populateHistoryDropdown(dropdown),
+        excludeFromClose: [],
+    });
 }
 
 function refreshHistoryDropdown() {

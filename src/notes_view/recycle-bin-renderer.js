@@ -12,9 +12,12 @@ import {
 import { getAllImageObjectsFromDB, deleteImage, restoreImage, deleteImagePermanently } from '../database/index.js';
 
 // Import state from state module
-import { 
+import {
   deletedNotes
 } from '../state.js';
+
+import { THIRTY_DAYS_MS } from '../constants.js';
+import { createTrackedBlobUrl, revokeAllBlobUrls } from '../utils.js';
 
 // Import image modal function
 import { showImageModal } from './image-manager.js';
@@ -25,6 +28,7 @@ import { showImageModal } from './image-manager.js';
 // === 휴지통 항목 렌더링 ===
 
 async function renderDeletedItemsList() {
+  revokeAllBlobUrls();
   deletedItemsList.innerHTML = '';
 
   // 1. 삭제된 노트와 이미지 가져오기
@@ -52,7 +56,7 @@ async function renderDeletedItemsList() {
       titleSpan.textContent = item.title;
       itemInfo.appendChild(titleSpan);
 
-      const deletionDate = new Date(item.deletedAt + 30 * 24 * 60 * 60 * 1000);
+      const deletionDate = new Date(item.deletedAt + THIRTY_DAYS_MS);
       const deletionDateSpan = document.createElement('span');
       deletionDateSpan.textContent = `Deletes on: ${deletionDate.toLocaleString()}`;
       deletionDateSpan.classList.add('deletion-date');
@@ -62,7 +66,7 @@ async function renderDeletedItemsList() {
       const img = document.createElement('img');
       const imageBlob = item.blob;
       if (imageBlob) {
-          const blobUrl = URL.createObjectURL(imageBlob);
+          const blobUrl = createTrackedBlobUrl(imageBlob);
           img.src = blobUrl;
           img.onclick = () => showImageModal(blobUrl);
       }
@@ -76,7 +80,7 @@ async function renderDeletedItemsList() {
       imageName.textContent = `image_${item.id.substring(0, 8)}.png`;
       textContainer.appendChild(imageName);
 
-      const deletionDate = new Date(item.deletedAt + 30 * 24 * 60 * 60 * 1000);
+      const deletionDate = new Date(item.deletedAt + THIRTY_DAYS_MS);
       const deletionDateSpan = document.createElement('span');
       deletionDateSpan.textContent = `Deletes on: ${deletionDate.toLocaleString()}`;
       deletionDateSpan.classList.add('deletion-date');

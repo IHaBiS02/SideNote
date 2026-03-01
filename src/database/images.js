@@ -1,5 +1,5 @@
-// Import database instance getter
-import { getDB } from './init.js';
+// Import database helpers
+import { dbTransaction } from './init.js';
 
 /**
  * Retrieves an image object from the database by its ID.
@@ -7,24 +7,7 @@ import { getDB } from './init.js';
  * @returns {Promise<object>} A promise that resolves with the image object.
  */
 function _getImageObject(id) {
-  return new Promise((resolve, reject) => {
-    const db = getDB();
-    if (!db) {
-      reject('DB not initialized');
-      return;
-    }
-    const transaction = db.transaction(['images'], 'readonly');
-    const store = transaction.objectStore('images');
-    const request = store.get(id);
-
-    request.onsuccess = (event) => {
-      resolve(event.target.result);
-    };
-
-    request.onerror = (event) => {
-      reject(event.target.error);
-    };
-  });
+  return dbTransaction('images', 'readonly', (store) => store.get(id));
 }
 
 /**
@@ -34,42 +17,22 @@ function _getImageObject(id) {
  * @returns {Promise<void>} A promise that resolves when the image is saved.
  */
 function saveImage(id, blob) {
-  return new Promise((resolve, reject) => {
-    const db = getDB();
-    if (!db) {
-      reject('DB not initialized');
-      return;
-    }
-    const transaction = db.transaction(['images'], 'readwrite');
-    const store = transaction.objectStore('images');
-    const request = store.put({ id: id, blob: blob, deletedAt: null });
-
-    request.onsuccess = () => {
-      resolve();
-    };
-
-    request.onerror = (event) => {
-      reject(event.target.error);
-    };
-  });
+  return dbTransaction('images', 'readwrite', (store) =>
+    store.put({ id, blob, deletedAt: null })
+  );
 }
 
 /**
  * Retrieves an image blob from the database.
  * @param {string} id The ID of the image to retrieve.
- * @returns {Promise<Blob>} A promise that resolves with the image blob.
+ * @returns {Promise<Blob|null>} A promise that resolves with the image blob or null.
  */
-function getImage(id) {
-  return new Promise((resolve, reject) => {
-    _getImageObject(id).then(imageObject => {
-      // 삭제되지 않은 이미지만 반환
-      if (imageObject && !imageObject.deletedAt) {
-        resolve(imageObject.blob);
-      } else {
-        resolve(null);
-      }
-    }).catch(reject);
-  });
+async function getImage(id) {
+  const imageObject = await _getImageObject(id);
+  if (imageObject && !imageObject.deletedAt) {
+    return imageObject.blob;
+  }
+  return null;
 }
 
 /**
@@ -77,29 +40,12 @@ function getImage(id) {
  * @param {string} id The ID of the image to delete.
  * @returns {Promise<void>} A promise that resolves when the image is marked as deleted.
  */
-function deleteImage(id) {
-  return new Promise(async (resolve, reject) => {
-    const db = getDB();
-    if (!db) {
-      reject('DB not initialized');
-      return;
-    }
-    try {
-      const imageObject = await _getImageObject(id);
-      if (imageObject) {
-        imageObject.deletedAt = Date.now();
-        const transaction = db.transaction(['images'], 'readwrite');
-        const store = transaction.objectStore('images');
-        const request = store.put(imageObject);
-        request.onsuccess = () => resolve();
-        request.onerror = (event) => reject(event.target.error);
-      } else {
-        resolve(); // 이미지를 찾을 수 없음, 아무 작업도 하지 않음
-      }
-    } catch (err) {
-      reject(err);
-    }
-  });
+async function deleteImage(id) {
+  const imageObject = await _getImageObject(id);
+  if (imageObject) {
+    imageObject.deletedAt = Date.now();
+    await dbTransaction('images', 'readwrite', (store) => store.put(imageObject));
+  }
 }
 
 /**
@@ -107,29 +53,12 @@ function deleteImage(id) {
  * @param {string} id The ID of the image to restore.
  * @returns {Promise<void>} A promise that resolves when the image is restored.
  */
-function restoreImage(id) {
-  return new Promise(async (resolve, reject) => {
-    const db = getDB();
-    if (!db) {
-      reject('DB not initialized');
-      return;
-    }
-    try {
-      const imageObject = await _getImageObject(id);
-      if (imageObject) {
-        imageObject.deletedAt = null;
-        const transaction = db.transaction(['images'], 'readwrite');
-        const store = transaction.objectStore('images');
-        const request = store.put(imageObject);
-        request.onsuccess = () => resolve();
-        request.onerror = (event) => reject(event.target.error);
-      } else {
-        resolve();
-      }
-    } catch (err) {
-      reject(err);
-    }
-  });
+async function restoreImage(id) {
+  const imageObject = await _getImageObject(id);
+  if (imageObject) {
+    imageObject.deletedAt = null;
+    await dbTransaction('images', 'readwrite', (store) => store.put(imageObject));
+  }
 }
 
 /**
@@ -138,24 +67,7 @@ function restoreImage(id) {
  * @returns {Promise<void>} A promise that resolves when the image is deleted.
  */
 function deleteImagePermanently(id) {
-  return new Promise((resolve, reject) => {
-    const db = getDB();
-    if (!db) {
-      reject('DB not initialized');
-      return;
-    }
-    const transaction = db.transaction(['images'], 'readwrite');
-    const store = transaction.objectStore('images');
-    const request = store.delete(id);
-
-    request.onsuccess = () => {
-      resolve();
-    };
-
-    request.onerror = (event) => {
-      reject(event.target.error);
-    };
-  });
+  return dbTransaction('images', 'readwrite', (store) => store.delete(id));
 }
 
 /**
@@ -163,24 +75,7 @@ function deleteImagePermanently(id) {
  * @returns {Promise<Array<object>>} A promise that resolves with an array of image objects.
  */
 function getAllImageObjectsFromDB() {
-  return new Promise((resolve, reject) => {
-    const db = getDB();
-    if (!db) {
-      reject('DB not initialized');
-      return;
-    }
-    const transaction = db.transaction(['images'], 'readonly');
-    const store = transaction.objectStore('images');
-    const request = store.getAll();
-
-    request.onsuccess = (event) => {
-      resolve(event.target.result);
-    };
-
-    request.onerror = (event) => {
-      reject(event.target.error);
-    };
-  });
+  return dbTransaction('images', 'readonly', (store) => store.getAll());
 }
 
 // Export functions

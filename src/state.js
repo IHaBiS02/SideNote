@@ -1,3 +1,8 @@
+// State management conventions:
+// - Prefer in-place mutation (splice, push) for array state when possible
+// - Use setter functions (setNotes, setDeletedNotes) only when replacing the entire array
+// - ES module exports are live bindings, so in-place mutations are visible to all importers
+
 // Shared state variables across modules
 export let notes = [];         // 활성 노트 목록
 export let deletedNotes = [];  // 삭제된 노트 목록 (휴지통)

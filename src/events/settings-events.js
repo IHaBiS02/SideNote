@@ -31,9 +31,11 @@ import {
   applyFontSize,
   applyMode,
   updateAutoLineBreakButton,
-  updateTildeReplacementButton
+  updateTildeReplacementButton,
+  populateSettingsForm
 } from '../settings.js';
 import { saveNote } from '../database/index.js';
+import { createDropdown } from '../ui-helpers.js';
 
 // Import state from state module
 import {
@@ -51,22 +53,14 @@ function initializeSettingsEvents() {
   settingsButton.addEventListener('click', () => {
     setIsGlobalSettings(false);
     const note = notes.find(n => n.id === activeNoteId);
-    titleSetting.value = note.settings.title || 'default';
-    fontSizeSetting.value = note.settings.fontSize || globalSettings.fontSize || 12;
-    modeSetting.value = globalSettings.mode || 'system';
-    autoAddSpacesCheckbox.checked = globalSettings.autoAddSpaces;
-    preventUsedImageDeletionCheckbox.checked = globalSettings.preventUsedImageDeletion;
+    populateSettingsForm(false, note);
     showSettingsView();
   });
 
   // Open global settings
   globalSettingsButton.addEventListener('click', () => {
     setIsGlobalSettings(true);
-    titleSetting.value = globalSettings.title || 'default';
-    fontSizeSetting.value = globalSettings.fontSize || 12;
-    modeSetting.value = globalSettings.mode || 'system';
-    autoAddSpacesCheckbox.checked = globalSettings.autoAddSpaces;
-    preventUsedImageDeletionCheckbox.checked = globalSettings.preventUsedImageDeletion;
+    populateSettingsForm(true);
     showSettingsView();
   });
 
@@ -93,48 +87,33 @@ function initializeSettingsEvents() {
   emptyRecycleBinButton.addEventListener('click', (e) => {
       e.stopPropagation();
 
-      const existingDropdown = document.querySelector('.confirmation-dropdown');
-      if (existingDropdown) {
-          existingDropdown.remove();
-          return;
-      }
+      createDropdown({
+          className: 'confirmation-dropdown',
+          populate: (dropdown) => {
+              const eraseAction = document.createElement('div');
+              eraseAction.textContent = 'Erase All Notes';
+              eraseAction.classList.add('delete-action');
 
-      const dropdown = document.createElement('div');
-      dropdown.classList.add('confirmation-dropdown');
+              const handleFirstClick = (event) => {
+                  event.stopPropagation();
 
-      const eraseAction = document.createElement('div');
-      eraseAction.textContent = 'Erase All Notes';
-      eraseAction.classList.add('delete-action');
+                  const confirmAction = document.createElement('div');
+                  confirmAction.textContent = 'Are you sure?';
+                  confirmAction.classList.add('delete-action', 'confirm');
 
-      const handleFirstClick = (event) => {
-          event.stopPropagation();
+                  confirmAction.addEventListener('click', () => {
+                      emptyRecycleBin();
+                      dropdown.remove();
+                  });
 
-          const confirmAction = document.createElement('div');
-          confirmAction.textContent = 'Are you sure?';
-          confirmAction.classList.add('delete-action', 'confirm');
+                  dropdown.insertBefore(confirmAction, eraseAction);
+                  eraseAction.removeEventListener('click', handleFirstClick);
+              };
 
-          confirmAction.addEventListener('click', () => {
-              emptyRecycleBin();
-              dropdown.remove();
-          });
-
-          dropdown.insertBefore(confirmAction, eraseAction);
-          eraseAction.removeEventListener('click', handleFirstClick);
-      };
-
-      eraseAction.addEventListener('click', handleFirstClick);
-
-      dropdown.appendChild(eraseAction);
-      document.body.appendChild(dropdown);
-
-      setTimeout(() => {
-          document.addEventListener('click', function closeDropdown(event) {
-              if (!dropdown.contains(event.target)) {
-                  dropdown.remove();
-                  document.removeEventListener('click', closeDropdown);
-              }
-          });
-      }, 0);
+              eraseAction.addEventListener('click', handleFirstClick);
+              dropdown.appendChild(eraseAction);
+          },
+      });
   });
 
   // Mode setting change
