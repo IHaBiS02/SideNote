@@ -4,6 +4,7 @@ sidenote.zip
 SideNote_2_9_5.zip
 *.zip
 commit_message.txt
+.claude/
 /node_modules
 /build
 licenses.json
