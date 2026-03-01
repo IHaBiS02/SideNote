@@ -58,5 +58,15 @@ async function processSnote(zip) {
   return newNote;
 }
 
+async function saveImportedNotes(newNotes) {
+  newNotes.sort((a, b) => a.metadata.lastModified - b.metadata.lastModified);
+  const now = Date.now();
+  for (let i = 0; i < newNotes.length; i++) {
+    newNotes[i].metadata.lastModified = now + i;
+    await saveNote(newNotes[i]);
+  }
+  return newNotes;
+}
+
 // Export the function
-export { processSnote };
+export { processSnote, saveImportedNotes };

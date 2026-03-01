@@ -20,7 +20,7 @@ import {
   downloadFile, 
   extractImageIds 
 } from '../utils.js';
-import { processSnote } from '../import_export.js';
+import { processSnote, saveImportedNotes } from '../import_export.js';
 
 // Import state from state module
 import {
@@ -147,14 +147,10 @@ function initializeImportExportEvents() {
           newNotes.push(newNote);
         }
 
-        newNotes.sort((a, b) => a.metadata.lastModified - b.metadata.lastModified);
-        
-        const now = Date.now();
-        newNotes.forEach(async (note, index) => {
-          note.metadata.lastModified = now + index;
+        await saveImportedNotes(newNotes);
+        for (const note of newNotes) {
           notes.push(note);
-          await saveNote(note);
-        });
+        }
         
       }
       sortNotes();

@@ -6,7 +6,7 @@ vi.mock('../../src/database/index.js', () => ({
   saveNote: vi.fn().mockResolvedValue(),
 }));
 
-import { processSnote } from '../../src/import_export.js';
+import { processSnote, saveImportedNotes } from '../../src/import_export.js';
 import { saveImage, saveNote } from '../../src/database/index.js';
 
 // Helper to create a mock JSZip object
@@ -163,6 +163,62 @@ describe('import_export', () => {
       const result = await processSnote(zip);
       expect(result).toBeDefined();
       expect(saveImage).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('saveImportedNotes', () => {
+    function makeNote(lastModified) {
+      return {
+        id: crypto.randomUUID(),
+        title: `Note ${lastModified}`,
+        content: 'test',
+        settings: {},
+        metadata: { createdAt: 1000, lastModified },
+        isPinned: false,
+      };
+    }
+
+    it('should call saveNote sequentially for all notes', async () => {
+      const callOrder = [];
+      saveNote.mockImplementation(async (note) => {
+        callOrder.push(note.title);
+      });
+
+      const notes = [makeNote(3000), makeNote(1000), makeNote(2000)];
+      await saveImportedNotes(notes);
+
+      expect(callOrder).toEqual(['Note 1000', 'Note 2000', 'Note 3000']);
+    });
+
+    it('should assign increasing lastModified timestamps', async () => {
+      const notes = [makeNote(3000), makeNote(1000), makeNote(2000)];
+      const result = await saveImportedNotes(notes);
+
+      for (let i = 1; i < result.length; i++) {
+        expect(result[i].metadata.lastModified).toBeGreaterThan(
+          result[i - 1].metadata.lastModified
+        );
+      }
+    });
+
+    it('should sort notes by lastModified before processing', async () => {
+      const notes = [makeNote(3000), makeNote(1000), makeNote(2000)];
+      await saveImportedNotes(notes);
+
+      expect(notes[0].title).toBe('Note 1000');
+      expect(notes[1].title).toBe('Note 2000');
+      expect(notes[2].title).toBe('Note 3000');
+    });
+
+    it('should not call saveNote for empty array', async () => {
+      await saveImportedNotes([]);
+      expect(saveNote).not.toHaveBeenCalled();
+    });
+
+    it('should call saveNote exactly once per note', async () => {
+      const notes = [makeNote(100), makeNote(200), makeNote(300)];
+      await saveImportedNotes(notes);
+      expect(saveNote).toHaveBeenCalledTimes(3);
     });
   });
 });
