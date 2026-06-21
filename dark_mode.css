@@ -95,6 +95,14 @@ body.dark-mode {
     border: 1px solid #555;
 }
 
+.dark-mode .settings-section {
+    border-color: #444;
+}
+
+.dark-mode .settings-section legend {
+    color: #e0e0e0;
+}
+
 .dark-mode pre code {
     background-color: #2d2d2d;
     border: 1px solid #444;

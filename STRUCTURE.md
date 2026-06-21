@@ -37,7 +37,7 @@ SideNote is a browser extension that provides a simple note-taking interface wit
     -   `settings.js`: Manages global and note-specific settings, including default setting normalization and effective setting resolution.
     -   `import_export.js`: Contains the logic for parsing `.snote` files, saving parsed imports, and packaging `.snote`/`.snotes` zip archives.
     -   `utils.js`: Utility functions for timestamps, filename sanitization, file downloads, scoped blob URL tracking, and image ID extraction.
-    -   `text-processors.js`: Text processing utilities for markdown editing, including tilde escaping, auto line breaks, Enter key handling, and whitespace cleanup.
+    -   `text-processors.js`: Legacy text processing utilities for markdown editing, including tilde escaping, auto line breaks, Enter key handling, and whitespace cleanup.
 -   **`sidepanel.css`**: The primary stylesheet for the extension's UI.
 -   **`dark_mode.css`**: A supplementary stylesheet containing CSS variables and rules specifically for the dark mode theme.
 -   **`background.js`**: A service worker script that handles the initial opening of the side panel when the extension icon is clicked.
@@ -55,11 +55,12 @@ The UI is a single-page application with several distinct "views" that are shown
     -   A header with a "Back" button (`#back-button`) and the note's title (`#editor-title`).
     -   `#markdown-editor`: A `<textarea>` for raw Markdown input.
     -   `#html-preview`: A `<div>` to display the rendered HTML preview.
-    -   A toolbar with buttons for toggling the view, line breaks, tilde replacement, and note-specific import/export/settings.
+    -   A toolbar with buttons for toggling the view and note-specific import/export/settings.
 -   **`#settings-view`**: The screen for configuring settings.
     -   Can be accessed globally (from list view) or for a specific note (from editor view).
     -   Controls for UI Mode (Light/Dark), Title behavior, Font Size, and other options.
-    -   Checkbox for "Auto Add Two Spaces on Enter" and "Prevent deletion of used images".
+    -   Checkbox for "Prevent deletion of used images".
+    -   Legacy controls for Markdown line-break mode, adding two trailing spaces to pasted lines, adding two trailing spaces on Enter, and tilde escaping.
     -   Buttons to navigate to Image Management, Recycle Bin, and Licenses pages.
 -   **`#license-view`**: Displays the contents of `LIBRARY_LICENSES.md`.
 -   **`#recycle-bin-view`**: Displays a list of deleted items (`#deleted-items-list`), both notes and images, with options to restore or delete them permanently. Includes an "Empty Recycle Bin" button.
@@ -116,9 +117,9 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **`openNote(noteId, inEditMode, addToHistory)`**: Sets the `activeNoteId` and populates the editor with the note's content. It now also records the action in the navigation history (located in `src/notes_view/note-renderer.js`).
 -   **`markdownEditor` (Event Listeners)** (handled in `src/events/editor.js`):
     -   `input`: Updates the note content and metadata on every keystroke.
-    -   `paste`: Intercepts pasted content. If it's an image, it saves it to IndexedDB and inserts the corresponding Markdown tag. If it's text, it applies formatting.
-    -   `keydown`: Handles keyboard shortcuts (Enter, Shift+Enter).
--   **`renderMarkdown()`**: Converts Markdown to HTML, sanitizes it, and applies syntax highlighting. It also calls `renderImages()` (located in `src/notes_view/markdown-renderer.js`).
+    -   `paste`: Intercepts pasted content. If it's an image, it saves it to IndexedDB and inserts the corresponding Markdown tag. If it's text, it applies enabled legacy text formatting.
+    -   `keydown`: Handles keyboard shortcuts (Enter, Shift+Enter) and legacy trailing-space insertion only when legacy line-break mode is enabled.
+-   **`renderMarkdown()`**: Converts Markdown to HTML, sanitizes it, applies syntax highlighting, and renders normal newlines as line breaks by default. Legacy line-break mode disables Marked's `breaks` option. It also calls `renderImages()` (located in `src/notes_view/markdown-renderer.js`).
 -   **`renderImages()`**: Finds all `<img>` tags in the preview and loads their `src` from IndexedDB blob URLs (located in `src/notes_view/markdown-renderer.js`). Preview, image management, and recycle bin views each use scoped blob URL trackers.
 -   **`togglePreview()`**: Switches between the raw text editor and the rendered view, and records the change in the navigation history (located in `src/notes_view/markdown-renderer.js`).
 

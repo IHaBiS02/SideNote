@@ -18,7 +18,7 @@ import {
 } from '../notes_view/index.js';
 import { saveNote, saveImage } from '../database/index.js';
 import { pushToHistory } from '../history.js';
-import { normalizeGlobalSettings, resolveEffectiveSettings } from '../settings.js';
+import { resolveEffectiveSettings, resolveLegacyTextProcessingSettings } from '../settings.js';
 import {
   processPastedText,
   handleEnterKeyInput,
@@ -124,7 +124,7 @@ function initializeEditorEvents() {
     } else {
       // Handle text paste
       const rawText = e.clipboardData.getData('text/plain');
-      const processedText = processPastedText(rawText, normalizeGlobalSettings(globalSettings));
+      const processedText = processPastedText(rawText, resolveLegacyTextProcessingSettings(globalSettings));
       insertTextAtCursor(markdownEditor, processedText);
     }
   });
@@ -136,7 +136,7 @@ function initializeEditorEvents() {
   markdownEditor.addEventListener('keydown', (e) => {
     // Auto add two spaces at end of line when pressing Enter
     if (e.key === 'Enter' && !e.isComposing && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
-      const result = handleEnterKeyInput(markdownEditor, normalizeGlobalSettings(globalSettings), insertTextAtCursor);
+      const result = handleEnterKeyInput(markdownEditor, resolveLegacyTextProcessingSettings(globalSettings), insertTextAtCursor);
       if (result.handled) {
         e.preventDefault();
       }

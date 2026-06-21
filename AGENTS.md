@@ -26,7 +26,7 @@ npm run clean
 npm test          # vitest watch mode
 npm run test:run  # single run
 ```
-151 unit/integration tests using vitest + jsdom + fake-indexeddb.
+155 unit/integration tests using vitest + jsdom + fake-indexeddb.
 
 ### Install Dependencies
 ```bash
@@ -119,6 +119,7 @@ tests/
 - Opening settings from an individual note sets `isGlobalSettings` to `false` and edits that note's `settings`, which is stored with the note in IndexedDB.
 - Note-specific settings should fall back to `globalSettings` when the note does not define a value.
 - `codeBlockHeader` controls whether preview code blocks show the language/copy header; it supports both global and note-specific values.
+- Markdown preview renders normal newlines as line breaks by default. `legacyLineBreakMode` is global-only and disables Marked `breaks`, re-enabling the old trailing-space line-break workflow.
 
 ## Development Workflow
 
@@ -160,7 +161,7 @@ After changes:
 
 ## Important Notes
 
-- Test suite: vitest with jsdom + fake-indexeddb (151 tests)
+- Test suite: vitest with jsdom + fake-indexeddb (155 tests)
 - No linting configuration - maintain consistent code style
 - Extension uses Manifest V3 (Chrome) with Firefox compatibility
 - Images in notes use markdown format: `![Image](images/[id].png)`

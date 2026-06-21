@@ -76,9 +76,10 @@ Important settings:
 
 - `title`: whether note titles come from the first line or a custom title.
 - `fontSize`: editor/preview font size.
-- `autoLineBreak`: add Markdown line break spaces on paste.
-- `tildeReplacement`: escape `~` on paste.
-- `autoAddSpaces`: add two spaces when pressing Enter.
+- `legacyLineBreakMode`: disables default soft line break rendering and restores the old trailing-space Markdown workflow.
+- `autoLineBreak`: legacy option to add Markdown line break spaces on paste.
+- `tildeReplacement`: legacy option to escape `~` on paste.
+- `autoAddSpaces`: legacy option to add two spaces when pressing Enter.
 - `codeBlockHeader`: show language/copy header above code blocks.
 - `preventUsedImageDeletion`: prevent deleting images referenced by notes.
 - `mode`: `system`, `light`, or `dark`.
@@ -102,7 +103,7 @@ Important settings:
 - `src/dom.js`: central DOM element lookup/export module.
 - `src/utils.js`: timestamp generation, filename sanitization, file download, image ID extraction, and both default/scoped blob URL tracking.
 - `src/ui-helpers.js`: shared dropdown creation/closing helper.
-- `src/text-processors.js`: pure text editing helpers for paste processing, Markdown line breaks, Enter handling, cursor analysis, and checkbox toggling.
+- `src/text-processors.js`: pure text editing helpers for legacy paste processing, Markdown line breaks, Enter handling, cursor analysis, and checkbox toggling.
 
 ### Database Modules
 

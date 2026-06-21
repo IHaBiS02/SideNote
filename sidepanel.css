@@ -329,6 +329,21 @@ button:hover {
   margin-bottom: 15px;
 }
 
+.settings-section {
+  margin: 0 0 15px;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+.settings-section legend {
+  padding: 0 5px;
+  font-weight: bold;
+}
+
+.settings-section .setting:last-child {
+  margin-bottom: 0;
+}
+
 #recycle-bin-button {
   background-color: #f0f0f0;
 }

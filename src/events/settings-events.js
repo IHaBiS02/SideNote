@@ -11,6 +11,7 @@ import {
   modeSetting,
   autoLineBreakButton,
   tildeReplacementButton,
+  legacyLineBreakModeCheckbox,
   autoAddSpacesCheckbox,
   codeBlockHeaderCheckbox,
   preventUsedImageDeletionCheckbox,
@@ -32,9 +33,9 @@ import {
   saveGlobalSettings,
   applyFontSize,
   applyMode,
-  normalizeGlobalSettings,
   updateAutoLineBreakButton,
   updateTildeReplacementButton,
+  updateLegacyLineBreakControls,
   populateSettingsForm
 } from '../settings.js';
 import { saveNote } from '../database/index.js';
@@ -193,16 +194,24 @@ function initializeSettingsEvents() {
     renderMarkdown();
   });
 
-  // Auto line break button
-  autoLineBreakButton.addEventListener('click', () => {
-    globalSettings.autoLineBreak = !normalizeGlobalSettings(globalSettings).autoLineBreak;
+  // Legacy Markdown line break mode
+  legacyLineBreakModeCheckbox.addEventListener('change', () => {
+    globalSettings.legacyLineBreakMode = legacyLineBreakModeCheckbox.checked;
+    updateLegacyLineBreakControls();
+    saveGlobalSettings();
+    renderMarkdown();
+  });
+
+  // Auto line break legacy checkbox
+  autoLineBreakButton.addEventListener('change', () => {
+    globalSettings.autoLineBreak = autoLineBreakButton.checked;
     updateAutoLineBreakButton();
     saveGlobalSettings();
   });
 
-  // Tilde replacement button
-  tildeReplacementButton.addEventListener('click', () => {
-    globalSettings.tildeReplacement = !normalizeGlobalSettings(globalSettings).tildeReplacement;
+  // Tilde replacement legacy checkbox
+  tildeReplacementButton.addEventListener('change', () => {
+    globalSettings.tildeReplacement = tildeReplacementButton.checked;
     updateTildeReplacementButton();
     saveGlobalSettings();
   });
@@ -210,6 +219,7 @@ function initializeSettingsEvents() {
   // Auto add spaces checkbox
   autoAddSpacesCheckbox.addEventListener('change', () => {
       globalSettings.autoAddSpaces = autoAddSpacesCheckbox.checked;
+      updateLegacyLineBreakControls();
       saveGlobalSettings();
   });
 

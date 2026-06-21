@@ -9,11 +9,12 @@ import {
 import { pushToHistory, getHistory, getHistoryIndex, moveBack } from '../history.js';
 import { getImage } from '../database/index.js';
 import { createBlobUrlTracker } from '../utils.js';
-import { isCodeBlockHeaderEnabled } from '../settings.js';
+import { isCodeBlockHeaderEnabled, normalizeGlobalSettings } from '../settings.js';
 
 // Import state from state module
 import { 
   activeNoteId,
+  globalSettings,
   isPreview,
   notes,
   setIsPreview
@@ -126,6 +127,7 @@ function configureMarkdownRenderer() {
   // marked 옵션 설정
   marked.setOptions({
     gfm: true,        // GitHub Flavored Markdown 사용
+    breaks: !normalizeGlobalSettings(globalSettings).legacyLineBreakMode,
     renderer: renderer,
     highlight: function(code, lang) {
       // 코드 하이라이팅 (highlight.js 사용)

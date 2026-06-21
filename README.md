@@ -5,6 +5,7 @@ A simple notes browser extension that provides a note-taking interface in the br
 ## Features
 
 - **Markdown Support**: Write notes in Markdown with live preview
+- **Soft Line Breaks**: Preview renders normal newlines without requiring trailing spaces
 - **Syntax Highlighting**: Code blocks with syntax highlighting using highlight.js
 - **Dark/Light Mode**: Toggle between themes for comfortable viewing
 - **Import/Export**: Save and load notes in `.snote` and `.snotes` formats
@@ -52,10 +53,10 @@ A simple notes browser extension that provides a note-taking interface in the br
 3. Make a new note and write notes
 4. Press ESC or Shift+Enter to save edit and return to preview
 
-You can paste image on the clipboard directly into notes by Ctrl+V  
-On the bottom, there are two buttons with ✅/❌ on it, the left one add two spaces on the pasted text, and the right one replace `~` to `\~` automatically.
+You can paste image on the clipboard directly into notes by Ctrl+V.  
+Legacy text-processing options are available in settings for older Markdown workflows that used trailing spaces for line breaks.
 
-In settings, you can choose theme, Mode of Title (Default use first line as title, Custom let user type own title by double-click title in note), text size, and two settings on it.
+In settings, you can choose theme, Mode of Title (Default use first line as title, Custom let user type own title by double-click title in note), text size, code block header behavior, image deletion behavior, and legacy Markdown line-break behavior.
 
 Images button show all images used in the notes, showing that which one is used in which note.
 Recycle bin shows all soft-deleted notes and images, and let user delete all at once.

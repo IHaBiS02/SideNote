@@ -100,4 +100,22 @@ describe('markdown renderer code blocks', () => {
 
     expect(preview.querySelector('.code-block-header')).toBeNull();
   });
+
+  it('renders normal newlines as breaks by default', async () => {
+    await renderCodeBlock();
+
+    expect(globalThis.marked.setOptions).toHaveBeenCalledWith(
+      expect.objectContaining({ breaks: true })
+    );
+  });
+
+  it('disables normal newline breaks when legacy line break mode is enabled', async () => {
+    await renderCodeBlock({
+      globalSettings: { legacyLineBreakMode: true },
+    });
+
+    expect(globalThis.marked.setOptions).toHaveBeenCalledWith(
+      expect.objectContaining({ breaks: false })
+    );
+  });
 });

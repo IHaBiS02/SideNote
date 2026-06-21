@@ -4,6 +4,7 @@ import {
   htmlPreview,
   autoLineBreakButton,
   tildeReplacementButton,
+  legacyLineBreakModeCheckbox,
   titleSetting,
   fontSizeSetting,
   modeSetting,
@@ -18,9 +19,10 @@ import { globalSettings, setActiveNoteId } from './state.js';
 const DEFAULT_SETTINGS = Object.freeze({
   title: 'default',
   fontSize: 12,
-  autoLineBreak: true,
-  tildeReplacement: true,
-  autoAddSpaces: true,
+  legacyLineBreakMode: false,
+  autoLineBreak: false,
+  tildeReplacement: false,
+  autoAddSpaces: false,
   codeBlockHeader: true,
   preventUsedImageDeletion: true,
   mode: 'system'
@@ -46,6 +48,19 @@ function resolveEffectiveSettings(note) {
   }
 
   return effectiveSettings;
+}
+
+function resolveLegacyTextProcessingSettings(settings = globalSettings) {
+  const normalizedSettings = normalizeGlobalSettings(settings);
+  if (!normalizedSettings.legacyLineBreakMode) {
+    return {
+      ...normalizedSettings,
+      autoLineBreak: false,
+      autoAddSpaces: false
+    };
+  }
+
+  return normalizedSettings;
 }
 
 /**
@@ -106,8 +121,10 @@ function applyMode(mode) {
 function updateAutoLineBreakButton() {
   // 자동 줄바꿈 버튼 아이콘 및 툴팁 업데이트
   const settings = normalizeGlobalSettings(globalSettings);
-  autoLineBreakButton.textContent = settings.autoLineBreak ? '↩✅' : '↩❌';
-  autoLineBreakButton.title = settings.autoLineBreak ? 'Auto Line Break Enabled' : 'Auto Line Break Disabled';
+  const isEnabled = settings.legacyLineBreakMode && settings.autoLineBreak;
+  autoLineBreakButton.checked = isEnabled;
+  autoLineBreakButton.disabled = !settings.legacyLineBreakMode;
+  autoLineBreakButton.title = isEnabled ? 'Add two spaces to pasted lines enabled' : 'Add two spaces to pasted lines disabled';
 }
 
 /**
@@ -116,8 +133,16 @@ function updateAutoLineBreakButton() {
 function updateTildeReplacementButton() {
   // 틸데(~) 자동 변환 버튼 아이콘 및 툴팁 업데이트
   const settings = normalizeGlobalSettings(globalSettings);
-  tildeReplacementButton.textContent = settings.tildeReplacement ? '~✅' : '~❌';
-  tildeReplacementButton.title = settings.tildeReplacement ? 'Tilde Replacement Enabled' : 'Tilde Replacement Disabled';
+  tildeReplacementButton.checked = settings.tildeReplacement;
+  tildeReplacementButton.title = settings.tildeReplacement ? 'Tilde replacement enabled' : 'Tilde replacement disabled';
+}
+
+function updateLegacyLineBreakControls() {
+  const settings = normalizeGlobalSettings(globalSettings);
+  legacyLineBreakModeCheckbox.checked = settings.legacyLineBreakMode;
+  updateAutoLineBreakButton();
+  autoAddSpacesCheckbox.checked = settings.legacyLineBreakMode && settings.autoAddSpaces;
+  autoAddSpacesCheckbox.disabled = !settings.legacyLineBreakMode;
 }
 
 function isCodeBlockHeaderEnabled(note) {
@@ -146,7 +171,9 @@ function populateSettingsForm(isGlobal, note) {
     codeBlockHeaderCheckbox.checked = effectiveNoteSettings.codeBlockHeader !== false;
   }
   modeSetting.value = effectiveGlobalSettings.mode;
-  autoAddSpacesCheckbox.checked = effectiveGlobalSettings.autoAddSpaces;
+  legacyLineBreakModeCheckbox.checked = effectiveGlobalSettings.legacyLineBreakMode;
+  updateLegacyLineBreakControls();
+  updateTildeReplacementButton();
   preventUsedImageDeletionCheckbox.checked = effectiveGlobalSettings.preventUsedImageDeletion;
   return true;
 }
@@ -156,11 +183,13 @@ export {
   DEFAULT_SETTINGS,
   normalizeGlobalSettings,
   resolveEffectiveSettings,
+  resolveLegacyTextProcessingSettings,
   saveGlobalSettings,
   applyFontSize,
   applyMode,
   updateAutoLineBreakButton,
   updateTildeReplacementButton,
+  updateLegacyLineBreakControls,
   isCodeBlockHeaderEnabled,
   populateSettingsForm
 };

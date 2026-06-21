@@ -35,8 +35,6 @@
     <div class="toolbar">
       <div class="toolbar-left">
         <button id="toggle-view-button">Preview</button>
-        <button id="auto-line-break-button" title="Auto Line Break">↩</button>
-        <button id="tilde-replacement-button" title="Tilde Replacement">~</button>
       </div>
       <div class="toolbar-right">
         <button id="import-note-button" title="Import Single Note">📂</button>
@@ -76,14 +74,29 @@
         <label for="code-block-header-checkbox">Code Block Header</label>
         <input type="checkbox" id="code-block-header-checkbox">
       </div>
-      <div class="setting" id="auto-add-spaces-setting">
-        <label for="auto-add-spaces-checkbox">Auto Add Two Spaces on Enter</label>
-        <input type="checkbox" id="auto-add-spaces-checkbox">
-      </div>
       <div class="setting" id="prevent-used-image-deletion-setting">
         <label for="prevent-used-image-deletion-checkbox">Prevent deletion of used images</label>
         <input type="checkbox" id="prevent-used-image-deletion-checkbox">
       </div>
+      <fieldset class="settings-section" id="legacy-settings-section">
+        <legend>Legacy</legend>
+        <div class="setting" id="legacy-line-break-mode-setting">
+          <label for="legacy-line-break-mode-checkbox">Legacy Markdown line breaks</label>
+          <input type="checkbox" id="legacy-line-break-mode-checkbox">
+        </div>
+        <div class="setting" id="auto-line-break-setting">
+          <label for="auto-line-break-button">Add two spaces to pasted lines</label>
+          <input type="checkbox" id="auto-line-break-button">
+        </div>
+        <div class="setting" id="auto-add-spaces-setting">
+          <label for="auto-add-spaces-checkbox">Add two spaces on Enter</label>
+          <input type="checkbox" id="auto-add-spaces-checkbox">
+        </div>
+        <div class="setting" id="tilde-replacement-setting">
+          <label for="tilde-replacement-button">Escape tildes on paste</label>
+          <input type="checkbox" id="tilde-replacement-button">
+        </div>
+      </fieldset>
       <div class="setting">
         <button id="image-management-button" title="Images 🖼️">Images 🖼️</button>
       </div>

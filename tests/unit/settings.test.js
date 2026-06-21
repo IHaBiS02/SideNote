@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   DEFAULT_SETTINGS,
   normalizeGlobalSettings,
-  resolveEffectiveSettings
+  resolveEffectiveSettings,
+  resolveLegacyTextProcessingSettings
 } from '../../src/settings.js';
 import { setGlobalSettings } from '../../src/state.js';
 
@@ -17,7 +18,9 @@ describe('settings model helpers', () => {
     expect(settings.fontSize).toBe(18);
     expect(settings.mode).toBe('dark');
     expect(settings.title).toBe(DEFAULT_SETTINGS.title);
-    expect(settings.autoLineBreak).toBe(true);
+    expect(settings.legacyLineBreakMode).toBe(false);
+    expect(settings.autoLineBreak).toBe(false);
+    expect(settings.autoAddSpaces).toBe(false);
   });
 
   it('resolves note-specific settings over normalized global settings', () => {
@@ -52,6 +55,30 @@ describe('settings model helpers', () => {
     });
 
     expect(effective.mode).toBe('light');
+    expect(effective.autoAddSpaces).toBe(true);
+  });
+
+  it('disables legacy line-break processors when legacy mode is off', () => {
+    const effective = resolveLegacyTextProcessingSettings({
+      legacyLineBreakMode: false,
+      autoLineBreak: true,
+      autoAddSpaces: true,
+      tildeReplacement: true,
+    });
+
+    expect(effective.autoLineBreak).toBe(false);
+    expect(effective.autoAddSpaces).toBe(false);
+    expect(effective.tildeReplacement).toBe(true);
+  });
+
+  it('keeps legacy line-break processors when legacy mode is on', () => {
+    const effective = resolveLegacyTextProcessingSettings({
+      legacyLineBreakMode: true,
+      autoLineBreak: true,
+      autoAddSpaces: true,
+    });
+
+    expect(effective.autoLineBreak).toBe(true);
     expect(effective.autoAddSpaces).toBe(true);
   });
 });

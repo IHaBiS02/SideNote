@@ -82,7 +82,7 @@ Utility functions (all functions exported):
 
 ## src/text-processors.js
 
-Text processing utilities for markdown editing (all functions exported):
+Legacy text processing utilities for markdown editing (all functions exported):
 
 - `escapeTildes(text)`: Escapes tilde characters to prevent markdown strikethrough formatting
 - `addAutoLineBreaks(text)`: Adds two spaces at the end of each line for markdown line breaks
@@ -101,11 +101,13 @@ Settings management (functions exported):
 - `DEFAULT_SETTINGS`: Default global settings used to normalize missing settings
 - `normalizeGlobalSettings(settings)`: Merges partial global settings with defaults
 - `resolveEffectiveSettings(note)`: Resolves note-specific settings with global/default fallback
+- `resolveLegacyTextProcessingSettings(settings)`: Returns legacy text-processing settings, forcing trailing-space processors off unless legacy line-break mode is enabled
 - `saveGlobalSettings()`: Saves the global settings to chrome.storage.local
 - `applyFontSize(size)`: Applies font size to editor and preview elements
 - `applyMode(mode)`: Applies color mode (light/dark/system) to the document
-- `updateAutoLineBreakButton()`: Updates the auto line break button state
-- `updateTildeReplacementButton()`: Updates the tilde replacement button state
+- `updateAutoLineBreakButton()`: Updates the legacy auto line break checkbox state
+- `updateTildeReplacementButton()`: Updates the legacy tilde replacement checkbox state
+- `updateLegacyLineBreakControls()`: Updates the legacy line-break mode checkbox and dependent controls
 - `isCodeBlockHeaderEnabled(note)`: Resolves the effective code block header setting from note settings with global fallback
 - `populateSettingsForm(isGlobal, note)`: Populates settings fields for either global or note-specific settings
 
@@ -182,7 +184,7 @@ Note list and editor functionality:
 
 Markdown and image rendering functionality:
 
-- `configureMarkdownRenderer()`: Configures Marked with SideNote renderer options
+- `configureMarkdownRenderer()`: Configures Marked with SideNote renderer options, including default soft line breaks unless legacy mode is enabled
 - `renderMarkdownToHtml(markdown)`: Converts Markdown to sanitized HTML
 - `decorateCodeBlocks(container, note)`: Adds code block headers, line classes, and line numbers
 - `renderMarkdown()`: Renders markdown content as HTML in preview

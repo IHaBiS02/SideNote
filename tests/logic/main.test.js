@@ -22,9 +22,10 @@ const mocks = vi.hoisted(() => {
     normalizeGlobalSettings: vi.fn((settings = {}) => ({
       title: 'default',
       fontSize: 12,
-      autoLineBreak: true,
-      tildeReplacement: true,
-      autoAddSpaces: true,
+      legacyLineBreakMode: false,
+      autoLineBreak: false,
+      tildeReplacement: false,
+      autoAddSpaces: false,
       codeBlockHeader: true,
       preventUsedImageDeletion: true,
       mode: 'system',
