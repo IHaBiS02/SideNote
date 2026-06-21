@@ -83,7 +83,10 @@ firefoxManifest.sidebar_action = {
 };
 firefoxManifest.browser_specific_settings = {
     gecko: {
-        id: 'sidenote@example.com'
+        id: 'sidenote@example.com',
+        data_collection_permissions: {
+            required: ['none']
+        }
     }
 };
 
