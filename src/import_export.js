@@ -1,13 +1,13 @@
 // Import required functions from database
-import { saveImage, saveNote } from './database/index.js';
+import { getImage, saveImage, saveNote } from './database/index.js';
+import { extractImageIds } from './utils.js';
 
 /**
- * Processes a .snote or .snotes file.
- * @param {JSZip} zip The JSZip object representing the zip file.
- * @returns {Promise<object>} A promise that resolves with the new note object.
+ * Parses a .snote zip without saving notes or images.
+ * @param {JSZip} zip The JSZip object representing one note archive.
+ * @returns {Promise<object>} Parsed note data and image blobs.
  */
-// .snote 파일 처리 (단일 노트 또는 전체 가져오기에서 사용)
-async function processSnote(zip) {
+async function parseSnote(zip) {
   // 필수 파일 확인: metadata.json과 note.md
   const metadataFile = zip.file('metadata.json');
   const noteFile = zip.file('note.md');
@@ -20,6 +20,8 @@ async function processSnote(zip) {
   // 메타데이터와 노트 내용 읽기
   const metadata = JSON.parse(await metadataFile.async('string'));
   const content = await noteFile.async('string');
+  const now = Date.now();
+  const images = [];
   
   // 이미지 폴더가 있으면 모든 이미지 처리
   const imagesFolder = zip.folder('images');
@@ -30,43 +32,131 @@ async function processSnote(zip) {
             // 이미지 ID 추출 (images/[id].png 형식)
             const imageId = imageFile.name.split('/').pop().replace('.png', '');
             const promise = imageFile.async('blob').then(blob => {
-                return saveImage(imageId, blob);
+                images.push({ id: imageId, blob });
             });
             imagePromises.push(promise);
         }
     });
-    // 모든 이미지 저장 완료 대기
     await Promise.all(imagePromises);
   }
 
-  // 새 노트 객체 생성
-  const now = Date.now();
-  const newNote = {
-    id: crypto.randomUUID(),  // 새 UUID 생성 (중복 방지)
+  return {
     title: metadata.title,
-    content: content,
-    settings: metadata.settings,
+    content,
+    settings: metadata.settings || {},
     metadata: {
-      createdAt: metadata.metadata?.createdAt || now,  // 원래 생성 시간 유지 또는 현재 시간
+      createdAt: metadata.metadata?.createdAt || now,
       lastModified: metadata.metadata?.lastModified || now
     },
-    isPinned: false  // 가져온 노트는 고정되지 않음
+    images
+  };
+}
+
+async function saveParsedSnoteImages(parsedNote) {
+  const imagePromises = (parsedNote.images || []).map(image => saveImage(image.id, image.blob));
+  await Promise.all(imagePromises);
+}
+
+function createNoteFromParsedSnote(parsedNote, overrides = {}) {
+  const now = Date.now();
+  const metadata = {
+    createdAt: parsedNote.metadata?.createdAt || now,
+    lastModified: parsedNote.metadata?.lastModified || now,
+    ...(overrides.metadata || {})
   };
 
+  // 새 노트 객체 생성
+  const newNote = {
+    id: overrides.id || crypto.randomUUID(),  // 새 UUID 생성 (중복 방지)
+    title: parsedNote.title,
+    content: parsedNote.content,
+    settings: parsedNote.settings || {},
+    metadata,
+    isPinned: overrides.isPinned ?? false  // 가져온 노트는 기본적으로 고정되지 않음
+  };
+
+  return newNote;
+}
+
+async function saveParsedSnote(parsedNote, overrides = {}) {
+  await saveParsedSnoteImages(parsedNote);
+  const newNote = createNoteFromParsedSnote(parsedNote, overrides);
   // 데이터베이스에 저장
   await saveNote(newNote);
   return newNote;
 }
 
-async function saveImportedNotes(newNotes) {
-  newNotes.sort((a, b) => a.metadata.lastModified - b.metadata.lastModified);
+async function processSnote(zip) {
+  const parsedNote = await parseSnote(zip);
+  return saveParsedSnote(parsedNote);
+}
+
+async function saveImportedNotes(parsedNotes) {
+  parsedNotes.sort((a, b) => a.metadata.lastModified - b.metadata.lastModified);
   const now = Date.now();
-  for (let i = 0; i < newNotes.length; i++) {
-    newNotes[i].metadata.lastModified = now + i;
-    await saveNote(newNotes[i]);
+  const savedNotes = [];
+  for (let i = 0; i < parsedNotes.length; i++) {
+    const savedNote = await saveParsedSnote(parsedNotes[i], {
+      metadata: {
+        ...parsedNotes[i].metadata,
+        lastModified: now + i
+      }
+    });
+    savedNotes.push(savedNote);
   }
-  return newNotes;
+  return savedNotes;
+}
+
+async function addNoteToZip(zipTarget, note) {
+  const metadata = {
+    title: note.title,
+    settings: note.settings,
+    metadata: note.metadata
+  };
+  zipTarget.file('metadata.json', JSON.stringify(metadata, null, 2));
+  zipTarget.file('note.md', note.content);
+
+  const imageIds = extractImageIds(note.content);
+  if (imageIds.length === 0) {
+    return;
+  }
+
+  const imagesFolder = zipTarget.folder('images');
+  for (const imageId of imageIds) {
+    try {
+      const imageBlob = await getImage(imageId);
+      if (imageBlob) {
+        imagesFolder.file(`${imageId}.png`, imageBlob);
+      }
+    } catch (err) {
+      console.error(`Failed to get image ${imageId} for export:`, err);
+    }
+  }
+}
+
+async function createSingleNoteArchive(note) {
+  const zip = new JSZip();
+  await addNoteToZip(zip, note);
+  return zip;
+}
+
+async function createAllNotesArchive(notes) {
+  const zip = new JSZip();
+  for (const note of notes) {
+    await addNoteToZip(zip.folder(note.id), note);
+  }
+  return zip;
 }
 
 // Export the function
-export { processSnote, saveImportedNotes };
+export {
+  parseSnote,
+  saveParsedSnoteImages,
+  createNoteFromParsedSnote,
+  saveParsedSnote,
+  processSnote,
+  saveImportedNotes,
+  addNoteToZip,
+  createSingleNoteArchive,
+  createAllNotesArchive
+};

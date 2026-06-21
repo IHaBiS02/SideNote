@@ -13,14 +13,20 @@ import {
 // Import functions from other modules
 import { sortNotes } from '../notes.js';
 import { renderMarkdown, renderNoteList } from '../notes_view/index.js';
-import { saveNote, getImage } from '../database/index.js';
+import { saveNote } from '../database/index.js';
 import { 
   getTimestamp, 
   sanitizeFilename, 
-  downloadFile, 
-  extractImageIds 
+  downloadFile
 } from '../utils.js';
-import { processSnote, saveImportedNotes } from '../import_export.js';
+import {
+  createAllNotesArchive,
+  createSingleNoteArchive,
+  parseSnote,
+  saveImportedNotes,
+  saveParsedSnote,
+  saveParsedSnoteImages
+} from '../import_export.js';
 
 // Import state from state module
 import {
@@ -33,75 +39,20 @@ import {
 function initializeImportExportEvents() {
   // Export all notes
   globalExportButton.addEventListener('click', async () => {
-    const zip = new JSZip();
     const timestamp = getTimestamp();
-
-    // Compress all notes into ZIP
-    for (const note of notes) {
-      const noteFolder = zip.folder(note.id);
-      
-      const metadata = {
-        title: note.title,
-        settings: note.settings,
-        metadata: note.metadata
-      };
-      noteFolder.file('metadata.json', JSON.stringify(metadata, null, 2));
-      noteFolder.file('note.md', note.content);
-
-      const imageIds = extractImageIds(note.content);
-      if (imageIds.length > 0) {
-        const imagesFolder = noteFolder.folder('images');
-        for (const imageId of imageIds) {
-          try {
-            const imageBlob = await getImage(imageId);
-            if (imageBlob) {
-              imagesFolder.file(`${imageId}.png`, imageBlob);
-            }
-          } catch (err) {
-            console.error(`Failed to get image ${imageId} for export:`, err);
-          }
-        }
-      }
-    }
-
-    zip.generateAsync({ type: 'blob' }).then(blob => {
-      downloadFile(blob, `notes_${timestamp}.snotes`);
-    });
+    const zip = await createAllNotesArchive(notes);
+    const blob = await zip.generateAsync({ type: 'blob' });
+    downloadFile(blob, `notes_${timestamp}.snotes`);
   });
 
   // Export current note
   exportNoteButton.addEventListener('click', async () => {
     const note = notes.find(n => n.id === activeNoteId);
     if (note) {
-      const zip = new JSZip();
       const sanitizedTitle = sanitizeFilename(note.title);
-
-      const metadata = {
-        title: note.title,
-        settings: note.settings,
-        metadata: note.metadata
-      };
-      zip.file('metadata.json', JSON.stringify(metadata, null, 2));
-      zip.file('note.md', note.content);
-
-      const imageIds = extractImageIds(note.content);
-      if (imageIds.length > 0) {
-        const imagesFolder = zip.folder('images');
-        for (const imageId of imageIds) {
-          try {
-            const imageBlob = await getImage(imageId);
-            if (imageBlob) {
-              imagesFolder.file(`${imageId}.png`, imageBlob);
-            }
-          } catch (err) {
-            console.error(`Failed to get image ${imageId} for export:`, err);
-          }
-        }
-      }
-
-      zip.generateAsync({ type: 'blob' }).then(blob => {
-        downloadFile(blob, `${sanitizedTitle}.snote`);
-      });
+      const zip = await createSingleNoteArchive(note);
+      const blob = await zip.generateAsync({ type: 'blob' });
+      downloadFile(blob, `${sanitizedTitle}.snote`);
     }
   });
 
@@ -126,13 +77,17 @@ function initializeImportExportEvents() {
       const zip = await JSZip.loadAsync(file);
       // Single note file (.snote)
       if (file.name.endsWith('.snote')) {
-        const newNote = await processSnote(zip);
-        newNote.metadata.lastModified = Date.now();
+        const parsedNote = await parseSnote(zip);
+        const newNote = await saveParsedSnote(parsedNote, {
+          metadata: {
+            ...parsedNote.metadata,
+            lastModified: Date.now()
+          }
+        });
         notes.push(newNote);
-        await saveNote(newNote);
       } else if (file.name.endsWith('.snotes')) {
         // Multiple notes file (.snotes)
-        const newNotes = [];
+        const parsedNotes = [];
         const topLevelFolders = new Set();
         
         // Find top-level folders (each folder is one note)
@@ -143,11 +98,11 @@ function initializeImportExportEvents() {
         }
 
         for (const noteFolder of topLevelFolders) {
-          const newNote = await processSnote(zip.folder(noteFolder));
-          newNotes.push(newNote);
+          const parsedNote = await parseSnote(zip.folder(noteFolder));
+          parsedNotes.push(parsedNote);
         }
 
-        await saveImportedNotes(newNotes);
+        const newNotes = await saveImportedNotes(parsedNotes);
         for (const note of newNotes) {
           notes.push(note);
         }
@@ -172,9 +127,10 @@ function initializeImportExportEvents() {
     
     try {
       const zip = await JSZip.loadAsync(file);
-      const importedNote = await processSnote(zip);
+      const importedNote = await parseSnote(zip);
       const note = notes.find(n => n.id === activeNoteId);
       if (note) {
+        await saveParsedSnoteImages(importedNote);
         note.title = importedNote.title;
         note.content = importedNote.content;
         note.settings = importedNote.settings;

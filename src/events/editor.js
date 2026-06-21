@@ -18,7 +18,7 @@ import {
 } from '../notes_view/index.js';
 import { saveNote, saveImage } from '../database/index.js';
 import { pushToHistory } from '../history.js';
-import { extractImageIds } from '../utils.js';
+import { normalizeGlobalSettings, resolveEffectiveSettings } from '../settings.js';
 import {
   processPastedText,
   handleEnterKeyInput,
@@ -29,9 +29,7 @@ import {
 import {
   notes,
   globalSettings,
-  activeNoteId,
-  setActiveNoteId,
-  setOriginalNoteContent
+  activeNoteId
 } from '../state.js';
 
 // === Editor utility functions ===
@@ -62,9 +60,7 @@ function initializeEditorEvents() {
       id: crypto.randomUUID(),
       title: 'New Note',
       content: '',
-      settings: {
-        fontSize: globalSettings.fontSize || 12
-      },
+      settings: {},
       metadata: {
         createdAt: now,
         lastModified: now
@@ -86,7 +82,7 @@ function initializeEditorEvents() {
     if (note) {
       note.content = markdownEditor.value;
       note.metadata.lastModified = Date.now();
-      const titleSource = note.settings.title || globalSettings.title;
+      const titleSource = resolveEffectiveSettings(note).title;
       let titleChanged = false;
       // Use first line as title when default title setting is used
       if (titleSource === 'default') {
@@ -128,7 +124,7 @@ function initializeEditorEvents() {
     } else {
       // Handle text paste
       const rawText = e.clipboardData.getData('text/plain');
-      const processedText = processPastedText(rawText, globalSettings);
+      const processedText = processPastedText(rawText, normalizeGlobalSettings(globalSettings));
       insertTextAtCursor(markdownEditor, processedText);
     }
   });
@@ -140,7 +136,7 @@ function initializeEditorEvents() {
   markdownEditor.addEventListener('keydown', (e) => {
     // Auto add two spaces at end of line when pressing Enter
     if (e.key === 'Enter' && !e.isComposing && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
-      const result = handleEnterKeyInput(markdownEditor, globalSettings, insertTextAtCursor);
+      const result = handleEnterKeyInput(markdownEditor, normalizeGlobalSettings(globalSettings), insertTextAtCursor);
       if (result.handled) {
         e.preventDefault();
       }
@@ -188,7 +184,8 @@ function initializeEditorEvents() {
   editorTitle.addEventListener('dblclick', () => {
     const note = notes.find(n => n.id === activeNoteId);
     if (note) {
-      let titleSource = note.settings.title || globalSettings.title;
+      note.settings = note.settings || {};
+      let titleSource = resolveEffectiveSettings(note).title;
       // Change from default to custom title when double-clicking
       if (titleSource === 'default') {
         note.settings.title = 'custom';

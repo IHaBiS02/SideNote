@@ -11,7 +11,7 @@ SideNote is a browser extension that provides a simple note-taking interface wit
 -   **`manifest.json`**: The core configuration file for the Chrome extension. It defines permissions, icons, and registers the side panel.
 -   **`sidepanel.html`**: The main HTML file that defines the structure of the user interface, including all views (note list, editor, settings, etc.).
 -   **`src/`**: This directory contains all the JavaScript logic for the extension, broken down into modules.
-    -   `main.js`: The main entry point. It initializes the application, loads data, handles the one-time migration of notes from `chrome.storage` to `IndexedDB`, and calls `initializeAllEvents()` to set up all event listeners.
+    -   `main.js`: The main entry point. It runs a deterministic `bootstrap()` sequence that initializes the database, loads settings and notes, handles the one-time migration of notes from `chrome.storage` to `IndexedDB`, cleans expired recycle-bin items, renders the initial view, and calls `initializeAllEvents()` to set up all event listeners.
     -   `database/`: Directory containing modularized IndexedDB operations:
         -   `init.js`: Database initialization and shared instance management
         -   `notes.js`: Note-related database operations and CRUD functions
@@ -34,9 +34,9 @@ SideNote is a browser extension that provides a simple note-taking interface wit
         -   `global-events.js`: Global keyboard events and system theme detection
         -   `index.js`: Unified entry point that exports `initializeAllEvents()` function
     -   `history.js`: Manages the view navigation history stack, allowing for "back" functionality.
-    -   `settings.js`: Manages global and note-specific settings.
-    -   `import_export.js`: Contains the logic for importing and exporting notes.
-    -   `utils.js`: Utility functions for timestamps, filename sanitization, file downloads, and image ID extraction.
+    -   `settings.js`: Manages global and note-specific settings, including default setting normalization and effective setting resolution.
+    -   `import_export.js`: Contains the logic for parsing `.snote` files, saving parsed imports, and packaging `.snote`/`.snotes` zip archives.
+    -   `utils.js`: Utility functions for timestamps, filename sanitization, file downloads, scoped blob URL tracking, and image ID extraction.
     -   `text-processors.js`: Text processing utilities for markdown editing, including tilde escaping, auto line breaks, Enter key handling, and whitespace cleanup.
 -   **`sidepanel.css`**: The primary stylesheet for the extension's UI.
 -   **`dark_mode.css`**: A supplementary stylesheet containing CSS variables and rules specifically for the dark mode theme.
@@ -77,18 +77,22 @@ The UI is a single-page application with several distinct "views" that are shown
     -   `isPreview`: A boolean flag to track if the editor is in "Preview" or "Edit" mode.
     -   Navigation history is managed through the `history.js` module.
 -   **Data Persistence**:
-    -   All data (`notes`, `images`, and `globalSettings`) is now stored in `IndexedDB`. `chrome.storage.local` is only used for `globalSettings` and for the one-time migration of old notes.
+    -   Notes and images are stored in `IndexedDB`.
+    -   `chrome.storage.local` stores `globalSettings` and is also used for the one-time migration of old note data.
+    -   Startup runs through `bootstrap()` so storage load, migration, cleanup, rendering, and event binding happen in a predictable order.
 
 ### Function Breakdown
 
 #### Initialization & Data Management (`main.js`, `src/database/`)
 
+-   **`bootstrap()`**: Runs the startup sequence in order: IndexedDB initialization, settings/note load and migration, recycle-bin cleanup, initial UI render, and event binding.
 -   **`initDB()`**: Initializes the IndexedDB database and creates the `images` and `notes` object stores (located in `src/database/init.js`).
 -   **`loadAndMigrateData()`**: On startup, this function loads all data from `IndexedDB`. It also handles the one-time migration of notes from `chrome.storage.local` to `IndexedDB`.
 -   **`saveNote()` / `getAllNotes()` / `deleteNoteDB()` / etc.**: A set of async functions in `src/database/notes.js` to perform CRUD operations on note data in IndexedDB.
 -   **`saveImage()` / `getImage()` / `deleteImage()` / etc.**: A set of async functions in `src/database/images.js` to perform CRUD operations on image data in IndexedDB.
--   **`sortNotes()`**: Sorts the `notes` array based on the `lastModified` timestamp.
+-   **`sortNotes()`**: Sorts the `notes` array based on pin status and the `lastModified` timestamp.
 -   **`cleanupDeletedNotes()` / `cleanupDeletedImages()`**: Automatically and permanently deletes items from the recycle bin that are older than 30 days.
+    -   Note operations mutate state and persist through the database layer. UI refreshes are handled by the event or view caller rather than by `src/notes.js`.
 
 #### View Management (`src/notes_view/`, `history.js`, `src/events/`)
 
@@ -115,7 +119,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   `paste`: Intercepts pasted content. If it's an image, it saves it to IndexedDB and inserts the corresponding Markdown tag. If it's text, it applies formatting.
     -   `keydown`: Handles keyboard shortcuts (Enter, Shift+Enter).
 -   **`renderMarkdown()`**: Converts Markdown to HTML, sanitizes it, and applies syntax highlighting. It also calls `renderImages()` (located in `src/notes_view/markdown-renderer.js`).
--   **`renderImages()`**: Finds all `<img>` tags in the preview and loads their `src` from IndexedDB blob URLs (located in `src/notes_view/markdown-renderer.js`).
+-   **`renderImages()`**: Finds all `<img>` tags in the preview and loads their `src` from IndexedDB blob URLs (located in `src/notes_view/markdown-renderer.js`). Preview, image management, and recycle bin views each use scoped blob URL trackers.
 -   **`togglePreview()`**: Switches between the raw text editor and the rendered view, and records the change in the navigation history (located in `src/notes_view/markdown-renderer.js`).
 
 #### Settings & Recycle Bin (`settings.js`, `src/notes_view/`, `src/events/`)
@@ -123,14 +127,14 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **Settings Listeners**: Update `globalSettings` or note-specific settings (handled in `src/events/settings-events.js`).
 -   **`applyMode(mode)`**: Toggles the `dark-mode` class on the `<body>`.
 -   **`renderDeletedItemsList()`**: Fetches all deleted notes and images from `IndexedDB`. It combines them into a single array, sorts them by deletion date, and renders them in the `#deleted-items-list`. Each item has controls to be restored or permanently deleted (located in `src/notes_view/recycle-bin-renderer.js`).
--   **`renderImagesList()`**: Renders the list of images in the image management view, showing usage information and delete controls (located in `src/notes_view/image-manager.js`).
+-   **`renderImagesList()`**: Renders the list of images in the image management view, showing usage information and delete controls (located in `src/notes_view/image-manager.js`). Usage detection is based on exact Markdown image references extracted from note content.
 -   **`restoreNote(noteId)` / `restoreImage(id)`**: Moves an item from the recycle bin back to the active state.
 -   **`deleteNotePermanently(noteId)` / `deleteImagePermanently(id)`**: Removes an item permanently from storage.
 
 #### Import & Export (`import_export.js`, `src/events/`)
 
--   **Export Buttons**: Package one or all notes into a `.snote` or `.snotes` zip file. The zip includes the note content (`note.md`), metadata (`metadata.json`), and any associated images from IndexedDB (handled in `src/events/import-export-events.js`).
--   **Import Buttons**: Unzip a `.snote` or `.snotes` file, read the metadata and content, save any included images to IndexedDB, and create new notes in the application (handled in `src/events/import-export-events.js`).
+-   **Export Buttons**: Package one or all notes into a `.snote` or `.snotes` zip file. Shared helpers in `src/import_export.js` write note content (`note.md`), metadata (`metadata.json`), and any associated images from IndexedDB.
+-   **Import Buttons**: Unzip a `.snote` or `.snotes` file and parse metadata/content/images without saving first. Event handlers then choose whether to create new notes or update the active note.
 
 ## 5. External Libraries (`vendor/`)
 

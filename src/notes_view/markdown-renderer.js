@@ -8,7 +8,7 @@ import {
 // Import required functions from other modules
 import { pushToHistory, getHistory, getHistoryIndex, moveBack } from '../history.js';
 import { getImage } from '../database/index.js';
-import { createTrackedBlobUrl, revokeAllBlobUrls } from '../utils.js';
+import { createBlobUrlTracker } from '../utils.js';
 import { isCodeBlockHeaderEnabled } from '../settings.js';
 
 // Import state from state module
@@ -18,6 +18,8 @@ import {
   notes,
   setIsPreview
 } from '../state.js';
+
+const previewBlobUrls = createBlobUrlTracker();
 
 /**
  * Renders the markdown content as HTML.
@@ -108,7 +110,7 @@ function getActiveNote() {
   return notes.find(note => note.id === activeNoteId);
 }
 
-function renderMarkdown() {
+function configureMarkdownRenderer() {
   // 커스텀 렌더러 설정 (체크박스 지원)
   const renderer = new marked.Renderer();
   renderer.listitem = function(text, task, checked) {
@@ -131,14 +133,20 @@ function renderMarkdown() {
       return hljs.highlight(code, { language }).value;
     }
   });
+}
 
-  const dirtyHtml = marked.parse(markdownEditor.value);
-  htmlPreview.innerHTML = DOMPurify.sanitize(dirtyHtml, {
+function renderMarkdownToHtml(markdown) {
+  configureMarkdownRenderer();
+  const dirtyHtml = marked.parse(markdown);
+  return DOMPurify.sanitize(dirtyHtml, {
     ADD_TAGS: ['pre', 'code', 'span'],
     ADD_ATTR: ['class']
   });
+}
+
+function decorateCodeBlocks(container, note = getActiveNote()) {
   // 코드 블록에 줄 번호 추가
-  htmlPreview.querySelectorAll('pre code').forEach((block) => {
+  container.querySelectorAll('pre code').forEach((block) => {
     const codeText = block.textContent;
     const language = getCodeBlockLanguage(block);
 
@@ -151,7 +159,7 @@ function renderMarkdown() {
       block.parentElement.classList.add('multi-line-code');
     }
 
-    if (isCodeBlockHeaderEnabled(getActiveNote())) {
+    if (isCodeBlockHeaderEnabled(note)) {
       addCodeBlockHeader(block, language, codeText);
     }
 
@@ -159,7 +167,11 @@ function renderMarkdown() {
     hljs.lineNumbersBlock(block);
   });
   hljs.highlightAll();
+}
 
+function renderMarkdown() {
+  htmlPreview.innerHTML = renderMarkdownToHtml(markdownEditor.value);
+  decorateCodeBlocks(htmlPreview, getActiveNote());
   renderImages();
 }
 
@@ -169,7 +181,7 @@ function renderMarkdown() {
 // === 이미지 렌더링 ===
 
 async function renderImages() {
-  revokeAllBlobUrls();
+  previewBlobUrls.revokeAll();
   const images = htmlPreview.querySelectorAll('img');
   for (const img of images) {
     const src = img.getAttribute('src');
@@ -180,7 +192,7 @@ async function renderImages() {
       try {
         const imageBlob = await getImage(imageId);
         if (imageBlob) {
-          const blobUrl = createTrackedBlobUrl(imageBlob);
+          const blobUrl = previewBlobUrls.create(imageBlob);
           img.src = blobUrl;
         } else {
           img.alt = `Image not found: ${imageId}`;
@@ -241,6 +253,9 @@ function togglePreview() {
 
 // Export functions
 export {
+  configureMarkdownRenderer,
+  renderMarkdownToHtml,
+  decorateCodeBlocks,
   renderMarkdown,
   renderImages,
   togglePreview

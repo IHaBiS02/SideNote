@@ -74,6 +74,7 @@ Contains references to all UI elements used throughout the extension, including:
 
 Utility functions (all functions exported):
 
+- `createBlobUrlTracker()`: Creates an isolated blob URL tracker with `create`, `revoke`, `revokeAll`, and `getCount` methods
 - `getTimestamp()`: Gets a timestamp string in YYYY_MM_DD_HH_MM_SS format
 - `sanitizeFilename(filename)`: Sanitizes a filename by replacing invalid characters
 - `downloadFile(blob, fileName)`: Downloads a file using blob URL
@@ -97,6 +98,9 @@ Text processing utilities for markdown editing (all functions exported):
 
 Settings management (functions exported):
 
+- `DEFAULT_SETTINGS`: Default global settings used to normalize missing settings
+- `normalizeGlobalSettings(settings)`: Merges partial global settings with defaults
+- `resolveEffectiveSettings(note)`: Resolves note-specific settings with global/default fallback
 - `saveGlobalSettings()`: Saves the global settings to chrome.storage.local
 - `applyFontSize(size)`: Applies font size to editor and preview elements
 - `applyMode(mode)`: Applies color mode (light/dark/system) to the document
@@ -117,6 +121,8 @@ Note operations (functions exported):
 - `restoreNote(noteId)`: Restores a deleted note from recycle bin
 - `deleteNotePermanently(noteId)`: Permanently deletes a note
 - `emptyRecycleBin()`: Empties the recycle bin (permanent deletion of all items)
+
+**Note**: These functions mutate in-memory state and persist through the database layer, but they no longer call view renderers directly. Event or view callers are responsible for refreshing affected UI.
 
 ## src/history.js
 
@@ -140,7 +146,15 @@ Navigation history management (all functions exported):
 
 File processing (functions exported):
 
-- `processSnote(zip)`: Processes a .snote or .snotes file and imports the note with images
+- `parseSnote(zip)`: Parses a `.snote` zip and returns note data plus image blobs without saving
+- `saveParsedSnoteImages(parsedNote)`: Saves parsed image blobs to IndexedDB
+- `createNoteFromParsedSnote(parsedNote, overrides)`: Creates a note object from parsed note data
+- `saveParsedSnote(parsedNote, overrides)`: Saves parsed images and a new note to IndexedDB
+- `processSnote(zip)`: Backward-compatible helper that parses and saves a new note
+- `saveImportedNotes(parsedNotes)`: Saves multiple parsed notes in last-modified order with increasing timestamps
+- `addNoteToZip(zipTarget, note)`: Adds note metadata, Markdown, and referenced images to a zip target
+- `createSingleNoteArchive(note)`: Creates a `.snote` archive for one note
+- `createAllNotesArchive(notes)`: Creates a `.snotes` archive for all notes
 
 ## src/notes_view/
 
@@ -168,6 +182,9 @@ Note list and editor functionality:
 
 Markdown and image rendering functionality:
 
+- `configureMarkdownRenderer()`: Configures Marked with SideNote renderer options
+- `renderMarkdownToHtml(markdown)`: Converts Markdown to sanitized HTML
+- `decorateCodeBlocks(container, note)`: Adds code block headers, line classes, and line numbers
 - `renderMarkdown()`: Renders markdown content as HTML in preview
 - `renderImages()`: Renders images in the markdown preview
 - `togglePreview()`: Toggles between editor and preview modes
@@ -251,11 +268,13 @@ Unified entry point for all event modules:
 
 Application entry point and initialization:
 
+- `bootstrap()`: Runs deterministic startup: DB init, data load/migration, cleanup, initial UI render, and event binding
+- `initializeInitialView()`: Applies loaded settings and shows the initial list view
 - `loadAndMigrateData()`: Loads data from storage and migrates to IndexedDB if necessary
 - `cleanupDeletedImages()`: Deletes images in recycle bin for more than 30 days
 - `cleanupDeletedNotes()`: Deletes notes in recycle bin for more than 30 days
 
-**Note**: Main entry point that imports all other modules, calls `initializeAllEvents()` to set up all event listeners, and initializes the application
+**Note**: Main entry point now exports startup helpers for tests and only auto-runs `bootstrap()` when auto bootstrap is not disabled.
 
 ## Module Architecture
 

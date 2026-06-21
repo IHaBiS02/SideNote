@@ -2,20 +2,29 @@
 import { initDB, saveNote, getAllNotes, getAllImageObjectsFromDB, deleteNotePermanentlyDB, deleteImagePermanently } from './database/index.js';
 import { THIRTY_DAYS_MS } from './constants.js';
 import { sortNotes } from './notes.js';
-import { applyFontSize, applyMode, updateAutoLineBreakButton, updateTildeReplacementButton } from './settings.js';
-import { renderNoteList, showListView } from './notes_view/index.js';
-import { pushToHistory } from './history.js';
-import { notes, deletedNotes, globalSettings, setNotes, setDeletedNotes, setGlobalSettings } from './state.js';
+import { applyFontSize, applyMode, normalizeGlobalSettings, updateAutoLineBreakButton, updateTildeReplacementButton } from './settings.js';
+import { showListView } from './notes_view/index.js';
+import { deletedNotes, globalSettings, setNotes, setDeletedNotes, setGlobalSettings } from './state.js';
 // Import events initialization function
 import { initializeAllEvents } from './events/index.js';
 
 // === 애플리케이션 초기화 ===
 
-// 스크립트 로드 시 데이터베이스 초기화
-initDB().then(() => {
-  loadAndMigrateData();   // 데이터 로드 및 마이그레이션
-  cleanupDeletedImages(); // 삭제된 이미지 정리
-}).catch(err => console.error("Failed to initialize DB:", err));
+async function bootstrap() {
+  await initDB();
+  await loadAndMigrateData();
+  await cleanupDeletedImages();
+  initializeInitialView();
+  initializeAllEvents();
+}
+
+function initializeInitialView() {
+  applyMode(globalSettings.mode);
+  applyFontSize(globalSettings.fontSize);
+  updateAutoLineBreakButton();
+  updateTildeReplacementButton();
+  showListView();
+}
 
 /**
  * Loads data from storage and migrates it to IndexedDB if necessary.
@@ -24,21 +33,7 @@ async function loadAndMigrateData() {
   // chrome.storage.local에서 설정 및 노트 데이터 로드
   const data = await browser.storage.local.get(['globalSettings', 'notes', 'deletedNotes']);
   const loadedSettings = data.globalSettings;
-  if (loadedSettings) {
-    setGlobalSettings(loadedSettings);
-  } else {
-    // 기본 전역 설정
-    setGlobalSettings({
-      title: 'default',            // 노트 제목 설정
-      fontSize: 12,                // 글꼴 크기
-      autoLineBreak: true,         // 자동 줄바꿈
-      tildeReplacement: true,      // 틸데 자동 이스케이프
-      autoAddSpaces: true,         // Enter 시 자동 공백 추가
-      codeBlockHeader: true,       // 코드 블록 언어/복사 헤더 표시
-      preventUsedImageDeletion: true, // 사용 중인 이미지 삭제 방지
-      mode: 'system'               // 다크 모드 설정
-    });
-  }
+  setGlobalSettings(normalizeGlobalSettings(loadedSettings));
 
   const loadedNotes = data.notes;
   const loadedDeletedNotes = data.deletedNotes;
@@ -67,9 +62,7 @@ async function loadAndMigrateData() {
   setDeletedNotes(allNotesFromDB.filter(note => note.metadata.deletedAt));
 
   sortNotes();              // 노트 정렬
-  renderNoteList();         // 노트 목록 렌더링
-  applyMode(globalSettings.mode); // 테마 적용
-  cleanupDeletedNotes();    // 30일 이상 된 삭제 노트 정리
+  await cleanupDeletedNotes();    // 30일 이상 된 삭제 노트 정리
 }
 
 /**
@@ -103,18 +96,14 @@ async function cleanupDeletedNotes() {
     setDeletedNotes(deletedNotes.filter(note => note.metadata.deletedAt >= thirtyDaysAgo));
 }
 
-// === 초기 화면 설정 ===
+if (!globalThis.__SIDENOTE_DISABLE_AUTO_BOOTSTRAP__) {
+  bootstrap().catch(err => console.error("Failed to initialize SideNote:", err));
+}
 
-// 노트 목록 화면으로 시작
-showListView();
-pushToHistory({ view: 'list' });
-
-// UI 초기 설정
-updateAutoLineBreakButton();      // 자동 줄바꿈 버튼 상태
-updateTildeReplacementButton();   // 틸데 대체 버튼 상태
-applyFontSize(globalSettings.fontSize || 12);  // 글꼴 크기 적용
-applyMode(globalSettings.mode || 'system');    // 다크 모드 적용
-renderNoteList();                  // 노트 목록 렌더링
-
-// 모든 이벤트 리스너 초기화
-initializeAllEvents();
+export {
+  bootstrap,
+  loadAndMigrateData,
+  cleanupDeletedImages,
+  cleanupDeletedNotes,
+  initializeInitialView
+};

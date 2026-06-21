@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
+  createBlobUrlTracker,
   createTrackedBlobUrl,
   revokeAllBlobUrls,
   revokeTrackedBlobUrl,
@@ -73,6 +74,20 @@ describe('blob URL tracking', () => {
 
   it('should not error revoking untracked URL', () => {
     expect(() => revokeTrackedBlobUrl('blob:fake-url')).not.toThrow();
+  });
+
+  it('should keep scoped blob URL trackers isolated', () => {
+    const trackerA = createBlobUrlTracker();
+    const trackerB = createBlobUrlTracker();
+    const blob = new Blob(['test'], { type: 'text/plain' });
+
+    trackerA.create(blob);
+    trackerB.create(blob);
+    trackerA.revokeAll();
+
+    expect(trackerA.getCount()).toBe(0);
+    expect(trackerB.getCount()).toBe(1);
+    trackerB.revokeAll();
   });
 });
 

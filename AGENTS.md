@@ -26,7 +26,7 @@ npm run clean
 npm test          # vitest watch mode
 npm run test:run  # single run
 ```
-138 unit/integration tests using vitest + jsdom + fake-indexeddb.
+151 unit/integration tests using vitest + jsdom + fake-indexeddb.
 
 ### Install Dependencies
 ```bash
@@ -160,7 +160,7 @@ After changes:
 
 ## Important Notes
 
-- Test suite: vitest with jsdom + fake-indexeddb (138 tests)
+- Test suite: vitest with jsdom + fake-indexeddb (151 tests)
 - No linting configuration - maintain consistent code style
 - Extension uses Manifest V3 (Chrome) with Firefox compatibility
 - Images in notes use markdown format: `![Image](images/[id].png)`

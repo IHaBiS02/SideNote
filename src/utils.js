@@ -1,6 +1,36 @@
 // === Blob URL 추적 ===
 
-const trackedBlobUrls = new Set();
+function createBlobUrlTracker() {
+  const trackedBlobUrls = new Set();
+
+  return {
+    create(blob) {
+      const url = URL.createObjectURL(blob);
+      trackedBlobUrls.add(url);
+      return url;
+    },
+
+    revokeAll() {
+      for (const url of trackedBlobUrls) {
+        URL.revokeObjectURL(url);
+      }
+      trackedBlobUrls.clear();
+    },
+
+    revoke(url) {
+      if (trackedBlobUrls.has(url)) {
+        URL.revokeObjectURL(url);
+        trackedBlobUrls.delete(url);
+      }
+    },
+
+    getCount() {
+      return trackedBlobUrls.size;
+    }
+  };
+}
+
+const defaultBlobUrlTracker = createBlobUrlTracker();
 
 /**
  * Creates a blob URL and tracks it for later cleanup.
@@ -8,19 +38,14 @@ const trackedBlobUrls = new Set();
  * @returns {string} The created blob URL.
  */
 function createTrackedBlobUrl(blob) {
-  const url = URL.createObjectURL(blob);
-  trackedBlobUrls.add(url);
-  return url;
+  return defaultBlobUrlTracker.create(blob);
 }
 
 /**
  * Revokes all tracked blob URLs and clears the tracking set.
  */
 function revokeAllBlobUrls() {
-  for (const url of trackedBlobUrls) {
-    URL.revokeObjectURL(url);
-  }
-  trackedBlobUrls.clear();
+  defaultBlobUrlTracker.revokeAll();
 }
 
 /**
@@ -28,10 +53,7 @@ function revokeAllBlobUrls() {
  * @param {string} url The blob URL to revoke.
  */
 function revokeTrackedBlobUrl(url) {
-  if (trackedBlobUrls.has(url)) {
-    URL.revokeObjectURL(url);
-    trackedBlobUrls.delete(url);
-  }
+  defaultBlobUrlTracker.revoke(url);
 }
 
 /**
@@ -39,7 +61,7 @@ function revokeTrackedBlobUrl(url) {
  * @returns {number}
  */
 function getTrackedBlobUrlCount() {
-  return trackedBlobUrls.size;
+  return defaultBlobUrlTracker.getCount();
 }
 
 // === 유틸리티 함수들 ===
@@ -102,6 +124,7 @@ function extractImageIds(content) {
 
 // Export all functions
 export {
+  createBlobUrlTracker,
   createTrackedBlobUrl,
   revokeAllBlobUrls,
   revokeTrackedBlobUrl,

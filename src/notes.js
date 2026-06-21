@@ -8,9 +8,6 @@ import {
   deleteImagePermanently
 } from './database/index.js';
 
-// Import required functions from notes_view
-import { renderNoteList, renderDeletedItemsList } from './notes_view/index.js';
-
 // Import state from state module
 import { notes, deletedNotes, setDeletedNotes } from './state.js';
 
@@ -42,8 +39,9 @@ async function deleteNote(noteId) {
     deletedNote.metadata.deletedAt = Date.now();
     deletedNotes.push(deletedNote);
     await deleteNoteDB(noteId);
-    renderNoteList();
+    return deletedNote;
   }
+  return null;
 }
 
 /**
@@ -64,8 +62,9 @@ async function togglePin(noteId) {
         }
         sortNotes();
         await saveNote(note);
-        renderNoteList();
+        return note;
     }
+    return null;
 }
 
 /**
@@ -81,8 +80,9 @@ async function restoreNote(noteId) {
     notes.push(restoredNote);
     sortNotes();
     await restoreNoteDB(noteId);
-    renderDeletedItemsList();
+    return restoredNote;
   }
+  return null;
 }
 
 /**
@@ -92,13 +92,13 @@ async function restoreNote(noteId) {
 async function deleteNotePermanently(noteId) {
   setDeletedNotes(deletedNotes.filter(n => n.id !== noteId));
   await deleteNotePermanentlyDB(noteId);
-  renderDeletedItemsList();
 }
 
 /**
  * Empties the recycle bin.
  */
 async function emptyRecycleBin() {
+    const deletedNotesCount = deletedNotes.length;
     // 모든 삭제된 노트 영구 삭제
     for (const note of deletedNotes) {
         await deleteNotePermanentlyDB(note.id);
@@ -112,7 +112,10 @@ async function emptyRecycleBin() {
         await deleteImagePermanently(image.id);
     }
 
-    renderDeletedItemsList();
+    return {
+        deletedNotesCount,
+        deletedImagesCount: deletedImages.length
+    };
 }
 
 // Export functions

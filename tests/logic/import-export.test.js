@@ -1,13 +1,22 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import JSZip from 'jszip';
 
 // Mock database module
 vi.mock('../../src/database/index.js', () => ({
   saveImage: vi.fn().mockResolvedValue(),
   saveNote: vi.fn().mockResolvedValue(),
+  getImage: vi.fn().mockResolvedValue(new Blob(['fake image'], { type: 'image/png' })),
 }));
 
-import { processSnote, saveImportedNotes } from '../../src/import_export.js';
-import { saveImage, saveNote } from '../../src/database/index.js';
+import {
+  addNoteToZip,
+  createSingleNoteArchive,
+  parseSnote,
+  processSnote,
+  saveImportedNotes,
+  saveParsedSnoteImages
+} from '../../src/import_export.js';
+import { getImage, saveImage, saveNote } from '../../src/database/index.js';
 
 // Helper to create a mock JSZip object
 function createMockZip({ metadata, content, images = [] }) {
@@ -54,6 +63,41 @@ function createMockZip({ metadata, content, images = [] }) {
 describe('import_export', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    globalThis.JSZip = JSZip;
+  });
+
+  describe('parseSnote', () => {
+    it('should parse a .snote zip without saving notes or images', async () => {
+      const zip = createMockZip({
+        metadata: { title: 'Parsed', settings: { fontSize: 16 }, metadata: {} },
+        content: '![img](images/img1.png)',
+        images: [{ id: 'img1' }],
+      });
+
+      const result = await parseSnote(zip);
+
+      expect(result.title).toBe('Parsed');
+      expect(result.content).toBe('![img](images/img1.png)');
+      expect(result.settings.fontSize).toBe(16);
+      expect(result.images).toHaveLength(1);
+      expect(saveImage).not.toHaveBeenCalled();
+      expect(saveNote).not.toHaveBeenCalled();
+    });
+
+    it('should save parsed images separately when requested', async () => {
+      const parsed = await parseSnote(createMockZip({
+        metadata: { title: 'Parsed', settings: {}, metadata: {} },
+        content: 'content',
+        images: [{ id: 'img1' }, { id: 'img2' }],
+      }));
+
+      await saveParsedSnoteImages(parsed);
+
+      expect(saveImage).toHaveBeenCalledTimes(2);
+      expect(saveImage).toHaveBeenCalledWith('img1', expect.anything());
+      expect(saveImage).toHaveBeenCalledWith('img2', expect.anything());
+      expect(saveNote).not.toHaveBeenCalled();
+    });
   });
 
   describe('processSnote', () => {
@@ -219,6 +263,39 @@ describe('import_export', () => {
       const notes = [makeNote(100), makeNote(200), makeNote(300)];
       await saveImportedNotes(notes);
       expect(saveNote).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  describe('export helpers', () => {
+    function makeExportNote() {
+      return {
+        id: 'note-1',
+        title: 'Export Me',
+        content: 'hello\n![Image](images/img1.png)',
+        settings: { fontSize: 14 },
+        metadata: { createdAt: 1000, lastModified: 2000 },
+      };
+    }
+
+    it('should add note metadata, content, and referenced images to a zip target', async () => {
+      const zip = new JSZip();
+      await addNoteToZip(zip, makeExportNote());
+
+      expect(zip.file('metadata.json')).toBeTruthy();
+      expect(zip.file('note.md')).toBeTruthy();
+      expect(zip.file('images/img1.png')).toBeTruthy();
+      expect(getImage).toHaveBeenCalledWith('img1');
+    });
+
+    it('should create a single-note archive with the expected files', async () => {
+      const zip = await createSingleNoteArchive(makeExportNote());
+
+      const metadata = JSON.parse(await zip.file('metadata.json').async('string'));
+      const content = await zip.file('note.md').async('string');
+
+      expect(metadata.title).toBe('Export Me');
+      expect(content).toBe('hello\n![Image](images/img1.png)');
+      expect(zip.file('images/img1.png')).toBeTruthy();
     });
   });
 });

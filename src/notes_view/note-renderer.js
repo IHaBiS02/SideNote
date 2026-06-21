@@ -15,6 +15,7 @@ import {
 
 import { 
   applyFontSize,
+  resolveEffectiveSettings,
   updateAutoLineBreakButton,
   updateTildeReplacementButton 
 } from '../settings.js';
@@ -24,7 +25,6 @@ import { pushToHistory } from '../history.js';
 // Import state from state module
 import { 
   notes, 
-  globalSettings, 
   activeNoteId, 
   isPreview,
   setActiveNoteId,
@@ -59,18 +59,20 @@ function renderNoteList() {
     pinSpan.textContent = note.isPinned ? '📌' : '📎';
     pinSpan.title = note.isPinned ? 'Unpin Note' : 'Pin Note';
     pinSpan.classList.add('pin-note-icon');
-    pinSpan.addEventListener('click', (e) => {
+    pinSpan.addEventListener('click', async (e) => {
         e.stopPropagation();
-        togglePin(note.id);
+        await togglePin(note.id);
+        renderNoteList();
     });
 
     const deleteSpan = document.createElement('span');
     deleteSpan.textContent = '🗑️';
     deleteSpan.title = 'Delete Note';
     deleteSpan.classList.add('delete-note-icon');
-    deleteSpan.addEventListener('click', (e) => {
+    deleteSpan.addEventListener('click', async (e) => {
       e.stopPropagation();
-      deleteNote(note.id);
+      await deleteNote(note.id);
+      renderNoteList();
     });
 
     li.appendChild(titleSpan);
@@ -97,7 +99,7 @@ function openNote(noteId, inEditMode = false, addToHistory = true) {
     editorTitle.textContent = note.title;
     markdownEditor.value = note.content;
     // 노트 설정 적용 (폰트 크기 등)
-    const fontSize = note.settings.fontSize || globalSettings.fontSize || 12;
+    const fontSize = resolveEffectiveSettings(note).fontSize;
     applyFontSize(fontSize);
     updateAutoLineBreakButton();
     updateTildeReplacementButton();

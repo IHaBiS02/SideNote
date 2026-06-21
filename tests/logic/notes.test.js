@@ -10,15 +10,9 @@ vi.mock('../../src/database/index.js', () => ({
   getAllImageObjectsFromDB: vi.fn().mockResolvedValue([]),
 }));
 
-vi.mock('../../src/notes_view/index.js', () => ({
-  renderNoteList: vi.fn(),
-  renderDeletedItemsList: vi.fn(),
-}));
-
 import { sortNotes, deleteNote, togglePin, restoreNote, deleteNotePermanently, emptyRecycleBin } from '../../src/notes.js';
 import { setNotes, setDeletedNotes, notes, deletedNotes } from '../../src/state.js';
 import { deleteNoteDB, restoreNoteDB, deleteNotePermanentlyDB, getAllImageObjectsFromDB, deleteImagePermanently } from '../../src/database/index.js';
-import { renderNoteList, renderDeletedItemsList } from '../../src/notes_view/index.js';
 
 describe('notes business logic', () => {
   beforeEach(() => {
@@ -70,7 +64,6 @@ describe('notes business logic', () => {
       expect(deletedNotes[0].id).toBe('n1');
       expect(deletedNotes[0].metadata.deletedAt).toBeDefined();
       expect(deleteNoteDB).toHaveBeenCalledWith('n1');
-      expect(renderNoteList).toHaveBeenCalled();
     });
 
     it('should not do anything for non-existent note', async () => {
@@ -110,7 +103,6 @@ describe('notes business logic', () => {
       expect(notes).toHaveLength(1);
       expect(notes[0].metadata.deletedAt).toBeUndefined();
       expect(restoreNoteDB).toHaveBeenCalledWith('n1');
-      expect(renderDeletedItemsList).toHaveBeenCalled();
     });
   });
 

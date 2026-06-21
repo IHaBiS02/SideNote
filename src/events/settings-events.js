@@ -25,13 +25,14 @@ import {
   showLicenseView,
   showRecycleBinView,
   showImageManagementView,
-  renderNoteList,
+  renderDeletedItemsList,
   renderMarkdown
 } from '../notes_view/index.js';
 import {
   saveGlobalSettings,
   applyFontSize,
   applyMode,
+  normalizeGlobalSettings,
   updateAutoLineBreakButton,
   updateTildeReplacementButton,
   populateSettingsForm
@@ -103,8 +104,9 @@ function initializeSettingsEvents() {
                   confirmAction.textContent = 'Are you sure?';
                   confirmAction.classList.add('delete-action', 'confirm');
 
-                  confirmAction.addEventListener('click', () => {
-                      emptyRecycleBin();
+                  confirmAction.addEventListener('click', async () => {
+                      await emptyRecycleBin();
+                      renderDeletedItemsList();
                       dropdown.remove();
                   });
 
@@ -135,6 +137,7 @@ function initializeSettingsEvents() {
     } else {
       const note = notes.find(n => n.id === activeNoteId);
       if (note) {
+        note.settings = note.settings || {};
         note.settings.title = value;
         note.metadata.lastModified = Date.now();
         if (value === 'default') {
@@ -161,6 +164,7 @@ function initializeSettingsEvents() {
     } else {
       const note = notes.find(n => n.id === activeNoteId);
       if (note) {
+        note.settings = note.settings || {};
         note.settings.fontSize = value;
         note.metadata.lastModified = Date.now();
         applyFontSize(value);
@@ -191,14 +195,14 @@ function initializeSettingsEvents() {
 
   // Auto line break button
   autoLineBreakButton.addEventListener('click', () => {
-    globalSettings.autoLineBreak = !globalSettings.autoLineBreak;
+    globalSettings.autoLineBreak = !normalizeGlobalSettings(globalSettings).autoLineBreak;
     updateAutoLineBreakButton();
     saveGlobalSettings();
   });
 
   // Tilde replacement button
   tildeReplacementButton.addEventListener('click', () => {
-    globalSettings.tildeReplacement = !globalSettings.tildeReplacement;
+    globalSettings.tildeReplacement = !normalizeGlobalSettings(globalSettings).tildeReplacement;
     updateTildeReplacementButton();
     saveGlobalSettings();
   });

@@ -6,7 +6,8 @@ import {
 
 // Import required functions from other modules
 import { getAllImageObjectsFromDB, deleteImage } from '../database/index.js';
-import { createTrackedBlobUrl, revokeAllBlobUrls } from '../utils.js';
+import { createBlobUrlTracker, extractImageIds } from '../utils.js';
+import { normalizeGlobalSettings } from '../settings.js';
 
 // Import state from state module
 import {
@@ -20,15 +21,25 @@ import { openNote } from './note-renderer.js';
 // Import image modal
 import { showImageModal } from './image-modal.js';
 
+const imageListBlobUrls = createBlobUrlTracker();
+
 /**
  * Renders the list of images.
  */
 async function renderImagesList() {
-  revokeAllBlobUrls();
+  imageListBlobUrls.revokeAll();
   imageList.innerHTML = '';
   try {
     const imageObjects = await getAllImageObjectsFromDB();
-    const allNoteContent = notes.map(n => n.content).join('\n');
+    const imageUsageMap = new Map();
+    for (const note of notes) {
+      for (const imageId of extractImageIds(note.content || '')) {
+        if (!imageUsageMap.has(imageId)) {
+          imageUsageMap.set(imageId, []);
+        }
+        imageUsageMap.get(imageId).push(note);
+      }
+    }
 
     const activeImages = imageObjects.filter(img => !img.deletedAt);
 
@@ -43,7 +54,7 @@ async function renderImagesList() {
       const img = document.createElement('img');
       const imageBlob = imageObject.blob;
       if (imageBlob) {
-        const blobUrl = createTrackedBlobUrl(imageBlob);
+        const blobUrl = imageListBlobUrls.create(imageBlob);
         img.src = blobUrl;
         img.onclick = () => showImageModal(blobUrl);
       }
@@ -104,8 +115,8 @@ async function renderImagesList() {
 
       const usageIcon = document.createElement('span');
       usageIcon.classList.add('usage-icon');
-      const isUsed = allNoteContent.includes(imageId);
-      const notesUsingImage = isUsed ? notes.filter(n => n.content.includes(imageId)) : [];
+      const notesUsingImage = imageUsageMap.get(imageId) || [];
+      const isUsed = notesUsingImage.length > 0;
 
       usageIcon.textContent = isUsed ? '✅' : '❌';
       usageIcon.title = isUsed ? 'Image is used in one or more notes' : 'Image is not used in any note';
@@ -151,7 +162,7 @@ async function renderImagesList() {
       deleteIcon.title = 'Move Image to Recycle Bin';
       deleteIcon.onclick = async (e) => {
         e.stopPropagation();
-        if (globalSettings.preventUsedImageDeletion && isUsed) {
+        if (normalizeGlobalSettings(globalSettings).preventUsedImageDeletion && isUsed) {
             return;
         }
         try {

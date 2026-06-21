@@ -9,7 +9,7 @@ import {
   deleteNotePermanently 
 } from '../notes.js';
 
-import { getAllImageObjectsFromDB, deleteImage, restoreImage, deleteImagePermanently } from '../database/index.js';
+import { getAllImageObjectsFromDB, restoreImage, deleteImagePermanently } from '../database/index.js';
 
 // Import state from state module
 import {
@@ -17,10 +17,12 @@ import {
 } from '../state.js';
 
 import { THIRTY_DAYS_MS } from '../constants.js';
-import { createTrackedBlobUrl, revokeAllBlobUrls } from '../utils.js';
+import { createBlobUrlTracker } from '../utils.js';
 
 // Import image modal function
 import { showImageModal } from './image-manager.js';
+
+const recycleBinBlobUrls = createBlobUrlTracker();
 
 /**
  * Renders the list of deleted items.
@@ -28,7 +30,7 @@ import { showImageModal } from './image-manager.js';
 // === 휴지통 항목 렌더링 ===
 
 async function renderDeletedItemsList() {
-  revokeAllBlobUrls();
+  recycleBinBlobUrls.revokeAll();
   deletedItemsList.innerHTML = '';
 
   // 1. 삭제된 노트와 이미지 가져오기
@@ -66,7 +68,7 @@ async function renderDeletedItemsList() {
       const img = document.createElement('img');
       const imageBlob = item.blob;
       if (imageBlob) {
-          const blobUrl = createTrackedBlobUrl(imageBlob);
+          const blobUrl = recycleBinBlobUrls.create(imageBlob);
           img.src = blobUrl;
           img.onclick = () => showImageModal(blobUrl);
       }
@@ -96,12 +98,14 @@ async function renderDeletedItemsList() {
     restoreSpan.textContent = '♻️';
     restoreSpan.title = `Restore ${item.type === 'note' ? 'Note' : 'Image'}`;
     restoreSpan.classList.add('restore-item-icon');
-    restoreSpan.addEventListener('click', (e) => {
+    restoreSpan.addEventListener('click', async (e) => {
       e.stopPropagation();
       if (item.type === 'note') {
-        restoreNote(item.id);
+        await restoreNote(item.id);
+        renderDeletedItemsList();
       } else {
-        restoreImage(item.id).then(renderDeletedItemsList);
+        await restoreImage(item.id);
+        renderDeletedItemsList();
       }
     });
 
@@ -109,12 +113,14 @@ async function renderDeletedItemsList() {
     deleteSpan.textContent = '🗑️';
     deleteSpan.title = `Delete ${item.type === 'note' ? 'Note' : 'Image'} Permanently`;
     deleteSpan.classList.add('delete-item-icon');
-    deleteSpan.addEventListener('click', (e) => {
+    deleteSpan.addEventListener('click', async (e) => {
       e.stopPropagation();
       if (item.type === 'note') {
-        deleteNotePermanently(item.id);
+        await deleteNotePermanently(item.id);
+        renderDeletedItemsList();
       } else {
-        deleteImagePermanently(item.id).then(renderDeletedItemsList);
+        await deleteImagePermanently(item.id);
+        renderDeletedItemsList();
       }
     });
 

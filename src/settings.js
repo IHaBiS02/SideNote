@@ -13,7 +13,40 @@ import {
 } from './dom.js';
 
 // Import state from state module
-import { notes, globalSettings, activeNoteId, setActiveNoteId } from './state.js';
+import { globalSettings, setActiveNoteId } from './state.js';
+
+const DEFAULT_SETTINGS = Object.freeze({
+  title: 'default',
+  fontSize: 12,
+  autoLineBreak: true,
+  tildeReplacement: true,
+  autoAddSpaces: true,
+  codeBlockHeader: true,
+  preventUsedImageDeletion: true,
+  mode: 'system'
+});
+
+const NOTE_SETTING_KEYS = ['title', 'fontSize', 'codeBlockHeader'];
+
+function normalizeGlobalSettings(settings = {}) {
+  return {
+    ...DEFAULT_SETTINGS,
+    ...(settings || {})
+  };
+}
+
+function resolveEffectiveSettings(note) {
+  const effectiveSettings = normalizeGlobalSettings(globalSettings);
+  const noteSettings = note?.settings || {};
+
+  for (const key of NOTE_SETTING_KEYS) {
+    if (noteSettings[key] !== undefined) {
+      effectiveSettings[key] = noteSettings[key];
+    }
+  }
+
+  return effectiveSettings;
+}
 
 /**
  * Saves the global settings to storage.
@@ -72,8 +105,9 @@ function applyMode(mode) {
 
 function updateAutoLineBreakButton() {
   // 자동 줄바꿈 버튼 아이콘 및 툴팁 업데이트
-  autoLineBreakButton.textContent = globalSettings.autoLineBreak ? '↩✅' : '↩❌';
-  autoLineBreakButton.title = globalSettings.autoLineBreak ? 'Auto Line Break Enabled' : 'Auto Line Break Disabled';
+  const settings = normalizeGlobalSettings(globalSettings);
+  autoLineBreakButton.textContent = settings.autoLineBreak ? '↩✅' : '↩❌';
+  autoLineBreakButton.title = settings.autoLineBreak ? 'Auto Line Break Enabled' : 'Auto Line Break Disabled';
 }
 
 /**
@@ -81,17 +115,13 @@ function updateAutoLineBreakButton() {
  */
 function updateTildeReplacementButton() {
   // 틸데(~) 자동 변환 버튼 아이콘 및 툴팁 업데이트
-  tildeReplacementButton.textContent = globalSettings.tildeReplacement ? '~✅' : '~❌';
-  tildeReplacementButton.title = globalSettings.tildeReplacement ? 'Tilde Replacement Enabled' : 'Tilde Replacement Disabled';
+  const settings = normalizeGlobalSettings(globalSettings);
+  tildeReplacementButton.textContent = settings.tildeReplacement ? '~✅' : '~❌';
+  tildeReplacementButton.title = settings.tildeReplacement ? 'Tilde Replacement Enabled' : 'Tilde Replacement Disabled';
 }
 
 function isCodeBlockHeaderEnabled(note) {
-  const globalValue = globalSettings.codeBlockHeader !== false;
-  if (!note || !note.settings || typeof note.settings.codeBlockHeader !== 'boolean') {
-    return globalValue;
-  }
-
-  return note.settings.codeBlockHeader;
+  return resolveEffectiveSettings(note).codeBlockHeader !== false;
 }
 
 /**
@@ -101,26 +131,31 @@ function isCodeBlockHeaderEnabled(note) {
  * @returns {boolean} True if form was populated, false if note not found.
  */
 function populateSettingsForm(isGlobal, note) {
+  const effectiveGlobalSettings = normalizeGlobalSettings(globalSettings);
   if (isGlobal) {
-    titleSetting.value = globalSettings.title || 'default';
-    fontSizeSetting.value = globalSettings.fontSize || 12;
-    codeBlockHeaderCheckbox.checked = globalSettings.codeBlockHeader !== false;
+    titleSetting.value = effectiveGlobalSettings.title;
+    fontSizeSetting.value = effectiveGlobalSettings.fontSize;
+    codeBlockHeaderCheckbox.checked = effectiveGlobalSettings.codeBlockHeader !== false;
   } else {
     if (!note) return false;
     note.settings = note.settings || {};
+    const effectiveNoteSettings = resolveEffectiveSettings(note);
     setActiveNoteId(note.id);
-    titleSetting.value = note.settings.title || 'default';
-    fontSizeSetting.value = note.settings.fontSize || globalSettings.fontSize || 12;
-    codeBlockHeaderCheckbox.checked = isCodeBlockHeaderEnabled(note);
+    titleSetting.value = effectiveNoteSettings.title;
+    fontSizeSetting.value = effectiveNoteSettings.fontSize;
+    codeBlockHeaderCheckbox.checked = effectiveNoteSettings.codeBlockHeader !== false;
   }
-  modeSetting.value = globalSettings.mode || 'system';
-  autoAddSpacesCheckbox.checked = globalSettings.autoAddSpaces;
-  preventUsedImageDeletionCheckbox.checked = globalSettings.preventUsedImageDeletion;
+  modeSetting.value = effectiveGlobalSettings.mode;
+  autoAddSpacesCheckbox.checked = effectiveGlobalSettings.autoAddSpaces;
+  preventUsedImageDeletionCheckbox.checked = effectiveGlobalSettings.preventUsedImageDeletion;
   return true;
 }
 
 // Export functions
 export {
+  DEFAULT_SETTINGS,
+  normalizeGlobalSettings,
+  resolveEffectiveSettings,
   saveGlobalSettings,
   applyFontSize,
   applyMode,
