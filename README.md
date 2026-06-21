@@ -62,6 +62,8 @@ Images button show all images used in the notes, showing that which one is used 
 Recycle bin shows all soft-deleted notes and images, and let user delete all at once.
 Licenses show license of libraries used in this project.
 
+Export buttons keep the default `.snote` / `.snotes` behavior on left click. Right-click an export button to choose `.zip` or `.snote` / `.snotes`; right-click the `.zip` option to choose the original Markdown or a two-space line-break Markdown export.
+
 ## Development
 
 ### Build Commands

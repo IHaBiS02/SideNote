@@ -27,6 +27,7 @@ import {
   saveParsedSnote,
   saveParsedSnoteImages
 } from '../import_export.js';
+import { createDropdown } from '../ui-helpers.js';
 
 // Import state from state module
 import {
@@ -36,24 +37,132 @@ import {
 
 // === Import/Export Event Listeners ===
 
+async function exportAllNotes({ extension = 'snotes', addTwoSpaceLineBreaks = false } = {}) {
+  const timestamp = getTimestamp();
+  const zip = await createAllNotesArchive(notes, { addTwoSpaceLineBreaks });
+  const blob = await zip.generateAsync({ type: 'blob' });
+  downloadFile(blob, `notes_${timestamp}.${extension}`);
+}
+
+async function exportCurrentNote({ extension = 'snote', addTwoSpaceLineBreaks = false } = {}) {
+  const note = notes.find(n => n.id === activeNoteId);
+  if (!note) {
+    return;
+  }
+
+  const sanitizedTitle = sanitizeFilename(note.title);
+  const zip = await createSingleNoteArchive(note, { addTwoSpaceLineBreaks });
+  const blob = await zip.generateAsync({ type: 'blob' });
+  downloadFile(blob, `${sanitizedTitle}.${extension}`);
+}
+
+function positionDropdownNearButton(dropdown, button) {
+  const rect = button.getBoundingClientRect();
+  const margin = 6;
+  const left = Math.min(rect.left, window.innerWidth - dropdown.offsetWidth - margin);
+  const topAbove = rect.top - dropdown.offsetHeight - margin;
+  const top = topAbove >= margin ? topAbove : rect.bottom + margin;
+
+  dropdown.style.left = `${Math.max(margin, left)}px`;
+  dropdown.style.top = `${top}px`;
+}
+
+function addDropdownItem(dropdown, text, onClick) {
+  const item = document.createElement('div');
+  item.textContent = text;
+  item.tabIndex = 0;
+  item.addEventListener('click', async (event) => {
+    event.stopPropagation();
+    await onClick();
+    dropdown.remove();
+  });
+  dropdown.appendChild(item);
+  return item;
+}
+
+function showZipLineBreakOptions(parentItem, exportZip) {
+  const existingDropdown = parentItem.querySelector('.export-nested-dropdown');
+  if (existingDropdown) {
+    existingDropdown.remove();
+    return;
+  }
+
+  const dropdown = document.createElement('div');
+  dropdown.classList.add('export-nested-dropdown');
+
+  const addNestedItem = (text, addTwoSpaceLineBreaks) => {
+    const item = document.createElement('div');
+    item.textContent = text;
+    item.tabIndex = 0;
+    item.addEventListener('click', async (event) => {
+      event.stopPropagation();
+      await exportZip(addTwoSpaceLineBreaks);
+      parentItem.closest('.export-options-dropdown')?.remove();
+    });
+    dropdown.appendChild(item);
+  };
+
+  addNestedItem('Export original', false);
+  addNestedItem('Export with two-space line breaks', true);
+
+  parentItem.appendChild(dropdown);
+}
+
+function showExportOptionsDropdown(button, { archiveExtension, zipExport, archiveExport }) {
+  const dropdown = createDropdown({
+    className: 'export-options-dropdown',
+    populate: (dropdownElement) => {
+      const zipItem = addDropdownItem(dropdownElement, 'Export as .zip', () => zipExport(false));
+      zipItem.classList.add('export-zip-option');
+      zipItem.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        showZipLineBreakOptions(zipItem, zipExport);
+      });
+
+      addDropdownItem(dropdownElement, `Export as .${archiveExtension}`, archiveExport);
+    },
+    excludeFromClose: ['.export-options-dropdown', '.export-nested-dropdown']
+  });
+
+  if (dropdown) {
+    positionDropdownNearButton(dropdown, button);
+  }
+}
+
 function initializeImportExportEvents() {
   // Export all notes
   globalExportButton.addEventListener('click', async () => {
-    const timestamp = getTimestamp();
-    const zip = await createAllNotesArchive(notes);
-    const blob = await zip.generateAsync({ type: 'blob' });
-    downloadFile(blob, `notes_${timestamp}.snotes`);
+    await exportAllNotes();
+  });
+
+  globalExportButton.addEventListener('contextmenu', (event) => {
+    event.preventDefault();
+    showExportOptionsDropdown(globalExportButton, {
+      archiveExtension: 'snotes',
+      zipExport: (addTwoSpaceLineBreaks) => exportAllNotes({
+        extension: 'zip',
+        addTwoSpaceLineBreaks
+      }),
+      archiveExport: () => exportAllNotes()
+    });
   });
 
   // Export current note
   exportNoteButton.addEventListener('click', async () => {
-    const note = notes.find(n => n.id === activeNoteId);
-    if (note) {
-      const sanitizedTitle = sanitizeFilename(note.title);
-      const zip = await createSingleNoteArchive(note);
-      const blob = await zip.generateAsync({ type: 'blob' });
-      downloadFile(blob, `${sanitizedTitle}.snote`);
-    }
+    await exportCurrentNote();
+  });
+
+  exportNoteButton.addEventListener('contextmenu', (event) => {
+    event.preventDefault();
+    showExportOptionsDropdown(exportNoteButton, {
+      archiveExtension: 'snote',
+      zipExport: (addTwoSpaceLineBreaks) => exportCurrentNote({
+        extension: 'zip',
+        addTwoSpaceLineBreaks
+      }),
+      archiveExport: () => exportCurrentNote()
+    });
   });
 
   // Global import button
@@ -152,5 +261,7 @@ function initializeImportExportEvents() {
 
 // Export functions
 export {
+  exportAllNotes,
+  exportCurrentNote,
   initializeImportExportEvents
 };

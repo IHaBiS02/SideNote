@@ -11,6 +11,7 @@ vi.mock('../../src/database/index.js', () => ({
 import {
   addNoteToZip,
   createSingleNoteArchive,
+  getExportContent,
   parseSnote,
   processSnote,
   saveImportedNotes,
@@ -296,6 +297,22 @@ describe('import_export', () => {
       expect(metadata.title).toBe('Export Me');
       expect(content).toBe('hello\n![Image](images/img1.png)');
       expect(zip.file('images/img1.png')).toBeTruthy();
+    });
+
+    it('should preserve note content for normal exports', () => {
+      const note = makeExportNote();
+
+      expect(getExportContent(note)).toBe('hello\n![Image](images/img1.png)');
+    });
+
+    it('should add two-space line breaks for line-break zip exports', async () => {
+      const zip = await createSingleNoteArchive(makeExportNote(), {
+        addTwoSpaceLineBreaks: true,
+      });
+
+      const content = await zip.file('note.md').async('string');
+
+      expect(content).toBe('hello  \n![Image](images/img1.png)');
     });
   });
 });

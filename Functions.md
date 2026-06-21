@@ -154,9 +154,10 @@ File processing (functions exported):
 - `saveParsedSnote(parsedNote, overrides)`: Saves parsed images and a new note to IndexedDB
 - `processSnote(zip)`: Backward-compatible helper that parses and saves a new note
 - `saveImportedNotes(parsedNotes)`: Saves multiple parsed notes in last-modified order with increasing timestamps
-- `addNoteToZip(zipTarget, note)`: Adds note metadata, Markdown, and referenced images to a zip target
-- `createSingleNoteArchive(note)`: Creates a `.snote` archive for one note
-- `createAllNotesArchive(notes)`: Creates a `.snotes` archive for all notes
+- `getExportContent(note, options)`: Returns note Markdown for export, optionally adding two-space line breaks
+- `addNoteToZip(zipTarget, note, options)`: Adds note metadata, Markdown, and referenced images to a zip target
+- `createSingleNoteArchive(note, options)`: Creates a `.snote`/`.zip` archive for one note
+- `createAllNotesArchive(notes, options)`: Creates a `.snotes`/`.zip` archive for all notes
 
 ## src/notes_view/
 
@@ -250,6 +251,8 @@ Import/export functionality:
 - `initializeImportExportEvents()`: Sets up all import/export event listeners
 
 Handles: note/global export, file import, .snote/.snotes processing
+
+Right-clicking an export button opens a format dropdown. The `.zip` option can be right-clicked again to choose original Markdown or Markdown with two-space line breaks.
 
 ### src/events/global-events.js
 

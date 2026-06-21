@@ -205,6 +205,18 @@ body.dark-mode {
     color: #82aaff;
 }
 
+.dark-mode .export-options-dropdown,
+.dark-mode .export-nested-dropdown {
+    background-color: #2d2d2d;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+.dark-mode .export-options-dropdown div:hover,
+.dark-mode .export-nested-dropdown div:hover {
+    background-color: #444;
+}
+
 .dark-mode .confirmation-dropdown {
     background-color: #2d2d2d;
     border-color: #444;

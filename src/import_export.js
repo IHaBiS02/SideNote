@@ -1,6 +1,7 @@
 // Import required functions from database
 import { getImage, saveImage, saveNote } from './database/index.js';
 import { extractImageIds } from './utils.js';
+import { addAutoLineBreaks } from './text-processors.js';
 
 /**
  * Parses a .snote zip without saving notes or images.
@@ -107,14 +108,23 @@ async function saveImportedNotes(parsedNotes) {
   return savedNotes;
 }
 
-async function addNoteToZip(zipTarget, note) {
+function getExportContent(note, options = {}) {
+  const content = note.content;
+  if (options.addTwoSpaceLineBreaks) {
+    return addAutoLineBreaks(content);
+  }
+
+  return content;
+}
+
+async function addNoteToZip(zipTarget, note, options = {}) {
   const metadata = {
     title: note.title,
     settings: note.settings,
     metadata: note.metadata
   };
   zipTarget.file('metadata.json', JSON.stringify(metadata, null, 2));
-  zipTarget.file('note.md', note.content);
+  zipTarget.file('note.md', getExportContent(note, options));
 
   const imageIds = extractImageIds(note.content);
   if (imageIds.length === 0) {
@@ -134,16 +144,16 @@ async function addNoteToZip(zipTarget, note) {
   }
 }
 
-async function createSingleNoteArchive(note) {
+async function createSingleNoteArchive(note, options = {}) {
   const zip = new JSZip();
-  await addNoteToZip(zip, note);
+  await addNoteToZip(zip, note, options);
   return zip;
 }
 
-async function createAllNotesArchive(notes) {
+async function createAllNotesArchive(notes, options = {}) {
   const zip = new JSZip();
   for (const note of notes) {
-    await addNoteToZip(zip.folder(note.id), note);
+    await addNoteToZip(zip.folder(note.id), note, options);
   }
   return zip;
 }
@@ -156,6 +166,7 @@ export {
   saveParsedSnote,
   processSnote,
   saveImportedNotes,
+  getExportContent,
   addNoteToZip,
   createSingleNoteArchive,
   createAllNotesArchive
