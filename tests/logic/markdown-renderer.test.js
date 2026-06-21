@@ -34,13 +34,26 @@ describe('markdown renderer code blocks', () => {
     };
   });
 
-  it('adds a language header and copy button above fenced code blocks', async () => {
+  async function renderCodeBlock({ globalSettings = {}, noteSettings, activeNoteId = 'note-1' } = {}) {
+    const state = await import('../../src/state.js');
+    state.setGlobalSettings(globalSettings);
+    state.setActiveNoteId(activeNoteId);
+    state.setNotes(noteSettings ? [{
+      id: activeNoteId,
+      settings: noteSettings,
+    }] : []);
+
     const { renderMarkdown } = await import('../../src/notes_view/markdown-renderer.js');
 
     document.getElementById('markdown-editor').value = '```bash\n' + codeText + '```';
     renderMarkdown();
 
-    const preview = document.getElementById('html-preview');
+    return document.getElementById('html-preview');
+  }
+
+  it('adds a language header and copy button above fenced code blocks', async () => {
+    const preview = await renderCodeBlock();
+
     expect(preview.querySelector('.code-block-container')).toBeTruthy();
     expect(preview.querySelector('.code-block-language').textContent).toBe('bash');
     expect(preview.querySelector('.copy-code-button').textContent).toBe('📄');
@@ -54,12 +67,37 @@ describe('markdown renderer code blocks', () => {
       value: { writeText },
       configurable: true,
     });
-    const { renderMarkdown } = await import('../../src/notes_view/markdown-renderer.js');
 
-    document.getElementById('markdown-editor').value = '```bash\n' + codeText + '```';
-    renderMarkdown();
+    await renderCodeBlock();
     document.querySelector('.copy-code-button').click();
 
     expect(writeText).toHaveBeenCalledWith(codeText);
+  });
+
+  it('does not add the header when the global setting is disabled', async () => {
+    const preview = await renderCodeBlock({
+      globalSettings: { codeBlockHeader: false },
+    });
+
+    expect(preview.querySelector('.code-block-header')).toBeNull();
+    expect(preview.querySelector('pre code')).toBeTruthy();
+  });
+
+  it('uses the note setting before the global code block header setting', async () => {
+    const preview = await renderCodeBlock({
+      globalSettings: { codeBlockHeader: false },
+      noteSettings: { codeBlockHeader: true },
+    });
+
+    expect(preview.querySelector('.code-block-header')).toBeTruthy();
+  });
+
+  it('allows a note setting to hide the header when the global setting is enabled', async () => {
+    const preview = await renderCodeBlock({
+      globalSettings: { codeBlockHeader: true },
+      noteSettings: { codeBlockHeader: false },
+    });
+
+    expect(preview.querySelector('.code-block-header')).toBeNull();
   });
 });

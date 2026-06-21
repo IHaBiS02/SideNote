@@ -34,6 +34,7 @@ async function loadAndMigrateData() {
       autoLineBreak: true,         // 자동 줄바꿈
       tildeReplacement: true,      // 틸데 자동 이스케이프
       autoAddSpaces: true,         // Enter 시 자동 공백 추가
+      codeBlockHeader: true,       // 코드 블록 언어/복사 헤더 표시
       preventUsedImageDeletion: true, // 사용 중인 이미지 삭제 방지
       mode: 'system'               // 다크 모드 설정
     });

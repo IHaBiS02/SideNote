@@ -12,6 +12,7 @@ import {
   autoLineBreakButton,
   tildeReplacementButton,
   autoAddSpacesCheckbox,
+  codeBlockHeaderCheckbox,
   preventUsedImageDeletionCheckbox,
   licenseContent,
   editorTitle
@@ -24,7 +25,8 @@ import {
   showLicenseView,
   showRecycleBinView,
   showImageManagementView,
-  renderNoteList
+  renderNoteList,
+  renderMarkdown
 } from '../notes_view/index.js';
 import {
   saveGlobalSettings,
@@ -166,6 +168,25 @@ function initializeSettingsEvents() {
         await saveNote(note);
       }
     }
+  });
+
+  // Code block header setting
+  codeBlockHeaderCheckbox.addEventListener('change', async () => {
+    const value = codeBlockHeaderCheckbox.checked;
+    if (isGlobalSettings) {
+      globalSettings.codeBlockHeader = value;
+      saveGlobalSettings();
+    } else {
+      const note = notes.find(n => n.id === activeNoteId);
+      if (note) {
+        note.settings = note.settings || {};
+        note.settings.codeBlockHeader = value;
+        note.metadata.lastModified = Date.now();
+        sortNotes();
+        await saveNote(note);
+      }
+    }
+    renderMarkdown();
   });
 
   // Auto line break button

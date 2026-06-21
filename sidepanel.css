@@ -416,12 +416,16 @@ button:hover {
   background-color: #f5f5f5;
   border: 1px solid #ccc;
   border-bottom: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .code-block-language {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .copy-code-button {
@@ -430,6 +434,8 @@ button:hover {
   height: 22px;
   padding: 0 4px;
   line-height: 1;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .code-block-body code {

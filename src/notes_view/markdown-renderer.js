@@ -9,11 +9,13 @@ import {
 import { pushToHistory, getHistory, getHistoryIndex, moveBack } from '../history.js';
 import { getImage } from '../database/index.js';
 import { createTrackedBlobUrl, revokeAllBlobUrls } from '../utils.js';
+import { isCodeBlockHeaderEnabled } from '../settings.js';
 
 // Import state from state module
 import { 
   activeNoteId,
   isPreview,
+  notes,
   setIsPreview
 } from '../state.js';
 
@@ -102,6 +104,10 @@ function addCodeBlockHeader(block, language, codeText) {
   container.appendChild(pre);
 }
 
+function getActiveNote() {
+  return notes.find(note => note.id === activeNoteId);
+}
+
 function renderMarkdown() {
   // 커스텀 렌더러 설정 (체크박스 지원)
   const renderer = new marked.Renderer();
@@ -145,7 +151,9 @@ function renderMarkdown() {
       block.parentElement.classList.add('multi-line-code');
     }
 
-    addCodeBlockHeader(block, language, codeText);
+    if (isCodeBlockHeaderEnabled(getActiveNote())) {
+      addCodeBlockHeader(block, language, codeText);
+    }
 
     // 줄 번호 추가
     hljs.lineNumbersBlock(block);

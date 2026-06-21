@@ -8,6 +8,7 @@ import {
   fontSizeSetting,
   modeSetting,
   autoAddSpacesCheckbox,
+  codeBlockHeaderCheckbox,
   preventUsedImageDeletionCheckbox
 } from './dom.js';
 
@@ -84,6 +85,15 @@ function updateTildeReplacementButton() {
   tildeReplacementButton.title = globalSettings.tildeReplacement ? 'Tilde Replacement Enabled' : 'Tilde Replacement Disabled';
 }
 
+function isCodeBlockHeaderEnabled(note) {
+  const globalValue = globalSettings.codeBlockHeader !== false;
+  if (!note || !note.settings || typeof note.settings.codeBlockHeader !== 'boolean') {
+    return globalValue;
+  }
+
+  return note.settings.codeBlockHeader;
+}
+
 /**
  * Populates the settings form fields based on global or note-specific settings.
  * @param {boolean} isGlobal Whether to show global settings.
@@ -94,11 +104,14 @@ function populateSettingsForm(isGlobal, note) {
   if (isGlobal) {
     titleSetting.value = globalSettings.title || 'default';
     fontSizeSetting.value = globalSettings.fontSize || 12;
+    codeBlockHeaderCheckbox.checked = globalSettings.codeBlockHeader !== false;
   } else {
     if (!note) return false;
+    note.settings = note.settings || {};
     setActiveNoteId(note.id);
     titleSetting.value = note.settings.title || 'default';
     fontSizeSetting.value = note.settings.fontSize || globalSettings.fontSize || 12;
+    codeBlockHeaderCheckbox.checked = isCodeBlockHeaderEnabled(note);
   }
   modeSetting.value = globalSettings.mode || 'system';
   autoAddSpacesCheckbox.checked = globalSettings.autoAddSpaces;
@@ -113,5 +126,6 @@ export {
   applyMode,
   updateAutoLineBreakButton,
   updateTildeReplacementButton,
+  isCodeBlockHeaderEnabled,
   populateSettingsForm
 };

@@ -102,6 +102,8 @@ Settings management (functions exported):
 - `applyMode(mode)`: Applies color mode (light/dark/system) to the document
 - `updateAutoLineBreakButton()`: Updates the auto line break button state
 - `updateTildeReplacementButton()`: Updates the tilde replacement button state
+- `isCodeBlockHeaderEnabled(note)`: Resolves the effective code block header setting from note settings with global fallback
+- `populateSettingsForm(isGlobal, note)`: Populates settings fields for either global or note-specific settings
 
 **Note**: Uses `globalSettings` from state.js module
 

@@ -26,7 +26,7 @@ npm run clean
 npm test          # vitest watch mode
 npm run test:run  # single run
 ```
-128 unit/integration tests using vitest + jsdom + fake-indexeddb.
+138 unit/integration tests using vitest + jsdom + fake-indexeddb.
 
 ### Install Dependencies
 ```bash
@@ -104,6 +104,7 @@ tests/
 │   └── images.test.js
 └── logic/                # Business logic tests (with mocked DB/views)
     ├── notes.test.js
+    ├── markdown-renderer.test.js
     └── import-export.test.js
 ```
 
@@ -111,6 +112,13 @@ tests/
 - ES module exports are live bindings — in-place mutations (splice, push) are visible to all importers
 - Prefer in-place mutation for array state when possible
 - Use setter functions (`setNotes`, `setDeletedNotes`) only when replacing the entire array
+
+### Settings Scope Conventions
+- `isGlobalSettings` determines whether the settings view is editing global settings or the active note's settings.
+- Opening settings from the notes list sets `isGlobalSettings` to `true` and edits `globalSettings`, which is stored in `chrome.storage.local`.
+- Opening settings from an individual note sets `isGlobalSettings` to `false` and edits that note's `settings`, which is stored with the note in IndexedDB.
+- Note-specific settings should fall back to `globalSettings` when the note does not define a value.
+- `codeBlockHeader` controls whether preview code blocks show the language/copy header; it supports both global and note-specific values.
 
 ## Development Workflow
 
@@ -152,7 +160,7 @@ After changes:
 
 ## Important Notes
 
-- Test suite: vitest with jsdom + fake-indexeddb (128 tests)
+- Test suite: vitest with jsdom + fake-indexeddb (138 tests)
 - No linting configuration - maintain consistent code style
 - Extension uses Manifest V3 (Chrome) with Firefox compatibility
 - Images in notes use markdown format: `![Image](images/[id].png)`
