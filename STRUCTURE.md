@@ -134,7 +134,7 @@ The UI is a single-page application with several distinct "views" that are shown
 
 #### Import & Export (`import_export.js`, `src/events/`)
 
--   **Export Buttons**: Left-click packages one or all notes into a `.snote` or `.snotes` zip file. Right-click opens an export format dropdown with `.zip` above `.snote`/`.snotes`. Right-clicking the `.zip` option opens a second menu for original Markdown or Markdown with two-space line breaks. Shared helpers in `src/import_export.js` write note content (`note.md`), metadata (`metadata.json`), and any associated images from IndexedDB.
+-   **Export Buttons**: Left-click packages one or all notes into a `.snote` or `.snotes` zip file. Right-click opens an export format dropdown with `.zip` above `.snote`/`.snotes`. Right-clicking the `.zip` option inserts original Markdown and Markdown with two-space line breaks options above the `.zip` row. Shared helpers in `src/import_export.js` write note content (`note.md`), metadata (`metadata.json`), and any associated images from IndexedDB.
 -   **Import Buttons**: Unzip a `.snote` or `.snotes` file and parse metadata/content/images without saving first. Event handlers then choose whether to create new notes or update the active note.
 
 ## 5. External Libraries (`vendor/`)

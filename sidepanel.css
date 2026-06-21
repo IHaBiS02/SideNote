@@ -627,16 +627,7 @@ li.task-list-item {
   background-color: #f5f5f5;
 }
 
-.export-nested-dropdown {
-  position: absolute;
-  left: 0;
-  bottom: 100%;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-  z-index: 21;
-  width: max-content;
+.export-options-dropdown .export-zip-line-break-option {
   min-width: 220px;
 }
 

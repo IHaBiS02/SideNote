@@ -81,31 +81,32 @@ function addDropdownItem(dropdown, text, onClick) {
 }
 
 function showZipLineBreakOptions(parentItem, exportZip) {
-  const existingDropdown = parentItem.querySelector('.export-nested-dropdown');
-  if (existingDropdown) {
-    existingDropdown.remove();
+  const dropdown = parentItem.closest('.export-options-dropdown');
+  if (!dropdown) {
     return;
   }
 
-  const dropdown = document.createElement('div');
-  dropdown.classList.add('export-nested-dropdown');
+  const existingOptions = dropdown.querySelectorAll('.export-zip-line-break-option');
+  if (existingOptions.length > 0) {
+    existingOptions.forEach(option => option.remove());
+    return;
+  }
 
-  const addNestedItem = (text, addTwoSpaceLineBreaks) => {
+  const addZipOption = (text, addTwoSpaceLineBreaks) => {
     const item = document.createElement('div');
     item.textContent = text;
     item.tabIndex = 0;
+    item.classList.add('export-zip-line-break-option');
     item.addEventListener('click', async (event) => {
       event.stopPropagation();
       await exportZip(addTwoSpaceLineBreaks);
-      parentItem.closest('.export-options-dropdown')?.remove();
+      dropdown.remove();
     });
-    dropdown.appendChild(item);
+    dropdown.insertBefore(item, parentItem);
   };
 
-  addNestedItem('Export original', false);
-  addNestedItem('Export with two-space line breaks', true);
-
-  parentItem.appendChild(dropdown);
+  addZipOption('Export original', false);
+  addZipOption('Export with two-space line breaks', true);
 }
 
 function showExportOptionsDropdown(button, { archiveExtension, zipExport, archiveExport }) {
@@ -122,7 +123,7 @@ function showExportOptionsDropdown(button, { archiveExtension, zipExport, archiv
 
       addDropdownItem(dropdownElement, `Export as .${archiveExtension}`, archiveExport);
     },
-    excludeFromClose: ['.export-options-dropdown', '.export-nested-dropdown']
+    excludeFromClose: ['.export-options-dropdown']
   });
 
   if (dropdown) {

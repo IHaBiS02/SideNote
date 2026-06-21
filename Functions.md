@@ -252,7 +252,7 @@ Import/export functionality:
 
 Handles: note/global export, file import, .snote/.snotes processing
 
-Right-clicking an export button opens a format dropdown. The `.zip` option can be right-clicked again to choose original Markdown or Markdown with two-space line breaks.
+Right-clicking an export button opens a format dropdown. The `.zip` option can be right-clicked again to show original Markdown and Markdown with two-space line break options above the `.zip` row.
 
 ### src/events/global-events.js
 

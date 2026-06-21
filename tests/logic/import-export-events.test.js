@@ -183,7 +183,7 @@ describe('import/export events', () => {
     );
   });
 
-  it('exports all notes as zip with two-space line breaks from the nested context menu', async () => {
+  it('exports all notes as zip with two-space line breaks from options inserted above the zip item', async () => {
     const generateAsync = vi.fn().mockResolvedValue(new Blob(['zip'], { type: 'application/zip' }));
     mocks.createAllNotesArchive.mockResolvedValue({ generateAsync });
 
@@ -206,8 +206,12 @@ describe('import/export events', () => {
     const zipItem = document.querySelector('.export-options-dropdown .export-zip-option');
     zipItem.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
 
-    const nestedItems = document.querySelectorAll('.export-nested-dropdown div');
-    nestedItems[1].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    const menuItems = document.querySelectorAll('.export-options-dropdown > div');
+    expect(menuItems[0].textContent).toBe('Export original');
+    expect(menuItems[1].textContent).toBe('Export with two-space line breaks');
+    expect(menuItems[2]).toBe(zipItem);
+
+    menuItems[1].dispatchEvent(new MouseEvent('click', { bubbles: true }));
     await new Promise(resolve => setTimeout(resolve, 0));
 
     expect(mocks.createAllNotesArchive).toHaveBeenCalledWith(
