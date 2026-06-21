@@ -220,4 +220,31 @@ describe('import/export events', () => {
     );
     expect(generateAsync).toHaveBeenCalledWith({ type: 'blob' });
   });
+
+  it('keeps the export dropdown bottom stable when zip options are inserted', async () => {
+    const state = await import('../../src/state.js');
+    state.setNotes([]);
+
+    const { initializeImportExportEvents } = await import('../../src/events/import-export-events.js');
+    initializeImportExportEvents();
+
+    const globalExportButton = document.getElementById('global-export-button');
+    globalExportButton.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
+
+    const dropdown = document.querySelector('.export-options-dropdown');
+    Object.defineProperty(dropdown, 'offsetHeight', {
+      configurable: true,
+      get: () => dropdown.children.length * 20,
+    });
+    dropdown.style.top = '100px';
+    dropdown.getBoundingClientRect = () => ({
+      bottom: parseInt(dropdown.style.top, 10) + dropdown.offsetHeight,
+    });
+
+    const zipItem = document.querySelector('.export-options-dropdown .export-zip-option');
+    zipItem.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
+
+    expect(dropdown.style.top).toBe('60px');
+    expect(dropdown.getBoundingClientRect().bottom).toBe(140);
+  });
 });

@@ -64,7 +64,20 @@ function positionDropdownNearButton(dropdown, button) {
   const top = topAbove >= margin ? topAbove : rect.bottom + margin;
 
   dropdown.style.left = `${Math.max(margin, left)}px`;
-  dropdown.style.top = `${top}px`;
+  setDropdownTop(dropdown, top);
+}
+
+function setDropdownTop(dropdown, top) {
+  const margin = 6;
+  const maxTop = window.innerHeight - dropdown.offsetHeight - margin;
+  const boundedTop = Math.min(Math.max(margin, top), Math.max(margin, maxTop));
+  dropdown.style.top = `${boundedTop}px`;
+}
+
+function keepDropdownBottomStable(dropdown, update) {
+  const previousBottom = dropdown.getBoundingClientRect().bottom;
+  update();
+  setDropdownTop(dropdown, previousBottom - dropdown.offsetHeight);
 }
 
 function addDropdownItem(dropdown, text, onClick) {
@@ -88,7 +101,9 @@ function showZipLineBreakOptions(parentItem, exportZip) {
 
   const existingOptions = dropdown.querySelectorAll('.export-zip-line-break-option');
   if (existingOptions.length > 0) {
-    existingOptions.forEach(option => option.remove());
+    keepDropdownBottomStable(dropdown, () => {
+      existingOptions.forEach(option => option.remove());
+    });
     return;
   }
 
@@ -105,8 +120,10 @@ function showZipLineBreakOptions(parentItem, exportZip) {
     dropdown.insertBefore(item, parentItem);
   };
 
-  addZipOption('Export original', false);
-  addZipOption('Export with two-space line breaks', true);
+  keepDropdownBottomStable(dropdown, () => {
+    addZipOption('Export original', false);
+    addZipOption('Export with two-space line breaks', true);
+  });
 }
 
 function showExportOptionsDropdown(button, { archiveExtension, zipExport, archiveExport }) {
