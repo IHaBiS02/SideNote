@@ -37,9 +37,16 @@ import {
 
 // === Import/Export Event Listeners ===
 
-async function exportAllNotes({ extension = 'snotes', addTwoSpaceLineBreaks = false } = {}) {
+async function exportAllNotes({
+  extension = 'snotes',
+  addTwoSpaceLineBreaks = false,
+  useTitleFolderNames = false
+} = {}) {
   const timestamp = getTimestamp();
-  const zip = await createAllNotesArchive(notes, { addTwoSpaceLineBreaks });
+  const zip = await createAllNotesArchive(notes, {
+    addTwoSpaceLineBreaks,
+    useTitleFolderNames
+  });
   const blob = await zip.generateAsync({ type: 'blob' });
   downloadFile(blob, `notes_${timestamp}.${extension}`);
 }
@@ -160,7 +167,8 @@ function initializeImportExportEvents() {
       archiveExtension: 'snotes',
       zipExport: (addTwoSpaceLineBreaks) => exportAllNotes({
         extension: 'zip',
-        addTwoSpaceLineBreaks
+        addTwoSpaceLineBreaks,
+        useTitleFolderNames: true
       }),
       archiveExport: () => exportAllNotes()
     });

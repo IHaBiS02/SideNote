@@ -1,6 +1,6 @@
 // Import required functions from database
 import { getImage, saveImage, saveNote } from './database/index.js';
-import { extractImageIds } from './utils.js';
+import { extractImageIds, sanitizeFilename } from './utils.js';
 import { addAutoLineBreaks } from './text-processors.js';
 
 /**
@@ -117,6 +117,25 @@ function getExportContent(note, options = {}) {
   return content;
 }
 
+function createNoteFolderName(note, usedFolderNames, options = {}) {
+  if (!options.useTitleFolderNames) {
+    return note.id;
+  }
+
+  const title = sanitizeFilename(note.title || '').trim();
+  const baseName = title || note.id;
+  let folderName = baseName;
+  let suffix = 2;
+
+  while (usedFolderNames.has(folderName)) {
+    folderName = `${baseName}_${suffix}`;
+    suffix++;
+  }
+
+  usedFolderNames.add(folderName);
+  return folderName;
+}
+
 async function addNoteToZip(zipTarget, note, options = {}) {
   const metadata = {
     title: note.title,
@@ -152,8 +171,10 @@ async function createSingleNoteArchive(note, options = {}) {
 
 async function createAllNotesArchive(notes, options = {}) {
   const zip = new JSZip();
+  const usedFolderNames = new Set();
   for (const note of notes) {
-    await addNoteToZip(zip.folder(note.id), note, options);
+    const folderName = createNoteFolderName(note, usedFolderNames, options);
+    await addNoteToZip(zip.folder(folderName), note, options);
   }
   return zip;
 }
@@ -167,6 +188,7 @@ export {
   processSnote,
   saveImportedNotes,
   getExportContent,
+  createNoteFolderName,
   addNoteToZip,
   createSingleNoteArchive,
   createAllNotesArchive

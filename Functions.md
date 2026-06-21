@@ -155,6 +155,7 @@ File processing (functions exported):
 - `processSnote(zip)`: Backward-compatible helper that parses and saves a new note
 - `saveImportedNotes(parsedNotes)`: Saves multiple parsed notes in last-modified order with increasing timestamps
 - `getExportContent(note, options)`: Returns note Markdown for export, optionally adding two-space line breaks
+- `createNoteFolderName(note, usedFolderNames, options)`: Chooses an all-notes archive folder name, using sanitized unique note titles for `.zip` exports when requested
 - `addNoteToZip(zipTarget, note, options)`: Adds note metadata, Markdown, and referenced images to a zip target
 - `createSingleNoteArchive(note, options)`: Creates a `.snote`/`.zip` archive for one note
 - `createAllNotesArchive(notes, options)`: Creates a `.snotes`/`.zip` archive for all notes

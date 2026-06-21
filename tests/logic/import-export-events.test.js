@@ -136,7 +136,7 @@ describe('import/export events', () => {
 
     expect(mocks.createAllNotesArchive).toHaveBeenCalledWith(
       state.notes,
-      { addTwoSpaceLineBreaks: false }
+      { addTwoSpaceLineBreaks: false, useTitleFolderNames: false }
     );
     expect(generateAsync).toHaveBeenCalledWith({ type: 'blob' });
     expect(mocks.downloadFile).toHaveBeenCalledWith(
@@ -175,7 +175,7 @@ describe('import/export events', () => {
 
     expect(mocks.createAllNotesArchive).toHaveBeenCalledWith(
       state.notes,
-      { addTwoSpaceLineBreaks: false }
+      { addTwoSpaceLineBreaks: false, useTitleFolderNames: true }
     );
     expect(mocks.downloadFile).toHaveBeenCalledWith(
       blob,
@@ -216,7 +216,7 @@ describe('import/export events', () => {
 
     expect(mocks.createAllNotesArchive).toHaveBeenCalledWith(
       state.notes,
-      { addTwoSpaceLineBreaks: true }
+      { addTwoSpaceLineBreaks: true, useTitleFolderNames: true }
     );
     expect(generateAsync).toHaveBeenCalledWith({ type: 'blob' });
   });

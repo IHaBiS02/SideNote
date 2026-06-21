@@ -10,6 +10,8 @@ vi.mock('../../src/database/index.js', () => ({
 
 import {
   addNoteToZip,
+  createAllNotesArchive,
+  createNoteFolderName,
   createSingleNoteArchive,
   getExportContent,
   parseSnote,
@@ -313,6 +315,36 @@ describe('import_export', () => {
       const content = await zip.file('note.md').async('string');
 
       expect(content).toBe('hello  \n![Image](images/img1.png)');
+    });
+
+    it('should use note ids for all-notes archives by default', async () => {
+      const zip = await createAllNotesArchive([makeExportNote()]);
+
+      expect(zip.file('note-1/note.md')).toBeTruthy();
+    });
+
+    it('should use sanitized note titles for all-notes zip exports when requested', async () => {
+      const notes = [
+        { ...makeExportNote(), id: 'note-1', title: 'First Note' },
+        { ...makeExportNote(), id: 'note-2', title: 'Bad:/Name?' },
+        { ...makeExportNote(), id: 'note-3', title: 'Bad__Name_' },
+      ];
+
+      const zip = await createAllNotesArchive(notes, { useTitleFolderNames: true });
+
+      expect(zip.file('First Note/note.md')).toBeTruthy();
+      expect(zip.file('Bad__Name_/note.md')).toBeTruthy();
+      expect(zip.file('Bad__Name__2/note.md')).toBeTruthy();
+    });
+
+    it('should fall back to note id for blank title folder names', () => {
+      const usedFolderNames = new Set();
+
+      expect(createNoteFolderName(
+        { id: 'note-1', title: '   ' },
+        usedFolderNames,
+        { useTitleFolderNames: true }
+      )).toBe('note-1');
     });
   });
 });

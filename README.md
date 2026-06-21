@@ -63,6 +63,7 @@ Recycle bin shows all soft-deleted notes and images, and let user delete all at 
 Licenses show license of libraries used in this project.
 
 Export buttons keep the default `.snote` / `.snotes` behavior on left click. Right-click an export button to choose `.zip` or `.snote` / `.snotes`; right-click the `.zip` option to show original Markdown and two-space line-break Markdown export options above the `.zip` row.
+All-notes `.zip` exports use sanitized note titles as folder names, with suffixes added when titles collide.
 
 ## Development
 
