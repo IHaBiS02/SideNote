@@ -100,6 +100,20 @@ body.dark-mode {
     border: 1px solid #444;
 }
 
+.dark-mode .code-block-body code {
+    border-top: none;
+}
+
+.dark-mode .code-block-header {
+    color: #ccc;
+    background-color: #252525;
+    border-color: #444;
+}
+
+.dark-mode .copy-code-button:hover {
+    background-color: #444;
+}
+
 .dark-mode .hljs-ln-numbers {
     color: #ccc;
     border-right: 1px solid #444;

@@ -395,6 +395,47 @@ button:hover {
 }
 
 /* For line-breaking */
+.code-block-container {
+  margin: 1em 0;
+}
+
+.code-block-container pre {
+  margin: 0;
+}
+
+.code-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 26px;
+  box-sizing: border-box;
+  padding: 3px 5px;
+  font-family: monospace;
+  font-size: 0.9em;
+  color: #555;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-bottom: none;
+}
+
+.code-block-language {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copy-code-button {
+  flex: 0 0 auto;
+  min-width: 26px;
+  height: 22px;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.code-block-body code {
+  border-top: none;
+}
+
 pre code {
   white-space: pre-wrap;
   word-break: break-all;

@@ -22,6 +22,86 @@ import {
  */
 // === 마크다운 렌더링 ===
 
+function getCodeBlockLanguage(block) {
+  const languageClass = Array.from(block.classList).find((className) => className.startsWith('language-'));
+  if (!languageClass) {
+    return 'text';
+  }
+
+  return languageClass.replace('language-', '') || 'text';
+}
+
+async function copyTextToClipboard(text) {
+  if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.top = '-9999px';
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand('copy');
+  } finally {
+    document.body.removeChild(textarea);
+  }
+}
+
+function showCopyFeedback(button, text) {
+  const originalText = button.dataset.defaultText || button.textContent;
+  button.textContent = text;
+  setTimeout(() => {
+    button.textContent = originalText;
+  }, 1000);
+}
+
+function addCodeBlockHeader(block, language, codeText) {
+  const pre = block.parentElement;
+  if (!pre || pre.classList.contains('code-block-body')) {
+    return;
+  }
+
+  const container = document.createElement('div');
+  container.className = 'code-block-container';
+
+  const header = document.createElement('div');
+  header.className = 'code-block-header';
+
+  const languageLabel = document.createElement('span');
+  languageLabel.className = 'code-block-language';
+  languageLabel.textContent = language;
+
+  const copyButton = document.createElement('button');
+  copyButton.type = 'button';
+  copyButton.className = 'copy-code-button';
+  copyButton.title = 'Copy code';
+  copyButton.setAttribute('aria-label', 'Copy code');
+  copyButton.textContent = '📄';
+  copyButton.dataset.defaultText = copyButton.textContent;
+  copyButton.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    try {
+      await copyTextToClipboard(codeText);
+      showCopyFeedback(copyButton, '✓');
+    } catch (err) {
+      console.error('Failed to copy code block:', err);
+      showCopyFeedback(copyButton, '!');
+    }
+  });
+
+  header.appendChild(languageLabel);
+  header.appendChild(copyButton);
+
+  pre.classList.add('code-block-body');
+  pre.parentNode.insertBefore(container, pre);
+  container.appendChild(header);
+  container.appendChild(pre);
+}
+
 function renderMarkdown() {
   // 커스텀 렌더러 설정 (체크박스 지원)
   const renderer = new marked.Renderer();
@@ -53,14 +133,19 @@ function renderMarkdown() {
   });
   // 코드 블록에 줄 번호 추가
   htmlPreview.querySelectorAll('pre code').forEach((block) => {
+    const codeText = block.textContent;
+    const language = getCodeBlockLanguage(block);
+
     // 줄 수 계산
-    const lineCount = block.textContent.split('\n').length;
+    const lineCount = codeText.split('\n').length;
     // 줄 수에 따라 다른 스타일 적용
     if (lineCount === 2) {
       block.parentElement.classList.add('single-line-code');
     } else {
       block.parentElement.classList.add('multi-line-code');
     }
+
+    addCodeBlockHeader(block, language, codeText);
 
     // 줄 번호 추가
     hljs.lineNumbersBlock(block);
