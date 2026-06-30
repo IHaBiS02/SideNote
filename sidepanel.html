@@ -36,6 +36,7 @@
       <div class="toolbar-left">
         <button id="toggle-view-button">Preview</button>
         <button id="auto-line-break-button" title="Auto Line Break" hidden>↩</button>
+        <button id="tilde-replacement-button" title="Tilde Replacement" hidden>~</button>
       </div>
       <div class="toolbar-right">
         <button id="import-note-button" title="Import Single Note">📂</button>
@@ -80,14 +81,18 @@
         <input type="checkbox" id="prevent-used-image-deletion-checkbox">
       </div>
       <div class="setting" id="tilde-replacement-setting">
-        <label for="tilde-replacement-button">Tilde Replacement</label>
-        <input type="checkbox" id="tilde-replacement-button">
+        <label for="show-tilde-replacement-button-checkbox">Tilde Replacement Button</label>
+        <input type="checkbox" id="show-tilde-replacement-button-checkbox">
       </div>
       <fieldset class="settings-section" id="legacy-settings-section">
         <legend>Legacy</legend>
         <div class="setting" id="legacy-line-break-mode-setting">
           <label for="legacy-line-break-mode-checkbox">Legacy Markdown line breaks</label>
           <input type="checkbox" id="legacy-line-break-mode-checkbox">
+        </div>
+        <div class="setting" id="auto-add-spaces-setting" hidden>
+          <label for="auto-add-spaces-checkbox">Add two spaces on Enter</label>
+          <input type="checkbox" id="auto-add-spaces-checkbox">
         </div>
       </fieldset>
       <div class="setting">

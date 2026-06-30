@@ -4,7 +4,10 @@ import {
   htmlPreview,
   autoLineBreakButton,
   tildeReplacementButton,
+  showTildeReplacementButtonCheckbox,
   legacyLineBreakModeCheckbox,
+  autoAddSpacesCheckbox,
+  autoAddSpacesSetting,
   titleSetting,
   fontSizeSetting,
   modeSetting,
@@ -20,6 +23,8 @@ const DEFAULT_SETTINGS = Object.freeze({
   fontSize: 12,
   legacyLineBreakMode: false,
   autoLineBreak: false,
+  autoAddSpaces: false,
+  showTildeReplacementButton: false,
   tildeReplacement: false,
   codeBlockHeader: true,
   preventUsedImageDeletion: true,
@@ -50,14 +55,20 @@ function resolveEffectiveSettings(note) {
 
 function resolveLegacyTextProcessingSettings(settings = globalSettings) {
   const normalizedSettings = normalizeGlobalSettings(settings);
+  const tildeReplacement = normalizedSettings.showTildeReplacementButton && normalizedSettings.tildeReplacement;
   if (!normalizedSettings.legacyLineBreakMode) {
     return {
       ...normalizedSettings,
-      autoLineBreak: false
+      autoLineBreak: false,
+      autoAddSpaces: false,
+      tildeReplacement
     };
   }
 
-  return normalizedSettings;
+  return {
+    ...normalizedSettings,
+    tildeReplacement
+  };
 }
 
 /**
@@ -130,13 +141,19 @@ function updateAutoLineBreakButton() {
 function updateTildeReplacementButton() {
   // 틸데(~) 자동 변환 버튼 아이콘 및 툴팁 업데이트
   const settings = normalizeGlobalSettings(globalSettings);
-  tildeReplacementButton.checked = settings.tildeReplacement;
+  tildeReplacementButton.hidden = !settings.showTildeReplacementButton;
+  tildeReplacementButton.disabled = !settings.showTildeReplacementButton;
+  tildeReplacementButton.textContent = settings.tildeReplacement ? '~✅' : '~❌';
   tildeReplacementButton.title = settings.tildeReplacement ? 'Tilde Replacement Enabled' : 'Tilde Replacement Disabled';
 }
 
 function updateLegacyLineBreakControls() {
   const settings = normalizeGlobalSettings(globalSettings);
+  const legacyLineBreakModeEnabled = settings.legacyLineBreakMode;
   legacyLineBreakModeCheckbox.checked = settings.legacyLineBreakMode;
+  autoAddSpacesSetting.hidden = !legacyLineBreakModeEnabled;
+  autoAddSpacesCheckbox.checked = legacyLineBreakModeEnabled && settings.autoAddSpaces;
+  autoAddSpacesCheckbox.disabled = !legacyLineBreakModeEnabled;
   updateAutoLineBreakButton();
 }
 
@@ -167,6 +184,7 @@ function populateSettingsForm(isGlobal, note) {
   }
   modeSetting.value = effectiveGlobalSettings.mode;
   legacyLineBreakModeCheckbox.checked = effectiveGlobalSettings.legacyLineBreakMode;
+  showTildeReplacementButtonCheckbox.checked = effectiveGlobalSettings.showTildeReplacementButton;
   updateLegacyLineBreakControls();
   updateTildeReplacementButton();
   preventUsedImageDeletionCheckbox.checked = effectiveGlobalSettings.preventUsedImageDeletion;

@@ -20,6 +20,8 @@ describe('settings model helpers', () => {
     expect(settings.title).toBe(DEFAULT_SETTINGS.title);
     expect(settings.legacyLineBreakMode).toBe(false);
     expect(settings.autoLineBreak).toBe(false);
+    expect(settings.autoAddSpaces).toBe(false);
+    expect(settings.showTildeReplacementButton).toBe(false);
   });
 
   it('resolves note-specific settings over normalized global settings', () => {
@@ -61,19 +63,34 @@ describe('settings model helpers', () => {
     const effective = resolveLegacyTextProcessingSettings({
       legacyLineBreakMode: false,
       autoLineBreak: true,
+      autoAddSpaces: true,
       tildeReplacement: true,
     });
 
     expect(effective.autoLineBreak).toBe(false);
-    expect(effective.tildeReplacement).toBe(true);
+    expect(effective.autoAddSpaces).toBe(false);
+    expect(effective.tildeReplacement).toBe(false);
   });
 
   it('keeps legacy line-break processors when legacy mode is on', () => {
     const effective = resolveLegacyTextProcessingSettings({
       legacyLineBreakMode: true,
       autoLineBreak: true,
+      autoAddSpaces: true,
     });
 
     expect(effective.autoLineBreak).toBe(true);
+    expect(effective.autoAddSpaces).toBe(true);
+  });
+
+  it('keeps tilde replacement independent from legacy mode when its toolbar button is enabled', () => {
+    const effective = resolveLegacyTextProcessingSettings({
+      legacyLineBreakMode: false,
+      showTildeReplacementButton: true,
+      tildeReplacement: true,
+    });
+
+    expect(effective.autoLineBreak).toBe(false);
+    expect(effective.tildeReplacement).toBe(true);
   });
 });

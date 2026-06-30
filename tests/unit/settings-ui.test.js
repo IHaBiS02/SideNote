@@ -5,11 +5,14 @@ function renderSettingsDom() {
     <textarea id="markdown-editor"></textarea>
     <div id="html-preview"></div>
     <button id="auto-line-break-button" hidden>↩</button>
-    <input type="checkbox" id="tilde-replacement-button">
+    <button id="tilde-replacement-button" hidden>~</button>
+    <input type="checkbox" id="show-tilde-replacement-button-checkbox">
     <input type="checkbox" id="legacy-line-break-mode-checkbox">
     <select id="title-setting"></select>
     <input type="number" id="font-size-setting">
     <select id="mode-setting"></select>
+    <input type="checkbox" id="auto-add-spaces-checkbox">
+    <div id="auto-add-spaces-setting" hidden></div>
     <input type="checkbox" id="code-block-header-checkbox">
     <input type="checkbox" id="prevent-used-image-deletion-checkbox">
   `;
@@ -45,12 +48,15 @@ describe('settings UI helpers', () => {
     expect(document.getElementById('legacy-line-break-mode-checkbox').checked).toBe(false);
     expect(document.getElementById('auto-line-break-button').hidden).toBe(true);
     expect(document.getElementById('auto-line-break-button').disabled).toBe(true);
+    expect(document.getElementById('auto-add-spaces-setting').hidden).toBe(true);
+    expect(document.getElementById('auto-add-spaces-checkbox').disabled).toBe(true);
   });
 
-  it('shows the legacy auto line break toolbar button when legacy mode is enabled', async () => {
+  it('shows legacy line-break controls when legacy mode is enabled', async () => {
     const { updateLegacyLineBreakControls } = await loadSettingsModule({
       legacyLineBreakMode: true,
       autoLineBreak: true,
+      autoAddSpaces: true,
     });
 
     updateLegacyLineBreakControls();
@@ -59,6 +65,9 @@ describe('settings UI helpers', () => {
     expect(document.getElementById('auto-line-break-button').hidden).toBe(false);
     expect(document.getElementById('auto-line-break-button').textContent).toBe('↩✅');
     expect(document.getElementById('auto-line-break-button').disabled).toBe(false);
+    expect(document.getElementById('auto-add-spaces-setting').hidden).toBe(false);
+    expect(document.getElementById('auto-add-spaces-checkbox').checked).toBe(true);
+    expect(document.getElementById('auto-add-spaces-checkbox').disabled).toBe(false);
   });
 
   it('uses the legacy toolbar label for auto line break', async () => {
@@ -73,7 +82,19 @@ describe('settings UI helpers', () => {
 
     expect(document.getElementById('auto-line-break-button').textContent).toBe('↩✅');
     expect(document.getElementById('auto-line-break-button').title).toBe('Auto Line Break Enabled');
-    expect(document.getElementById('tilde-replacement-button').checked).toBe(true);
+    expect(document.getElementById('tilde-replacement-button').hidden).toBe(true);
+  });
+
+  it('shows the tilde replacement toolbar button only when enabled in settings', async () => {
+    const { updateTildeReplacementButton } = await loadSettingsModule({
+      showTildeReplacementButton: true,
+      tildeReplacement: true,
+    });
+
+    updateTildeReplacementButton();
+
+    expect(document.getElementById('tilde-replacement-button').hidden).toBe(false);
+    expect(document.getElementById('tilde-replacement-button').textContent).toBe('~✅');
     expect(document.getElementById('tilde-replacement-button').title).toBe('Tilde Replacement Enabled');
   });
 });

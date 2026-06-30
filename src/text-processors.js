@@ -85,12 +85,12 @@ function normalizeTrailingSpaces(text, targetSpaces = 2) {
  * Processes Enter key input for markdown line breaks
  * @param {HTMLTextAreaElement} textarea - The textarea element
  * @param {Object} settings - User settings object
- * @param {boolean} settings.autoLineBreak - Whether to add line break spaces on Enter
+ * @param {boolean} settings.autoAddSpaces - Whether to add line break spaces on Enter
  * @param {Function} insertTextFunction - Function to insert text at cursor
  * @returns {Object} Processing result with action taken
  */
 function handleEnterKeyInput(textarea, settings = {}, insertTextFunction) {
-  if (!settings.autoLineBreak) {
+  if (!settings.autoAddSpaces) {
     return { handled: false, action: 'default' };
   }
   
