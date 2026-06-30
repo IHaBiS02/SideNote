@@ -105,9 +105,10 @@ Settings management (functions exported):
 - `saveGlobalSettings()`: Saves the global settings to chrome.storage.local
 - `applyFontSize(size)`: Applies font size to editor and preview elements
 - `applyMode(mode)`: Applies color mode (light/dark/system) to the document
-- `updateAutoLineBreakButton()`: Updates the legacy auto line break checkbox state
+- `updateAutoLineBreakButton()`: Updates the legacy pasted-line trailing-space toolbar button state
+- `updateAutoAddSpacesButton()`: Updates the legacy Enter trailing-space toolbar button state
 - `updateTildeReplacementButton()`: Updates the legacy tilde replacement checkbox state
-- `updateLegacyLineBreakControls()`: Updates the legacy line-break mode checkbox and dependent controls
+- `updateLegacyLineBreakControls()`: Updates the legacy line-break mode checkbox and dependent toolbar controls
 - `isCodeBlockHeaderEnabled(note)`: Resolves the effective code block header setting from note settings with global fallback
 - `populateSettingsForm(isGlobal, note)`: Populates settings fields for either global or note-specific settings
 

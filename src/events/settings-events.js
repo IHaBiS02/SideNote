@@ -12,7 +12,7 @@ import {
   autoLineBreakButton,
   tildeReplacementButton,
   legacyLineBreakModeCheckbox,
-  autoAddSpacesCheckbox,
+  autoAddSpacesButton,
   codeBlockHeaderCheckbox,
   preventUsedImageDeletionCheckbox,
   licenseContent,
@@ -34,6 +34,7 @@ import {
   applyFontSize,
   applyMode,
   updateAutoLineBreakButton,
+  updateAutoAddSpacesButton,
   updateTildeReplacementButton,
   updateLegacyLineBreakControls,
   populateSettingsForm
@@ -202,9 +203,9 @@ function initializeSettingsEvents() {
     renderMarkdown();
   });
 
-  // Auto line break legacy checkbox
-  autoLineBreakButton.addEventListener('change', () => {
-    globalSettings.autoLineBreak = autoLineBreakButton.checked;
+  // Auto line break legacy toolbar button
+  autoLineBreakButton.addEventListener('click', () => {
+    globalSettings.autoLineBreak = !globalSettings.autoLineBreak;
     updateAutoLineBreakButton();
     saveGlobalSettings();
   });
@@ -216,10 +217,10 @@ function initializeSettingsEvents() {
     saveGlobalSettings();
   });
 
-  // Auto add spaces checkbox
-  autoAddSpacesCheckbox.addEventListener('change', () => {
-      globalSettings.autoAddSpaces = autoAddSpacesCheckbox.checked;
-      updateLegacyLineBreakControls();
+  // Auto add spaces legacy toolbar button
+  autoAddSpacesButton.addEventListener('click', () => {
+      globalSettings.autoAddSpaces = !globalSettings.autoAddSpaces;
+      updateAutoAddSpacesButton();
       saveGlobalSettings();
   });
 

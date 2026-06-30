@@ -16,7 +16,7 @@ import {
 import { 
   applyFontSize,
   resolveEffectiveSettings,
-  updateAutoLineBreakButton,
+  updateLegacyLineBreakControls,
   updateTildeReplacementButton 
 } from '../settings.js';
 
@@ -101,7 +101,7 @@ function openNote(noteId, inEditMode = false, addToHistory = true) {
     // 노트 설정 적용 (폰트 크기 등)
     const fontSize = resolveEffectiveSettings(note).fontSize;
     applyFontSize(fontSize);
-    updateAutoLineBreakButton();
+    updateLegacyLineBreakControls();
     updateTildeReplacementButton();
     renderMarkdown();
     showEditorView(false);

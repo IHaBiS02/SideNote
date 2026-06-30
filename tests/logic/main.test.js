@@ -31,7 +31,7 @@ const mocks = vi.hoisted(() => {
       mode: 'system',
       ...(settings || {}),
     })),
-    updateAutoLineBreakButton: vi.fn(() => calls.push('updateAutoLineBreakButton')),
+    updateLegacyLineBreakControls: vi.fn(() => calls.push('updateLegacyLineBreakControls')),
     updateTildeReplacementButton: vi.fn(() => calls.push('updateTildeReplacementButton')),
     showListView: vi.fn(() => calls.push('showListView')),
     initializeAllEvents: vi.fn(() => calls.push('initializeAllEvents')),
@@ -55,7 +55,7 @@ vi.mock('../../src/settings.js', () => ({
   applyFontSize: mocks.applyFontSize,
   applyMode: mocks.applyMode,
   normalizeGlobalSettings: mocks.normalizeGlobalSettings,
-  updateAutoLineBreakButton: mocks.updateAutoLineBreakButton,
+  updateLegacyLineBreakControls: mocks.updateLegacyLineBreakControls,
   updateTildeReplacementButton: mocks.updateTildeReplacementButton,
 }));
 
@@ -91,7 +91,7 @@ describe('main bootstrap', () => {
       'getAllImageObjectsFromDB',
       'applyMode',
       'applyFontSize',
-      'updateAutoLineBreakButton',
+      'updateLegacyLineBreakControls',
       'updateTildeReplacementButton',
       'showListView',
       'initializeAllEvents',

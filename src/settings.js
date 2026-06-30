@@ -3,14 +3,12 @@ import {
   markdownEditor,
   htmlPreview,
   autoLineBreakButton,
-  autoLineBreakSetting,
   tildeReplacementButton,
   legacyLineBreakModeCheckbox,
   titleSetting,
   fontSizeSetting,
   modeSetting,
-  autoAddSpacesCheckbox,
-  autoAddSpacesSetting,
+  autoAddSpacesButton,
   codeBlockHeaderCheckbox,
   preventUsedImageDeletionCheckbox
 } from './dom.js';
@@ -123,10 +121,18 @@ function applyMode(mode) {
 function updateAutoLineBreakButton() {
   // 자동 줄바꿈 버튼 아이콘 및 툴팁 업데이트
   const settings = normalizeGlobalSettings(globalSettings);
-  const isEnabled = settings.legacyLineBreakMode && settings.autoLineBreak;
-  autoLineBreakButton.checked = isEnabled;
+  autoLineBreakButton.hidden = !settings.legacyLineBreakMode;
   autoLineBreakButton.disabled = !settings.legacyLineBreakMode;
-  autoLineBreakButton.title = isEnabled ? 'Add two spaces to pasted lines enabled' : 'Add two spaces to pasted lines disabled';
+  autoLineBreakButton.textContent = settings.autoLineBreak ? '↩✅' : '↩❌';
+  autoLineBreakButton.title = settings.autoLineBreak ? 'Add two spaces to pasted lines enabled' : 'Add two spaces to pasted lines disabled';
+}
+
+function updateAutoAddSpacesButton() {
+  const settings = normalizeGlobalSettings(globalSettings);
+  autoAddSpacesButton.hidden = !settings.legacyLineBreakMode;
+  autoAddSpacesButton.disabled = !settings.legacyLineBreakMode;
+  autoAddSpacesButton.textContent = settings.autoAddSpaces ? '⏎✅' : '⏎❌';
+  autoAddSpacesButton.title = settings.autoAddSpaces ? 'Add two spaces on Enter enabled' : 'Add two spaces on Enter disabled';
 }
 
 /**
@@ -141,13 +147,9 @@ function updateTildeReplacementButton() {
 
 function updateLegacyLineBreakControls() {
   const settings = normalizeGlobalSettings(globalSettings);
-  const legacyLineBreakModeEnabled = settings.legacyLineBreakMode;
   legacyLineBreakModeCheckbox.checked = settings.legacyLineBreakMode;
-  autoLineBreakSetting.hidden = !legacyLineBreakModeEnabled;
-  autoAddSpacesSetting.hidden = !legacyLineBreakModeEnabled;
   updateAutoLineBreakButton();
-  autoAddSpacesCheckbox.checked = settings.legacyLineBreakMode && settings.autoAddSpaces;
-  autoAddSpacesCheckbox.disabled = !legacyLineBreakModeEnabled;
+  updateAutoAddSpacesButton();
 }
 
 function isCodeBlockHeaderEnabled(note) {
@@ -193,6 +195,7 @@ export {
   applyFontSize,
   applyMode,
   updateAutoLineBreakButton,
+  updateAutoAddSpacesButton,
   updateTildeReplacementButton,
   updateLegacyLineBreakControls,
   isCodeBlockHeaderEnabled,

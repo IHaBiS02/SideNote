@@ -24,11 +24,9 @@ const titleSetting = document.getElementById('title-setting');
 const fontSizeSetting = document.getElementById('font-size-setting');
 const modeSetting = document.getElementById('mode-setting');
 const autoLineBreakButton = document.getElementById('auto-line-break-button');
-const autoLineBreakSetting = document.getElementById('auto-line-break-setting');
 const tildeReplacementButton = document.getElementById('tilde-replacement-button');
 const legacyLineBreakModeCheckbox = document.getElementById('legacy-line-break-mode-checkbox');
-const autoAddSpacesCheckbox = document.getElementById('auto-add-spaces-checkbox');
-const autoAddSpacesSetting = document.getElementById('auto-add-spaces-setting');
+const autoAddSpacesButton = document.getElementById('auto-add-spaces-button');
 const codeBlockHeaderCheckbox = document.getElementById('code-block-header-checkbox');
 // === 가져오기/내보내기 요소 ===
 const globalExportButton = document.getElementById('global-export-button');
@@ -75,11 +73,9 @@ export {
   fontSizeSetting,
   modeSetting,
   autoLineBreakButton,
-  autoLineBreakSetting,
   tildeReplacementButton,
   legacyLineBreakModeCheckbox,
-  autoAddSpacesCheckbox,
-  autoAddSpacesSetting,
+  autoAddSpacesButton,
   codeBlockHeaderCheckbox,
   globalExportButton,
   globalImportButton,
