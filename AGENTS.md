@@ -130,6 +130,21 @@ When making changes:
 3. Run `npm install` to update `package-lock.json`
 4. commit changes to git
 
+### Release Workflow
+GitHub Actions publishes releases automatically when a `v*` tag is pushed.
+After the version bump commit is on `main`:
+```bash
+git push origin main
+git tag v<version>
+git push origin v<version>
+```
+Example:
+```bash
+git tag v4.1.14
+git push origin v4.1.14
+```
+The tag version must match `package.json`. The release workflow runs tests, builds Chrome/Firefox zip files, creates the GitHub Release, and uploads `build/*.zip` as release assets.
+
 ### Documentation Updates
 After significant changes, update:
 - **STRUCTURE.md**: If architecture/file organization changes
