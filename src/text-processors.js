@@ -26,7 +26,7 @@ function addAutoLineBreaks(text) {
   }
   
   const processedText = lines.map((line, index) => {
-    // Add two spaces to non-empty lines that aren't the last line
+    // Apply auto line break spaces to non-empty lines that aren't the last line
     if (index < lines.length - 1 && line.trim().length > 0) {
       return line.trimEnd() + '  ';
     }
@@ -85,12 +85,12 @@ function normalizeTrailingSpaces(text, targetSpaces = 2) {
  * Processes Enter key input for markdown line breaks
  * @param {HTMLTextAreaElement} textarea - The textarea element
  * @param {Object} settings - User settings object
- * @param {boolean} settings.autoAddSpaces - Whether to add spaces on Enter
+ * @param {boolean} settings.autoLineBreak - Whether to add line break spaces on Enter
  * @param {Function} insertTextFunction - Function to insert text at cursor
  * @returns {Object} Processing result with action taken
  */
 function handleEnterKeyInput(textarea, settings = {}, insertTextFunction) {
-  if (!settings.autoAddSpaces) {
+  if (!settings.autoLineBreak) {
     return { handled: false, action: 'default' };
   }
   

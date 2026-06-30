@@ -176,16 +176,16 @@ describe('handleEnterKeyInput', () => {
     };
   }
 
-  it('should return unhandled when autoAddSpaces is false', () => {
+  it('should return unhandled when autoLineBreak is false', () => {
     const textarea = createMockTextarea('hello');
-    const result = handleEnterKeyInput(textarea, { autoAddSpaces: false }, vi.fn());
+    const result = handleEnterKeyInput(textarea, { autoLineBreak: false }, vi.fn());
     expect(result.handled).toBe(false);
     expect(result.action).toBe('default');
   });
 
   it('should return unhandled for empty line', () => {
     const textarea = createMockTextarea('   ', 3);
-    const result = handleEnterKeyInput(textarea, { autoAddSpaces: true }, vi.fn());
+    const result = handleEnterKeyInput(textarea, { autoLineBreak: true }, vi.fn());
     expect(result.handled).toBe(false);
     expect(result.action).toBe('empty_line');
   });
@@ -193,7 +193,7 @@ describe('handleEnterKeyInput', () => {
   it('should add spaces and newline for normal text', () => {
     const insertFn = vi.fn();
     const textarea = createMockTextarea('hello', 5);
-    const result = handleEnterKeyInput(textarea, { autoAddSpaces: true }, insertFn);
+    const result = handleEnterKeyInput(textarea, { autoLineBreak: true }, insertFn);
     expect(result.handled).toBe(true);
     expect(result.action).toBe('normal_processing');
     expect(insertFn).toHaveBeenCalledWith(textarea, '  \n');
@@ -202,7 +202,7 @@ describe('handleEnterKeyInput', () => {
   it('should only add newline when already has 2+ spaces', () => {
     const insertFn = vi.fn();
     const textarea = createMockTextarea('hello  ', 7);
-    const result = handleEnterKeyInput(textarea, { autoAddSpaces: true }, insertFn);
+    const result = handleEnterKeyInput(textarea, { autoLineBreak: true }, insertFn);
     expect(result.handled).toBe(true);
     expect(insertFn).toHaveBeenCalledWith(textarea, '\n');
   });

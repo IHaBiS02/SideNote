@@ -25,7 +25,6 @@ const mocks = vi.hoisted(() => {
       legacyLineBreakMode: false,
       autoLineBreak: false,
       tildeReplacement: false,
-      autoAddSpaces: false,
       codeBlockHeader: true,
       preventUsedImageDeletion: true,
       mode: 'system',

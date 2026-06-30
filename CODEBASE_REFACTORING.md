@@ -77,9 +77,8 @@ Important settings:
 - `title`: whether note titles come from the first line or a custom title.
 - `fontSize`: editor/preview font size.
 - `legacyLineBreakMode`: disables default soft line break rendering and restores the old trailing-space Markdown workflow.
-- `autoLineBreak`: legacy option to add Markdown line break spaces on paste.
-- `tildeReplacement`: legacy option to escape `~` on paste.
-- `autoAddSpaces`: legacy option to add two spaces when pressing Enter.
+- `autoLineBreak`: legacy option to add Markdown line break spaces on paste and Enter.
+- `tildeReplacement`: independent option to escape `~` on paste.
 - `codeBlockHeader`: show language/copy header above code blocks.
 - `preventUsedImageDeletion`: prevent deleting images referenced by notes.
 - `mode`: `system`, `light`, or `dark`.

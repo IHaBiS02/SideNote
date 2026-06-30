@@ -20,7 +20,6 @@ describe('settings model helpers', () => {
     expect(settings.title).toBe(DEFAULT_SETTINGS.title);
     expect(settings.legacyLineBreakMode).toBe(false);
     expect(settings.autoLineBreak).toBe(false);
-    expect(settings.autoAddSpaces).toBe(false);
   });
 
   it('resolves note-specific settings over normalized global settings', () => {
@@ -45,29 +44,27 @@ describe('settings model helpers', () => {
   });
 
   it('does not let note settings override global-only settings', () => {
-    setGlobalSettings({ mode: 'light', autoAddSpaces: true });
+    setGlobalSettings({ mode: 'light', legacyLineBreakMode: true });
 
     const effective = resolveEffectiveSettings({
       settings: {
         mode: 'dark',
-        autoAddSpaces: false,
+        legacyLineBreakMode: false,
       },
     });
 
     expect(effective.mode).toBe('light');
-    expect(effective.autoAddSpaces).toBe(true);
+    expect(effective.legacyLineBreakMode).toBe(true);
   });
 
   it('disables legacy line-break processors when legacy mode is off', () => {
     const effective = resolveLegacyTextProcessingSettings({
       legacyLineBreakMode: false,
       autoLineBreak: true,
-      autoAddSpaces: true,
       tildeReplacement: true,
     });
 
     expect(effective.autoLineBreak).toBe(false);
-    expect(effective.autoAddSpaces).toBe(false);
     expect(effective.tildeReplacement).toBe(true);
   });
 
@@ -75,10 +72,8 @@ describe('settings model helpers', () => {
     const effective = resolveLegacyTextProcessingSettings({
       legacyLineBreakMode: true,
       autoLineBreak: true,
-      autoAddSpaces: true,
     });
 
     expect(effective.autoLineBreak).toBe(true);
-    expect(effective.autoAddSpaces).toBe(true);
   });
 });

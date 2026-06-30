@@ -12,7 +12,6 @@ import {
   autoLineBreakButton,
   tildeReplacementButton,
   legacyLineBreakModeCheckbox,
-  autoAddSpacesButton,
   codeBlockHeaderCheckbox,
   preventUsedImageDeletionCheckbox,
   licenseContent,
@@ -34,7 +33,6 @@ import {
   applyFontSize,
   applyMode,
   updateAutoLineBreakButton,
-  updateAutoAddSpacesButton,
   updateTildeReplacementButton,
   updateLegacyLineBreakControls,
   populateSettingsForm
@@ -210,18 +208,11 @@ function initializeSettingsEvents() {
     saveGlobalSettings();
   });
 
-  // Tilde replacement toolbar button
-  tildeReplacementButton.addEventListener('click', () => {
-    globalSettings.tildeReplacement = !globalSettings.tildeReplacement;
+  // Tilde replacement independent setting
+  tildeReplacementButton.addEventListener('change', () => {
+    globalSettings.tildeReplacement = tildeReplacementButton.checked;
     updateTildeReplacementButton();
     saveGlobalSettings();
-  });
-
-  // Auto add spaces legacy toolbar button
-  autoAddSpacesButton.addEventListener('click', () => {
-      globalSettings.autoAddSpaces = !globalSettings.autoAddSpaces;
-      updateAutoAddSpacesButton();
-      saveGlobalSettings();
   });
 
   // Prevent used image deletion checkbox

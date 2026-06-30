@@ -26,7 +26,6 @@ const modeSetting = document.getElementById('mode-setting');
 const autoLineBreakButton = document.getElementById('auto-line-break-button');
 const tildeReplacementButton = document.getElementById('tilde-replacement-button');
 const legacyLineBreakModeCheckbox = document.getElementById('legacy-line-break-mode-checkbox');
-const autoAddSpacesButton = document.getElementById('auto-add-spaces-button');
 const codeBlockHeaderCheckbox = document.getElementById('code-block-header-checkbox');
 // === 가져오기/내보내기 요소 ===
 const globalExportButton = document.getElementById('global-export-button');
@@ -75,7 +74,6 @@ export {
   autoLineBreakButton,
   tildeReplacementButton,
   legacyLineBreakModeCheckbox,
-  autoAddSpacesButton,
   codeBlockHeaderCheckbox,
   globalExportButton,
   globalImportButton,

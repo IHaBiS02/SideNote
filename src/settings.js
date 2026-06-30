@@ -8,7 +8,6 @@ import {
   titleSetting,
   fontSizeSetting,
   modeSetting,
-  autoAddSpacesButton,
   codeBlockHeaderCheckbox,
   preventUsedImageDeletionCheckbox
 } from './dom.js';
@@ -22,7 +21,6 @@ const DEFAULT_SETTINGS = Object.freeze({
   legacyLineBreakMode: false,
   autoLineBreak: false,
   tildeReplacement: false,
-  autoAddSpaces: false,
   codeBlockHeader: true,
   preventUsedImageDeletion: true,
   mode: 'system'
@@ -55,8 +53,7 @@ function resolveLegacyTextProcessingSettings(settings = globalSettings) {
   if (!normalizedSettings.legacyLineBreakMode) {
     return {
       ...normalizedSettings,
-      autoLineBreak: false,
-      autoAddSpaces: false
+      autoLineBreak: false
     };
   }
 
@@ -127,21 +124,13 @@ function updateAutoLineBreakButton() {
   autoLineBreakButton.title = settings.autoLineBreak ? 'Auto Line Break Enabled' : 'Auto Line Break Disabled';
 }
 
-function updateAutoAddSpacesButton() {
-  const settings = normalizeGlobalSettings(globalSettings);
-  autoAddSpacesButton.hidden = !settings.legacyLineBreakMode;
-  autoAddSpacesButton.disabled = !settings.legacyLineBreakMode;
-  autoAddSpacesButton.textContent = settings.autoAddSpaces ? '⏎✅' : '⏎❌';
-  autoAddSpacesButton.title = settings.autoAddSpaces ? 'Add two spaces on Enter enabled' : 'Add two spaces on Enter disabled';
-}
-
 /**
- * Updates the tilde replacement button text and title.
+ * Updates the tilde replacement checkbox state and title.
  */
 function updateTildeReplacementButton() {
   // 틸데(~) 자동 변환 버튼 아이콘 및 툴팁 업데이트
   const settings = normalizeGlobalSettings(globalSettings);
-  tildeReplacementButton.textContent = settings.tildeReplacement ? '~✅' : '~❌';
+  tildeReplacementButton.checked = settings.tildeReplacement;
   tildeReplacementButton.title = settings.tildeReplacement ? 'Tilde Replacement Enabled' : 'Tilde Replacement Disabled';
 }
 
@@ -149,7 +138,6 @@ function updateLegacyLineBreakControls() {
   const settings = normalizeGlobalSettings(globalSettings);
   legacyLineBreakModeCheckbox.checked = settings.legacyLineBreakMode;
   updateAutoLineBreakButton();
-  updateAutoAddSpacesButton();
 }
 
 function isCodeBlockHeaderEnabled(note) {
@@ -195,7 +183,6 @@ export {
   applyFontSize,
   applyMode,
   updateAutoLineBreakButton,
-  updateAutoAddSpacesButton,
   updateTildeReplacementButton,
   updateLegacyLineBreakControls,
   isCodeBlockHeaderEnabled,
