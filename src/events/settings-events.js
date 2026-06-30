@@ -210,9 +210,9 @@ function initializeSettingsEvents() {
     saveGlobalSettings();
   });
 
-  // Tilde replacement legacy checkbox
-  tildeReplacementButton.addEventListener('change', () => {
-    globalSettings.tildeReplacement = tildeReplacementButton.checked;
+  // Tilde replacement toolbar button
+  tildeReplacementButton.addEventListener('click', () => {
+    globalSettings.tildeReplacement = !globalSettings.tildeReplacement;
     updateTildeReplacementButton();
     saveGlobalSettings();
   });

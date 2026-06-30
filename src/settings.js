@@ -124,7 +124,7 @@ function updateAutoLineBreakButton() {
   autoLineBreakButton.hidden = !settings.legacyLineBreakMode;
   autoLineBreakButton.disabled = !settings.legacyLineBreakMode;
   autoLineBreakButton.textContent = settings.autoLineBreak ? '↩✅' : '↩❌';
-  autoLineBreakButton.title = settings.autoLineBreak ? 'Add two spaces to pasted lines enabled' : 'Add two spaces to pasted lines disabled';
+  autoLineBreakButton.title = settings.autoLineBreak ? 'Auto Line Break Enabled' : 'Auto Line Break Disabled';
 }
 
 function updateAutoAddSpacesButton() {
@@ -141,8 +141,8 @@ function updateAutoAddSpacesButton() {
 function updateTildeReplacementButton() {
   // 틸데(~) 자동 변환 버튼 아이콘 및 툴팁 업데이트
   const settings = normalizeGlobalSettings(globalSettings);
-  tildeReplacementButton.checked = settings.tildeReplacement;
-  tildeReplacementButton.title = settings.tildeReplacement ? 'Tilde replacement enabled' : 'Tilde replacement disabled';
+  tildeReplacementButton.textContent = settings.tildeReplacement ? '~✅' : '~❌';
+  tildeReplacementButton.title = settings.tildeReplacement ? 'Tilde Replacement Enabled' : 'Tilde Replacement Disabled';
 }
 
 function updateLegacyLineBreakControls() {

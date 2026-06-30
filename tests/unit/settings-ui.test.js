@@ -5,7 +5,7 @@ function renderSettingsDom() {
     <textarea id="markdown-editor"></textarea>
     <div id="html-preview"></div>
     <button id="auto-line-break-button" hidden>↩</button>
-    <input type="checkbox" id="tilde-replacement-button">
+    <button id="tilde-replacement-button">~</button>
     <input type="checkbox" id="legacy-line-break-mode-checkbox">
     <select id="title-setting"></select>
     <input type="number" id="font-size-setting">
@@ -67,5 +67,21 @@ describe('settings UI helpers', () => {
     expect(document.getElementById('auto-add-spaces-button').textContent).toBe('⏎✅');
     expect(document.getElementById('auto-line-break-button').disabled).toBe(false);
     expect(document.getElementById('auto-add-spaces-button').disabled).toBe(false);
+  });
+
+  it('uses the legacy toolbar labels for auto line break and tilde buttons', async () => {
+    const { updateAutoLineBreakButton, updateTildeReplacementButton } = await loadSettingsModule({
+      legacyLineBreakMode: true,
+      autoLineBreak: true,
+      tildeReplacement: true,
+    });
+
+    updateAutoLineBreakButton();
+    updateTildeReplacementButton();
+
+    expect(document.getElementById('auto-line-break-button').textContent).toBe('↩✅');
+    expect(document.getElementById('auto-line-break-button').title).toBe('Auto Line Break Enabled');
+    expect(document.getElementById('tilde-replacement-button').textContent).toBe('~✅');
+    expect(document.getElementById('tilde-replacement-button').title).toBe('Tilde Replacement Enabled');
   });
 });

@@ -107,7 +107,7 @@ Settings management (functions exported):
 - `applyMode(mode)`: Applies color mode (light/dark/system) to the document
 - `updateAutoLineBreakButton()`: Updates the legacy pasted-line trailing-space toolbar button state
 - `updateAutoAddSpacesButton()`: Updates the legacy Enter trailing-space toolbar button state
-- `updateTildeReplacementButton()`: Updates the legacy tilde replacement checkbox state
+- `updateTildeReplacementButton()`: Updates the legacy tilde replacement toolbar button state
 - `updateLegacyLineBreakControls()`: Updates the legacy line-break mode checkbox and dependent toolbar controls
 - `isCodeBlockHeaderEnabled(note)`: Resolves the effective code block header setting from note settings with global fallback
 - `populateSettingsForm(isGlobal, note)`: Populates settings fields for either global or note-specific settings
