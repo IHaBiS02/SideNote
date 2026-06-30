@@ -3,12 +3,14 @@ import {
   markdownEditor,
   htmlPreview,
   autoLineBreakButton,
+  autoLineBreakSetting,
   tildeReplacementButton,
   legacyLineBreakModeCheckbox,
   titleSetting,
   fontSizeSetting,
   modeSetting,
   autoAddSpacesCheckbox,
+  autoAddSpacesSetting,
   codeBlockHeaderCheckbox,
   preventUsedImageDeletionCheckbox
 } from './dom.js';
@@ -139,10 +141,13 @@ function updateTildeReplacementButton() {
 
 function updateLegacyLineBreakControls() {
   const settings = normalizeGlobalSettings(globalSettings);
+  const legacyLineBreakModeEnabled = settings.legacyLineBreakMode;
   legacyLineBreakModeCheckbox.checked = settings.legacyLineBreakMode;
+  autoLineBreakSetting.hidden = !legacyLineBreakModeEnabled;
+  autoAddSpacesSetting.hidden = !legacyLineBreakModeEnabled;
   updateAutoLineBreakButton();
   autoAddSpacesCheckbox.checked = settings.legacyLineBreakMode && settings.autoAddSpaces;
-  autoAddSpacesCheckbox.disabled = !settings.legacyLineBreakMode;
+  autoAddSpacesCheckbox.disabled = !legacyLineBreakModeEnabled;
 }
 
 function isCodeBlockHeaderEnabled(note) {
