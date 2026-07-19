@@ -7,17 +7,25 @@ import { markdownEditor } from '../dom.js';
 const INTERNAL_IMAGE_PATTERN = /^images\/([^/]+)\.png$/;
 
 function highlightCode(code, requestedLanguage) {
-  if (!globalThis.hljs?.highlight || !globalThis.hljs?.getLanguage) {
+  if (
+    !globalThis.hljs?.highlight
+    || !globalThis.hljs?.highlightAuto
+    || !globalThis.hljs?.getLanguage
+  ) {
     return [];
   }
 
-  const language = globalThis.hljs.getLanguage(requestedLanguage)
-    ? requestedLanguage
-    : 'plaintext';
-  const highlighted = globalThis.hljs.highlight(code, {
-    language,
-    ignoreIllegals: true
-  }).value;
+  let highlighted;
+  if (!requestedLanguage) {
+    highlighted = globalThis.hljs.highlightAuto(code).value;
+  } else if (globalThis.hljs.getLanguage(requestedLanguage)) {
+    highlighted = globalThis.hljs.highlight(code, {
+      language: requestedLanguage,
+      ignoreIllegals: true
+    }).value;
+  } else {
+    return [];
+  }
   const template = document.createElement('template');
   template.innerHTML = highlighted;
   const ranges = [];
@@ -68,16 +76,74 @@ const SIDENOTE_EDITOR_THEME = `
     line-height: inherit;
   }
 
+  .editor-mount .ProseMirror a {
+    color: var(--editor-link-color);
+    text-decoration: none;
+  }
+
+  .editor-mount .ProseMirror a:visited {
+    color: var(--editor-link-visited-color);
+  }
+
+  .editor-mount .ProseMirror a:hover {
+    color: var(--editor-link-hover-color);
+    text-decoration: underline;
+  }
+
+  .editor-mount .ProseMirror a:active {
+    color: var(--editor-link-active-color);
+  }
+
   .editor-mount .ProseMirror blockquote {
-    padding-left: 1em;
+    margin-left: 0;
+    padding-left: 10px;
     border-left: 4px solid var(--editor-border-color);
+  }
+
+  .editor-mount .ProseMirror :not(pre) > code {
+    border: 1px solid var(--editor-inline-code-border);
+    border-radius: 4px;
+    padding: 2px 4px;
+    background: var(--editor-inline-code-background);
+  }
+
+  .editor-mount .ProseMirror ul,
+  .editor-mount .ProseMirror ol {
+    padding-left: 15px;
+  }
+
+  .editor-mount .ProseMirror li[data-task] {
+    display: list-item;
+    list-style: none;
+  }
+
+  .editor-mount .ProseMirror li[data-task] > input {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    margin: 0 5px 0 0;
+    accent-color: var(--editor-checkbox-accent);
+    vertical-align: middle;
+  }
+
+  .editor-mount .ProseMirror .task-content {
+    display: inline;
+  }
+
+  .editor-mount .ProseMirror .task-content > p {
+    display: inline;
+  }
+
+  .editor-mount .ProseMirror li[data-checked="true"] .task-content {
+    opacity: 1;
+    text-decoration: none;
   }
 
   .editor-mount .ProseMirror pre {
     max-width: 100%;
     overflow-x: hidden;
-    border: 1px solid var(--editor-border-color);
-    padding: 5px;
+    border: 0;
+    padding: 0;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
     word-break: break-all;
@@ -87,7 +153,8 @@ const SIDENOTE_EDITOR_THEME = `
 
   .editor-mount .ProseMirror pre code {
     display: block;
-    padding: 0;
+    min-height: 100%;
+    padding: 5px;
     white-space: inherit;
     overflow-wrap: inherit;
     word-break: inherit;
@@ -101,6 +168,23 @@ const SIDENOTE_EDITOR_THEME = `
     margin: 0;
   }
 
+  .editor-mount .ProseMirror .code-block-content {
+    border: 1px solid var(--editor-border-color);
+    background: var(--editor-code-background);
+  }
+
+  .code-line-numbers {
+    border-right: 1px solid var(--editor-border-color);
+    padding: 5px 0;
+    color: var(--editor-code-line-number-color);
+    text-align: right;
+    user-select: none;
+  }
+
+  .code-line-numbers span {
+    padding: 0 5px;
+  }
+
   .code-block-header {
     display: flex;
     align-items: center;
@@ -109,8 +193,8 @@ const SIDENOTE_EDITOR_THEME = `
     border: 1px solid var(--editor-border-color);
     border-bottom: 0;
     padding: 3px 5px;
-    background: var(--editor-muted-background);
-    color: var(--editor-color);
+    background: var(--editor-code-header-background);
+    color: var(--editor-code-header-color);
     font-family: var(--editor-code-font-family);
     font-size: 0.9em;
     user-select: none;
@@ -137,8 +221,7 @@ const SIDENOTE_EDITOR_THEME = `
   }
 
   .copy-code-button:hover {
-    border-color: var(--editor-border-color);
-    background: var(--editor-muted-background);
+    background: var(--editor-copy-hover-background);
   }
 
   .editor-mount .ProseMirror code.hljs {
@@ -219,18 +302,26 @@ const SIDENOTE_EDITOR_THEME = `
   .editor-mount .ProseMirror code,
   .source-editor {
     font-family: var(--editor-code-font-family);
-    font-variant-ligatures: none;
   }
 
   .editor-mount .ProseMirror table {
-    table-layout: fixed;
+    width: auto;
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 2px;
+    table-layout: auto;
   }
 
   .editor-mount .ProseMirror th,
   .editor-mount .ProseMirror td {
-    border: 1px solid var(--editor-border-color);
-    padding: 0.5em;
+    min-width: 0;
+    border: 0;
+    padding: 1px;
     overflow-wrap: anywhere;
+  }
+
+  .editor-mount .ProseMirror th {
+    background: transparent;
   }
 
   .source-editor {
@@ -240,6 +331,32 @@ const SIDENOTE_EDITOR_THEME = `
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
+
+  .surface::-webkit-scrollbar,
+  .editor-mount::-webkit-scrollbar,
+  .source-editor::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .surface::-webkit-scrollbar-track,
+  .editor-mount::-webkit-scrollbar-track,
+  .source-editor::-webkit-scrollbar-track {
+    background: var(--editor-scrollbar-track);
+  }
+
+  .surface::-webkit-scrollbar-thumb,
+  .editor-mount::-webkit-scrollbar-thumb,
+  .source-editor::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background: var(--editor-scrollbar-thumb);
+  }
+
+  .surface::-webkit-scrollbar-thumb:hover,
+  .editor-mount::-webkit-scrollbar-thumb:hover,
+  .source-editor::-webkit-scrollbar-thumb:hover {
+    background: var(--editor-scrollbar-thumb-hover);
+  }
 `;
 
 function initializeWysiwygMarkdownEditor() {
@@ -248,6 +365,7 @@ function initializeWysiwygMarkdownEditor() {
   }
 
   markdownEditor.sourceEditScope = 'document';
+  markdownEditor.showCodeLineNumbers = true;
   markdownEditor.themeCss = SIDENOTE_EDITOR_THEME;
   markdownEditor.codeHighlighter = highlightCode;
 

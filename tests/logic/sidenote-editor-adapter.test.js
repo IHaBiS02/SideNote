@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 const mocks = vi.hoisted(() => ({
   getImage: vi.fn(),
@@ -33,7 +35,10 @@ describe('SideNote WYSIWYG editor adapter', () => {
       getLanguage: vi.fn(language => language === 'js'),
       highlight: vi.fn(() => ({
         value: '<span class="hljs-keyword">const</span> value = <span class="hljs-number">1</span>;'
-      }))
+      })),
+      highlightAuto: vi.fn(() => ({
+        value: '<span class="hljs-keyword">const</span> value = 1;'
+      })),
     };
   });
 
@@ -43,8 +48,14 @@ describe('SideNote WYSIWYG editor adapter', () => {
     const adapter = await import('../../src/editor/sidenote-editor-adapter.js');
     expect(adapter.initializeWysiwygMarkdownEditor()).toBe(true);
     expect(editor.sourceEditScope).toBe('document');
+    expect(editor.showCodeLineNumbers).toBe(true);
     expect(editor.themeCss).toContain('white-space: pre-wrap');
     expect(editor.themeCss).toContain('.code-block-header');
+    expect(editor.themeCss).toContain('var(--editor-code-header-background)');
+    expect(editor.themeCss).toContain('font-family: var(--editor-code-font-family)');
+    expect(editor.themeCss).toContain('background: var(--editor-code-background)');
+    expect(editor.themeCss).toContain('color: var(--editor-code-line-number-color)');
+    expect(editor.themeCss).toContain('background: var(--editor-inline-code-background)');
     return { adapter, editor };
   }
 
@@ -113,5 +124,44 @@ describe('SideNote WYSIWYG editor adapter', () => {
       language: 'js',
       ignoreIllegals: true
     });
+  });
+
+  it('auto-detects an unlabeled code block like the 4.1.14 preview', async () => {
+    const { editor } = await initializeEditor();
+
+    expect(editor.codeHighlighter('const value = 1;', '')).toEqual([
+      { from: 0, to: 5, className: 'hljs-keyword' }
+    ]);
+    expect(globalThis.hljs.highlightAuto).toHaveBeenCalledWith('const value = 1;');
+  });
+
+  it('leaves an unknown labeled language unhighlighted', async () => {
+    const { editor } = await initializeEditor();
+
+    expect(editor.codeHighlighter('example', 'unknown-language')).toEqual([]);
+    expect(globalThis.hljs.highlight).not.toHaveBeenCalled();
+    expect(globalThis.hljs.highlightAuto).not.toHaveBeenCalled();
+  });
+});
+
+describe('4.1.14 preview theme compatibility', () => {
+  const lightCss = readFileSync(resolve('sidepanel.css'), 'utf8');
+  const darkCss = readFileSync(resolve('dark_mode.css'), 'utf8');
+
+  it('keeps the legacy browser monospace font and light code colors', () => {
+    expect(lightCss).toContain('--editor-code-font-family: monospace;');
+    expect(lightCss).toContain('--editor-code-background: #fafafa;');
+    expect(lightCss).toContain('--editor-code-color: #383a42;');
+    expect(lightCss).toContain('--editor-code-header-background: #f5f5f5;');
+    expect(lightCss).toContain('--editor-code-line-number-color: black;');
+  });
+
+  it('keeps the legacy dark code surfaces and Atom One token colors', () => {
+    expect(darkCss).toContain('--editor-code-background: #2d2d2d;');
+    expect(darkCss).toContain('--editor-code-header-background: #252525;');
+    expect(darkCss).toContain('--editor-code-color: #abb2bf;');
+    expect(darkCss).toContain('--editor-hl-comment: #5c6370;');
+    expect(darkCss).toContain('--editor-hl-keyword: #c678dd;');
+    expect(darkCss).toContain('--editor-hl-string: #98c379;');
   });
 });
