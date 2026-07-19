@@ -33,7 +33,14 @@ body.dark-mode {
     background-color: #444;
 }
 
-.dark-mode #markdown-editor, .dark-mode #html-preview {
+.dark-mode #markdown-editor {
+    --editor-background: #1e1e1e;
+    --editor-color: #e0e0e0;
+    --editor-muted-background: #2a2a2a;
+    --editor-border-color: #444;
+}
+
+.dark-mode #html-preview {
     background-color: #1e1e1e;
     color: #e0e0e0;
 }

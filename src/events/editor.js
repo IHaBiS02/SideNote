@@ -36,6 +36,11 @@ import {
 
 // Insert text at cursor position (replaces deprecated document.execCommand)
 function insertTextAtCursor(textarea, text) {
+  if (typeof textarea.replaceSelection === 'function') {
+    textarea.replaceSelection(text);
+    return;
+  }
+
   const start = textarea.selectionStart;
   const end = textarea.selectionEnd;
   const value = textarea.value;
@@ -101,33 +106,35 @@ function initializeEditorEvents() {
     }
   });
 
-  // Paste event (handles images and text)
-  markdownEditor.addEventListener('paste', async (e) => {
-    e.preventDefault();
+  // Legacy textarea paste path. The WYSIWYG editor handles this through its adapter.
+  if (typeof markdownEditor.replaceSelection !== 'function') {
+    markdownEditor.addEventListener('paste', async (e) => {
+      e.preventDefault();
 
-    const items = Array.from(e.clipboardData.items);
-    const imageItem = items.find(item => item.kind === 'file' && item.type.startsWith('image/'));
+      const items = Array.from(e.clipboardData.items);
+      const imageItem = items.find(item => item.kind === 'file' && item.type.startsWith('image/'));
 
-    // Handle image paste
-    if (imageItem) {
-      const imageFile = imageItem.getAsFile();
-      const imageId = crypto.randomUUID();
-      
-      try {
-        await saveImage(imageId, imageFile);
-        const markdownImageText = `![Image](images/${imageId}.png)`;
-        insertTextAtCursor(markdownEditor, markdownImageText);
-      } catch (err) {
-        console.error('Failed to save image:', err);
-        return; 
+      // Handle image paste
+      if (imageItem) {
+        const imageFile = imageItem.getAsFile();
+        const imageId = crypto.randomUUID();
+
+        try {
+          await saveImage(imageId, imageFile);
+          const markdownImageText = `![Image](images/${imageId}.png)`;
+          insertTextAtCursor(markdownEditor, markdownImageText);
+        } catch (err) {
+          console.error('Failed to save image:', err);
+          return;
+        }
+      } else {
+        // Handle text paste
+        const rawText = e.clipboardData.getData('text/plain');
+        const processedText = processPastedText(rawText, resolveLegacyTextProcessingSettings(globalSettings));
+        insertTextAtCursor(markdownEditor, processedText);
       }
-    } else {
-      // Handle text paste
-      const rawText = e.clipboardData.getData('text/plain');
-      const processedText = processPastedText(rawText, resolveLegacyTextProcessingSettings(globalSettings));
-      insertTextAtCursor(markdownEditor, processedText);
-    }
-  });
+    });
+  }
 
   // Toggle preview button
   toggleViewButton.addEventListener('click', togglePreview);
@@ -135,7 +142,8 @@ function initializeEditorEvents() {
   // Keyboard shortcuts
   markdownEditor.addEventListener('keydown', (e) => {
     // Auto add two spaces at end of line when pressing Enter
-    if (e.key === 'Enter' && !e.isComposing && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
+    if (typeof markdownEditor.replaceSelection !== 'function' &&
+        e.key === 'Enter' && !e.isComposing && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
       const result = handleEnterKeyInput(markdownEditor, resolveLegacyTextProcessingSettings(globalSettings), insertTextAtCursor);
       if (result.handled) {
         e.preventDefault();

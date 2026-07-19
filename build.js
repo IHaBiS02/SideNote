@@ -28,7 +28,8 @@ const commonFiles = [
     'images',
     'background.js',
     'LICENSE',
-    'LIBRARY_LICENSES.md'
+    'LIBRARY_LICENSES.md',
+    'WYSIWYG_MARKDOWN_LICENSES.md'
 ];
 
 for (const file of commonFiles) {
@@ -58,6 +59,13 @@ for (const [src, dest] of Object.entries(vendorFiles)) {
     const destPathFirefox = path.join(firefoxDir, 'vendor', dest);
     fs.copyFileSync(sourcePath, destPathChrome);
     fs.copyFileSync(sourcePath, destPathFirefox);
+}
+
+for (const outputDirectory of [chromeDir, firefoxDir]) {
+    fs.copyFileSync(
+        path.join('vendor', 'wysiwyg-markdown.js'),
+        path.join(outputDirectory, 'vendor', 'wysiwyg-markdown.js')
+    );
 }
 
 // Create manifest.json for Chrome

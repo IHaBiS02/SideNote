@@ -217,12 +217,14 @@ function togglePreview() {
   
   if (isPreview) {
     // 미리보기 모드로 전환
+    markdownEditor.setMode?.('readonly');
     renderMarkdown();
     htmlPreview.style.display = 'block';
     markdownEditor.style.display = 'none';
     toggleViewButton.textContent = 'Edit';
   } else {
     // 편집 모드로 전환
+    markdownEditor.setMode?.('wysiwyg');
     htmlPreview.style.display = 'none';
     markdownEditor.style.display = 'block';
     toggleViewButton.textContent = 'Preview';

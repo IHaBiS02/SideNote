@@ -93,6 +93,7 @@ function applyFontSize(size) {
   editorElements.forEach(el => {
     el.style.fontSize = `${size}px`;
   });
+  markdownEditor.style.setProperty('--editor-font-size', `${size}px`);
 }
 
 /**

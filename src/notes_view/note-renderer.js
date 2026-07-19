@@ -108,10 +108,12 @@ function openNote(noteId, inEditMode = false, addToHistory = true) {
     // 모드 설정 (편집/미리보기)
     setIsPreview(!inEditMode);
     if (isPreview) {
+      markdownEditor.setMode?.('readonly');
       htmlPreview.style.display = 'block';
       markdownEditor.style.display = 'none';
       toggleViewButton.textContent = 'Edit';
     } else {
+      markdownEditor.setMode?.('wysiwyg');
       htmlPreview.style.display = 'none';
       markdownEditor.style.display = 'block';
       toggleViewButton.textContent = 'Preview';

@@ -94,6 +94,15 @@ Legacy text processing utilities for markdown editing (all functions exported):
 
 **Note**: Used by `src/events/editor.js` for consistent markdown text processing across different input methods
 
+## src/editor/sidenote-editor-adapter.js
+
+SideNote integration for the reusable WYSIWYG Markdown Web Component:
+
+- `initializeWysiwygMarkdownEditor()`: Installs image upload, image resolution, and pasted-text hooks on `#markdown-editor`
+- `setEditorMode(mode)`: Forwards `wysiwyg`, `source`, or `readonly` mode changes to the custom element when available
+
+Internal image Markdown paths remain `images/{id}.png`; the adapter resolves them to temporary Blob URLs without changing saved note content.
+
 ## src/settings.js
 
 Settings management (functions exported):
@@ -103,7 +112,7 @@ Settings management (functions exported):
 - `resolveEffectiveSettings(note)`: Resolves note-specific settings with global/default fallback
 - `resolveLegacyTextProcessingSettings(settings)`: Returns legacy text-processing settings, forcing trailing-space processors off unless legacy line-break mode is enabled
 - `saveGlobalSettings()`: Saves the global settings to chrome.storage.local
-- `applyFontSize(size)`: Applies font size to editor and preview elements
+- `applyFontSize(size)`: Applies font size to the editor Web Component (through `--editor-font-size`) and preview element
 - `applyMode(mode)`: Applies color mode (light/dark/system) to the document
 - `updateAutoLineBreakButton()`: Updates the legacy auto line break toolbar button state
 - `updateTildeReplacementButton()`: Updates the tilde replacement toolbar button visibility and state

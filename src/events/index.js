@@ -4,6 +4,7 @@ import { initializeEditorEvents } from './editor.js';
 import { initializeSettingsEvents } from './settings-events.js';
 import { initializeImportExportEvents } from './import-export-events.js';
 import { initializeGlobalEvents } from './global-events.js';
+import { initializeWysiwygMarkdownEditor } from '../editor/sidenote-editor-adapter.js';
 
 // Re-export utility functions for compatibility with existing code
 export {
@@ -20,6 +21,7 @@ export {
 
 // Initialize all event listeners
 function initializeAllEvents() {
+  initializeWysiwygMarkdownEditor();
   initializeNavigationEvents();
   initializeEditorEvents();
   initializeSettingsEvents();
