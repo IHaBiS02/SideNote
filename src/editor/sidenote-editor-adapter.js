@@ -65,7 +65,7 @@ const SIDENOTE_EDITOR_THEME = `
 
   .editor-mount .ProseMirror {
     min-height: 100%;
-    padding: 10px;
+    padding: var(--editor-padding);
     font-family: sans-serif;
     line-height: inherit;
     overflow-wrap: anywhere;
@@ -326,7 +326,7 @@ const SIDENOTE_EDITOR_THEME = `
 
   .source-editor {
     min-height: 100%;
-    padding: 10px;
+    padding: var(--editor-padding);
     line-height: 1.5;
     white-space: pre-wrap;
     overflow-wrap: anywhere;

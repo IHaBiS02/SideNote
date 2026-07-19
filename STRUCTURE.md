@@ -18,7 +18,7 @@ SideNote is a browser extension that provides a simple note-taking interface wit
         -   `images.js`: Image-related database operations and blob management
         -   `index.js`: Unified entry point for backward compatibility
     -   `editor/`:
-        -   `sidenote-editor-adapter.js`: Connects the reusable `<wysiwyg-markdown>` component to SideNote image storage, paste processing, editor modes, highlight.js syntax token ranges, and the 4.1.14-compatible Preview theme.
+        -   `sidenote-editor-adapter.js`: Connects the reusable `<wysiwyg-markdown>` component to SideNote image storage, paste processing, editor modes, highlight.js syntax token ranges, and the 4.1.14-compatible Preview theme. Preview and source editing share the SideNote-owned `--editor-padding` value.
     -   `dom.js`: Contains DOM element references as constants for all UI elements used throughout the extension.
     -   `notes.js`: Contains the core logic for managing notes (sorting, deleting, pinning, restoring, etc.).
     -   `notes_view/`: Directory containing modularized UI rendering and view management:

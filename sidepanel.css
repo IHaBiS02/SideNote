@@ -241,6 +241,7 @@ body {
 #markdown-editor {
   display: block;
   --editor-min-height: 100%;
+  --editor-padding: 10px;
   --editor-font-size: inherit;
   --editor-background: transparent;
   --editor-color: inherit;

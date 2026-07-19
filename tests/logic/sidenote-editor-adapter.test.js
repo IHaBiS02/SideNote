@@ -53,6 +53,7 @@ describe('SideNote WYSIWYG editor adapter', () => {
     expect(editor.themeCss).toContain('.code-block-header');
     expect(editor.themeCss).toContain('var(--editor-code-header-background)');
     expect(editor.themeCss).toContain('font-family: var(--editor-code-font-family)');
+    expect(editor.themeCss).toContain('padding: var(--editor-padding)');
     expect(editor.themeCss).toContain('background: var(--editor-code-background)');
     expect(editor.themeCss).toContain('color: var(--editor-code-line-number-color)');
     expect(editor.themeCss).toContain('background: var(--editor-inline-code-background)');
@@ -149,6 +150,7 @@ describe('4.1.14 preview theme compatibility', () => {
   const darkCss = readFileSync(resolve('dark_mode.css'), 'utf8');
 
   it('keeps the legacy browser monospace font and light code colors', () => {
+    expect(lightCss).toContain('--editor-padding: 10px;');
     expect(lightCss).toContain('--editor-code-font-family: monospace;');
     expect(lightCss).toContain('--editor-code-background: #fafafa;');
     expect(lightCss).toContain('--editor-code-color: #383a42;');
