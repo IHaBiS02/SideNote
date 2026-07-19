@@ -15,6 +15,7 @@ import {
 
 import { 
   applyFontSize,
+  isCodeBlockHeaderEnabled,
   resolveEffectiveSettings,
   updateLegacyLineBreakControls,
   updateTildeReplacementButton 
@@ -97,6 +98,7 @@ function openNote(noteId, inEditMode = false, addToHistory = true) {
     setOriginalNoteContent(note.content); // 원본 내용 저장 (변경 감지용)
     editorTitle.textContent = note.title;
     markdownEditor.value = note.content;
+    markdownEditor.showCodeBlockHeader = isCodeBlockHeaderEnabled(note);
     // 노트 설정 적용 (폰트 크기 등)
     const fontSize = resolveEffectiveSettings(note).fontSize;
     applyFontSize(fontSize);
@@ -106,7 +108,7 @@ function openNote(noteId, inEditMode = false, addToHistory = true) {
     // 모드 설정 (편집/미리보기)
     setIsPreview(!inEditMode);
     if (isPreview) {
-      markdownEditor.setMode?.('readonly');
+      markdownEditor.setMode?.('wysiwyg');
       htmlPreview.style.display = 'none';
       markdownEditor.style.display = 'block';
       toggleViewButton.textContent = 'Edit';

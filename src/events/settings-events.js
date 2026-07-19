@@ -17,7 +17,8 @@ import {
   codeBlockHeaderCheckbox,
   preventUsedImageDeletionCheckbox,
   licenseContent,
-  editorTitle
+  editorTitle,
+  markdownEditor
 } from '../dom.js';
 
 // Import functions from other modules
@@ -202,6 +203,7 @@ function initializeSettingsEvents() {
         await saveNote(note);
       }
     }
+    markdownEditor.showCodeBlockHeader = value;
     renderMarkdown();
   });
 

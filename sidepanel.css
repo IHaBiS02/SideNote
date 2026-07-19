@@ -247,6 +247,7 @@ body {
   --editor-border: 0;
   --editor-border-radius: 0;
   --editor-border-color: #ccc;
+  --editor-muted-background: #f5f5f5;
 }
 
 #markdown-editor::part(surface),

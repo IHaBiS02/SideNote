@@ -200,7 +200,7 @@ Markdown and image rendering functionality:
 - `decorateCodeBlocks(container, note)`: Adds code block headers, line classes, and line numbers
 - `renderMarkdown()`: Renders markdown content as HTML in preview
 - `renderImages()`: Renders images in the markdown preview
-- `togglePreview()`: Toggles between readonly WYSIWYG Preview and full-document Markdown source editing
+- `togglePreview()`: Toggles between editable WYSIWYG Preview and full-document Markdown source editing
 
 ### src/notes_view/recycle-bin-renderer.js
 

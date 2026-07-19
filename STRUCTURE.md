@@ -55,7 +55,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   A toolbar with global actions: Import (`#global-import-button`), Export (`#global-export-button`), and Settings (`#global-settings-button`).
 -   **`#editor-view`**: The screen for writing and viewing a single note.
     -   A header with a "Back" button (`#back-button`) and the note's title (`#editor-title`).
-    -   `#markdown-editor`: A `<wysiwyg-markdown>` custom element. Preview uses readonly WYSIWYG rendering; double-click or the Edit button opens the full document as plain Markdown source. Its public `value` remains a Markdown string.
+    -   `#markdown-editor`: A `<wysiwyg-markdown>` custom element. Preview is directly editable in WYSIWYG mode; double-click or the Edit button opens the full document as plain Markdown source. Its public `value` remains a Markdown string.
     -   `#html-preview`: A hidden legacy rendering target retained temporarily for compatibility while preview-only helpers are retired.
     -   A toolbar with buttons for toggling the view and note-specific import/export/settings.
 -   **`#settings-view`**: The screen for configuring settings.
@@ -123,7 +123,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   `keydown`: Handles Shift+Enter preview switching. The legacy textarea fallback retains its Enter and paste handlers.
 -   **`renderMarkdown()`**: Converts Markdown to HTML, sanitizes it, applies syntax highlighting, and renders normal newlines as line breaks by default. Legacy line-break mode disables Marked's `breaks` option. It also calls `renderImages()` (located in `src/notes_view/markdown-renderer.js`).
 -   **`renderImages()`**: Finds all `<img>` tags in the preview and loads their `src` from IndexedDB blob URLs (located in `src/notes_view/markdown-renderer.js`). Preview, image management, and recycle bin views each use scoped blob URL trackers.
--   **`togglePreview()`**: Switches the custom element between readonly WYSIWYG Preview and full-document Markdown source editing, and records the change in navigation history (located in `src/notes_view/markdown-renderer.js`).
+-   **`togglePreview()`**: Switches the custom element between editable WYSIWYG Preview and full-document Markdown source editing, and records the change in navigation history (located in `src/notes_view/markdown-renderer.js`).
 
 #### Settings & Recycle Bin (`settings.js`, `src/notes_view/`, `src/events/`)
 

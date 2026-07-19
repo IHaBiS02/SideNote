@@ -38,6 +38,7 @@ describe('SideNote WYSIWYG editor adapter', () => {
     expect(adapter.initializeWysiwygMarkdownEditor()).toBe(true);
     expect(editor.sourceEditScope).toBe('document');
     expect(editor.themeCss).toContain('white-space: pre-wrap');
+    expect(editor.themeCss).toContain('.code-block-header');
     return { adapter, editor };
   }
 

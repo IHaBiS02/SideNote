@@ -216,8 +216,8 @@ function togglePreview() {
   setIsPreview(!isPreview);
   
   if (isPreview) {
-    // WYSIWYG 미리보기 모드로 전환
-    markdownEditor.setMode?.('readonly');
+    // 직접 편집 가능한 WYSIWYG 미리보기 모드로 전환
+    markdownEditor.setMode?.('wysiwyg');
     htmlPreview.style.display = 'none';
     markdownEditor.style.display = 'block';
     toggleViewButton.textContent = 'Edit';

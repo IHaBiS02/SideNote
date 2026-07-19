@@ -119,7 +119,7 @@ describe('markdown renderer code blocks', () => {
     );
   });
 
-  it('toggles between readonly WYSIWYG preview and full Markdown source editing', async () => {
+  it('toggles between editable WYSIWYG preview and full Markdown source editing', async () => {
     const state = await import('../../src/state.js');
     state.setIsPreview(false);
     const editor = document.getElementById('markdown-editor');
@@ -128,7 +128,7 @@ describe('markdown renderer code blocks', () => {
     const { togglePreview } = await import('../../src/notes_view/markdown-renderer.js');
     togglePreview();
 
-    expect(editor.setMode).toHaveBeenLastCalledWith('readonly');
+    expect(editor.setMode).toHaveBeenLastCalledWith('wysiwyg');
     expect(editor.style.display).toBe('block');
     expect(document.getElementById('html-preview').style.display).toBe('none');
     expect(document.getElementById('toggle-view-button').textContent).toBe('Edit');

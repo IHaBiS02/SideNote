@@ -53,6 +53,54 @@ const SIDENOTE_EDITOR_THEME = `
     word-break: inherit;
   }
 
+  .editor-mount .ProseMirror .code-block-container {
+    margin: 1em 0;
+  }
+
+  .editor-mount .ProseMirror .code-block-container pre {
+    margin: 0;
+  }
+
+  .code-block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 26px;
+    border: 1px solid var(--editor-border-color);
+    border-bottom: 0;
+    padding: 3px 5px;
+    background: var(--editor-muted-background);
+    color: var(--editor-color);
+    font-family: monospace;
+    font-size: 0.9em;
+    user-select: none;
+  }
+
+  .code-block-language {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .copy-code-button {
+    flex: 0 0 auto;
+    min-width: 26px;
+    height: 22px;
+    border: 1px solid transparent;
+    padding: 0 4px;
+    background: transparent;
+    color: inherit;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .copy-code-button:hover {
+    border-color: var(--editor-border-color);
+    background: var(--editor-muted-background);
+  }
+
   .editor-mount .ProseMirror code,
   .source-editor {
     font-family: monospace;
