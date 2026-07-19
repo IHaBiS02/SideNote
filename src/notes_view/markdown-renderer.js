@@ -216,15 +216,14 @@ function togglePreview() {
   setIsPreview(!isPreview);
   
   if (isPreview) {
-    // 미리보기 모드로 전환
+    // WYSIWYG 미리보기 모드로 전환
     markdownEditor.setMode?.('readonly');
-    renderMarkdown();
-    htmlPreview.style.display = 'block';
-    markdownEditor.style.display = 'none';
+    htmlPreview.style.display = 'none';
+    markdownEditor.style.display = 'block';
     toggleViewButton.textContent = 'Edit';
   } else {
-    // 편집 모드로 전환
-    markdownEditor.setMode?.('wysiwyg');
+    // 전체 Markdown plain-text 편집 모드로 전환
+    markdownEditor.setMode?.('source');
     htmlPreview.style.display = 'none';
     markdownEditor.style.display = 'block';
     toggleViewButton.textContent = 'Preview';

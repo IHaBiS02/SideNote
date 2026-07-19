@@ -34,7 +34,6 @@ import {
 
 // Import view manager functions
 import { showEditorView } from './view-manager.js';
-import { renderMarkdown } from './markdown-renderer.js';
 
 /**
  * Renders the list of notes.
@@ -103,17 +102,16 @@ function openNote(noteId, inEditMode = false, addToHistory = true) {
     applyFontSize(fontSize);
     updateLegacyLineBreakControls();
     updateTildeReplacementButton();
-    renderMarkdown();
     showEditorView(false);
     // 모드 설정 (편집/미리보기)
     setIsPreview(!inEditMode);
     if (isPreview) {
       markdownEditor.setMode?.('readonly');
-      htmlPreview.style.display = 'block';
-      markdownEditor.style.display = 'none';
+      htmlPreview.style.display = 'none';
+      markdownEditor.style.display = 'block';
       toggleViewButton.textContent = 'Edit';
     } else {
-      markdownEditor.setMode?.('wysiwyg');
+      markdownEditor.setMode?.('source');
       htmlPreview.style.display = 'none';
       markdownEditor.style.display = 'block';
       toggleViewButton.textContent = 'Preview';

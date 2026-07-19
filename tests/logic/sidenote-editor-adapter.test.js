@@ -36,6 +36,8 @@ describe('SideNote WYSIWYG editor adapter', () => {
     editor.setMode = vi.fn();
     const adapter = await import('../../src/editor/sidenote-editor-adapter.js');
     expect(adapter.initializeWysiwygMarkdownEditor()).toBe(true);
+    expect(editor.sourceEditScope).toBe('document');
+    expect(editor.themeCss).toContain('white-space: pre-wrap');
     return { adapter, editor };
   }
 

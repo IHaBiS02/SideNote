@@ -98,7 +98,7 @@ Legacy text processing utilities for markdown editing (all functions exported):
 
 SideNote integration for the reusable WYSIWYG Markdown Web Component:
 
-- `initializeWysiwygMarkdownEditor()`: Installs image upload, image resolution, and pasted-text hooks on `#markdown-editor`
+- `initializeWysiwygMarkdownEditor()`: Installs the SideNote Shadow DOM theme plus image upload, image resolution, and pasted-text hooks on `#markdown-editor`
 - `setEditorMode(mode)`: Forwards `wysiwyg`, `source`, or `readonly` mode changes to the custom element when available
 
 Internal image Markdown paths remain `images/{id}.png`; the adapter resolves them to temporary Blob URLs without changing saved note content.
@@ -200,7 +200,7 @@ Markdown and image rendering functionality:
 - `decorateCodeBlocks(container, note)`: Adds code block headers, line classes, and line numbers
 - `renderMarkdown()`: Renders markdown content as HTML in preview
 - `renderImages()`: Renders images in the markdown preview
-- `togglePreview()`: Toggles between editor and preview modes
+- `togglePreview()`: Toggles between readonly WYSIWYG Preview and full-document Markdown source editing
 
 ### src/notes_view/recycle-bin-renderer.js
 

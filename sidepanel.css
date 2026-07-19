@@ -242,16 +242,25 @@ body {
   display: block;
   --editor-min-height: 100%;
   --editor-font-size: inherit;
-  --editor-border: none;
+  --editor-background: transparent;
+  --editor-color: inherit;
+  --editor-border: 0;
   --editor-border-radius: 0;
+  --editor-border-color: #ccc;
 }
 
 #markdown-editor::part(surface),
-#markdown-editor::part(editor) {
+#markdown-editor::part(editor),
+#markdown-editor::part(source-editor) {
   height: 100%;
 }
 
-#markdown-editor::part(editor) {
+#markdown-editor::part(surface) {
+  overflow: hidden;
+}
+
+#markdown-editor::part(editor),
+#markdown-editor::part(source-editor) {
   box-sizing: border-box;
   overflow-y: auto;
 }

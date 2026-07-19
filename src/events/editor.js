@@ -29,7 +29,9 @@ import {
 import {
   notes,
   globalSettings,
-  activeNoteId
+  activeNoteId,
+  isPreview,
+  setIsPreview
 } from '../state.js';
 
 // === Editor utility functions ===
@@ -58,6 +60,22 @@ function insertTextAtCursor(textarea, text) {
 // === Editor Event Listeners ===
 
 function initializeEditorEvents() {
+  // A double-click in readonly WYSIWYG mode opens the component's full source editor.
+  markdownEditor.addEventListener('mode-change', (event) => {
+    const mode = event.detail?.mode;
+    if (mode !== 'source' && mode !== 'readonly') return;
+
+    const nextIsPreview = mode === 'readonly';
+    if (nextIsPreview === isPreview) return;
+
+    setIsPreview(nextIsPreview);
+    toggleViewButton.textContent = nextIsPreview ? 'Edit' : 'Preview';
+    pushToHistory({
+      view: 'editor',
+      params: { noteId: activeNoteId, inEditMode: !nextIsPreview }
+    });
+  });
+
   // New note creation
   newNoteButton.addEventListener('click', async () => {
     const now = Date.now();
@@ -156,9 +174,6 @@ function initializeEditorEvents() {
       togglePreview();
     }
   });
-
-  // Double-click on preview to toggle edit mode
-  htmlPreview.addEventListener('dblclick', togglePreview);
 
   // Preview area click events
   htmlPreview.addEventListener('click', async (e) => {
