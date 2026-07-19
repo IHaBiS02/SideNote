@@ -38,6 +38,16 @@ body.dark-mode {
     --editor-color: #e0e0e0;
     --editor-muted-background: #2a2a2a;
     --editor-border-color: #444;
+    --editor-code-background: #282c34;
+    --editor-code-color: #abb2bf;
+    --editor-hl-comment: #5c6370;
+    --editor-hl-keyword: #c678dd;
+    --editor-hl-name: #e06c75;
+    --editor-hl-literal: #56b6c2;
+    --editor-hl-string: #98c379;
+    --editor-hl-number: #d19a66;
+    --editor-hl-title: #61aeee;
+    --editor-hl-built-in: #e6c07b;
 }
 
 .dark-mode #html-preview {

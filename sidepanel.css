@@ -248,6 +248,17 @@ body {
   --editor-border-radius: 0;
   --editor-border-color: #ccc;
   --editor-muted-background: #f5f5f5;
+  --editor-code-font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --editor-code-background: #fafafa;
+  --editor-code-color: #383a42;
+  --editor-hl-comment: #a0a1a7;
+  --editor-hl-keyword: #a626a4;
+  --editor-hl-name: #e45649;
+  --editor-hl-literal: #0184bb;
+  --editor-hl-string: #50a14f;
+  --editor-hl-number: #986801;
+  --editor-hl-title: #4078f2;
+  --editor-hl-built-in: #c18401;
 }
 
 #markdown-editor::part(surface),

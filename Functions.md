@@ -98,7 +98,7 @@ Legacy text processing utilities for markdown editing (all functions exported):
 
 SideNote integration for the reusable WYSIWYG Markdown Web Component:
 
-- `initializeWysiwygMarkdownEditor()`: Installs the SideNote Shadow DOM theme plus image upload, image resolution, and pasted-text hooks on `#markdown-editor`
+- `initializeWysiwygMarkdownEditor()`: Installs the SideNote Shadow DOM theme plus image upload, image resolution, pasted-text, and highlight.js decoration hooks on `#markdown-editor`
 - `setEditorMode(mode)`: Forwards `wysiwyg`, `source`, or `readonly` mode changes to the custom element when available
 
 Internal image Markdown paths remain `images/{id}.png`; the adapter resolves them to temporary Blob URLs without changing saved note content.

@@ -29,6 +29,12 @@ describe('SideNote WYSIWYG editor adapter', () => {
     vi.resetModules();
     vi.clearAllMocks();
     document.body.innerHTML = '<div id="markdown-editor"></div>';
+    globalThis.hljs = {
+      getLanguage: vi.fn(language => language === 'js'),
+      highlight: vi.fn(() => ({
+        value: '<span class="hljs-keyword">const</span> value = <span class="hljs-number">1</span>;'
+      }))
+    };
   });
 
   async function initializeEditor() {
@@ -94,5 +100,18 @@ describe('SideNote WYSIWYG editor adapter', () => {
     adapter.setEditorMode('readonly');
 
     expect(editor.setMode).toHaveBeenCalledWith('readonly');
+  });
+
+  it('converts highlight.js markup into editable decoration ranges', async () => {
+    const { editor } = await initializeEditor();
+
+    expect(editor.codeHighlighter('const value = 1;', 'js')).toEqual([
+      { from: 0, to: 5, className: 'hljs-keyword' },
+      { from: 14, to: 15, className: 'hljs-number' }
+    ]);
+    expect(globalThis.hljs.highlight).toHaveBeenCalledWith('const value = 1;', {
+      language: 'js',
+      ignoreIllegals: true
+    });
   });
 });

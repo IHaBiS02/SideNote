@@ -6,6 +6,44 @@ import { markdownEditor } from '../dom.js';
 
 const INTERNAL_IMAGE_PATTERN = /^images\/([^/]+)\.png$/;
 
+function highlightCode(code, requestedLanguage) {
+  if (!globalThis.hljs?.highlight || !globalThis.hljs?.getLanguage) {
+    return [];
+  }
+
+  const language = globalThis.hljs.getLanguage(requestedLanguage)
+    ? requestedLanguage
+    : 'plaintext';
+  const highlighted = globalThis.hljs.highlight(code, {
+    language,
+    ignoreIllegals: true
+  }).value;
+  const template = document.createElement('template');
+  template.innerHTML = highlighted;
+  const ranges = [];
+  let offset = 0;
+
+  function visit(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      offset += node.textContent.length;
+      return;
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+
+    const start = offset;
+    Array.from(node.childNodes).forEach(visit);
+    const className = Array.from(node.classList)
+      .filter(name => name.startsWith('hljs-'))
+      .join(' ');
+    if (className && offset > start) {
+      ranges.push({ from: start, to: offset, className });
+    }
+  }
+
+  Array.from(template.content.childNodes).forEach(visit);
+  return ranges;
+}
+
 const SIDENOTE_EDITOR_THEME = `
   .surface {
     height: 100%;
@@ -43,6 +81,8 @@ const SIDENOTE_EDITOR_THEME = `
     white-space: pre-wrap;
     overflow-wrap: anywhere;
     word-break: break-all;
+    background: var(--editor-code-background);
+    color: var(--editor-code-color);
   }
 
   .editor-mount .ProseMirror pre code {
@@ -71,7 +111,7 @@ const SIDENOTE_EDITOR_THEME = `
     padding: 3px 5px;
     background: var(--editor-muted-background);
     color: var(--editor-color);
-    font-family: monospace;
+    font-family: var(--editor-code-font-family);
     font-size: 0.9em;
     user-select: none;
   }
@@ -101,9 +141,85 @@ const SIDENOTE_EDITOR_THEME = `
     background: var(--editor-muted-background);
   }
 
+  .editor-mount .ProseMirror code.hljs {
+    background: var(--editor-code-background);
+    color: var(--editor-code-color);
+  }
+
+  .hljs-comment,
+  .hljs-quote {
+    color: var(--editor-hl-comment);
+    font-style: italic;
+  }
+
+  .hljs-doctag,
+  .hljs-keyword,
+  .hljs-formula {
+    color: var(--editor-hl-keyword);
+  }
+
+  .hljs-section,
+  .hljs-name,
+  .hljs-selector-tag,
+  .hljs-deletion,
+  .hljs-subst {
+    color: var(--editor-hl-name);
+  }
+
+  .hljs-literal {
+    color: var(--editor-hl-literal);
+  }
+
+  .hljs-string,
+  .hljs-regexp,
+  .hljs-addition,
+  .hljs-attribute,
+  .hljs-meta .hljs-string {
+    color: var(--editor-hl-string);
+  }
+
+  .hljs-attr,
+  .hljs-variable,
+  .hljs-template-variable,
+  .hljs-type,
+  .hljs-selector-class,
+  .hljs-selector-attr,
+  .hljs-selector-pseudo,
+  .hljs-number {
+    color: var(--editor-hl-number);
+  }
+
+  .hljs-symbol,
+  .hljs-bullet,
+  .hljs-link,
+  .hljs-meta,
+  .hljs-selector-id,
+  .hljs-title {
+    color: var(--editor-hl-title);
+  }
+
+  .hljs-built_in,
+  .hljs-title.class_,
+  .hljs-class .hljs-title {
+    color: var(--editor-hl-built-in);
+  }
+
+  .hljs-emphasis {
+    font-style: italic;
+  }
+
+  .hljs-strong {
+    font-weight: bold;
+  }
+
+  .hljs-link {
+    text-decoration: underline;
+  }
+
   .editor-mount .ProseMirror code,
   .source-editor {
-    font-family: monospace;
+    font-family: var(--editor-code-font-family);
+    font-variant-ligatures: none;
   }
 
   .editor-mount .ProseMirror table {
@@ -133,6 +249,7 @@ function initializeWysiwygMarkdownEditor() {
 
   markdownEditor.sourceEditScope = 'document';
   markdownEditor.themeCss = SIDENOTE_EDITOR_THEME;
+  markdownEditor.codeHighlighter = highlightCode;
 
   markdownEditor.uploadImage = async (file) => {
     const imageId = crypto.randomUUID();
