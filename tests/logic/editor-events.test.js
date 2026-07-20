@@ -75,4 +75,30 @@ describe('editor events', () => {
     });
     expect(mocks.openNote).toHaveBeenCalledWith(newNote.id, false, false);
   });
+
+  it('leaves Shift+Enter to the WYSIWYG soft-break handler', async () => {
+    const { initializeEditorEvents } = await import('../../src/events/editor.js');
+    const editor = document.getElementById('markdown-editor');
+    editor.mode = 'wysiwyg';
+    initializeEditorEvents();
+
+    editor.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', shiftKey: true, bubbles: true }),
+    );
+
+    expect(mocks.togglePreview).not.toHaveBeenCalled();
+  });
+
+  it('keeps Shift+Enter as a Preview shortcut in source mode', async () => {
+    const { initializeEditorEvents } = await import('../../src/events/editor.js');
+    const editor = document.getElementById('markdown-editor');
+    editor.mode = 'source';
+    initializeEditorEvents();
+
+    editor.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', shiftKey: true, bubbles: true }),
+    );
+
+    expect(mocks.togglePreview).toHaveBeenCalledOnce();
+  });
 });

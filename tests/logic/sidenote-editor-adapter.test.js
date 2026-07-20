@@ -56,6 +56,7 @@ describe('SideNote WYSIWYG editor adapter', () => {
     expect(editor.themeCss).toContain('padding: var(--editor-padding)');
     expect(editor.themeCss).toContain('background: var(--editor-code-background)');
     expect(editor.themeCss).toContain('color: var(--editor-code-line-number-color)');
+    expect(editor.themeCss).toContain('word-break: keep-all');
     expect(editor.themeCss).toContain('background: var(--editor-inline-code-background)');
     return { adapter, editor };
   }

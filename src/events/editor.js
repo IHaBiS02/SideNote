@@ -168,8 +168,9 @@ function initializeEditorEvents() {
       }
     }
 
-    // Shift+Enter to toggle preview
-    if (e.shiftKey && e.key === 'Enter') {
+    // WYSIWYG owns Shift+Enter as an inline soft break. Keep the legacy
+    // preview shortcut only for the full-document source editor.
+    if (e.shiftKey && e.key === 'Enter' && markdownEditor.mode !== 'wysiwyg') {
       e.preventDefault();
       togglePreview();
     }

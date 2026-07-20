@@ -177,7 +177,12 @@ const SIDENOTE_EDITOR_THEME = `
     border-right: 1px solid var(--editor-border-color);
     padding: 5px 0;
     color: var(--editor-code-line-number-color);
+    font-family: var(--editor-code-font-family);
+    line-height: inherit;
     text-align: right;
+    vertical-align: top;
+    white-space: pre;
+    word-break: keep-all;
     user-select: none;
   }
 
