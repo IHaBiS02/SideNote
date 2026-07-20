@@ -6,6 +6,7 @@ SideNote_2_9_5.zip
 commit_message.txt
 .claude/
 /node_modules
+/packages/*/node_modules
 /build
 /packages/wysiwyg-markdown/dist
 /vendor/wysiwyg-markdown.js
