@@ -196,6 +196,15 @@ const SIDENOTE_EDITOR_THEME = `
     word-break: inherit;
   }
 
+  .editor-mount .ProseMirror .code-block-content[data-line-numbers] > pre {
+    padding-block: 5px;
+  }
+
+  .editor-mount .ProseMirror .code-block-content[data-line-numbers] > pre > code {
+    padding-block: 0;
+    line-height: 1.2;
+  }
+
   .code-block-header {
     display: flex;
     align-items: center;
