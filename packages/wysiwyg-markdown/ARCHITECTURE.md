@@ -150,7 +150,8 @@ selection, undo, and serialization continue to operate on plain code text.
 From the SideNote repository root, `npm run build` performs the complete build:
 
 1. clean prior output and editor `dist`;
-2. generate editor runtime license notices;
+2. generate one `LIBRARY_LICENSES.md` from the extension and editor runtime
+   dependency graphs;
 3. bundle the TypeScript editor with Vite and emit declarations;
 4. package Chrome and Firefox extensions;
 5. create the allow-listed Firefox AMO reviewer source ZIP.

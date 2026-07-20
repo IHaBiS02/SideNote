@@ -27,6 +27,10 @@ npm.cmd run demo --workspace @sidenote/wysiwyg-markdown
 포함하고 Firefox 심사용 원본 소스 ZIP까지 생성하므로 수동 복사나 별도
 저장소가 필요하지 않습니다.
 
+같은 빌드 과정에서 확장 프로그램과 에디터의 전체 런타임 의존성 그래프를
+기준으로 루트 `LIBRARY_LICENSES.md`를 다시 생성합니다. Lit, ProseMirror,
+Markdown-it 및 각각의 전이 런타임 의존성도 여기에 포함됩니다.
+
 ## 기본 사용법
 
 ```html

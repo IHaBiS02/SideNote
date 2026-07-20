@@ -72,18 +72,11 @@ function initializeSettingsEvents() {
 
   // Licenses button
   licensesButton.addEventListener('click', async () => {
-    const licenseFiles = [
-      'LIBRARY_LICENSES.md',
-      'WYSIWYG_MARKDOWN_LICENSES.md'
-    ];
-    const texts = await Promise.all(licenseFiles.map(async (file) => {
-      const response = await fetch(file);
-      if (!response.ok) {
-        throw new Error(`Failed to load ${file}: ${response.status}`);
-      }
-      return response.text();
-    }));
-    const text = texts.join('\n\n---\n\n');
+    const response = await fetch('LIBRARY_LICENSES.md');
+    if (!response.ok) {
+      throw new Error(`Failed to load LIBRARY_LICENSES.md: ${response.status}`);
+    }
+    const text = await response.text();
     const dirtyHtml = marked.parse(text);
     licenseContent.innerHTML = DOMPurify.sanitize(dirtyHtml);
     showLicenseView();

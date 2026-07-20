@@ -7,8 +7,12 @@ const editorRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..',
 );
+const sideNoteRoot = path.resolve(editorRoot, '..', '..');
 const editorPackage = JSON.parse(
   fs.readFileSync(path.join(editorRoot, 'package.json'), 'utf8'),
+);
+const sideNotePackage = JSON.parse(
+  fs.readFileSync(path.join(sideNoteRoot, 'package.json'), 'utf8'),
 );
 
 function findPackageJson(packageName, fromDirectory) {
@@ -35,11 +39,18 @@ function findPackageJson(packageName, fromDirectory) {
   }
 }
 
-const pending = Object.keys(editorPackage.dependencies ?? {}).map(name => ({
-  name,
-  fromDirectory: editorRoot,
-  optional: false,
-}));
+const pending = [
+  ...Object.keys(sideNotePackage.dependencies ?? {}).map(name => ({
+    name,
+    fromDirectory: sideNoteRoot,
+    optional: false,
+  })),
+  ...Object.keys(editorPackage.dependencies ?? {}).map(name => ({
+    name,
+    fromDirectory: editorRoot,
+    optional: false,
+  })),
+];
 const visitedPackageFiles = new Set();
 const packages = new Map();
 
@@ -102,18 +113,19 @@ ${entry.licenseText}
 \`\`\``,
   );
 
-const output = `# Third-party licenses
+const output = `# Library licenses
 
-This distribution bundles the runtime dependencies listed below. This file is
-generated from the installed workspace dependency tree by
+SideNote and its WYSIWYG Markdown editor bundle the runtime dependencies listed
+below. This file is generated from the complete installed npm workspace
+dependency trees by
 \`packages/wysiwyg-markdown/scripts/generate-third-party-licenses.mjs\`.
 
 ${sections.join('\n\n')}
 `;
 
 fs.writeFileSync(
-  path.join(editorRoot, 'THIRD_PARTY_LICENSES.md'),
+  path.join(sideNoteRoot, 'LIBRARY_LICENSES.md'),
   output,
   'utf8',
 );
-console.log(`Wrote licenses for ${sections.length} editor runtime packages.`);
+console.log(`Wrote licenses for ${sections.length} workspace runtime packages.`);

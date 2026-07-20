@@ -12,7 +12,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         inlineDynamicImports: true,
-        banner: '/*! @sidenote/wysiwyg-markdown | Includes third-party software; see THIRD_PARTY_LICENSES.md */',
+        banner: '/*! @sidenote/wysiwyg-markdown | Includes third-party software; see LIBRARY_LICENSES.md */',
       },
     },
   },

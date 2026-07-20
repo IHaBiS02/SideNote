@@ -27,6 +27,10 @@ SideNote root builds this file first and packages it directly into both browser
 extensions, then creates the Firefox reviewer source ZIP. No manual copy or
 second repository is required.
 
+The same build regenerates the root `LIBRARY_LICENSES.md` from both the
+extension and editor runtime dependency graphs. This includes Lit, ProseMirror,
+Markdown-it, and their transitive runtime dependencies.
+
 ## Basic usage
 
 ```html

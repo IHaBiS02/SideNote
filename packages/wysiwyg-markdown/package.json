@@ -8,8 +8,7 @@
   "files": [
     "dist",
     "README.md",
-    "LICENSE",
-    "THIRD_PARTY_LICENSES.md"
+    "LICENSE"
   ],
   "main": "./dist/wysiwyg-markdown.js",
   "module": "./dist/wysiwyg-markdown.js",

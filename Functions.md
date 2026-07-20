@@ -7,8 +7,9 @@ This file documents the functions used in the SideNote extension (ES6 modules).
 - `npm run build`: Cleans prior output, builds the WYSIWYG editor workspace,
   packages Chrome and Firefox extensions, and creates the AMO reviewer source
   ZIP.
-- `npm run build:editor`: Generates editor dependency notices, compiles the
-  TypeScript Web Component with Vite, and emits declaration files.
+- `npm run build:editor`: Generates the combined extension/editor runtime
+  dependency notices, compiles the TypeScript Web Component with Vite, and
+  emits declaration files.
 - `npm run build:extension`: Runs `build.js`, which copies extension sources,
   locked third-party browser assets, and the compiled editor bundle into each
   browser package.
@@ -20,6 +21,11 @@ This file documents the functions used in the SideNote extension (ES6 modules).
 
 The reusable editor is an internal npm workspace. Markdown strings are its
 public data format; ProseMirror documents remain an implementation detail.
+
+`packages/wysiwyg-markdown/scripts/generate-third-party-licenses.mjs` walks
+the root extension and editor workspace runtime dependency graphs, deduplicates
+packages by name and version, reads their declared license and license text,
+and deterministically regenerates the root `LIBRARY_LICENSES.md` file.
 
 ### src/index.ts
 

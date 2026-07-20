@@ -54,7 +54,7 @@ SideNote is a browser extension that provides a note-taking interface within the
     -   `src/extensions/types.ts`: Command, shortcut, and input-rule extension contracts.
     -   `demo/`: Standalone browser demo that does not depend on SideNote storage.
     -   `tests/`: Parser/serializer, Web Component, and extension tests.
-    -   `scripts/generate-third-party-licenses.mjs`: Generates notices for packages included in the editor bundle.
+    -   `scripts/generate-third-party-licenses.mjs`: Generates the root `LIBRARY_LICENSES.md` from the complete extension and editor runtime dependency graphs.
 -   **`build.js`**: Packages the compiled editor and extension sources for Chrome and Firefox. It reads the editor bundle from `packages/wysiwyg-markdown/dist/`; generated bundles are not checked into Git.
 -   **`scripts/create-amo-source-package.mjs`**: Creates the allow-listed, deterministic source ZIP used for Firefox AMO review.
 -   **`build/<browser>/vendor/`**: Generated output directory containing runtime third-party browser assets plus the first-party `wysiwyg-markdown.js` bundle. There is no tracked source-level `vendor/` directory.
@@ -78,7 +78,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   Checkbox for "Prevent deletion of used images".
     -   Legacy controls for Markdown line-break mode, adding two trailing spaces to pasted lines, adding two trailing spaces on Enter, and tilde escaping.
     -   Buttons to navigate to Image Management, Recycle Bin, and Licenses pages.
--   **`#license-view`**: Displays the contents of `LIBRARY_LICENSES.md` and `WYSIWYG_MARKDOWN_LICENSES.md`.
+-   **`#license-view`**: Displays the generated `LIBRARY_LICENSES.md`, which contains extension and WYSIWYG editor runtime dependency notices.
 -   **`#recycle-bin-view`**: Displays a list of deleted items (`#deleted-items-list`), both notes and images, with options to restore or delete them permanently. Includes an "Empty Recycle Bin" button.
 -   **`#image-management-view`**: Displays a list of all images (`#image-list`) with usage information and deletion controls.
 
@@ -171,8 +171,8 @@ is first-party generated code and is listed separately.
 
 -   **`wysiwyg-markdown.js`**: Self-contained Lit/ProseMirror Web Component bundle generated from `packages/wysiwyg-markdown/src/`. Code tokens use the local highlight.js runtime and Atom One color variables without replacing editable DOM. Multi-line code uses a separate non-editable gutter whose line boxes and spacing mirror the editable code body and the 4.1.14 layout; single-line code hides it so copied and saved code remains clean.
 
-The root `npm run build` command builds the editor workspace first and copies its
-bundle and generated dependency notices directly into the Chrome and Firefox
-outputs, then creates the allow-listed AMO reviewer source ZIP. The repository
-therefore has one lockfile, one build command, and no manual synchronization
-step.
+The root `npm run build` command first regenerates the combined extension/editor
+dependency notices, builds the editor workspace, and copies the bundle and
+`LIBRARY_LICENSES.md` into the Chrome and Firefox outputs. It then creates the
+allow-listed AMO reviewer source ZIP. The repository therefore has one lockfile,
+one build command, and no manual synchronization step.

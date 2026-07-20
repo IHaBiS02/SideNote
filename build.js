@@ -54,10 +54,6 @@ const editorArtifacts = [
     {
         source: path.join('packages', 'wysiwyg-markdown', 'dist', 'wysiwyg-markdown.js'),
         destination: path.join('vendor', 'wysiwyg-markdown.js')
-    },
-    {
-        source: path.join('packages', 'wysiwyg-markdown', 'THIRD_PARTY_LICENSES.md'),
-        destination: 'WYSIWYG_MARKDOWN_LICENSES.md'
     }
 ];
 
