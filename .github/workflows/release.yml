@@ -20,8 +20,11 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24.14.0
           cache: npm
+
+      - name: Use reviewer npm version
+        run: npm install --global npm@11.9.0
 
       - name: Install dependencies
         run: npm ci
@@ -29,8 +32,8 @@ jobs:
       - name: Run tests
         run: npm run test:run
 
-      - name: Build browser packages
-        run: npm run build
+      - name: Build browser and reviewer source packages
+        run: npm run release:amo
 
       - name: Create GitHub release
         shell: pwsh
@@ -46,8 +49,8 @@ jobs:
           }
 
           $assets = Get-ChildItem -Path build -Filter *.zip | ForEach-Object { $_.FullName }
-          if ($assets.Count -lt 2) {
-            throw "Expected Chrome and Firefox zip files in build/, found $($assets.Count)."
+          if ($assets.Count -lt 3) {
+            throw "Expected Chrome, Firefox, and AMO source zip files in build/, found $($assets.Count)."
           }
 
           gh release create $tag @assets --title "SideNote $tag" --generate-notes

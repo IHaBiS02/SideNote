@@ -14,7 +14,14 @@ All developing command should run on windows environment, as the development env
 ```bash
 npm run build
 ```
-Creates Chrome and Firefox builds in `build/chrome-*.zip` and `build/firefox-*.zip`.
+Builds the editor workspace first, then creates Chrome and Firefox packages in
+`build/chrome-*.zip` and `build/firefox-*.zip`.
+
+### Firefox Release Source
+```bash
+npm run release:amo
+```
+Creates both browser packages and `build/sidenote-*-source.zip` for AMO review.
 
 ### Clean Build Directory
 ```bash
@@ -26,7 +33,8 @@ npm run clean
 npm test          # vitest watch mode
 npm run test:run  # single run
 ```
-164 unit/integration tests using vitest + jsdom + fake-indexeddb.
+Runs the editor tests followed by the extension unit/integration tests using
+Vitest, jsdom, and fake-indexeddb.
 
 ### Install Dependencies
 ```bash
@@ -55,6 +63,10 @@ npm install
 - **src/history.js**: Navigation history management
 - **src/text-processors.js**: Text processing (tilde escaping, line breaks, checkbox toggle)
 - **src/import_export.js**: .snote/.snotes file processing
+- **packages/wysiwyg-markdown/**: Lit/ProseMirror Web Component source, demo,
+  tests, and build configuration managed as an npm workspace
+- **build.js**: Packages the compiled editor and extension files for Chrome and
+  Firefox
 
 ### Database Module (`src/database/`)
 - **init.js**: IndexedDB initialization, `dbTransaction()` helper, `closeDB()`
@@ -143,7 +155,9 @@ Example:
 git tag v4.1.14
 git push origin v4.1.14
 ```
-The tag version must match `package.json`. The release workflow runs tests, builds Chrome/Firefox zip files, creates the GitHub Release, and uploads `build/*.zip` as release assets.
+The tag version must match `package.json`. The release workflow runs tests,
+builds Chrome/Firefox ZIP files and the AMO reviewer source ZIP, creates the
+GitHub Release, and uploads `build/*.zip` as release assets.
 
 ### Documentation Updates
 After significant changes, update:
@@ -176,7 +190,7 @@ After changes:
 
 ## Important Notes
 
-- Test suite: vitest with jsdom + fake-indexeddb (164 tests)
+- Test suite: editor and extension Vitest suites with jsdom + fake-indexeddb
 - No linting configuration - maintain consistent code style
 - Extension uses Manifest V3 (Chrome) with Firefox compatibility
 - Images in notes use markdown format: `![Image](images/[id].png)`

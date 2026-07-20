@@ -1,0 +1,51 @@
+{
+  "name": "@sidenote/wysiwyg-markdown",
+  "version": "0.1.0",
+  "description": "Extensible WYSIWYG Markdown editor exposed as a Web Component",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_LICENSES.md"
+  ],
+  "main": "./dist/wysiwyg-markdown.js",
+  "module": "./dist/wysiwyg-markdown.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/wysiwyg-markdown.js"
+    }
+  },
+  "scripts": {
+    "dev": "vite demo --host 127.0.0.1",
+    "demo": "vite demo --host 127.0.0.1",
+    "demo:dist": "npm run build && vite --host 127.0.0.1",
+    "build": "npm run licenses && vite build && tsc -p tsconfig.build.json",
+    "licenses": "node scripts/generate-third-party-licenses.mjs",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "lit": "^3.3.0",
+    "markdown-it": "^14.3.0",
+    "prosemirror-commands": "^1.7.0",
+    "prosemirror-history": "^1.4.0",
+    "prosemirror-inputrules": "^1.5.0",
+    "prosemirror-keymap": "^1.2.0",
+    "prosemirror-markdown": "^1.13.0",
+    "prosemirror-model": "^1.25.0",
+    "prosemirror-state": "^1.4.0",
+    "prosemirror-view": "^1.40.0"
+  },
+  "devDependencies": {
+    "jsdom": "^26.1.0",
+    "typescript": "^5.8.0",
+    "vite": "^7.0.0",
+    "vitest": "^3.2.0"
+  }
+}

@@ -2,6 +2,20 @@
 
 This file documents the functions used in the SideNote extension (ES6 modules).
 
+## Build workspace
+
+- `npm run build`: Cleans prior output, builds the WYSIWYG editor workspace,
+  and packages Chrome and Firefox extensions.
+- `npm run build:editor`: Generates editor dependency notices, compiles the
+  TypeScript Web Component with Vite, and emits declaration files.
+- `npm run build:extension`: Runs `build.js`, which copies extension sources,
+  locked third-party browser assets, and the compiled editor bundle into each
+  browser package.
+- `npm run package:amo-source`: Creates an allow-listed, deterministic source
+  ZIP with reviewer instructions.
+- `npm run release:amo`: Builds the browser packages and AMO source ZIP in one
+  command.
+
 ## src/state.js
 
 Central state management for shared variables:

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WYSIWYG Markdown Production Bundle Demo</title>
+    <link rel="stylesheet" href="./demo.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header>
+        <div>
+          <p class="eyebrow">Production bundle playground</p>
+          <h1>WYSIWYG Markdown</h1>
+        </div>
+        <button id="theme-toggle" type="button">다크 모드</button>
+      </header>
+
+      <nav class="toolbar" aria-label="Editor controls">
+        <div class="button-group">
+          <button type="button" data-mode="wysiwyg" class="active">WYSIWYG</button>
+          <button type="button" data-mode="source">Source</button>
+          <button type="button" data-mode="readonly">Readonly</button>
+        </div>
+        <div class="button-group">
+          <button id="undo" type="button">Undo</button>
+          <button id="redo" type="button">Redo</button>
+          <button id="reset" type="button">샘플 초기화</button>
+        </div>
+        <div class="button-group">
+          <button id="heading" type="button">H1</button>
+          <button id="bold" type="button">Bold</button>
+          <button id="image-button" type="button">이미지 넣기</button>
+          <input id="image-input" type="file" accept="image/*" hidden />
+          <button id="extension-toggle" type="button">날짜 확장 켜기</button>
+        </div>
+      </nav>
+
+      <section class="workspace">
+        <div class="editor-column">
+          <wysiwyg-markdown
+            id="editor"
+            placeholder="Markdown을 입력하세요"
+          ></wysiwyg-markdown>
+          <p class="hint">
+            이 페이지는 <code>dist/wysiwyg-markdown.js</code>를 직접 불러옵니다.
+            줄 시작에서 <kbd>#</kbd> 다음에 Space를 누르거나 문서를 더블클릭해
+            전체 Markdown 소스를 plain text로 편집해 보세요.
+          </p>
+        </div>
+
+        <aside class="inspector">
+          <div class="panel-heading">
+            <h2>현재 Markdown</h2>
+            <button id="apply-source" type="button">에디터에 적용</button>
+          </div>
+          <textarea id="markdown-output" spellcheck="false"></textarea>
+        </aside>
+      </section>
+
+      <section class="event-panel">
+        <div class="panel-heading">
+          <h2>이벤트 로그</h2>
+          <button id="clear-log" type="button">지우기</button>
+        </div>
+        <ol id="event-log" aria-live="polite"></ol>
+      </section>
+    </main>
+
+    <script type="module" src="./demo.ts"></script>
+  </body>
+</html>

@@ -33,7 +33,7 @@ A simple notes browser extension that provides a note-taking interface in the br
 2. Install dependencies:
 
    ```bash
-   npm install
+   npm ci
    ```
 
 3. Build the extension:
@@ -70,12 +70,27 @@ All-notes `.zip` exports use sanitized note titles as folder names, with suffixe
 ### Build Commands
 
 ```bash
-# Install dependencies
-npm install
+# Install the extension and editor workspace dependencies
+npm ci
 
-# Build for both Chrome and Firefox
+# Type-check and test the editor and extension
+npm run typecheck
+npm run test:run
+
+# Build the editor, then package Chrome and Firefox
 npm run build
+
+# Build browser packages and the Firefox reviewer source ZIP
+npm run release:amo
 ```
+
+The reusable editor source is part of this repository at
+`packages/wysiwyg-markdown/`. The root build compiles it before packaging the
+extension, so a SideNote checkout is sufficient for development and releases.
+
+Build output is written to `build/`. See
+[`FIREFOX_AMO_SOURCE_SUBMISSION_GUIDE.md`](./FIREFOX_AMO_SOURCE_SUBMISSION_GUIDE.md)
+for the Firefox source-review package workflow.
 
 ## License
 

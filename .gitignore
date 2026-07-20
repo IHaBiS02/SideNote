@@ -7,4 +7,6 @@ commit_message.txt
 .claude/
 /node_modules
 /build
+/packages/wysiwyg-markdown/dist
+/vendor/wysiwyg-markdown.js
 licenses.json

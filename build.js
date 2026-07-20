@@ -1,25 +1,17 @@
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
 const glob = require('glob');
-
-const exec = (command) => execSync(command, { stdio: 'inherit' });
-
-const mkdirp = 'mkdirp';
+const archiver = require('archiver');
 
 const buildDir = 'build';
 const chromeDir = path.join(buildDir, 'chrome');
 const firefoxDir = path.join(buildDir, 'firefox');
+const outputDirectories = [chromeDir, firefoxDir];
 
-// Create build directories if they don't exist
-if (!fs.existsSync(chromeDir)) {
-    exec(`${mkdirp} ${chromeDir}`);
-}
-if (!fs.existsSync(firefoxDir)) {
-    exec(`${mkdirp} ${firefoxDir}`);
+for (const outputDirectory of outputDirectories) {
+    fs.mkdirSync(path.join(outputDirectory, 'vendor'), { recursive: true });
 }
 
-// Copy common files
 const commonFiles = [
     'src',
     'sidepanel.html',
@@ -28,17 +20,15 @@ const commonFiles = [
     'images',
     'background.js',
     'LICENSE',
-    'LIBRARY_LICENSES.md',
-    'WYSIWYG_MARKDOWN_LICENSES.md'
+    'LIBRARY_LICENSES.md'
 ];
 
 for (const file of commonFiles) {
-    fs.cpSync(file, path.join(chromeDir, file), { recursive: true });
-    fs.cpSync(file, path.join(firefoxDir, file), { recursive: true });
+    for (const outputDirectory of outputDirectories) {
+        fs.cpSync(file, path.join(outputDirectory, file), { recursive: true });
+    }
 }
 
-
-// Copy vendor files
 const vendorFiles = {
     'dompurify/dist/purify.min.js': 'dompurify.min.js',
     'marked/marked.min.js': 'marked.min.js',
@@ -50,43 +40,62 @@ const vendorFiles = {
     'webextension-polyfill/dist/browser-polyfill.min.js': 'browser-polyfill.min.js'
 };
 
-exec(`${mkdirp} ${chromeDir}/vendor`);
-exec(`${mkdirp} ${firefoxDir}/vendor`);
-
-for (const [src, dest] of Object.entries(vendorFiles)) {
-    const sourcePath = path.join('node_modules', src);
-    const destPathChrome = path.join(chromeDir, 'vendor', dest);
-    const destPathFirefox = path.join(firefoxDir, 'vendor', dest);
-    fs.copyFileSync(sourcePath, destPathChrome);
-    fs.copyFileSync(sourcePath, destPathFirefox);
+for (const [source, destination] of Object.entries(vendorFiles)) {
+    const sourcePath = path.join('node_modules', source);
+    for (const outputDirectory of outputDirectories) {
+        fs.copyFileSync(
+            sourcePath,
+            path.join(outputDirectory, 'vendor', destination)
+        );
+    }
 }
 
-for (const outputDirectory of [chromeDir, firefoxDir]) {
-    fs.copyFileSync(
-        path.join('vendor', 'wysiwyg-markdown.js'),
-        path.join(outputDirectory, 'vendor', 'wysiwyg-markdown.js')
-    );
+const editorArtifacts = [
+    {
+        source: path.join('packages', 'wysiwyg-markdown', 'dist', 'wysiwyg-markdown.js'),
+        destination: path.join('vendor', 'wysiwyg-markdown.js')
+    },
+    {
+        source: path.join('packages', 'wysiwyg-markdown', 'THIRD_PARTY_LICENSES.md'),
+        destination: 'WYSIWYG_MARKDOWN_LICENSES.md'
+    }
+];
+
+for (const artifact of editorArtifacts) {
+    if (!fs.existsSync(artifact.source)) {
+        throw new Error(`Required editor build artifact is missing: ${artifact.source}`);
+    }
+
+    for (const outputDirectory of outputDirectories) {
+        fs.copyFileSync(
+            artifact.source,
+            path.join(outputDirectory, artifact.destination)
+        );
+    }
 }
 
-// Create manifest.json for Chrome
 const chromeManifest = JSON.parse(fs.readFileSync('manifest.json', 'utf-8'));
-fs.writeFileSync(path.join(chromeDir, 'manifest.json'), JSON.stringify(chromeManifest, null, 2));
+fs.writeFileSync(
+    path.join(chromeDir, 'manifest.json'),
+    JSON.stringify(chromeManifest, null, 2)
+);
 
-// Create manifest.json for Firefox
-const firefoxManifest = { ...chromeManifest };
+const firefoxManifest = structuredClone(chromeManifest);
 delete firefoxManifest.side_panel;
 if (firefoxManifest.background.service_worker) {
     firefoxManifest.background.scripts = [firefoxManifest.background.service_worker];
     delete firefoxManifest.background.service_worker;
 }
-firefoxManifest.permissions = firefoxManifest.permissions.filter(p => p !== 'sidePanel');
+firefoxManifest.permissions = firefoxManifest.permissions.filter(
+    permission => permission !== 'sidePanel'
+);
 firefoxManifest.sidebar_action = {
-    "default_panel": "sidepanel.html",
-    "default_title": "SideNote",
-    "default_icon": {
-        "16": "images/icon16.png",
-        "48": "images/icon48.png",
-        "128": "images/icon128.png"
+    default_panel: 'sidepanel.html',
+    default_title: 'SideNote',
+    default_icon: {
+        16: 'images/icon16.png',
+        48: 'images/icon48.png',
+        128: 'images/icon128.png'
     }
 };
 firefoxManifest.browser_specific_settings = {
@@ -99,44 +108,37 @@ firefoxManifest.browser_specific_settings = {
 };
 
 if (firefoxManifest.commands && firefoxManifest.commands._execute_action) {
-    firefoxManifest.commands._execute_sidebar_action = firefoxManifest.commands._execute_action;
+    firefoxManifest.commands._execute_sidebar_action =
+        firefoxManifest.commands._execute_action;
     delete firefoxManifest.commands._execute_action;
 }
 
-fs.writeFileSync(path.join(firefoxDir, 'manifest.json'), JSON.stringify(firefoxManifest, null, 2));
+fs.writeFileSync(
+    path.join(firefoxDir, 'manifest.json'),
+    JSON.stringify(firefoxManifest, null, 2)
+);
 
-
-const archiver = require('archiver');
-const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
-const version = packageJson.version.replace(/\./g, '_');
-
-function createZip(sourceDir, outPath) {
+function createZip(sourceDirectory, outputPath) {
     const archive = archiver('zip', { zlib: { level: 9 } });
-    const stream = fs.createWriteStream(outPath);
+    const output = fs.createWriteStream(outputPath);
 
     return new Promise((resolve, reject) => {
-        archive
-            .directory(sourceDir, false)
-            .on('error', err => reject(err))
-            .pipe(stream);
-
-        stream.on('close', () => resolve());
+        output.on('close', resolve);
+        output.on('error', reject);
+        archive.on('error', reject);
+        archive.directory(sourceDirectory, false).pipe(output);
         archive.finalize();
     });
 }
 
 async function main() {
-    console.log('Deleting old zip files if they exist...');
+    console.log('Deleting old browser zip files if they exist...');
     const oldChromeZips = await glob.glob('build/chrome-*.zip');
     const oldFirefoxZips = await glob.glob('build/firefox-*.zip');
 
     for (const file of [...oldChromeZips, ...oldFirefoxZips]) {
-        try {
-            fs.unlinkSync(file);
-            console.log(`Deleted ${file}`);
-        } catch (err) {
-            console.error(`Could not delete ${file}:`, err.message);
-        }
+        fs.unlinkSync(file);
+        console.log(`Deleted ${file}`);
     }
 
     const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
@@ -144,15 +146,13 @@ async function main() {
     const chromeZipPath = path.join(buildDir, `chrome-${version}.zip`);
     const firefoxZipPath = path.join(buildDir, `firefox-${version}.zip`);
 
-    console.log('Creating zip archives...');
+    console.log('Creating browser zip archives...');
     await createZip(chromeDir, chromeZipPath);
     await createZip(firefoxDir, firefoxZipPath);
-    console.log('Zip archives created successfully!');
+    console.log('Browser zip archives created successfully.');
 }
 
-main().then(() => {
-    console.log('Build finished successfully!');
-}).catch(err => {
-    console.error('Error during build:', err);
+main().catch(error => {
+    console.error('Build failed:', error);
     process.exit(1);
 });
