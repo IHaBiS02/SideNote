@@ -200,9 +200,18 @@ const SIDENOTE_EDITOR_THEME = `
     padding-block: 5px;
   }
 
+  .editor-mount .ProseMirror .code-block-content[data-line-numbers] {
+    column-gap: 5px;
+  }
+
   .editor-mount .ProseMirror .code-block-content[data-line-numbers] > pre > code {
     padding-block: 0;
     line-height: 1.2;
+  }
+
+  .editor-mount .ProseMirror .code-block-content[data-line-numbers]
+    > pre.code-block-body > code {
+    padding-left: 0;
   }
 
   .code-block-header {

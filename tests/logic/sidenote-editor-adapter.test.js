@@ -60,6 +60,9 @@ describe('SideNote WYSIWYG editor adapter', () => {
     expect(editor.themeCss).toContain('pre.code-line-numbers code');
     expect(editor.themeCss).toContain('.code-block-content[data-line-numbers] > pre');
     expect(editor.themeCss).toContain('padding-block: 5px');
+    expect(editor.themeCss).toContain('column-gap: 5px');
+    expect(editor.themeCss).toContain('> pre.code-block-body > code');
+    expect(editor.themeCss).toContain('padding-left: 0');
     expect(editor.themeCss).toContain('line-height: 1.2');
     expect(editor.themeCss).toContain('word-break: keep-all');
     expect(editor.themeCss).toContain('background: var(--editor-inline-code-background)');
