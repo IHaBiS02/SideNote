@@ -1,18 +1,18 @@
 {
   "name": "simple-notes-extension",
-  "version": "4.2.11",
+  "version": "4.2.12",
   "description": "A simple notes extension using the side panel.",
   "private": true,
   "workspaces": [
     "packages/wysiwyg-markdown"
   ],
   "scripts": {
-    "build": "npm run clean && npm run build:editor && npm run build:extension",
+    "build": "npm run clean && npm run build:editor && npm run build:extension && npm run package:amo-source",
     "build:editor": "npm run build --workspace @sidenote/wysiwyg-markdown",
     "build:extension": "node build.js",
     "clean": "rimraf build packages/wysiwyg-markdown/dist",
     "package:amo-source": "node scripts/create-amo-source-package.mjs",
-    "release:amo": "npm run build && npm run package:amo-source",
+    "release:amo": "npm run build",
     "test": "vitest",
     "test:editor": "npm run test:run --workspace @sidenote/wysiwyg-markdown",
     "test:extension": "vitest run",

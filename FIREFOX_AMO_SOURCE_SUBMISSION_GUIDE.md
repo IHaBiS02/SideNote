@@ -25,10 +25,10 @@ From the SideNote repository root:
 npm.cmd ci
 npm.cmd run test:run
 npm.cmd run typecheck
-npm.cmd run release:amo
+npm.cmd run build
 ```
 
-`release:amo` creates all browser builds and the reviewer source archive:
+`build` creates all browser builds and the reviewer source archive:
 
 ```text
 build/chrome-<version>.zip

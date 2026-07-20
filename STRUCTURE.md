@@ -155,5 +155,6 @@ The UI is a single-page application with several distinct "views" that are shown
 
 The root `npm run build` command builds the editor workspace first and copies its
 bundle and generated dependency notices directly into the Chrome and Firefox
-outputs. The repository therefore has one lockfile, one install command, and no
-manual synchronization step.
+outputs, then creates the allow-listed AMO reviewer source ZIP. The repository
+therefore has one lockfile, one build command, and no manual synchronization
+step.

@@ -33,7 +33,7 @@ jobs:
         run: npm run test:run
 
       - name: Build browser and reviewer source packages
-        run: npm run release:amo
+        run: npm run build
 
       - name: Create GitHub release
         shell: pwsh

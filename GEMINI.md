@@ -51,4 +51,4 @@ To build the extension for both Chrome and Firefox, run the following command:
 npm run build
 ```
 
-This will create a `build` directory with `chrome` and `firefox` subdirectories, each containing the appropriate extension package.
+This creates the Chrome and Firefox extension packages plus the Firefox reviewer source ZIP under `build`.

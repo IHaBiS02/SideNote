@@ -131,6 +131,7 @@ The command creates:
 
 - Firefox build directory: \`build/firefox/\`
 - Firefox package: \`build/firefox-${archiveVersion}.zip\`
+- Reviewer source package: \`build/sidenote-${version}-source.zip\`
 
 The first command installs the exact versions in the included workspace
 lockfile. The build then compiles

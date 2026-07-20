@@ -14,7 +14,8 @@ All developing command should run on windows environment, as the development env
 ```bash
 npm run build
 ```
-Creates Chrome and Firefox builds in `build/chrome-*.zip` and `build/firefox-*.zip`.
+Creates Chrome and Firefox builds in `build/chrome-*.zip` and
+`build/firefox-*.zip`, plus `build/sidenote-*-source.zip` for Firefox review.
 
 ### Clean Build Directory
 ```bash

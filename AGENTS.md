@@ -15,13 +15,14 @@ All developing command should run on windows environment, as the development env
 npm run build
 ```
 Builds the editor workspace first, then creates Chrome and Firefox packages in
-`build/chrome-*.zip` and `build/firefox-*.zip`.
+`build/chrome-*.zip` and `build/firefox-*.zip`, plus the Firefox reviewer source
+archive at `build/sidenote-*-source.zip`.
 
 ### Firefox Release Source
 ```bash
 npm run release:amo
 ```
-Creates both browser packages and `build/sidenote-*-source.zip` for AMO review.
+Compatibility alias for `npm run build`.
 
 ### Clean Build Directory
 ```bash

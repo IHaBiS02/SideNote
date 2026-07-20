@@ -77,16 +77,15 @@ npm ci
 npm run typecheck
 npm run test:run
 
-# Build the editor, then package Chrome and Firefox
+# Build the editor, Chrome/Firefox packages, and Firefox reviewer source ZIP
 npm run build
-
-# Build browser packages and the Firefox reviewer source ZIP
-npm run release:amo
 ```
 
 The reusable editor source is part of this repository at
 `packages/wysiwyg-markdown/`. The root build compiles it before packaging the
-extension, so a SideNote checkout is sufficient for development and releases.
+extension, then creates the AMO reviewer source archive, so a SideNote checkout
+is sufficient for development and releases. `npm run release:amo` remains an
+alias of `npm run build` for compatibility.
 
 Build output is written to `build/`. See
 [`FIREFOX_AMO_SOURCE_SUBMISSION_GUIDE.md`](./FIREFOX_AMO_SOURCE_SUBMISSION_GUIDE.md)
