@@ -64,6 +64,9 @@ npm install
 - **src/history.js**: Navigation history management
 - **src/text-processors.js**: Text processing (tilde escaping, line breaks, checkbox toggle)
 - **src/import_export.js**: .snote/.snotes file processing
+- **src/editor/sidenote-editor-adapter.js**: Connects SideNote storage,
+  settings, paste processing, theme CSS, and highlight.js token ranges to the
+  reusable editor Web Component
 - **packages/wysiwyg-markdown/**: Lit/ProseMirror Web Component source, demo,
   tests, and build configuration managed as an npm workspace
 - **build.js**: Packages the compiled editor and extension files for Chrome and
@@ -86,20 +89,30 @@ npm install
 ### Notes View Module (`src/notes_view/`)
 - **view-manager.js**: View visibility management (list, editor, settings, etc.)
 - **note-renderer.js**: Note list rendering and note opening
-- **markdown-renderer.js**: Markdown parsing, HTML rendering, image loading
+- **markdown-renderer.js**: Preview/source mode switching plus hidden legacy
+  HTML rendering, sanitization, code decoration, and image loading helpers
 - **image-modal.js**: Fullscreen image preview modal with zoom
 - **image-manager.js**: Image list UI and management
 - **recycle-bin-renderer.js**: Deleted items list rendering
 - **index.js**: Re-exports all view functions
 
 ### Key Features Implementation
-- **Markdown Rendering**: Uses `marked.js` with `DOMPurify` sanitization
-- **Syntax Highlighting**: `highlight.js` with line numbers plugin
+- **WYSIWYG Markdown**: The editor workspace parses Markdown into a
+  ProseMirror document and serializes each change back to Markdown
+- **Preview/Source Modes**: Preview is editable WYSIWYG; double-click or Edit
+  opens the complete document in plain Markdown source mode
+- **Legacy HTML Renderer**: Marked and DOMPurify remain for the hidden
+  compatibility preview and preview-only helper paths
+- **Syntax Highlighting**: The SideNote adapter converts highlight.js output
+  into editable ProseMirror decorations; multi-line code uses a non-editable
+  line-number gutter
+- **Host Styling**: SideNote injects its 4.1.14-compatible theme through
+  `themeCss` because document CSS does not cross the editor Shadow DOM
 - **Image Handling**: Images pasted/imported are stored as blobs in IndexedDB; blob URLs are tracked and revoked on re-render to prevent memory leaks
 - **Recycle Bin**: Soft delete with 30-day auto-cleanup (`THIRTY_DAYS_MS`)
 
 ### Test Structure (`tests/`)
-```
+```text
 tests/
 ├── setup.js              # Global setup (fake-indexeddb, browser API mock)
 ├── mocks/
@@ -110,15 +123,32 @@ tests/
 │   ├── text-processors.test.js
 │   ├── history.test.js
 │   ├── state.test.js
+│   ├── settings.test.js
+│   ├── settings-ui.test.js
 │   └── utils.test.js
 ├── database/             # IndexedDB layer tests
 │   ├── init.test.js
 │   ├── notes.test.js
 │   └── images.test.js
 └── logic/                # Business logic tests (with mocked DB/views)
-    ├── notes.test.js
+    ├── editor-events.test.js
+    ├── sidenote-editor-adapter.test.js
     ├── markdown-renderer.test.js
-    └── import-export.test.js
+    ├── image-manager.test.js
+    ├── import-export.test.js
+    ├── import-export-events.test.js
+    ├── main.test.js
+    └── notes.test.js
+```
+
+Editor workspace tests are maintained separately:
+
+```text
+packages/wysiwyg-markdown/tests/
+├── markdown.test.ts       # parser and serializer behavior
+├── element.test.ts        # modes, APIs, events, images, and code UI
+├── extensions.test.ts     # commands, shortcuts, and input rules
+└── setup.ts
 ```
 
 ### State Management Conventions
@@ -164,9 +194,13 @@ GitHub Release, and uploads `build/*.zip` as release assets.
 After significant changes, update:
 - **STRUCTURE.md**: If architecture/file organization changes
 - **Functions.md**: If function signatures or purposes change
+- **packages/wysiwyg-markdown/ARCHITECTURE.md**: If editor internals, the host
+  boundary, or build flow changes
+- **packages/wysiwyg-markdown/README.md** and **README.ko.md**: If the public
+  editor API or usage changes
 
 ### Git Commit Process
-Use file-based commit method as specified in GEMINI.md:
+Use the file-based commit method:
 ```bash
 git diff
 git log -n 5

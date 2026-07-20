@@ -4,9 +4,15 @@ A simple notes browser extension that provides a note-taking interface in the br
 
 ## Features
 
-- **Markdown Support**: Write notes in Markdown with live preview
+- **Editable WYSIWYG Preview**: Open notes in a directly editable rendered
+  document while keeping Markdown as the stored format
+- **Full Markdown Source Editing**: Double-click Preview or press Edit to edit
+  the complete note as plain Markdown text
 - **Soft Line Breaks**: Preview renders normal newlines without requiring trailing spaces
-- **Syntax Highlighting**: Code blocks with syntax highlighting using highlight.js
+- **Extensible Editing**: Lit/ProseMirror editor with commands, shortcuts, and
+  input-rule extensions
+- **Code Blocks**: Language/copy headers, editable highlight.js syntax
+  highlighting, and aligned multi-line line numbers
 - **Dark/Light Mode**: Toggle between themes for comfortable viewing
 - **Import/Export**: Save and load notes in `.snote` and `.snotes` formats
 - **Image Support**: Paste and embed images directly into notes
@@ -86,6 +92,12 @@ The reusable editor source is part of this repository at
 extension, then creates the AMO reviewer source archive, so a SideNote checkout
 is sufficient for development and releases. `npm run release:amo` remains an
 alias of `npm run build` for compatibility.
+
+Architecture references:
+
+- [`STRUCTURE.md`](./STRUCTURE.md): repository and SideNote runtime structure
+- [`Functions.md`](./Functions.md): application functions and editor public API
+- [`packages/wysiwyg-markdown/ARCHITECTURE.md`](./packages/wysiwyg-markdown/ARCHITECTURE.md): editor internals and host boundary
 
 Build output is written to `build/`. See
 [`FIREFOX_AMO_SOURCE_SUBMISSION_GUIDE.md`](./FIREFOX_AMO_SOURCE_SUBMISSION_GUIDE.md)

@@ -1,6 +1,13 @@
 # SideNote Codebase Overview and Refactoring Notes
 
-This document summarizes the current code structure and records practical refactoring candidates based on the repository state at review time.
+> Historical refactoring record: this document describes the application
+> refactoring work before the Lit/ProseMirror editor workspace was integrated.
+> It is retained for design history, not as the current structure reference.
+> Use `STRUCTURE.md`, `Functions.md`, and
+> `packages/wysiwyg-markdown/ARCHITECTURE.md` for the current codebase.
+
+This document summarizes the code structure at its original review time and
+records the refactoring candidates considered during that phase.
 
 ## Summary
 

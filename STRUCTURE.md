@@ -4,7 +4,7 @@ This document outlines the internal structure of the SideNote browser extension,
 
 ## 1. Project Overview
 
-SideNote is a browser extension that provides a simple note-taking interface within the browser's side panel. Users can create, edit, and manage notes written in Markdown. It supports features like a live preview, syntax highlighting, dark/light modes, image embedding, and data import/export.
+SideNote is a browser extension that provides a note-taking interface within the browser's side panel. Markdown remains the persisted format, while Preview is a directly editable WYSIWYG document backed by a Lit/ProseMirror Web Component. Double-clicking Preview or pressing Edit opens the complete note as plain Markdown source. The application also supports syntax highlighting, dark/light modes, image embedding, and data import/export.
 
 ## 2. File Structure
 
@@ -43,10 +43,21 @@ SideNote is a browser extension that provides a simple note-taking interface wit
 -   **`sidepanel.css`**: The primary stylesheet for the extension's UI.
 -   **`dark_mode.css`**: A supplementary stylesheet containing CSS variables and rules specifically for the dark mode theme.
 -   **`background.js`**: A service worker script that handles the initial opening of the side panel when the extension icon is clicked.
--   **`packages/wysiwyg-markdown/`**: The reusable Lit/ProseMirror editor npm workspace. It contains the TypeScript source, tests, demo app, Vite configuration, and license generator.
+-   **`packages/wysiwyg-markdown/`**: The reusable Lit/ProseMirror editor npm workspace:
+    -   `src/index.ts`: Public exports and idempotent registration of `<wysiwyg-markdown>`.
+    -   `src/core/markdown.ts`: ProseMirror schema plus Markdown parser and serializer. It covers headings, emphasis, strikethrough, lists/tasks, soft breaks, fenced code, links, and images.
+    -   `src/core/commands.ts`: Standard history, block, and inline-format commands.
+    -   `src/element/wysiwyg-markdown.ts`: Form-associated Lit custom element, ProseMirror lifecycle, source modes, node views, events, image hooks, and public API.
+    -   `src/element/styles.ts`: Minimal component-owned layout and state CSS. Product styling is supplied by the host through `themeCss`.
+    -   `src/extensions/registry.ts`: Extension validation, priority ordering, command merging, shortcuts, and input-rule plugins.
+    -   `src/extensions/standard.ts`: Built-in Markdown input rules for headings, code blocks, quotes, lists, task items, and horizontal rules.
+    -   `src/extensions/types.ts`: Command, shortcut, and input-rule extension contracts.
+    -   `demo/`: Standalone browser demo that does not depend on SideNote storage.
+    -   `tests/`: Parser/serializer, Web Component, and extension tests.
+    -   `scripts/generate-third-party-licenses.mjs`: Generates notices for packages included in the editor bundle.
 -   **`build.js`**: Packages the compiled editor and extension sources for Chrome and Firefox. It reads the editor bundle from `packages/wysiwyg-markdown/dist/`; generated bundles are not checked into Git.
 -   **`scripts/create-amo-source-package.mjs`**: Creates the allow-listed, deterministic source ZIP used for Firefox AMO review.
--   **`vendor/`**: Runtime third-party libraries copied from the root `node_modules` during the extension build. The generated editor bundle is added to the build output directly rather than stored here.
+-   **`build/<browser>/vendor/`**: Generated output directory containing runtime third-party browser assets plus the first-party `wysiwyg-markdown.js` bundle. There is no tracked source-level `vendor/` directory.
 
 ## 3. HTML Structure (`sidepanel.html`)
 
@@ -124,7 +135,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   `input`: Updates the note content and metadata on every keystroke.
     -   WYSIWYG paste hooks save images to IndexedDB and apply enabled legacy text formatting through `src/editor/sidenote-editor-adapter.js`.
     -   `keydown`: WYSIWYG `Shift+Enter` inserts a single inline soft break; the full-document source editor retains `Shift+Enter` preview switching. The legacy textarea fallback retains its Enter and paste handlers.
--   **`renderMarkdown()`**: Converts Markdown to HTML, sanitizes it, applies syntax highlighting, and renders normal newlines as line breaks by default. Legacy line-break mode disables Marked's `breaks` option. It also calls `renderImages()` (located in `src/notes_view/markdown-renderer.js`).
+-   **`renderMarkdown()`**: Updates the hidden legacy HTML preview used by compatibility helpers. It converts Markdown with Marked, sanitizes with DOMPurify, applies legacy code decoration, and calls `renderImages()`. The visible Preview is the `<wysiwyg-markdown>` component and does not use this HTML as its editable DOM (located in `src/notes_view/markdown-renderer.js`).
 -   **`renderImages()`**: Finds all `<img>` tags in the preview and loads their `src` from IndexedDB blob URLs (located in `src/notes_view/markdown-renderer.js`). Preview, image management, and recycle bin views each use scoped blob URL trackers.
 -   **`togglePreview()`**: Switches the custom element between editable WYSIWYG Preview and full-document Markdown source editing, and records the change in navigation history (located in `src/notes_view/markdown-renderer.js`).
 
@@ -142,7 +153,11 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **Export Buttons**: Left-click packages one or all notes into a `.snote` or `.snotes` zip file. Right-click opens an export format dropdown with `.zip` above `.snote`/`.snotes`. Right-clicking the `.zip` option inserts original Markdown and Markdown with two-space line breaks options above the `.zip` row. All-notes `.zip` exports use sanitized note titles as folder names, while `.snotes` keeps note IDs for compatibility. Shared helpers in `src/import_export.js` write note content (`note.md`), metadata (`metadata.json`), and any associated images from IndexedDB.
 -   **Import Buttons**: Unzip a `.snote` or `.snotes` file and parse metadata/content/images without saving first. Event handlers then choose whether to create new notes or update the active note.
 
-## 5. External Libraries (`vendor/`)
+## 5. Packaged Runtime Assets (`build/<browser>/vendor/`)
+
+`build.js` copies the exact locked browser assets below into each extension
+package. Most are third-party libraries from `node_modules`; the editor bundle
+is first-party generated code and is listed separately.
 
 -   **`marked.min.js`**: A high-performance Markdown parser to convert Markdown text into HTML.
 -   **`dompurify.min.js`**: A robust HTML sanitizer used to prevent Cross-Site Scripting (XSS) vulnerabilities by cleaning the HTML generated from user-provided Markdown.
@@ -151,7 +166,10 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **`jszip.min.js`**: A library for creating, reading, and editing `.zip` files, used for the import/export functionality.
 -   **`browser-polyfill.min.js`**: WebExtension browser API Polyfill for cross-browser compatibility.
 -   **`atom-one-light.css`**: Light theme for syntax highlighting (additional dark theme available).
--   **`wysiwyg-markdown.js`**: Self-contained Lit/ProseMirror-based Web Component bundle generated from `packages/wysiwyg-markdown/src/`. Code tokens use the existing local highlight.js runtime and Atom One color variables without replacing editable DOM. Multi-line code uses a separate non-editable gutter whose `pre > code` line boxes, explicit line height, first/last row spacing, and 5px divider-to-code gap mirror the editable code body and the 4.1.14 table layout; single-line code hides it so copied and saved code remains clean.
+
+### First-party generated asset
+
+-   **`wysiwyg-markdown.js`**: Self-contained Lit/ProseMirror Web Component bundle generated from `packages/wysiwyg-markdown/src/`. Code tokens use the local highlight.js runtime and Atom One color variables without replacing editable DOM. Multi-line code uses a separate non-editable gutter whose line boxes and spacing mirror the editable code body and the 4.1.14 layout; single-line code hides it so copied and saved code remains clean.
 
 The root `npm run build` command builds the editor workspace first and copies its
 bundle and generated dependency notices directly into the Chrome and Firefox

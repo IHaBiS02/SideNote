@@ -76,6 +76,9 @@ complete build is `npm ci` followed by `npm run build`. Mention that
 `vendor/wysiwyg-markdown.js` in the built extension is generated from
 `packages/wysiwyg-markdown/src/`.
 
+The current editor source layout and host boundary are documented in
+`packages/wysiwyg-markdown/ARCHITECTURE.md`.
+
 Before uploading, extract the source ZIP into a clean directory, execute only
 the included README commands, and compare the rebuilt `build/firefox/` files
 with the release build by path and SHA-256 hash.

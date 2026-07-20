@@ -31,7 +31,7 @@ const sourceEntries = [
   'packages/wysiwyg-markdown/LICENSE',
   'packages/wysiwyg-markdown/README.md',
   'packages/wysiwyg-markdown/README.ko.md',
-  'packages/wysiwyg-markdown/IMPLEMENTATION_PLAN.md',
+  'packages/wysiwyg-markdown/ARCHITECTURE.md',
   'packages/wysiwyg-markdown/THIRD_PARTY_LICENSES.md',
   'packages/wysiwyg-markdown/package.json',
   'packages/wysiwyg-markdown/src',

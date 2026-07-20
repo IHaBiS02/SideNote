@@ -16,6 +16,101 @@ This file documents the functions used in the SideNote extension (ES6 modules).
   ZIP with reviewer instructions.
 - `npm run release:amo`: Compatibility alias for `npm run build`.
 
+## packages/wysiwyg-markdown
+
+The reusable editor is an internal npm workspace. Markdown strings are its
+public data format; ProseMirror documents remain an implementation detail.
+
+### src/index.ts
+
+- Registers `<wysiwyg-markdown>` only when the tag is not already defined.
+- Exports `WysiwygMarkdownElement`, editor hook/event types,
+  `parseMarkdown()`, `serializeMarkdown()`, and `markdownSchema`.
+- Exports the command and extension TypeScript contracts used by hosts.
+
+### src/core/markdown.ts
+
+- `markdownSchema`: ProseMirror schema used by every editor instance. It
+  extends CommonMark with task-list state, strikethrough, soft breaks, fenced
+  code language metadata, and image metadata.
+- `parseMarkdown(markdown)`: Parses a Markdown string into a ProseMirror
+  document using markdown-it and `prosemirror-markdown` token handlers.
+- `serializeMarkdown(document)`: Serializes the editor document back to stable
+  Markdown for SideNote persistence.
+
+### src/core/commands.ts
+
+- `EditorCommand(context)`: Command contract receiving the current state,
+  optional dispatch function, and optional view.
+- `standardCommands`: Built-in named commands: `undo`, `redo`, `paragraph`,
+  `heading1`, `heading2`, `heading3`, `toggleBold`, `toggleItalic`,
+  `toggleCode`, `toggleStrike`, and `blockquote`.
+
+### src/element/wysiwyg-markdown.ts
+
+`WysiwygMarkdownElement` is a form-associated Lit custom element. Its important
+public properties are:
+
+- `value`: Canonical Markdown string.
+- `mode`: `wysiwyg`, `source`, or `readonly`.
+- `placeholder`, `readonly`, `disabled`, `name`: Standard input state.
+- `sourceEditScope`: `document` by default; `block` is an explicit opt-in.
+- `showCodeBlockHeader`, `showCodeLineNumbers`: Code-block UI controls.
+- `themeCss`: Trusted host CSS injected into the component Shadow DOM.
+- `codeHighlighter(code, language)`: Returns token ranges/classes used as
+  ProseMirror decorations.
+- `uploadImage(file)`: Persists a pasted file and returns its Markdown source.
+- `imageResolver(source)`: Resolves a stored Markdown image source to a display
+  URL without modifying saved Markdown.
+- `transformPastedText(text)`: Host hook for plain-text paste processing.
+
+Public methods:
+
+- `getMarkdown()`: Returns the current Markdown value.
+- `setMarkdown(markdown)`: Replaces the complete document value.
+- `setMode(mode)`: Validates and switches editor mode.
+- `focus(options)`: Focuses the WYSIWYG view or active source textarea.
+- `undo()` / `redo()`: Runs ProseMirror history commands.
+- `execute(commandName)`: Executes a built-in or extension command.
+- `use(extension)`: Registers an extension and rebuilds editor plugins.
+- `removeExtension(name)`: Removes a registered extension.
+- `getExtensions()`: Returns extensions in effective priority order.
+- `insertText(text)`: Replaces the current selection with plain text.
+- `insertMarkdown(markdown)`: Parses Markdown and replaces the selection.
+- `replaceSelection(markdown)`: Alias of `insertMarkdown()`.
+- `insertImage(source, alt, title)`: Inserts an image node.
+- `cancelBlockSourceEdit()` / `applyBlockSourceEdit()`: Controls the optional
+  block-source panel.
+
+Emitted events are bubbling and composed:
+
+- `input`: Emitted for document edits; `detail` contains `markdown` and the
+  edit source.
+- `change`: Emitted on committed/blurred changes with the same detail shape.
+- `mode-change`: Contains the new mode.
+- `selection-change`: Contains ProseMirror `from` and `to` positions.
+- `editor-error`: Contains the parsing/serialization error and related
+  Markdown.
+
+The element exposes Shadow DOM parts named `surface`, `placeholder`, `editor`,
+`source-editor`, and `block-source-panel`. SideNote primarily uses `themeCss`
+because normal document CSS does not cross the Shadow DOM boundary.
+
+### src/extensions
+
+- `ExtensionRegistry.add(extension)`: Rejects empty or duplicate names.
+- `remove(name)`, `has(name)`, `list()`: Manage extensions; `list()` sorts by
+  descending priority.
+- `commands(base)`: Merges extension commands with the standard command map.
+- `plugins()`: Converts extension shortcuts and input rules into ProseMirror
+  plugins.
+- `createStandardInputRules()`: Creates built-in rules for headings, fenced
+  code, blockquotes, bullet/ordered lists, task items, and horizontal rules.
+
+An `EditorExtension` can provide `commands`, `shortcuts`, `inputRules`, and a
+numeric `priority`. Structural schema extensions are not dynamically installed;
+the Markdown schema remains fixed for document compatibility.
+
 ## src/state.js
 
 Central state management for shared variables:
@@ -212,7 +307,9 @@ Markdown and image rendering functionality:
 - `configureMarkdownRenderer()`: Configures Marked with SideNote renderer options, including default soft line breaks unless legacy mode is enabled
 - `renderMarkdownToHtml(markdown)`: Converts Markdown to sanitized HTML
 - `decorateCodeBlocks(container, note)`: Adds code block headers, line classes, and line numbers
-- `renderMarkdown()`: Renders markdown content as HTML in preview
+- `renderMarkdown()`: Updates the hidden legacy HTML preview retained for
+  compatibility helpers; the visible editable Preview is rendered by the
+  `<wysiwyg-markdown>` component
 - `renderImages()`: Renders images in the markdown preview
 - `togglePreview()`: Toggles between editable WYSIWYG Preview and full-document Markdown source editing
 

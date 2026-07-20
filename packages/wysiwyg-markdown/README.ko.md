@@ -24,7 +24,8 @@ npm.cmd run demo --workspace @sidenote/wysiwyg-markdown
 프로덕션 번들은
 `packages/wysiwyg-markdown/dist/wysiwyg-markdown.js`에 생성됩니다. SideNote
 루트의 `npm run build`가 에디터를 먼저 빌드한 뒤 Chrome/Firefox 확장에 바로
-포함하므로 수동 복사나 별도 저장소가 필요하지 않습니다.
+포함하고 Firefox 심사용 원본 소스 ZIP까지 생성하므로 수동 복사나 별도
+저장소가 필요하지 않습니다.
 
 ## 기본 사용법
 
@@ -41,14 +42,50 @@ editor.addEventListener('input', (event) => {
 });
 ```
 
+## 공개 API
+
+Markdown 문자열은 `value`, `getMarkdown()`, `setMarkdown()`으로 읽고
+설정합니다. `setMode('wysiwyg' | 'source' | 'readonly')`로 모드를 바꿉니다.
+
+편집 메서드는 `focus()`, `undo()`, `redo()`, `execute()`, `insertText()`,
+`insertMarkdown()`, `replaceSelection()`, `insertImage()`를 제공합니다.
+`use()`로 확장을 설치하고 `removeExtension()`으로 제거합니다.
+
+호스트 통합 훅은 다음과 같습니다.
+
+- `themeCss`: Shadow DOM에 적용할 신뢰 가능한 호스트 CSS
+- `codeHighlighter`: 문법 강조 토큰 범위와 CSS 클래스
+- `uploadImage`: 붙여넣은 이미지 저장
+- `imageResolver`: 저장된 Markdown 이미지 경로 해석
+- `transformPastedText`: plain text 붙여넣기 변환
+- `showCodeBlockHeader`, `showCodeLineNumbers`: 코드 블럭 UI 설정
+
+컴포넌트는 Shadow DOM 밖에서도 받을 수 있는 `input`, `change`,
+`mode-change`, `selection-change`, `editor-error` 이벤트를 발생시킵니다.
+`input`과 `change`의 최신 Markdown은 `event.detail.markdown`에 있습니다.
+
+확장은 command, shortcut, input rule을 추가할 수 있습니다.
+
+```js
+editor.use({
+  name: 'insert-date',
+  shortcuts: {
+    'Mod-Shift-d': ({ state, dispatch }) => {
+      if (!dispatch) return true;
+      dispatch(state.tr.insertText(new Date().toISOString().slice(0, 10)));
+      return true;
+    },
+  },
+});
+```
+
 기본적으로 WYSIWYG 문서를 더블클릭하면 문서 전체를 수정하는 Markdown source
 모드로 전환됩니다. `Ctrl/Cmd + Enter`로 돌아갈 수 있습니다. 블록 단위 source
 편집은 `source-edit-scope="block"`을 지정할 때만 사용합니다.
 
-호스트 앱은 `themeCss`로 신뢰할 수 있는 CSS를 전달하고 코드 헤더와 줄 번호를
-설정하며 공개 확장 API로 command/input rule을 등록할 수 있습니다. 편집 가능한
-문법 강조는 `codeHighlighter` 콜백과 ProseMirror decoration을 사용하므로 편집
-DOM을 다시 작성하지 않습니다.
+호스트 앱은 `themeCss`로 신뢰할 수 있는 CSS를 전달할 수 있습니다. 편집 가능한
+문법 강조는 ProseMirror decoration을 사용하므로 편집 DOM을 다시 작성하지
+않습니다.
 
-구조와 확장 지점은 [`IMPLEMENTATION_PLAN.md`](./IMPLEMENTATION_PLAN.md)를
+현재 구조와 확장 지점은 [`ARCHITECTURE.md`](./ARCHITECTURE.md)를
 참고하세요.
