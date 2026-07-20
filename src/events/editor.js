@@ -96,7 +96,7 @@ function initializeEditorEvents() {
     const inEditMode = false;
     const noteId = newNote.id;
     pushToHistory({ view: 'editor', params: { noteId, inEditMode } });
-    openNote(noteId, true);  // Open in edit mode
+    openNote(noteId, inEditMode, false);  // Open directly in editable WYSIWYG Preview
   });
 
   // Markdown editor input event (auto-save)

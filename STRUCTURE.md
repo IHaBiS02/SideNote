@@ -55,7 +55,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   A toolbar with global actions: Import (`#global-import-button`), Export (`#global-export-button`), and Settings (`#global-settings-button`).
 -   **`#editor-view`**: The screen for writing and viewing a single note.
     -   A header with a "Back" button (`#back-button`) and the note's title (`#editor-title`).
-    -   `#markdown-editor`: A `<wysiwyg-markdown>` custom element. Preview is directly editable in WYSIWYG mode; double-click or the Edit button opens the full document as plain Markdown source. Its public `value` remains a Markdown string.
+    -   `#markdown-editor`: A `<wysiwyg-markdown>` custom element. New notes and normal note opening start in directly editable WYSIWYG Preview mode; double-click or the Edit button opens the full document as plain Markdown source. Its public `value` remains a Markdown string.
     -   `#html-preview`: A hidden legacy rendering target retained temporarily for compatibility while preview-only helpers are retired.
     -   A toolbar with buttons for toggling the view and note-specific import/export/settings.
 -   **`#settings-view`**: The screen for configuring settings.

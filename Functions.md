@@ -244,7 +244,7 @@ Note creation, markdown editor, and paste handling:
 - `insertTextAtCursor(textarea, text)`: Inserts text at cursor position in textarea
 - `initializeEditorEvents()`: Sets up all editor-related event listeners
 
-Handles: new note creation, markdown input, image paste, keyboard shortcuts, preview toggle, checkbox interactions, title editing
+Handles: new note creation (opening directly in editable WYSIWYG Preview), markdown input, image paste, keyboard shortcuts, preview toggle, checkbox interactions, title editing
 
 ### src/events/settings-events.js
 
