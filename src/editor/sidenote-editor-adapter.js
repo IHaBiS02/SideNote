@@ -173,9 +173,9 @@ const SIDENOTE_EDITOR_THEME = `
     background: var(--editor-code-background);
   }
 
-  .code-line-numbers {
+  .editor-mount .ProseMirror pre.code-line-numbers {
     border-right: 1px solid var(--editor-border-color);
-    padding: 5px 0;
+    padding: 0;
     color: var(--editor-code-line-number-color);
     font-family: var(--editor-code-font-family);
     line-height: inherit;
@@ -186,8 +186,14 @@ const SIDENOTE_EDITOR_THEME = `
     user-select: none;
   }
 
-  .code-line-numbers span {
-    padding: 0 5px;
+  .editor-mount .ProseMirror pre.code-line-numbers code {
+    padding: 5px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    white-space: inherit;
+    word-break: inherit;
   }
 
   .code-block-header {
