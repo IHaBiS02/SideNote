@@ -32,7 +32,7 @@ import {
 
 // Import view manager functions
 import { showEditorView } from './view-manager.js';
-import { applyEditorDisplayMode } from './markdown-renderer.js';
+import { applyEditorDisplayMode } from './editor-mode.js';
 
 /**
  * Renders the list of notes.

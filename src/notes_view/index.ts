@@ -15,11 +15,9 @@ export {
 } from './note-renderer.js';
 
 export {
-  renderMarkdown,
-  renderImages,
   applyEditorDisplayMode,
   togglePreview
-} from './markdown-renderer.js';
+} from './editor-mode.js';
 
 export {
   renderDeletedItemsList

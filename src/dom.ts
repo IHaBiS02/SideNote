@@ -10,7 +10,6 @@ const deleteNoteButton = document.getElementById('delete-note-button') as HTMLBu
 // === 에디터 관련 요소 ===
 const editorTitle = document.getElementById('editor-title') as HTMLHeadingElement;
 const markdownEditor = document.getElementById('markdown-editor') as WysiwygMarkdownElement;
-const htmlPreview = document.getElementById('html-preview') as HTMLDivElement;
 const toggleViewButton = document.getElementById('toggle-view-button') as HTMLButtonElement;
 // === 설정 및 라이선스 뷰 요소 ===
 const settingsView = document.getElementById('settings-view') as HTMLDivElement;
@@ -29,8 +28,6 @@ const autoLineBreakButton = document.getElementById('auto-line-break-button') as
 const tildeReplacementButton = document.getElementById('tilde-replacement-button') as HTMLButtonElement;
 const showTildeReplacementButtonCheckbox = document.getElementById('show-tilde-replacement-button-checkbox') as HTMLInputElement;
 const legacyLineBreakModeCheckbox = document.getElementById('legacy-line-break-mode-checkbox') as HTMLInputElement;
-const autoAddSpacesCheckbox = document.getElementById('auto-add-spaces-checkbox') as HTMLInputElement;
-const autoAddSpacesSetting = document.getElementById('auto-add-spaces-setting') as HTMLDivElement;
 const codeBlockHeaderCheckbox = document.getElementById('code-block-header-checkbox') as HTMLInputElement;
 const wysiwygPreviewCheckbox = document.getElementById('wysiwyg-preview-checkbox') as HTMLInputElement;
 // === 가져오기/내보내기 요소 ===
@@ -64,7 +61,6 @@ export {
   deleteNoteButton,
   editorTitle,
   markdownEditor,
-  htmlPreview,
   toggleViewButton,
   settingsView,
   settingsButton,
@@ -81,8 +77,6 @@ export {
   tildeReplacementButton,
   showTildeReplacementButtonCheckbox,
   legacyLineBreakModeCheckbox,
-  autoAddSpacesCheckbox,
-  autoAddSpacesSetting,
   codeBlockHeaderCheckbox,
   wysiwygPreviewCheckbox,
   globalExportButton,

@@ -64,11 +64,6 @@ body.dark-mode {
     --editor-hl-built-in: #e6c07b;
 }
 
-.dark-mode #html-preview {
-    background-color: #1e1e1e;
-    color: #e0e0e0;
-}
-
 .dark-mode .toolbar {
     background-color: #1e1e1e;
     border-top: 1px solid #333;
@@ -132,30 +127,6 @@ body.dark-mode {
 
 .dark-mode .settings-section legend {
     color: #e0e0e0;
-}
-
-.dark-mode pre code {
-    background-color: #2d2d2d;
-    border: 1px solid #444;
-}
-
-.dark-mode .code-block-body code {
-    border-top: none;
-}
-
-.dark-mode .code-block-header {
-    color: #ccc;
-    background-color: #252525;
-    border-color: #444;
-}
-
-.dark-mode .copy-code-button:hover {
-    background-color: #444;
-}
-
-.dark-mode .hljs-ln-numbers {
-    color: #ccc;
-    border-right: 1px solid #444;
 }
 
 /* 전체 스크롤바의 영역 */

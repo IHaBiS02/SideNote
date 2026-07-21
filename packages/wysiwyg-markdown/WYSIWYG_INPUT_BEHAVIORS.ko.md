@@ -41,6 +41,7 @@ source 편집에 들어갈 수 있습니다.
 | source 모드에서 `Ctrl+Enter` / `Cmd+Enter` | 설정된 WYSIWYG Preview 모드로 복귀 |
 | 작업 항목의 체크박스 클릭 | 체크 상태와 Markdown의 `[ ]`/`[x]`를 함께 변경 |
 | 링크를 마우스 휠로 클릭 | 링크를 새 브라우저 탭으로 열기 |
+| 렌더링된 이미지 클릭 | `image-activate` 이벤트를 보내며 SideNote는 이미지 모달을 열기 |
 | 코드 블록 헤더의 언어 입력칸 | fenced code의 언어를 바로 수정 |
 
 `Shift+Enter`는 코드 블록 안에서도 줄바꿈으로 작동합니다. 일반 `Enter`는 현재
@@ -105,6 +106,8 @@ Markdown 값은 다음과 같이 저장됩니다.
 
 - 클립보드의 이미지는 SideNote 이미지 저장소에 저장한 뒤
   `![파일명](images/...)` 형태로 문서에 삽입합니다.
+- SideNote 이미지 관리 화면은 `scrollToImage(source)`로 노트를 연 뒤 해당
+  이미지가 보이는 위치까지 이동합니다.
 - 일반 텍스트는 SideNote의 물결표 처리와 기존 줄바꿈 호환 설정을 적용한 뒤
   삽입합니다.
 - source 모드에서는 WYSIWYG 입력 규칙을 적용하지 않고 Markdown 원문을 직접

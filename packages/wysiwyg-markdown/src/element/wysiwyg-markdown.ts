@@ -38,6 +38,11 @@ export interface WysiwygMarkdownInputDetail {
   source: 'keyboard' | 'paste' | 'command' | 'source-edit' | 'api';
 }
 
+export interface WysiwygMarkdownImageActivateDetail {
+  source: string;
+  displaySource: string;
+}
+
 export type ImageUploadHandler = (file: File) => Promise<string | null>;
 export type ImageResolver = (source: string) => Promise<string | null> | string | null;
 export type PastedTextTransformer = (text: string) => string;
@@ -251,6 +256,7 @@ export class WysiwygMarkdownElement extends LitElement {
           return false;
         },
         auxclick: (_view, event) => this.#handleLinkAuxClick(event),
+        click: (_view, event) => this.#handleImageActivate(event),
       },
       nodeViews: {
         code_block: (node, view, getPos) =>
@@ -1063,6 +1069,38 @@ export class WysiwygMarkdownElement extends LitElement {
 
     event.preventDefault();
     window.open(link.href, '_blank', 'noopener,noreferrer');
+    return true;
+  }
+
+  #handleImageActivate(event: MouseEvent): boolean {
+    const image = event
+      .composedPath()
+      .find((target): target is HTMLImageElement => target instanceof HTMLImageElement);
+    const source = image?.dataset.source;
+    if (!image || !source) return false;
+
+    this.dispatchEvent(
+      new CustomEvent<WysiwygMarkdownImageActivateDetail>('image-activate', {
+        detail: {
+          source,
+          displaySource: image.currentSrc || image.src,
+        },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+    return false;
+  }
+
+  scrollToImage(
+    source: string,
+    options: ScrollIntoViewOptions = { behavior: 'smooth', block: 'center' },
+  ): boolean {
+    const image = Array.from(
+      this.renderRoot.querySelectorAll<HTMLImageElement>('img[data-source]'),
+    ).find((candidate) => candidate.dataset.source === source);
+    if (!image) return false;
+    image.scrollIntoView(options);
     return true;
   }
 

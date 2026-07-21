@@ -25,7 +25,6 @@ const mocks = vi.hoisted(() => {
       wysiwygPreview: true,
       legacyLineBreakMode: false,
       autoLineBreak: false,
-      autoAddSpaces: false,
       showTildeReplacementButton: false,
       tildeReplacement: false,
       codeBlockHeader: true,

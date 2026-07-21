@@ -28,6 +28,12 @@ describe('wysiwyg-markdown element', () => {
     expect(editorStyles.cssText).toContain(
       'padding: var(--editor-code-content-padding)',
     );
+    expect(editorStyles.cssText).toContain(
+      'column-gap: var(--editor-code-content-padding)',
+    );
+    expect(editorStyles.cssText).toContain(
+      'padding-inline: 0 var(--editor-code-content-padding)',
+    );
   });
 
   it('renders Markdown and exposes its canonical value', async () => {
@@ -371,6 +377,26 @@ describe('wysiwyg-markdown element', () => {
     expect(editor.value).toContain('![Example](images/example.png)');
     expect(resolver).toHaveBeenCalledWith('images/example.png');
     expect(image?.src).toBe('data:image/png;base64,AA==');
+  });
+
+  it('exposes image activation and source-based scrolling without leaking Shadow DOM', async () => {
+    const editor = await createEditor('![Example](images/example.png)');
+    const image = editor.renderRoot.querySelector<HTMLImageElement>('img');
+    const scrollIntoView = vi.fn();
+    image!.scrollIntoView = scrollIntoView;
+    const activate = vi.fn();
+    editor.addEventListener('image-activate', activate);
+
+    image!.click();
+
+    expect(activate).toHaveBeenCalledOnce();
+    expect(activate.mock.calls[0][0].detail).toMatchObject({
+      source: 'images/example.png',
+      displaySource: expect.any(String),
+    });
+    expect(editor.scrollToImage('images/example.png')).toBe(true);
+    expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'center' });
+    expect(editor.scrollToImage('images/missing.png')).toBe(false);
   });
 
   it('does not mutate content while disabled', async () => {

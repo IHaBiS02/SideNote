@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>Simple Notes</title>
-  <link rel="stylesheet" href="node_modules/reset-css/reset.css">
+  <link rel="stylesheet" href="vendor/reset.css">
   <link rel="stylesheet" href="sidepanel.css">
   <link rel="stylesheet" href="dark_mode.css">
-  <link id="theme-stylesheet" rel="stylesheet" href="vendor/atom-one-light.css">
 </head>
 <body>
   <div id="list-view">
@@ -30,7 +29,6 @@
     </div>
     <div id="editor-container">
       <wysiwyg-markdown id="markdown-editor" aria-label="Markdown editor"></wysiwyg-markdown>
-      <div id="html-preview" hidden aria-hidden="true"></div>
     </div>
     <div class="toolbar">
       <div class="toolbar-left">
@@ -94,10 +92,6 @@
           <label for="legacy-line-break-mode-checkbox">Legacy Markdown line breaks</label>
           <input type="checkbox" id="legacy-line-break-mode-checkbox">
         </div>
-        <div class="setting" id="auto-add-spaces-setting" hidden>
-          <label for="auto-add-spaces-checkbox">Add two spaces on Enter</label>
-          <input type="checkbox" id="auto-add-spaces-checkbox">
-        </div>
       </fieldset>
       <div class="setting">
         <button id="image-management-button" title="Images 🖼️">Images 🖼️</button>
@@ -142,7 +136,6 @@
   <script src="vendor/marked.min.js"></script>
   <script src="vendor/dompurify.min.js"></script>
   <script src="vendor/highlight.min.js"></script>
-  <script src="vendor/highlightjs-line-numbers.min.js"></script>
   <script src="vendor/jszip.min.js"></script>
   <script type="module" src="vendor/wysiwyg-markdown.js"></script>
   <script type="module" src="src/main.js"></script>

@@ -70,7 +70,8 @@ npm install
 - **src/settings.ts**: Global settings management, theme, and `populateSettingsForm`
 - **src/notes.ts**: Note data operations (CRUD, sorting, pin/unpin)
 - **src/history.ts**: Navigation history management
-- **src/text-processors.ts**: Text processing (tilde escaping, line breaks, checkbox toggle)
+- **src/text-processors.ts**: Plain-text paste processing (tilde escaping and
+  optional legacy two-space line breaks)
 - **src/import_export.ts**: .snote/.snotes file processing
 - **src/editor/sidenote-editor-adapter.ts**: Connects SideNote storage,
   settings, paste processing, theme CSS, and highlight.js token ranges to the
@@ -89,7 +90,7 @@ npm install
 - **index.ts**: Re-exports all database functions
 
 ### Events Module (`src/events/`)
-- **editor.ts**: Editor input, paste, keyboard shortcuts, checkbox clicks
+- **editor.ts**: Editor autosave, mode shortcuts, image activation, and title editing
 - **navigation.ts**: Back navigation, `saveCurrentEditorIfChanged()`, history dropdown
 - **settings-events.ts**: Settings UI event handlers
 - **import-export-events.ts**: Import/export button handlers
@@ -99,8 +100,8 @@ npm install
 ### Notes View Module (`src/notes_view/`)
 - **view-manager.ts**: View visibility management (list, editor, settings, etc.)
 - **note-renderer.ts**: Note list rendering and note opening
-- **markdown-renderer.ts**: Preview/source mode switching plus hidden legacy
-  HTML rendering, sanitization, code decoration, and image loading helpers
+- **editor-mode.ts**: Switches the shared editor between editable/read-only
+  Preview and full-document Markdown source modes
 - **image-modal.ts**: Fullscreen image preview modal with zoom
 - **image-manager.ts**: Image list UI and management
 - **recycle-bin-renderer.ts**: Deleted items list rendering
@@ -112,8 +113,8 @@ npm install
 - **Preview/Source Modes**: Preview uses the same WYSIWYG renderer in editable
   or read-only mode according to settings; double-click or Edit opens the
   complete document in plain Markdown source mode
-- **Legacy HTML Renderer**: Marked and DOMPurify remain for the hidden
-  compatibility preview and preview-only helper paths
+- **License Rendering**: Marked and DOMPurify are limited to rendering the
+  bundled third-party license document; note Preview has one renderer
 - **Syntax Highlighting**: The SideNote adapter converts highlight.js output
   into editable ProseMirror decorations; multi-line code uses a non-editable
   line-number gutter
@@ -144,7 +145,7 @@ tests/
 └── logic/                # Business logic tests (with mocked DB/views)
     ├── editor-events.test.js
     ├── sidenote-editor-adapter.test.js
-    ├── markdown-renderer.test.js
+    ├── editor-mode.test.js
     ├── image-manager.test.js
     ├── import-export.test.js
     ├── import-export-events.test.js
@@ -173,7 +174,9 @@ packages/wysiwyg-markdown/tests/
 - Opening settings from an individual note sets `isGlobalSettings` to `false` and edits that note's `settings`, which is stored with the note in IndexedDB.
 - Note-specific settings should fall back to `globalSettings` when the note does not define a value.
 - `codeBlockHeader` controls whether preview code blocks show the language/copy header; it supports both global and note-specific values.
-- Markdown preview renders normal newlines as line breaks by default. `legacyLineBreakMode` is global-only and disables Marked `breaks`, re-enabling the old trailing-space line-break workflow.
+- Markdown Preview renders normal newlines as soft breaks. `legacyLineBreakMode`
+  is global-only and re-enables older paste/export transformations that use
+  two trailing spaces for Markdown line breaks.
 
 ## Development Workflow
 

@@ -26,13 +26,13 @@ SideNote is a browser extension that provides a note-taking interface within the
     -   `notes_view/`: Directory containing modularized UI rendering and view management:
         -   `view-manager.ts`: View switching and navigation management
         -   `note-renderer.ts`: Note list and editor functionality
-        -   `markdown-renderer.ts`: Markdown and image rendering functionality
+        -   `editor-mode.ts`: Editable/read-only Preview and full-document source-mode switching
         -   `recycle-bin-renderer.ts`: Recycle bin rendering and management
         -   `image-manager.ts`: Image modal and management functionality
         -   `index.ts`: Unified entry point for backward compatibility
     -   `events/`: Directory containing modularized event handling:
         -   `navigation.ts`: Navigation, history, and back button functionality
-        -   `editor.ts`: Note creation, markdown editor, and paste handling
+        -   `editor.ts`: Note creation, autosave, mode shortcuts, image activation, and title editing
         -   `settings-events.ts`: Settings-related event listeners
         -   `import-export-events.ts`: Import/export functionality
         -   `global-events.ts`: Global keyboard events and system theme detection
@@ -74,13 +74,12 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **`#editor-view`**: The screen for writing and viewing a single note.
     -   A header with a "Back" button (`#back-button`) and the note's title (`#editor-title`).
     -   `#markdown-editor`: A `<wysiwyg-markdown>` custom element. New notes and normal note opening start in WYSIWYG Preview mode, editable by default or read-only when configured; double-click or the Edit button opens the full document as plain Markdown source. Its public `value` remains a Markdown string.
-    -   `#html-preview`: A hidden legacy rendering target retained temporarily for compatibility while preview-only helpers are retired.
     -   A toolbar with buttons for toggling the view and note-specific import/export/settings.
 -   **`#settings-view`**: The screen for configuring settings.
     -   Can be accessed globally (from list view) or for a specific note (from editor view).
     -   Controls for UI Mode (Light/Dark), Title behavior, Font Size, and other options.
     -   Checkbox for "Prevent deletion of used images".
-    -   Legacy controls for Markdown line-break mode, adding two trailing spaces to pasted lines, adding two trailing spaces on Enter, and tilde escaping.
+    -   Legacy controls for adding two trailing spaces to pasted lines and tilde escaping.
     -   Buttons to navigate to Image Management, Recycle Bin, and Licenses pages.
 -   **`#license-view`**: Displays the generated `LIBRARY_LICENSES.md`, which contains extension and WYSIWYG editor runtime dependency notices.
 -   **`#recycle-bin-view`**: Displays a list of deleted items (`#deleted-items-list`), both notes and images, with options to restore or delete them permanently. Includes an "Empty Recycle Bin" button.
@@ -138,10 +137,10 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **`markdownEditor` (Event Listeners)** (handled in `src/events/editor.ts`):
     -   `input`: Updates the note content and metadata on every keystroke.
     -   WYSIWYG paste hooks save images to IndexedDB and apply enabled legacy text formatting through `src/editor/sidenote-editor-adapter.ts`.
-    -   `keydown`: WYSIWYG `Shift+Enter` inserts a single inline soft break; the full-document source editor retains `Shift+Enter` preview switching. The legacy textarea fallback retains its Enter and paste handlers.
--   **`renderMarkdown()`**: Updates the hidden legacy HTML preview used by compatibility helpers. It converts Markdown with Marked, sanitizes with DOMPurify, applies legacy code decoration, and calls `renderImages()`. The visible Preview always uses the `<wysiwyg-markdown>` component (located in `src/notes_view/markdown-renderer.ts`).
--   **`renderImages()`**: Finds all `<img>` tags in the preview and loads their `src` from IndexedDB blob URLs (located in `src/notes_view/markdown-renderer.ts`). Preview, image management, and recycle bin views each use scoped blob URL trackers.
--   **`applyEditorDisplayMode()` / `togglePreview()`**: Uses the same custom element for editable WYSIWYG and read-only Preview, selected by the global `wysiwygPreview` setting, and switches Edit to full-document Markdown source mode (located in `src/notes_view/markdown-renderer.ts`).
+    -   `keydown`: WYSIWYG `Shift+Enter` inserts a single inline soft break; the full-document source editor retains `Shift+Enter` preview switching.
+    -   `image-activate`: Opens the SideNote image modal using the display URL supplied by the component.
+-   **`applyEditorDisplayMode()` / `togglePreview()`**: Uses the same custom element for editable WYSIWYG and read-only Preview, selected by the global `wysiwygPreview` setting, and switches Edit to full-document Markdown source mode (located in `src/notes_view/editor-mode.ts`).
+-   **Image integration**: The component resolves stored images through the adapter, emits `image-activate` for modal opening, and exposes `scrollToImage()` so image management can navigate without reaching into the component Shadow DOM.
 
 #### Settings & Recycle Bin (`settings.ts`, `src/notes_view/`, `src/events/`)
 
@@ -163,13 +162,12 @@ The UI is a single-page application with several distinct "views" that are shown
 package. Most are third-party libraries from `node_modules`; the editor bundle
 is first-party generated code and is listed separately.
 
--   **`marked.min.js`**: A high-performance Markdown parser to convert Markdown text into HTML.
--   **`dompurify.min.js`**: A robust HTML sanitizer used to prevent Cross-Site Scripting (XSS) vulnerabilities by cleaning the HTML generated from user-provided Markdown.
+-   **`marked.min.js`**: Renders the bundled generated license Markdown in the license view.
+-   **`dompurify.min.js`**: Sanitizes the HTML generated for the license view.
 -   **`highlight.min.js`**: A syntax highlighter that can parse and style code blocks in many different languages.
--   **`highlightjs-line-numbers.min.js`**: A plugin for `highlight.js` that adds line numbers to the highlighted code blocks.
 -   **`jszip.min.js`**: A library for creating, reading, and editing `.zip` files, used for the import/export functionality.
 -   **`browser-polyfill.min.js`**: WebExtension browser API Polyfill for cross-browser compatibility.
--   **`atom-one-light.css`**: Light theme for syntax highlighting (additional dark theme available).
+-   **`reset.css`**: CSS reset loaded by the packaged side panel before SideNote styles.
 
 ### First-party generated asset
 

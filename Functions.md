@@ -90,6 +90,8 @@ Public methods:
 - `insertMarkdown(markdown)`: Parses Markdown and replaces the selection.
 - `replaceSelection(markdown)`: Alias of `insertMarkdown()`.
 - `insertImage(source, alt, title)`: Inserts an image node.
+- `scrollToImage(source, options)`: Scrolls the rendered image with the exact
+  Markdown source into view without exposing the component Shadow DOM.
 - `cancelBlockSourceEdit()` / `applyBlockSourceEdit()`: Controls the optional
   block-source panel.
 
@@ -100,6 +102,8 @@ Emitted events are bubbling and composed:
 - `change`: Emitted on committed/blurred changes with the same detail shape.
 - `mode-change`: Contains the new mode.
 - `selection-change`: Contains ProseMirror `from` and `to` positions.
+- `image-activate`: Contains the persisted Markdown `source` and resolved
+  `displaySource` when a rendered image is clicked.
 - `editor-error`: Contains the parsing/serialization error and related
   Markdown.
 
@@ -204,7 +208,7 @@ DOM element references (all constants exported):
 Contains references to all UI elements used throughout the extension, including:
 - View containers: `listView`, `editorView`, `settingsView`, etc.
 - Interactive elements: buttons, inputs, dropdowns
-- Content areas: `noteList`, `markdownEditor`, `htmlPreview`, etc.
+- Content areas: `noteList`, `markdownEditor`, `licenseContent`, etc.
 
 ## src/utils.ts
 
@@ -218,17 +222,15 @@ Utility functions (all functions exported):
 
 ## src/text-processors.ts
 
-Legacy text processing utilities for markdown editing (all functions exported):
+Plain-text paste processing utilities (all functions exported):
 
 - `escapeTildes(text)`: Escapes tilde characters to prevent markdown strikethrough formatting
 - `addAutoLineBreaks(text)`: Adds two spaces at the end of each line for markdown line breaks
 - `processPastedText(text, settings)`: Processes pasted text according to user settings (tilde escape, auto line breaks)
-- `countTrailingSpaces(text)`: Counts trailing spaces in a text string
-- `normalizeTrailingSpaces(text, targetSpaces)`: Ensures text has exactly the specified number of trailing spaces
-- `handleEnterKeyInput(textarea, settings, insertTextFunction)`: Processes Enter key input for markdown line breaks with whitespace cleanup
-- `analyzeTextAtCursor(text, cursorPos)`: Analyzes text structure for cursor position and line information
 
-**Note**: Used by `src/events/editor.ts` for consistent markdown text processing across different input methods
+The SideNote adapter calls `processPastedText()` through the component's
+`transformPastedText` hook. Removed textarea fallbacks are not part of this
+module.
 
 ## src/editor/sidenote-editor-adapter.ts
 
@@ -246,9 +248,9 @@ Settings management (functions exported):
 - `DEFAULT_SETTINGS`: Default global settings used to normalize missing settings
 - `normalizeGlobalSettings(settings)`: Merges partial global settings with defaults
 - `resolveEffectiveSettings(note)`: Resolves note-specific settings with global/default fallback
-- `resolveLegacyTextProcessingSettings(settings)`: Returns legacy text-processing settings, forcing trailing-space processors off unless legacy line-break mode is enabled
+- `resolveLegacyTextProcessingSettings(settings)`: Returns legacy paste-processing settings, forcing the two-space line-break transform off unless legacy mode is enabled
 - `saveGlobalSettings()`: Saves the global settings to chrome.storage.local
-- `applyFontSize(size)`: Applies font size to the editor Web Component (through `--editor-font-size`) and preview element
+- `applyFontSize(size)`: Applies font size to the editor Web Component through `--editor-font-size`
 - `applyMode(mode)`: Applies color mode (light/dark/system) to the document
 - `updateAutoLineBreakButton()`: Updates the legacy auto line break toolbar button state
 - `updateTildeReplacementButton()`: Updates the tilde replacement toolbar button visibility and state
@@ -327,17 +329,10 @@ Note list and editor functionality:
 - `renderNoteList()`: Renders the list of notes in the main view
 - `openNote(noteId, inEditMode, addToHistory)`: Opens a note in the editor
 
-### src/notes_view/markdown-renderer.ts
+### src/notes_view/editor-mode.ts
 
-Markdown and image rendering functionality:
+Editor display-mode coordination:
 
-- `configureMarkdownRenderer()`: Configures Marked with SideNote renderer options, including default soft line breaks unless legacy mode is enabled
-- `renderMarkdownToHtml(markdown)`: Converts Markdown to sanitized HTML
-- `decorateCodeBlocks(container, note)`: Adds code block headers, line classes, and line numbers
-- `renderMarkdown()`: Updates the hidden legacy HTML preview retained for
-  compatibility helpers; the visible Preview is rendered by the
-  `<wysiwyg-markdown>` component
-- `renderImages()`: Renders images in the markdown preview
 - `applyEditorDisplayMode()`: Uses `wysiwyg` or `readonly` for Preview according to `wysiwygPreview`, and `source` for full-document Markdown editing
 - `togglePreview()`: Toggles between the configured WYSIWYG Preview mode and full-document Markdown source editing
 
@@ -352,7 +347,8 @@ Recycle bin rendering and management:
 Image modal and management functionality:
 
 - `showImageModal(blobUrl)`: Shows an image in a modal dialog
-- `renderImagesList()`: Renders the list of images in image management
+- `renderImagesList()`: Renders the image-management list and uses the
+  component's `scrollToImage()` API when navigating to an image occurrence
 
 ### src/notes_view/index.ts
 
@@ -378,12 +374,14 @@ Navigation, history, and back button functionality:
 
 ### src/events/editor.ts
 
-Note creation, markdown editor, and paste handling:
+Note creation and editor interaction handling:
 
-- `insertTextAtCursor(textarea, text)`: Inserts text at cursor position in textarea
 - `initializeEditorEvents()`: Sets up all editor-related event listeners
 
-Handles: new note creation (opening in the configured editable or read-only WYSIWYG Preview), markdown input, image paste, WYSIWYG `Shift+Enter` soft breaks, source-mode preview shortcuts, checkbox interactions, title editing
+Handles: new note creation (opening in the configured editable or read-only
+WYSIWYG Preview), Markdown autosave, mode history, source-mode preview
+shortcuts, image activation, and title editing. Component-owned paste,
+checkbox, and WYSIWYG keyboard behavior stays inside the editor package.
 
 ### src/events/settings-events.ts
 
@@ -416,7 +414,9 @@ Handles: ESC key, system theme changes, dropdown closing
 Unified entry point for all event modules:
 
 - `initializeAllEvents()`: Initializes all event listeners from all modules
-- Re-exports utility functions: `navigateToState`, `goBack`, `populateHistoryDropdown`, `showHistoryDropdown`, `refreshHistoryDropdown`, `insertTextAtCursor`
+- Re-exports navigation helpers: `navigateToState`, `goBack`,
+  `populateHistoryDropdown`, `showHistoryDropdown`, and
+  `refreshHistoryDropdown`
 
 ## src/main.ts
 

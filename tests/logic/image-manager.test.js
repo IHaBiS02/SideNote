@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 const dbMocks = vi.hoisted(() => ({
   getAllImageObjectsFromDB: vi.fn(),
   deleteImage: vi.fn().mockResolvedValue(),
+  openNote: vi.fn(),
 }));
 
 vi.mock('../../src/database/index.js', () => ({
@@ -11,7 +12,7 @@ vi.mock('../../src/database/index.js', () => ({
 }));
 
 vi.mock('../../src/notes_view/note-renderer.js', () => ({
-  openNote: vi.fn(),
+  openNote: dbMocks.openNote,
 }));
 
 vi.mock('../../src/notes_view/image-modal.js', () => ({
@@ -24,10 +25,13 @@ describe('image manager usage detection', () => {
     vi.clearAllMocks();
     document.body.innerHTML = `
       <ul id="image-list"></ul>
-      <div id="html-preview"></div>
+      <div id="markdown-editor"></div>
     `;
     URL.createObjectURL = vi.fn(() => 'blob:test-url');
     URL.revokeObjectURL = vi.fn();
+    const editor = document.getElementById('markdown-editor');
+    editor.updateComplete = Promise.resolve();
+    editor.scrollToImage = vi.fn();
   });
 
   async function renderImages({ notes, images }) {
@@ -61,5 +65,21 @@ describe('image manager usage detection', () => {
 
     const usageIcon = imageList.querySelector('[data-image-id="img1"] .usage-icon');
     expect(usageIcon.textContent).toBe('✅');
+  });
+
+  it('opens the referencing note and scrolls through the editor public API', async () => {
+    const imageList = await renderImages({
+      notes: [{ id: 'note-1', title: 'Note', content: '![Image](images/img1.png)' }],
+      images: [{ id: 'img1', blob: new Blob(['image'], { type: 'image/png' }), deletedAt: null }],
+    });
+
+    imageList.querySelector('.usage-icon').click();
+    imageList.querySelector('.notes-dropdown div').click();
+    await Promise.resolve();
+
+    expect(dbMocks.openNote).toHaveBeenCalledWith('note-1', false);
+    expect(document.getElementById('markdown-editor').scrollToImage).toHaveBeenCalledWith(
+      'images/img1.png',
+    );
   });
 });

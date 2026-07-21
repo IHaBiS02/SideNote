@@ -1,7 +1,7 @@
 // Import required DOM elements
 import {
   imageList,
-  htmlPreview
+  markdownEditor
 } from '../dom.js';
 
 // Import required functions from other modules
@@ -141,12 +141,9 @@ async function renderImagesList(): Promise<void> {
               noteItem.textContent = note.title;
               noteItem.onclick = () => {
                 openNote(note.id, false);
-                setTimeout(() => {
-                  const imageInNote = htmlPreview.querySelector(`img[data-image-id="${imageId}"]`);
-                  if (imageInNote) {
-                    imageInNote.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  }
-                }, 200);
+                void markdownEditor.updateComplete.then(() => {
+                  markdownEditor.scrollToImage(`images/${imageId}.png`);
+                });
               };
               dropdown.appendChild(noteItem);
             });

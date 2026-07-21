@@ -15,10 +15,6 @@ export {
   refreshHistoryDropdown
 } from './navigation.js';
 
-export {
-  insertTextAtCursor
-} from './editor.js';
-
 // Initialize all event listeners
 function initializeAllEvents(): void {
   initializeWysiwygMarkdownEditor();

@@ -44,6 +44,7 @@ the converted empty heading changes it back to a paragraph.
 | `Ctrl+Enter` / `Cmd+Enter` in source mode | Return to the configured WYSIWYG Preview mode |
 | Click a task checkbox | Update both the checkbox state and `[ ]`/`[x]` in Markdown |
 | Middle-click a link | Open the link in a new browser tab |
+| Click a rendered image | Emit `image-activate`; SideNote opens the image modal |
 | Code language field in a code-block header | Edit the fenced-code language directly |
 
 `Shift+Enter` also inserts a line break inside a code block. A normal `Enter`
@@ -111,6 +112,8 @@ from the URL, it remains in the form `[link text](URL)`.
 
 - Clipboard images are saved to SideNote's image store and inserted as
   `![filename](images/...)`.
+- SideNote's image-management view uses `scrollToImage(source)` to open a note
+  and bring the matching rendered image into view.
 - Plain text is transformed using SideNote's tilde processing and legacy line
   break compatibility settings before insertion.
 - Source mode edits the original Markdown without applying WYSIWYG input rules.

@@ -12,7 +12,6 @@ export interface GlobalSettings {
   wysiwygPreview: boolean;
   legacyLineBreakMode: boolean;
   autoLineBreak: boolean;
-  autoAddSpaces: boolean;
   showTildeReplacementButton: boolean;
   tildeReplacement: boolean;
   codeBlockHeader: boolean;

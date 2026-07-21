@@ -1,9 +1,6 @@
 /**
- * Text processing utilities for markdown editing
- * Handles text transformations, spacing, and special character processing
+ * Plain-text paste transformations shared by WYSIWYG and source modes.
  */
-
-// === Text Processing Functions ===
 
 /**
  * Escapes tilde characters to prevent markdown strikethrough formatting
@@ -14,27 +11,6 @@ interface PastedTextSettings {
   tildeReplacement?: boolean;
   autoLineBreak?: boolean;
 }
-
-interface EnterKeySettings {
-  autoAddSpaces?: boolean;
-}
-
-export interface EnterKeyResult {
-  handled: boolean;
-  action: 'default' | 'empty_line' | 'whitespace_cleanup' | 'normal_processing';
-}
-
-export interface CursorAnalysis {
-  currentLineStart: number;
-  lineEndIndex: number;
-  fullCurrentLine: string;
-  beforeCursor: string;
-  afterCursor: string;
-  cursorPositionInLine: number;
-  isAfterCursorOnlyWhitespace: boolean;
-}
-
-type InsertTextFunction = (textarea: HTMLTextAreaElement, text: string) => void;
 
 function escapeTildes(text: string): string {
   return text.replace(/~/g, '\\~');
@@ -86,164 +62,8 @@ function processPastedText(text: string, settings: PastedTextSettings = {}): str
   return processedText;
 }
 
-/**
- * Counts trailing spaces in a text string
- * @param {string} text - Input text
- * @returns {number} Number of trailing spaces
- */
-function countTrailingSpaces(text: string): number {
-  const trailingSpacesMatch = text.match(/\s*$/);
-  return trailingSpacesMatch ? trailingSpacesMatch[0].length : 0;
-}
-
-/**
- * Ensures text has exactly the specified number of trailing spaces
- * @param {string} text - Input text
- * @param {number} targetSpaces - Desired number of trailing spaces (default: 2)
- * @returns {string} Text with normalized trailing spaces
- */
-function normalizeTrailingSpaces(text: string, targetSpaces = 2): string {
-  const trimmed = text.trimEnd();
-  return trimmed + ' '.repeat(targetSpaces);
-}
-
-/**
- * Processes Enter key input for markdown line breaks
- * @param {HTMLTextAreaElement} textarea - The textarea element
- * @param {Object} settings - User settings object
- * @param {boolean} settings.autoAddSpaces - Whether to add line break spaces on Enter
- * @param {Function} insertTextFunction - Function to insert text at cursor
- * @returns {Object} Processing result with action taken
- */
-function handleEnterKeyInput(
-  textarea: HTMLTextAreaElement,
-  settings: EnterKeySettings = {},
-  insertTextFunction: InsertTextFunction,
-): EnterKeyResult {
-  if (!settings.autoAddSpaces) {
-    return { handled: false, action: 'default' };
-  }
-  
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  
-  // Find the current line boundaries
-  const textUpToCursor = textarea.value.substring(0, start);
-  const textFromCursor = textarea.value.substring(start);
-  
-  const currentLineStart = textUpToCursor.lastIndexOf('\n') + 1;
-  const currentLineEnd = textFromCursor.indexOf('\n');
-  const lineEndIndex = currentLineEnd === -1 ? textarea.value.length : start + currentLineEnd;
-  
-  // Get the full current line and split it at cursor position
-  const fullCurrentLine = textarea.value.substring(currentLineStart, lineEndIndex);
-  const cursorPositionInLine = start - currentLineStart;
-  const beforeCursor = fullCurrentLine.substring(0, cursorPositionInLine);
-  const afterCursor = fullCurrentLine.substring(cursorPositionInLine);
-  
-  // Check if text after cursor is only whitespace
-  const isAfterCursorOnlyWhitespace = afterCursor.trim() === '';
-  
-  if (beforeCursor.trim().length === 0) {
-    return { handled: false, action: 'empty_line' };
-  }
-  
-  // Handle the case where after cursor is only whitespace
-  if (isAfterCursorOnlyWhitespace && afterCursor.length > 0) {
-    // Remove the trailing whitespace first
-    textarea.setSelectionRange(start, lineEndIndex);
-    textarea.setRangeText('', start, lineEndIndex);
-    
-    // Process the before cursor part
-    const trailingSpaces = countTrailingSpaces(beforeCursor);
-    
-    if (trailingSpaces < 2) {
-      const spacesToAdd = 2 - trailingSpaces;
-      insertTextFunction(textarea, ' '.repeat(spacesToAdd) + '\n');
-    } else {
-      insertTextFunction(textarea, '\n');
-    }
-    
-    return { handled: true, action: 'whitespace_cleanup' };
-  }
-  
-  // Normal case: process the line up to cursor
-  const trailingSpaces = countTrailingSpaces(beforeCursor);
-  
-  if (trailingSpaces < 2) {
-    const spacesToAdd = 2 - trailingSpaces;
-    insertTextFunction(textarea, ' '.repeat(spacesToAdd) + '\n');
-  } else {
-    insertTextFunction(textarea, '\n');
-  }
-  
-  return { handled: true, action: 'normal_processing' };
-}
-
-/**
- * Analyzes text structure for cursor position and line information
- * @param {string} text - Full text content
- * @param {number} cursorPos - Cursor position
- * @returns {Object} Analysis result with line information
- */
-function analyzeTextAtCursor(text: string, cursorPos: number): CursorAnalysis {
-  const textUpToCursor = text.substring(0, cursorPos);
-  const textFromCursor = text.substring(cursorPos);
-  
-  const currentLineStart = textUpToCursor.lastIndexOf('\n') + 1;
-  const currentLineEnd = textFromCursor.indexOf('\n');
-  const lineEndIndex = currentLineEnd === -1 ? text.length : cursorPos + currentLineEnd;
-  
-  const fullCurrentLine = text.substring(currentLineStart, lineEndIndex);
-  const cursorPositionInLine = cursorPos - currentLineStart;
-  const beforeCursor = fullCurrentLine.substring(0, cursorPositionInLine);
-  const afterCursor = fullCurrentLine.substring(cursorPositionInLine);
-  
-  return {
-    currentLineStart,
-    lineEndIndex,
-    fullCurrentLine,
-    beforeCursor,
-    afterCursor,
-    cursorPositionInLine,
-    isAfterCursorOnlyWhitespace: afterCursor.trim() === ''
-  };
-}
-
-/**
- * Toggles a markdown checkbox at the given index.
- * @param {string} markdown - The full markdown text.
- * @param {number} checkboxIndex - The 0-based index of the checkbox to toggle.
- * @returns {string|null} The updated markdown, or null if index is invalid.
- */
-function toggleMarkdownCheckbox(markdown: string, checkboxIndex: number): string | null {
-  if (checkboxIndex < 0) return null;
-
-  const regex = /\[[x ]\]/g;
-  let match;
-  const matches: RegExpExecArray[] = [];
-  while ((match = regex.exec(markdown)) !== null) {
-    matches.push(match);
-  }
-
-  if (checkboxIndex >= matches.length) return null;
-
-  const matchToUpdate = matches[checkboxIndex];
-  const charIndex = matchToUpdate.index;
-  const originalText = matchToUpdate[0];
-  const newText = originalText === '[ ]' ? '[x]' : '[ ]';
-
-  return markdown.substring(0, charIndex) + newText + markdown.substring(charIndex + 3);
-}
-
-// Export all functions
 export {
   escapeTildes,
   addAutoLineBreaks,
-  processPastedText,
-  countTrailingSpaces,
-  normalizeTrailingSpaces,
-  handleEnterKeyInput,
-  analyzeTextAtCursor,
-  toggleMarkdownCheckbox
+  processPastedText
 };

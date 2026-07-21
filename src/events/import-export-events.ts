@@ -12,7 +12,7 @@ import {
 
 // Import functions from other modules
 import { sortNotes } from '../notes.js';
-import { renderMarkdown, renderNoteList } from '../notes_view/index.js';
+import { renderNoteList } from '../notes_view/index.js';
 import { saveNote } from '../database/index.js';
 import { 
   getTimestamp, 
@@ -316,7 +316,6 @@ function initializeImportExportEvents(): void {
         markdownEditor.value = note.content;
         sortNotes();
         await saveNote(note);
-        renderMarkdown();
       }
     } catch (error) {
       console.error('Error importing note:', error);

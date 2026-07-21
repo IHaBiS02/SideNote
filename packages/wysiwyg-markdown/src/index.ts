@@ -9,6 +9,7 @@ export type {
   ImageUploadHandler,
   PastedTextTransformer,
   SourceEditScope,
+  WysiwygMarkdownImageActivateDetail,
   WysiwygMarkdownInputDetail,
 } from './element/wysiwyg-markdown';
 export { parseMarkdown, serializeMarkdown, markdownSchema } from './core/markdown';

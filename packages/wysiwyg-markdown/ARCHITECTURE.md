@@ -22,6 +22,7 @@ SideNote owns:
 - the 4.1.14-compatible visual theme;
 - highlight.js tokenization;
 - legacy pasted-text processing;
+- image-modal presentation and image-management navigation;
 - deciding when Preview/WYSIWYG and Markdown source modes are active.
 
 ## Workspace layout
@@ -83,12 +84,14 @@ Primary properties:
 
 Public methods include Markdown getters/setters, mode and focus control,
 undo/redo, named-command execution, extension management, and text/Markdown/
-image insertion. The complete contract is documented in `Functions.md` and the
-package README.
+image insertion. `scrollToImage(source)` provides source-based navigation
+without exposing the Shadow DOM. The complete contract is documented in
+`Functions.md` and the package README.
 
 The element emits composed, bubbling `input`, `change`, `mode-change`,
-`selection-change`, and `editor-error` events so host applications can listen
-outside the Shadow DOM.
+`selection-change`, `image-activate`, and `editor-error` events so host
+applications can listen outside the Shadow DOM. `image-activate` carries both
+the persisted Markdown source and resolved display source.
 
 ## Markdown and editing behavior
 
@@ -130,7 +133,9 @@ An `EditorExtension` can contribute:
 Extension commands are called with the current state, optional dispatch
 function, and view.
 
-Fenced code blocks apply `--editor-code-background` to the content wrapper,
+Component-owned CSS defines the structural grid and padding for fenced code;
+host CSS supplies colors, typography, and product-specific borders. Fenced
+code blocks apply `--editor-code-background` to the content wrapper,
 line-number `pre`, body `pre`, and nested `code` element. This prevents the
 generic `--editor-muted-background` used by inline code and other muted
 surfaces from showing through code-block padding or grid gaps. The header uses
@@ -149,8 +154,9 @@ resolves `images/{id}.png` references to scoped Blob URLs, stores pasted image
 files in IndexedDB, and applies enabled legacy text transformations.
 
 The adapter intentionally does not modify the editor's default CSS source.
-SideNote controls layout, fonts, colors, code-block spacing, and light/dark
-themes through the injected trusted CSS string and shared CSS variables.
+SideNote controls fonts, colors, product-specific borders, and light/dark
+themes through the injected trusted CSS string and shared CSS variables. The
+editor keeps reusable code-block grid and padding rules in its base stylesheet.
 
 ## Code blocks
 

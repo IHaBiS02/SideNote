@@ -53,7 +53,9 @@ The Markdown string is available through `value`, `getMarkdown()`, and
 'readonly')`.
 
 Editing methods include `focus()`, `undo()`, `redo()`, `execute()`,
-`insertText()`, `insertMarkdown()`, `replaceSelection()`, and `insertImage()`.
+`insertText()`, `insertMarkdown()`, `replaceSelection()`, `insertImage()`, and
+`scrollToImage()`. The last method locates an image by its persisted Markdown
+source and scrolls it into view without exposing Shadow DOM internals.
 Extensions are installed with `use()` and removed with `removeExtension()`.
 
 Host integration hooks:
@@ -66,8 +68,10 @@ Host integration hooks:
 - `showCodeBlockHeader` and `showCodeLineNumbers`: code-block UI controls.
 
 The component emits bubbling, composed `input`, `change`, `mode-change`,
-`selection-change`, and `editor-error` events. `input` and `change` expose the
-latest Markdown at `event.detail.markdown`.
+`selection-change`, `image-activate`, and `editor-error` events. `input` and
+`change` expose the latest Markdown at `event.detail.markdown`.
+`image-activate` exposes the persisted `source` and resolved `displaySource`
+when a rendered image is clicked.
 
 Extensions can contribute named commands, shortcuts, and input rules:
 

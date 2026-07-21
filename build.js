@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const glob = require('glob');
 const archiver = require('archiver');
 
 const buildDir = 'build';
@@ -13,6 +12,12 @@ for (const outputDirectory of outputDirectories) {
     fs.mkdirSync(path.join(outputDirectory, 'vendor'), { recursive: true });
 }
 
+function copyToBrowserOutputs(source, destination) {
+    for (const outputDirectory of outputDirectories) {
+        fs.cpSync(source, path.join(outputDirectory, destination), { recursive: true });
+    }
+}
+
 const commonFiles = [
     'sidepanel.html',
     'sidepanel.css',
@@ -23,9 +28,7 @@ const commonFiles = [
 ];
 
 for (const file of commonFiles) {
-    for (const outputDirectory of outputDirectories) {
-        fs.cpSync(file, path.join(outputDirectory, file), { recursive: true });
-    }
+    copyToBrowserOutputs(file, file);
 }
 
 const runtimeArtifacts = [
@@ -38,34 +41,21 @@ for (const artifact of runtimeArtifacts) {
         throw new Error(`Required compiled runtime artifact is missing: ${artifact.source}`);
     }
 
-    for (const outputDirectory of outputDirectories) {
-        fs.cpSync(
-            artifact.source,
-            path.join(outputDirectory, artifact.destination),
-            { recursive: true }
-        );
-    }
+    copyToBrowserOutputs(artifact.source, artifact.destination);
 }
 
 const vendorFiles = {
+    'reset-css/reset.css': 'reset.css',
     'dompurify/dist/purify.min.js': 'dompurify.min.js',
     'marked/marked.min.js': 'marked.min.js',
-    'highlight.js/styles/atom-one-dark.css': 'atom-one-dark.css',
-    'highlight.js/styles/atom-one-light.css': 'atom-one-light.css',
     '@highlightjs/cdn-assets/highlight.min.js': 'highlight.min.js',
-    'highlightjs-line-numbers.js/dist/highlightjs-line-numbers.min.js': 'highlightjs-line-numbers.min.js',
     'jszip/dist/jszip.min.js': 'jszip.min.js',
     'webextension-polyfill/dist/browser-polyfill.min.js': 'browser-polyfill.min.js'
 };
 
 for (const [source, destination] of Object.entries(vendorFiles)) {
     const sourcePath = path.join('node_modules', source);
-    for (const outputDirectory of outputDirectories) {
-        fs.copyFileSync(
-            sourcePath,
-            path.join(outputDirectory, 'vendor', destination)
-        );
-    }
+    copyToBrowserOutputs(sourcePath, path.join('vendor', destination));
 }
 
 const editorArtifacts = [
@@ -80,12 +70,7 @@ for (const artifact of editorArtifacts) {
         throw new Error(`Required editor build artifact is missing: ${artifact.source}`);
     }
 
-    for (const outputDirectory of outputDirectories) {
-        fs.copyFileSync(
-            artifact.source,
-            path.join(outputDirectory, artifact.destination)
-        );
-    }
+    copyToBrowserOutputs(artifact.source, artifact.destination);
 }
 
 const chromeManifest = JSON.parse(fs.readFileSync('manifest.json', 'utf-8'));
@@ -147,10 +132,11 @@ function createZip(sourceDirectory, outputPath) {
 
 async function main() {
     console.log('Deleting old browser zip files if they exist...');
-    const oldChromeZips = await glob.glob('build/chrome-*.zip');
-    const oldFirefoxZips = await glob.glob('build/firefox-*.zip');
+    const oldBrowserZips = fs.readdirSync(buildDir, { withFileTypes: true })
+        .filter(entry => entry.isFile() && /^(chrome|firefox)-.*\.zip$/.test(entry.name))
+        .map(entry => path.join(buildDir, entry.name));
 
-    for (const file of [...oldChromeZips, ...oldFirefoxZips]) {
+    for (const file of oldBrowserZips) {
         fs.unlinkSync(file);
         console.log(`Deleted ${file}`);
     }

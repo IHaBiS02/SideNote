@@ -124,6 +124,19 @@ export const editorStyles = css`
   .code-block-content[data-line-numbers] {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
+    column-gap: var(--editor-code-content-padding);
+  }
+
+  .code-block-content[data-line-numbers] > pre {
+    padding-block: var(--editor-code-content-padding);
+  }
+
+  .code-block-content[data-line-numbers] > pre > code {
+    padding-block: 0;
+  }
+
+  .code-block-content[data-line-numbers] > pre.code-block-body > code {
+    padding-inline: 0 var(--editor-code-content-padding);
   }
 
   .code-block-content pre {

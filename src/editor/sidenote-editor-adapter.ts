@@ -162,7 +162,6 @@ const SIDENOTE_EDITOR_THEME = `
   .editor-mount .ProseMirror pre code {
     display: block;
     min-height: 100%;
-    padding: var(--editor-code-content-padding);
     white-space: inherit;
     overflow-wrap: inherit;
     word-break: inherit;
@@ -178,7 +177,6 @@ const SIDENOTE_EDITOR_THEME = `
 
   .editor-mount .ProseMirror .code-block-content {
     border: 1px solid var(--editor-border-color);
-    background: var(--editor-code-background);
   }
 
   .editor-mount .ProseMirror pre.code-line-numbers {
@@ -195,7 +193,6 @@ const SIDENOTE_EDITOR_THEME = `
   }
 
   .editor-mount .ProseMirror pre.code-line-numbers code {
-    padding: var(--editor-code-content-padding);
     background: transparent;
     color: inherit;
     font: inherit;
@@ -204,22 +201,8 @@ const SIDENOTE_EDITOR_THEME = `
     word-break: inherit;
   }
 
-  .editor-mount .ProseMirror .code-block-content[data-line-numbers] > pre {
-    padding-block: var(--editor-code-content-padding);
-  }
-
-  .editor-mount .ProseMirror .code-block-content[data-line-numbers] {
-    column-gap: var(--editor-code-content-padding);
-  }
-
   .editor-mount .ProseMirror .code-block-content[data-line-numbers] > pre > code {
-    padding-block: 0;
     line-height: 1.2;
-  }
-
-  .editor-mount .ProseMirror .code-block-content[data-line-numbers]
-    > pre.code-block-body > code {
-    padding-inline: 0 var(--editor-code-content-padding);
   }
 
   .code-block-header {

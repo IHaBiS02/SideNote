@@ -3,7 +3,6 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   saveNote: vi.fn().mockResolvedValue(),
   sortNotes: vi.fn(),
-  renderMarkdown: vi.fn(),
   renderNoteList: vi.fn(),
   createAllNotesArchive: vi.fn(),
   createSingleNoteArchive: vi.fn(),
@@ -24,7 +23,6 @@ vi.mock('../../src/notes.js', () => ({
 }));
 
 vi.mock('../../src/notes_view/index.js', () => ({
-  renderMarkdown: mocks.renderMarkdown,
   renderNoteList: mocks.renderNoteList,
 }));
 
@@ -108,7 +106,6 @@ describe('import/export events', () => {
     expect(state.notes[0].title).toBe('Imported');
     expect(state.notes[0].content).toBe('# Imported');
     expect(document.getElementById('markdown-editor').value).toBe('# Imported');
-    expect(mocks.renderMarkdown).toHaveBeenCalled();
   });
 
   it('keeps the default all-notes export as .snotes on left click', async () => {

@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   DEFAULT_SETTINGS,
+  applyMode,
   normalizeGlobalSettings,
   resolveEffectiveSettings,
   resolveLegacyTextProcessingSettings
@@ -13,7 +14,11 @@ describe('settings model helpers', () => {
   });
 
   it('normalizes partial global settings with defaults', () => {
-    const settings = normalizeGlobalSettings({ fontSize: 18, mode: 'dark' });
+    const settings = normalizeGlobalSettings({
+      fontSize: 18,
+      mode: 'dark',
+      autoAddSpaces: true,
+    });
 
     expect(settings.fontSize).toBe(18);
     expect(settings.mode).toBe('dark');
@@ -21,8 +26,8 @@ describe('settings model helpers', () => {
     expect(settings.title).toBe(DEFAULT_SETTINGS.title);
     expect(settings.legacyLineBreakMode).toBe(false);
     expect(settings.autoLineBreak).toBe(false);
-    expect(settings.autoAddSpaces).toBe(false);
     expect(settings.showTildeReplacementButton).toBe(false);
+    expect(settings).not.toHaveProperty('autoAddSpaces');
   });
 
   it('resolves note-specific settings over normalized global settings', () => {
@@ -70,12 +75,10 @@ describe('settings model helpers', () => {
     const effective = resolveLegacyTextProcessingSettings({
       legacyLineBreakMode: false,
       autoLineBreak: true,
-      autoAddSpaces: true,
       tildeReplacement: true,
     });
 
     expect(effective.autoLineBreak).toBe(false);
-    expect(effective.autoAddSpaces).toBe(false);
     expect(effective.tildeReplacement).toBe(false);
   });
 
@@ -83,11 +86,9 @@ describe('settings model helpers', () => {
     const effective = resolveLegacyTextProcessingSettings({
       legacyLineBreakMode: true,
       autoLineBreak: true,
-      autoAddSpaces: true,
     });
 
     expect(effective.autoLineBreak).toBe(true);
-    expect(effective.autoAddSpaces).toBe(true);
   });
 
   it('keeps tilde replacement independent from legacy mode when its toolbar button is enabled', () => {
@@ -99,5 +100,15 @@ describe('settings model helpers', () => {
 
     expect(effective.autoLineBreak).toBe(false);
     expect(effective.tildeReplacement).toBe(true);
+  });
+
+  it('applies light and dark modes without a separate syntax-theme stylesheet', () => {
+    document.body.className = '';
+
+    applyMode('dark');
+    expect(document.body.classList.contains('dark-mode')).toBe(true);
+
+    applyMode('light');
+    expect(document.body.classList.contains('dark-mode')).toBe(false);
   });
 });

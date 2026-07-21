@@ -10,19 +10,10 @@ interface HighlightJsGlobal {
   getLanguage(language: string): unknown;
   highlight(code: string, options: { language: string; ignoreIllegals?: boolean }): HighlightResult;
   highlightAuto(code: string): HighlightResult;
-  highlightAll(): void;
-  lineNumbersBlock(element: Element): void;
-}
-
-interface MarkedRendererInstance {
-  listitem: (...args: unknown[]) => string;
-  checkbox: (...args: unknown[]) => string;
 }
 
 interface MarkedGlobal {
-  Renderer: new () => MarkedRendererInstance;
   parse(markdown: string): string;
-  setOptions(options: Record<string, unknown>): void;
 }
 
 declare global {

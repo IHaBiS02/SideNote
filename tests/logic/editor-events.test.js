@@ -2,13 +2,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   openNote: vi.fn(),
-  renderMarkdown: vi.fn(),
   togglePreview: vi.fn(),
   showImageModal: vi.fn(),
   renderNoteList: vi.fn(),
   sortNotes: vi.fn(),
   saveNote: vi.fn().mockResolvedValue(),
-  saveImage: vi.fn().mockResolvedValue(),
   pushToHistory: vi.fn(),
 }));
 
@@ -18,7 +16,6 @@ vi.mock('../../src/notes.js', () => ({
 
 vi.mock('../../src/notes_view/index.js', () => ({
   openNote: mocks.openNote,
-  renderMarkdown: mocks.renderMarkdown,
   togglePreview: mocks.togglePreview,
   showImageModal: mocks.showImageModal,
   renderNoteList: mocks.renderNoteList,
@@ -26,7 +23,6 @@ vi.mock('../../src/notes_view/index.js', () => ({
 
 vi.mock('../../src/database/index.js', () => ({
   saveNote: mocks.saveNote,
-  saveImage: mocks.saveImage,
 }));
 
 vi.mock('../../src/history.js', () => ({
@@ -35,13 +31,6 @@ vi.mock('../../src/history.js', () => ({
 
 vi.mock('../../src/settings.js', () => ({
   resolveEffectiveSettings: vi.fn(() => ({ title: 'default' })),
-  resolveLegacyTextProcessingSettings: vi.fn(() => ({})),
-}));
-
-vi.mock('../../src/text-processors.js', () => ({
-  processPastedText: vi.fn(text => text),
-  handleEnterKeyInput: vi.fn(),
-  toggleMarkdownCheckbox: vi.fn(),
 }));
 
 describe('editor events', () => {
@@ -52,7 +41,6 @@ describe('editor events', () => {
       <button id="new-note-button"></button>
       <div id="editor-title"></div>
       <div id="markdown-editor"></div>
-      <div id="html-preview"></div>
       <button id="toggle-view-button"></button>
     `;
   });
@@ -102,6 +90,19 @@ describe('editor events', () => {
     expect(mocks.togglePreview).toHaveBeenCalledOnce();
   });
 
+  it('does not treat Shift+Enter in readonly Preview as a mode shortcut', async () => {
+    const { initializeEditorEvents } = await import('../../src/events/editor.js');
+    const editor = document.getElementById('markdown-editor');
+    editor.mode = 'readonly';
+    initializeEditorEvents();
+
+    editor.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', shiftKey: true, bubbles: true }),
+    );
+
+    expect(mocks.togglePreview).not.toHaveBeenCalled();
+  });
+
   it('treats readonly editor mode as Preview state', async () => {
     const state = await import('../../src/state.js');
     state.setIsPreview(false);
@@ -120,5 +121,20 @@ describe('editor events', () => {
       view: 'editor',
       params: { noteId: null, inEditMode: false },
     });
+  });
+
+  it('opens the image modal from the editor image activation event', async () => {
+    const { initializeEditorEvents } = await import('../../src/events/editor.js');
+    const editor = document.getElementById('markdown-editor');
+    initializeEditorEvents();
+
+    editor.dispatchEvent(new CustomEvent('image-activate', {
+      detail: {
+        source: 'images/example.png',
+        displaySource: 'blob:example',
+      },
+    }));
+
+    expect(mocks.showImageModal).toHaveBeenCalledWith('blob:example');
   });
 });

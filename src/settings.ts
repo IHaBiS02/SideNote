@@ -1,13 +1,10 @@
 // Import required DOM elements
 import {
   markdownEditor,
-  htmlPreview,
   autoLineBreakButton,
   tildeReplacementButton,
   showTildeReplacementButtonCheckbox,
   legacyLineBreakModeCheckbox,
-  autoAddSpacesCheckbox,
-  autoAddSpacesSetting,
   titleSetting,
   fontSizeSetting,
   modeSetting,
@@ -26,7 +23,6 @@ const DEFAULT_SETTINGS: Readonly<GlobalSettings> = Object.freeze({
   wysiwygPreview: true,
   legacyLineBreakMode: false,
   autoLineBreak: false,
-  autoAddSpaces: false,
   showTildeReplacementButton: false,
   tildeReplacement: false,
   codeBlockHeader: true,
@@ -35,10 +31,13 @@ const DEFAULT_SETTINGS: Readonly<GlobalSettings> = Object.freeze({
 });
 
 function normalizeGlobalSettings(settings: Partial<GlobalSettings> = {}): GlobalSettings {
-  return {
+  const normalizedSettings = {
     ...DEFAULT_SETTINGS,
     ...(settings || {})
   };
+  // Remove the retired textarea-only setting from data saved by older versions.
+  delete (normalizedSettings as GlobalSettings & { autoAddSpaces?: unknown }).autoAddSpaces;
+  return normalizedSettings;
 }
 
 function resolveEffectiveSettings(note?: Note | null): GlobalSettings {
@@ -63,7 +62,6 @@ function resolveLegacyTextProcessingSettings(
     return {
       ...normalizedSettings,
       autoLineBreak: false,
-      autoAddSpaces: false,
       tildeReplacement
     };
   }
@@ -91,11 +89,7 @@ function saveGlobalSettings(): void {
 // === UI 설정 적용 함수 ===
 
 function applyFontSize(size: number): void {
-  // 에디터와 미리보기 모두에 글꼴 크기 적용
-  const editorElements = [markdownEditor, htmlPreview];
-  editorElements.forEach(el => {
-    el.style.fontSize = `${size}px`;
-  });
+  markdownEditor.style.fontSize = `${size}px`;
   markdownEditor.style.setProperty('--editor-font-size', `${size}px`);
 }
 
@@ -104,26 +98,10 @@ function applyFontSize(size: number): void {
  * @param {string} mode The color mode to apply.
  */
 function applyMode(mode: ThemeMode): void {
-  const themeStylesheet = document.getElementById('theme-stylesheet') as HTMLLinkElement | null;
-  if (!themeStylesheet) return;
-  if (mode === 'dark') {
-    // 다크 모드
-    document.body.classList.add('dark-mode');
-    themeStylesheet.href = 'vendor/atom-one-dark.css';
-  } else if (mode === 'light') {
-    // 라이트 모드
-    document.body.classList.remove('dark-mode');
-    themeStylesheet.href = 'vendor/atom-one-light.css';
-  } else {
-    // 시스템 모드 (운영체제 설정 따라가기)
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      document.body.classList.add('dark-mode');
-      themeStylesheet.href = 'vendor/atom-one-dark.css';
-    } else {
-      document.body.classList.remove('dark-mode');
-      themeStylesheet.href = 'vendor/atom-one-light.css';
-    }
-  }
+  const followsDarkSystemTheme =
+    mode === 'system'
+    && Boolean(window.matchMedia?.('(prefers-color-scheme: dark)').matches);
+  document.body.classList.toggle('dark-mode', mode === 'dark' || followsDarkSystemTheme);
 }
 
 /**
@@ -154,11 +132,7 @@ function updateTildeReplacementButton(): void {
 
 function updateLegacyLineBreakControls(): void {
   const settings = normalizeGlobalSettings(globalSettings);
-  const legacyLineBreakModeEnabled = settings.legacyLineBreakMode;
   legacyLineBreakModeCheckbox.checked = settings.legacyLineBreakMode;
-  autoAddSpacesSetting.hidden = !legacyLineBreakModeEnabled;
-  autoAddSpacesCheckbox.checked = legacyLineBreakModeEnabled && settings.autoAddSpaces;
-  autoAddSpacesCheckbox.disabled = !legacyLineBreakModeEnabled;
   updateAutoLineBreakButton();
 }
 

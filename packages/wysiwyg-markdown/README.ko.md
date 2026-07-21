@@ -52,8 +52,10 @@ Markdown 문자열은 `value`, `getMarkdown()`, `setMarkdown()`으로 읽고
 설정합니다. `setMode('wysiwyg' | 'source' | 'readonly')`로 모드를 바꿉니다.
 
 편집 메서드는 `focus()`, `undo()`, `redo()`, `execute()`, `insertText()`,
-`insertMarkdown()`, `replaceSelection()`, `insertImage()`를 제공합니다.
-`use()`로 확장을 설치하고 `removeExtension()`으로 제거합니다.
+`insertMarkdown()`, `replaceSelection()`, `insertImage()`, `scrollToImage()`를
+제공합니다. 마지막 메서드는 저장된 Markdown 이미지 경로로 이미지를 찾아
+Shadow DOM 내부를 외부에 노출하지 않고 화면 안으로 스크롤합니다. `use()`로
+확장을 설치하고 `removeExtension()`으로 제거합니다.
 
 호스트 통합 훅은 다음과 같습니다.
 
@@ -65,8 +67,10 @@ Markdown 문자열은 `value`, `getMarkdown()`, `setMarkdown()`으로 읽고
 - `showCodeBlockHeader`, `showCodeLineNumbers`: 코드 블럭 UI 설정
 
 컴포넌트는 Shadow DOM 밖에서도 받을 수 있는 `input`, `change`,
-`mode-change`, `selection-change`, `editor-error` 이벤트를 발생시킵니다.
-`input`과 `change`의 최신 Markdown은 `event.detail.markdown`에 있습니다.
+`mode-change`, `selection-change`, `image-activate`, `editor-error` 이벤트를
+발생시킵니다. `input`과 `change`의 최신 Markdown은
+`event.detail.markdown`에 있습니다. 렌더링된 이미지를 클릭하면 발생하는
+`image-activate`에는 저장된 `source`와 화면 표시용 `displaySource`가 있습니다.
 
 확장은 command, shortcut, input rule을 추가할 수 있습니다.
 

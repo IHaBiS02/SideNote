@@ -13,7 +13,6 @@ import {
   tildeReplacementButton,
   showTildeReplacementButtonCheckbox,
   legacyLineBreakModeCheckbox,
-  autoAddSpacesCheckbox,
   codeBlockHeaderCheckbox,
   wysiwygPreviewCheckbox,
   preventUsedImageDeletionCheckbox,
@@ -29,8 +28,7 @@ import {
   showLicenseView,
   showRecycleBinView,
   showImageManagementView,
-  renderDeletedItemsList,
-  renderMarkdown
+  renderDeletedItemsList
 } from '../notes_view/index.js';
 import {
   saveGlobalSettings,
@@ -199,7 +197,6 @@ function initializeSettingsEvents(): void {
       }
     }
     markdownEditor.showCodeBlockHeader = value;
-    renderMarkdown();
   });
 
   // Choose whether Preview is directly editable or read-only. Both options
@@ -214,7 +211,6 @@ function initializeSettingsEvents(): void {
     globalSettings.legacyLineBreakMode = legacyLineBreakModeCheckbox.checked;
     updateLegacyLineBreakControls();
     saveGlobalSettings();
-    renderMarkdown();
   });
 
   // Auto line break legacy toolbar button
@@ -236,13 +232,6 @@ function initializeSettingsEvents(): void {
     globalSettings.tildeReplacement = !globalSettings.tildeReplacement;
     updateTildeReplacementButton();
     saveGlobalSettings();
-  });
-
-  // Auto add spaces on Enter legacy setting
-  autoAddSpacesCheckbox.addEventListener('change', () => {
-      globalSettings.autoAddSpaces = autoAddSpacesCheckbox.checked;
-      updateLegacyLineBreakControls();
-      saveGlobalSettings();
   });
 
   // Prevent used image deletion checkbox
