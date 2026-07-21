@@ -22,6 +22,8 @@ const commonFiles = [
     'sidepanel.html',
     'sidepanel.css',
     'dark_mode.css',
+    'shortcut-setup.html',
+    'shortcut-setup.css',
     'images',
     'LICENSE',
     'LIBRARY_LICENSES.md'

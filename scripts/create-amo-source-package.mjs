@@ -22,6 +22,8 @@ const sourceEntries = [
   'manifest.json',
   'package.json',
   'package-lock.json',
+  'shortcut-setup.css',
+  'shortcut-setup.html',
   'sidepanel.css',
   'sidepanel.html',
   'src',

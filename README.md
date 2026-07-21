@@ -18,7 +18,8 @@ A simple notes browser extension that provides a note-taking interface in the br
 - **Image Support**: Paste and embed images directly into notes
 - **Recycle Bin**: Soft delete with 30-day auto-cleanup
 - **Browser Integration**: Works in Chrome **AND** Firefox ~~(Firefox is in development)~~
-- **Keyboard Shortcut**: Quick access with `Shift+Alt+W`
+- **Keyboard Shortcut**: Quick access with `Shift+Alt+W`; a new-install setup
+  popup appears when the browser leaves the command unassigned
 
 ## Installation
 
@@ -58,6 +59,11 @@ A simple notes browser extension that provides a note-taking interface in the br
 2. The side panel will open with the notes interface
 3. Make a new note and write notes
 4. Press ESC or Shift+Enter to save edit and return to preview
+
+On a new installation, SideNote checks the browser's registered command. If
+the shortcut is unassigned, a small setup window links directly to the browser's
+extension shortcut settings. The check runs only on initial installation, so a
+shortcut intentionally removed later does not cause repeated prompts.
 
 You can paste image on the clipboard directly into notes by Ctrl+V.  
 Legacy text-processing options are available in settings for older Markdown workflows that used trailing spaces for line breaks.

@@ -10,6 +10,7 @@ SideNote is a browser extension that provides a note-taking interface within the
 
 -   **`manifest.json`**: The core configuration file for the Chrome extension. It defines permissions, icons, and registers the side panel.
 -   **`sidepanel.html`**: The main HTML file that defines the structure of the user interface, including all views (note list, editor, settings, etc.).
+-   **`shortcut-setup.html` / `shortcut-setup.css`**: Small first-install window that explains an unassigned activation shortcut and links to the browser's shortcut settings.
 -   **`src/`**: This directory contains the TypeScript extension runtime, organized as readable ES modules. `tsc` preserves this module layout when emitting JavaScript for browser packages.
     -   `main.ts`: The main entry point. It runs a deterministic `bootstrap()` sequence that initializes the database, loads settings and notes, handles the one-time migration of notes from `chrome.storage` to `IndexedDB`, cleans expired recycle-bin items, renders the initial view, and calls `initializeAllEvents()` to set up all event listeners.
     -   `types.ts`: Shared note, settings, stored-image, and navigation types.
@@ -47,8 +48,9 @@ SideNote is a browser extension that provides a note-taking interface within the
     semantic margin, form-control font, and line-height baseline shared by
     Chrome and Firefox.
 -   **`dark_mode.css`**: A supplementary stylesheet containing CSS variables and rules specifically for the dark mode theme.
--   **`background.ts`**: Cross-browser background source compiled to the packaged `background.js`; it opens Chrome's side panel or Firefox's sidebar from the extension action/command.
+-   **`background.ts`**: Cross-browser background source compiled to the packaged `background.js`; it opens Chrome's side panel or Firefox's sidebar from the extension action/command. On initial installation it reads the registered commands and opens the shortcut setup window only when the browser reports the activation command as unassigned.
 -   **`tsconfig.extension.json`**: Strict TypeScript configuration that emits readable ES modules and `background.js` into `build/extension-runtime/`.
+-   **`src/shortcut-setup.ts`**: Opens Firefox's native extension shortcut settings API or Chrome's `chrome://extensions/shortcuts` page from the setup window.
 -   **`packages/wysiwyg-markdown/`**: The reusable Lit/ProseMirror editor npm workspace:
     -   `src/index.ts`: Public exports and idempotent registration of `<wysiwyg-markdown>`.
     -   `src/core/markdown.ts`: ProseMirror schema plus Markdown parser and serializer. It covers headings, emphasis, strikethrough, lists/tasks, soft breaks, fenced code, links, and images. Link serialization uses explicit `[text](destination)` syntax, including when the text and destination are identical.

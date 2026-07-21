@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Set up SideNote shortcut</title>
+  <link rel="stylesheet" href="vendor/reset.css">
+  <link rel="stylesheet" href="shortcut-setup.css">
+</head>
+<body>
+  <main class="shortcut-card">
+    <div class="shortcut-icon" aria-hidden="true">⌨</div>
+    <h1>Shortcut setup needed</h1>
+    <p>
+      Your browser did not activate SideNote's suggested shortcut. Assign a
+      shortcut to open SideNote quickly.
+    </p>
+    <div class="suggested-shortcut" aria-label="Suggested shortcut Shift Alt W">
+      Suggested: <kbd>Shift</kbd><span>+</span><kbd>Alt</kbd><span>+</span><kbd>W</kbd>
+    </div>
+    <p id="shortcut-error" class="error-message" role="status" aria-live="polite" hidden>
+      Shortcut settings could not be opened. Please open your browser's
+      extension shortcut settings manually.
+    </p>
+    <div class="actions">
+      <button id="dismiss-button" class="secondary-button" type="button">Not now</button>
+      <button id="open-shortcut-settings-button" class="primary-button" type="button">
+        Open shortcut settings
+      </button>
+    </div>
+  </main>
+
+  <script src="vendor/browser-polyfill.min.js"></script>
+  <script type="module" src="src/shortcut-setup.js"></script>
+</body>
+</html>

@@ -73,6 +73,8 @@ npm install
 - **src/text-processors.ts**: Plain-text paste processing (tilde escaping and
   optional legacy two-space line breaks)
 - **src/import_export.ts**: .snote/.snotes file processing
+- **src/shortcut-setup.ts**: Opens the browser's extension shortcut settings
+  from the first-install setup popup
 - **src/editor/sidenote-editor-adapter.ts**: Connects SideNote storage,
   settings, paste processing, theme CSS, and highlight.js token ranges to the
   reusable editor Web Component
@@ -122,6 +124,9 @@ npm install
   `themeCss` because document CSS does not cross the editor Shadow DOM
 - **Image Handling**: Images pasted/imported are stored as blobs in IndexedDB; blob URLs are tracked and revoked on re-render to prevent memory leaks
 - **Recycle Bin**: Soft delete with 30-day auto-cleanup (`THIRTY_DAYS_MS`)
+- **Shortcut Setup**: `background.ts` checks the activation command only on a
+  fresh install and opens `shortcut-setup.html` when the browser reports no
+  assigned shortcut
 
 ### Test Structure (`tests/`)
 ```text
@@ -143,6 +148,7 @@ tests/
 │   ├── notes.test.js
 │   └── images.test.js
 └── logic/                # Business logic tests (with mocked DB/views)
+    ├── background.test.js
     ├── editor-events.test.js
     ├── sidenote-editor-adapter.test.js
     ├── editor-mode.test.js
@@ -150,7 +156,8 @@ tests/
     ├── import-export.test.js
     ├── import-export-events.test.js
     ├── main.test.js
-    └── notes.test.js
+    ├── notes.test.js
+    └── shortcut-setup.test.js
 ```
 
 Editor workspace tests are maintained separately:

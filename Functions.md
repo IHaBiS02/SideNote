@@ -19,6 +19,17 @@ This file documents the functions used in the SideNote extension (TypeScript ES 
   ZIP with reviewer instructions.
 - `npm run release:amo`: Compatibility alias for `npm run build`.
 
+## background.ts and shortcut setup
+
+- The initial-install listener calls `browser.commands.getAll()` and checks
+  both `_execute_action` (Chrome) and `_execute_sidebar_action` (Firefox).
+- When the activation command is missing or has an empty `shortcut`, it opens
+  `shortcut-setup.html` as a compact popup window. Updates do not trigger the
+  check, which avoids repeatedly prompting users who later remove the shortcut.
+- `src/shortcut-setup.ts` exposes `openBrowserShortcutSettings()`. It uses
+  Firefox's `commands.openShortcutSettings()` when available and otherwise
+  opens Chrome's `chrome://extensions/shortcuts` page in a new tab.
+
 ## packages/wysiwyg-markdown
 
 The reusable editor is an internal npm workspace. Markdown strings are its
