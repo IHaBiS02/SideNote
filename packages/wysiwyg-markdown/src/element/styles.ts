@@ -157,18 +157,20 @@ export const editorStyles = css`
     box-sizing: border-box;
     flex: 1 1 auto;
     border: 0;
-    border-bottom: 1px solid currentColor;
     padding: 0;
     background: transparent;
     color: inherit;
     font: inherit;
     line-height: inherit;
     outline: none;
+    user-select: none;
+  }
+
+  .code-block-language-editor:focus {
     user-select: text;
   }
 
   .code-block-language-editor[readonly] {
-    border-bottom-color: transparent;
     cursor: text;
     user-select: none;
   }
