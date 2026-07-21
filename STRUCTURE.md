@@ -42,7 +42,9 @@ SideNote is a browser extension that provides a note-taking interface within the
     -   `import_export.ts`: Contains the logic for parsing `.snote` files, saving parsed imports, and packaging `.snote`/`.snotes` zip archives.
     -   `utils.ts`: Utility functions for timestamps, filename sanitization, file downloads, scoped blob URL tracking, and image ID extraction.
     -   `text-processors.ts`: Legacy text processing utilities for markdown editing, including tilde escaping, auto line breaks, Enter key handling, and whitespace cleanup.
--   **`sidepanel.css`**: The primary stylesheet for the extension's UI.
+-   **`sidepanel.css`**: The primary stylesheet for the extension's UI. The
+    packaged side panel intentionally uses browser typography defaults without
+    a CSS reset to preserve the 4.1.14 heading, margin, and line-height baseline.
 -   **`dark_mode.css`**: A supplementary stylesheet containing CSS variables and rules specifically for the dark mode theme.
 -   **`background.ts`**: Cross-browser background source compiled to the packaged `background.js`; it opens Chrome's side panel or Firefox's sidebar from the extension action/command.
 -   **`tsconfig.extension.json`**: Strict TypeScript configuration that emits readable ES modules and `background.js` into `build/extension-runtime/`.
@@ -167,7 +169,6 @@ is first-party generated code and is listed separately.
 -   **`highlight.min.js`**: A syntax highlighter that can parse and style code blocks in many different languages.
 -   **`jszip.min.js`**: A library for creating, reading, and editing `.zip` files, used for the import/export functionality.
 -   **`browser-polyfill.min.js`**: WebExtension browser API Polyfill for cross-browser compatibility.
--   **`reset.css`**: CSS reset loaded by the packaged side panel before SideNote styles.
 
 ### First-party generated asset
 

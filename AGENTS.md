@@ -260,4 +260,7 @@ After changes:
 - No linting configuration - maintain consistent code style
 - Extension uses Manifest V3 (Chrome) with Firefox compatibility
 - Images in notes use markdown format: `![Image](images/[id].png)`
+- The packaged side panel intentionally does not load a CSS reset. Its
+  4.1.14-compatible typography relies on browser heading, margin, and
+  line-height defaults; adding a reset requires explicit replacement styles.
 - All file paths must be absolute when using file operations

@@ -150,9 +150,14 @@ describe('SideNote WYSIWYG editor adapter', () => {
   });
 });
 
-describe('4.1.14 preview theme compatibility', () => {
+describe('4.1.14 packaged Preview theme compatibility', () => {
   const lightCss = readFileSync(resolve('sidepanel.css'), 'utf8');
   const darkCss = readFileSync(resolve('dark_mode.css'), 'utf8');
+  const sidePanelHtml = readFileSync(resolve('sidepanel.html'), 'utf8');
+
+  it('preserves browser heading and line-height defaults without a CSS reset', () => {
+    expect(sidePanelHtml).not.toContain('reset.css');
+  });
 
   it('keeps the legacy browser monospace font and light code colors', () => {
     expect(lightCss).toContain('--editor-padding: 10px;');

@@ -45,7 +45,6 @@ for (const artifact of runtimeArtifacts) {
 }
 
 const vendorFiles = {
-    'reset-css/reset.css': 'reset.css',
     'dompurify/dist/purify.min.js': 'dompurify.min.js',
     'marked/marked.min.js': 'marked.min.js',
     '@highlightjs/cdn-assets/highlight.min.js': 'highlight.min.js',
