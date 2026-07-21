@@ -138,4 +138,20 @@ describe('markdown renderer code blocks', () => {
     expect(editor.setMode).toHaveBeenLastCalledWith('source');
     expect(document.getElementById('toggle-view-button').textContent).toBe('Preview');
   });
+
+  it('uses the same editor in readonly mode when editable Preview is disabled', async () => {
+    const state = await import('../../src/state.js');
+    state.setGlobalSettings({ wysiwygPreview: false });
+    state.setIsPreview(false);
+    const editor = document.getElementById('markdown-editor');
+    editor.setMode = vi.fn();
+
+    const { togglePreview } = await import('../../src/notes_view/markdown-renderer.js');
+    togglePreview();
+
+    expect(editor.setMode).toHaveBeenLastCalledWith('readonly');
+    expect(editor.style.display).toBe('block');
+    expect(document.getElementById('html-preview').hidden).toBe(true);
+    expect(document.getElementById('toggle-view-button').textContent).toBe('Edit');
+  });
 });

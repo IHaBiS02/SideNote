@@ -17,6 +17,7 @@ export {
 export {
   renderMarkdown,
   renderImages,
+  applyEditorDisplayMode,
   togglePreview
 } from './markdown-renderer.js';
 

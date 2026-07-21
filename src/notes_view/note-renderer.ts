@@ -2,8 +2,6 @@
 import {
   noteList,
   markdownEditor,
-  htmlPreview,
-  toggleViewButton,
   editorTitle
 } from '../dom.js';
 
@@ -27,7 +25,6 @@ import { pushToHistory } from '../history.js';
 import { 
   notes, 
   activeNoteId, 
-  isPreview,
   setActiveNoteId,
   setOriginalNoteContent,
   setIsPreview
@@ -35,6 +32,7 @@ import {
 
 // Import view manager functions
 import { showEditorView } from './view-manager.js';
+import { applyEditorDisplayMode } from './markdown-renderer.js';
 
 /**
  * Renders the list of notes.
@@ -111,18 +109,7 @@ function openNote(
     showEditorView(false);
     // 모드 설정 (편집/미리보기)
     setIsPreview(!inEditMode);
-    if (isPreview) {
-      markdownEditor.setMode?.('wysiwyg');
-      htmlPreview.style.display = 'none';
-      markdownEditor.style.display = 'block';
-      toggleViewButton.textContent = 'Edit';
-    } else {
-      markdownEditor.setMode?.('source');
-      htmlPreview.style.display = 'none';
-      markdownEditor.style.display = 'block';
-      toggleViewButton.textContent = 'Preview';
-      markdownEditor.focus();
-    }
+    applyEditorDisplayMode();
     if (addToHistory) {
         pushToHistory({ view: 'editor', params: { noteId, inEditMode } });
     }

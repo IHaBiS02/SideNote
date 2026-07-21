@@ -32,6 +32,7 @@ const legacyLineBreakModeCheckbox = document.getElementById('legacy-line-break-m
 const autoAddSpacesCheckbox = document.getElementById('auto-add-spaces-checkbox') as HTMLInputElement;
 const autoAddSpacesSetting = document.getElementById('auto-add-spaces-setting') as HTMLDivElement;
 const codeBlockHeaderCheckbox = document.getElementById('code-block-header-checkbox') as HTMLInputElement;
+const wysiwygPreviewCheckbox = document.getElementById('wysiwyg-preview-checkbox') as HTMLInputElement;
 // === 가져오기/내보내기 요소 ===
 const globalExportButton = document.getElementById('global-export-button') as HTMLButtonElement;
 const globalImportButton = document.getElementById('global-import-button') as HTMLButtonElement;
@@ -83,6 +84,7 @@ export {
   autoAddSpacesCheckbox,
   autoAddSpacesSetting,
   codeBlockHeaderCheckbox,
+  wysiwygPreviewCheckbox,
   globalExportButton,
   globalImportButton,
   globalImportInput,

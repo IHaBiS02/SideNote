@@ -65,12 +65,12 @@ function insertTextAtCursor(
 // === Editor Event Listeners ===
 
 function initializeEditorEvents(): void {
-  // A double-click in WYSIWYG mode opens the component's full source editor.
+  // A double-click in editable or read-only Preview opens the full source editor.
   markdownEditor.addEventListener('mode-change', (event) => {
     const mode = (event as CustomEvent<{ mode?: string }>).detail?.mode;
-    if (mode !== 'source' && mode !== 'wysiwyg') return;
+    if (mode !== 'source' && mode !== 'wysiwyg' && mode !== 'readonly') return;
 
-    const nextIsPreview = mode === 'wysiwyg';
+    const nextIsPreview = mode !== 'source';
     if (nextIsPreview === isPreview) return;
 
     setIsPreview(nextIsPreview);

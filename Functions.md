@@ -252,7 +252,7 @@ Settings management (functions exported):
 - `updateTildeReplacementButton()`: Updates the tilde replacement toolbar button visibility and state
 - `updateLegacyLineBreakControls()`: Updates the legacy line-break mode checkbox and dependent controls
 - `isCodeBlockHeaderEnabled(note)`: Resolves the effective code block header setting from note settings with global fallback
-- `populateSettingsForm(isGlobal, note)`: Populates settings fields for either global or note-specific settings
+- `populateSettingsForm(isGlobal, note)`: Populates settings fields for either global or note-specific settings, including the global `wysiwygPreview` preference (enabled by default)
 
 **Note**: Uses `globalSettings` from state.js module
 
@@ -333,10 +333,11 @@ Markdown and image rendering functionality:
 - `renderMarkdownToHtml(markdown)`: Converts Markdown to sanitized HTML
 - `decorateCodeBlocks(container, note)`: Adds code block headers, line classes, and line numbers
 - `renderMarkdown()`: Updates the hidden legacy HTML preview retained for
-  compatibility helpers; the visible editable Preview is rendered by the
+  compatibility helpers; the visible Preview is rendered by the
   `<wysiwyg-markdown>` component
 - `renderImages()`: Renders images in the markdown preview
-- `togglePreview()`: Toggles between editable WYSIWYG Preview and full-document Markdown source editing
+- `applyEditorDisplayMode()`: Uses `wysiwyg` or `readonly` for Preview according to `wysiwygPreview`, and `source` for full-document Markdown editing
+- `togglePreview()`: Toggles between the configured WYSIWYG Preview mode and full-document Markdown source editing
 
 ### src/notes_view/recycle-bin-renderer.ts
 
@@ -380,7 +381,7 @@ Note creation, markdown editor, and paste handling:
 - `insertTextAtCursor(textarea, text)`: Inserts text at cursor position in textarea
 - `initializeEditorEvents()`: Sets up all editor-related event listeners
 
-Handles: new note creation (opening directly in editable WYSIWYG Preview), markdown input, image paste, WYSIWYG `Shift+Enter` soft breaks, source-mode preview shortcuts, checkbox interactions, title editing
+Handles: new note creation (opening in the configured editable or read-only WYSIWYG Preview), markdown input, image paste, WYSIWYG `Shift+Enter` soft breaks, source-mode preview shortcuts, checkbox interactions, title editing
 
 ### src/events/settings-events.ts
 

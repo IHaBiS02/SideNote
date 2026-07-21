@@ -17,6 +17,7 @@ describe('settings model helpers', () => {
 
     expect(settings.fontSize).toBe(18);
     expect(settings.mode).toBe('dark');
+    expect(settings.wysiwygPreview).toBe(true);
     expect(settings.title).toBe(DEFAULT_SETTINGS.title);
     expect(settings.legacyLineBreakMode).toBe(false);
     expect(settings.autoLineBreak).toBe(false);
@@ -46,17 +47,23 @@ describe('settings model helpers', () => {
   });
 
   it('does not let note settings override global-only settings', () => {
-    setGlobalSettings({ mode: 'light', legacyLineBreakMode: true });
+    setGlobalSettings({
+      mode: 'light',
+      legacyLineBreakMode: true,
+      wysiwygPreview: false,
+    });
 
     const effective = resolveEffectiveSettings({
       settings: {
         mode: 'dark',
         legacyLineBreakMode: false,
+        wysiwygPreview: true,
       },
     });
 
     expect(effective.mode).toBe('light');
     expect(effective.legacyLineBreakMode).toBe(true);
+    expect(effective.wysiwygPreview).toBe(false);
   });
 
   it('disables legacy line-break processors when legacy mode is off', () => {

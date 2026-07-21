@@ -4,6 +4,11 @@
 Markdown 입력 규칙, 키보드 동작, 붙여넣기 동작을 정리합니다. 아래 변환은
 WYSIWYG 모드에서 문단이나 목록 항목의 시작 부분에 입력할 때 적용됩니다.
 
+SideNote 설정의 `Editable WYSIWYG Preview`를 끄면 같은 렌더러가
+`readonly` 모드로 동작합니다. 문서 모양과 코드 강조는 유지되지만 아래의
+직접 입력 동작은 비활성화되며, 더블클릭 또는 Edit 버튼으로 전체 Markdown
+source 편집에 들어갈 수 있습니다.
+
 ## Markdown 입력 규칙
 
 | 입력 | 결과 | 저장되는 Markdown 예시 |

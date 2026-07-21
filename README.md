@@ -4,8 +4,8 @@ A simple notes browser extension that provides a note-taking interface in the br
 
 ## Features
 
-- **Editable WYSIWYG Preview**: Open notes in a directly editable rendered
-  document while keeping Markdown as the stored format
+- **Configurable WYSIWYG Preview**: Use the same rendered document in editable
+  or read-only mode while keeping Markdown as the stored format
 - **Full Markdown Source Editing**: Double-click Preview or press Edit to edit
   the complete note as plain Markdown text
 - **Soft Line Breaks**: Preview renders normal newlines without requiring trailing spaces
@@ -62,7 +62,7 @@ A simple notes browser extension that provides a note-taking interface in the br
 You can paste image on the clipboard directly into notes by Ctrl+V.  
 Legacy text-processing options are available in settings for older Markdown workflows that used trailing spaces for line breaks.
 
-In settings, you can choose theme, Mode of Title (Default use first line as title, Custom let user type own title by double-click title in note), text size, code block header behavior, image deletion behavior, and legacy Markdown line-break behavior.
+In settings, you can choose theme, Mode of Title (Default use first line as title, Custom let user type own title by double-click title in note), text size, whether Preview is directly editable, code block header behavior, image deletion behavior, and legacy Markdown line-break behavior. Editable WYSIWYG Preview is enabled by default; disabling it keeps the same rendering and switches Preview to read-only mode.
 
 Images button show all images used in the notes, showing that which one is used in which note.
 Recycle bin shows all soft-deleted notes and images, and let user delete all at once.

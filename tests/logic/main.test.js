@@ -22,6 +22,7 @@ const mocks = vi.hoisted(() => {
     normalizeGlobalSettings: vi.fn((settings = {}) => ({
       title: 'default',
       fontSize: 12,
+      wysiwygPreview: true,
       legacyLineBreakMode: false,
       autoLineBreak: false,
       autoAddSpaces: false,

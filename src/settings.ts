@@ -12,6 +12,7 @@ import {
   fontSizeSetting,
   modeSetting,
   codeBlockHeaderCheckbox,
+  wysiwygPreviewCheckbox,
   preventUsedImageDeletionCheckbox
 } from './dom.js';
 
@@ -22,6 +23,7 @@ import type { GlobalSettings, Note, ThemeMode } from './types.js';
 const DEFAULT_SETTINGS: Readonly<GlobalSettings> = Object.freeze({
   title: 'default',
   fontSize: 12,
+  wysiwygPreview: true,
   legacyLineBreakMode: false,
   autoLineBreak: false,
   autoAddSpaces: false,
@@ -185,6 +187,7 @@ function populateSettingsForm(isGlobal: boolean, note?: Note | null): boolean {
     fontSizeSetting.value = String(effectiveNoteSettings.fontSize);
     codeBlockHeaderCheckbox.checked = effectiveNoteSettings.codeBlockHeader !== false;
   }
+  wysiwygPreviewCheckbox.checked = effectiveGlobalSettings.wysiwygPreview !== false;
   modeSetting.value = effectiveGlobalSettings.mode;
   legacyLineBreakModeCheckbox.checked = effectiveGlobalSettings.legacyLineBreakMode;
   showTildeReplacementButtonCheckbox.checked = effectiveGlobalSettings.showTildeReplacementButton;

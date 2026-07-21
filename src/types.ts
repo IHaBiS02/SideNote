@@ -9,6 +9,7 @@ export interface NoteSettings {
 export interface GlobalSettings {
   title: string;
   fontSize: number;
+  wysiwygPreview: boolean;
   legacyLineBreakMode: boolean;
   autoLineBreak: boolean;
   autoAddSpaces: boolean;

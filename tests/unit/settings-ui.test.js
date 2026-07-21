@@ -14,6 +14,7 @@ function renderSettingsDom() {
     <input type="checkbox" id="auto-add-spaces-checkbox">
     <div id="auto-add-spaces-setting" hidden></div>
     <input type="checkbox" id="code-block-header-checkbox">
+    <input type="checkbox" id="wysiwyg-preview-checkbox">
     <input type="checkbox" id="prevent-used-image-deletion-checkbox">
   `;
 }
@@ -96,5 +97,12 @@ describe('settings UI helpers', () => {
     expect(document.getElementById('tilde-replacement-button').hidden).toBe(false);
     expect(document.getElementById('tilde-replacement-button').textContent).toBe('~✅');
     expect(document.getElementById('tilde-replacement-button').title).toBe('Tilde Replacement Enabled');
+  });
+
+  it('enables editable WYSIWYG Preview by default', async () => {
+    const { populateSettingsForm } = await loadSettingsModule({});
+
+    expect(populateSettingsForm(true)).toBe(true);
+    expect(document.getElementById('wysiwyg-preview-checkbox').checked).toBe(true);
   });
 });

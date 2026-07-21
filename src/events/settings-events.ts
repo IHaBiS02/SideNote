@@ -15,6 +15,7 @@ import {
   legacyLineBreakModeCheckbox,
   autoAddSpacesCheckbox,
   codeBlockHeaderCheckbox,
+  wysiwygPreviewCheckbox,
   preventUsedImageDeletionCheckbox,
   licenseContent,
   editorTitle,
@@ -199,6 +200,13 @@ function initializeSettingsEvents(): void {
     }
     markdownEditor.showCodeBlockHeader = value;
     renderMarkdown();
+  });
+
+  // Choose whether Preview is directly editable or read-only. Both options
+  // use the same WYSIWYG renderer so their layout and theme remain identical.
+  wysiwygPreviewCheckbox.addEventListener('change', () => {
+    globalSettings.wysiwygPreview = wysiwygPreviewCheckbox.checked;
+    saveGlobalSettings();
   });
 
   // Legacy Markdown line break mode

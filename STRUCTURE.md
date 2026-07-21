@@ -4,7 +4,7 @@ This document outlines the internal structure of the SideNote browser extension,
 
 ## 1. Project Overview
 
-SideNote is a browser extension that provides a note-taking interface within the browser's side panel. Markdown remains the persisted format, while Preview is a directly editable WYSIWYG document backed by a Lit/ProseMirror Web Component. Double-clicking Preview or pressing Edit opens the complete note as plain Markdown source. The application also supports syntax highlighting, dark/light modes, image embedding, and data import/export.
+SideNote is a browser extension that provides a note-taking interface within the browser's side panel. Markdown remains the persisted format, while Preview is a WYSIWYG document backed by a Lit/ProseMirror Web Component and can be editable or read-only. Double-clicking Preview or pressing Edit opens the complete note as plain Markdown source. The application also supports syntax highlighting, dark/light modes, image embedding, and data import/export.
 
 ## 2. File Structure
 
@@ -73,7 +73,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   A toolbar with global actions: Import (`#global-import-button`), Export (`#global-export-button`), and Settings (`#global-settings-button`).
 -   **`#editor-view`**: The screen for writing and viewing a single note.
     -   A header with a "Back" button (`#back-button`) and the note's title (`#editor-title`).
-    -   `#markdown-editor`: A `<wysiwyg-markdown>` custom element. New notes and normal note opening start in directly editable WYSIWYG Preview mode; double-click or the Edit button opens the full document as plain Markdown source. Its public `value` remains a Markdown string.
+    -   `#markdown-editor`: A `<wysiwyg-markdown>` custom element. New notes and normal note opening start in WYSIWYG Preview mode, editable by default or read-only when configured; double-click or the Edit button opens the full document as plain Markdown source. Its public `value` remains a Markdown string.
     -   `#html-preview`: A hidden legacy rendering target retained temporarily for compatibility while preview-only helpers are retired.
     -   A toolbar with buttons for toggling the view and note-specific import/export/settings.
 -   **`#settings-view`**: The screen for configuring settings.
@@ -94,7 +94,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   `notes`: An array of note objects. Each object contains an `id`, `title`, `content`, `settings`, and `metadata` (timestamps).
     -   `deletedNotes`: An array of note objects that have been moved to the recycle bin.
     -   `activeNoteId`: Stores the `id` of the note currently being edited.
-    -   `globalSettings`: An object holding all global application settings.
+    -   `globalSettings`: An object holding all global application settings, including `wysiwygPreview` (default `true`) for editable versus read-only Preview.
     -   `isPreview`: A boolean flag to track if the editor is in "Preview" or "Edit" mode.
     -   Navigation history is managed through the `history.ts` module.
 -   **Data Persistence**:
@@ -139,9 +139,9 @@ The UI is a single-page application with several distinct "views" that are shown
     -   `input`: Updates the note content and metadata on every keystroke.
     -   WYSIWYG paste hooks save images to IndexedDB and apply enabled legacy text formatting through `src/editor/sidenote-editor-adapter.ts`.
     -   `keydown`: WYSIWYG `Shift+Enter` inserts a single inline soft break; the full-document source editor retains `Shift+Enter` preview switching. The legacy textarea fallback retains its Enter and paste handlers.
--   **`renderMarkdown()`**: Updates the hidden legacy HTML preview used by compatibility helpers. It converts Markdown with Marked, sanitizes with DOMPurify, applies legacy code decoration, and calls `renderImages()`. The visible Preview is the `<wysiwyg-markdown>` component and does not use this HTML as its editable DOM (located in `src/notes_view/markdown-renderer.ts`).
+-   **`renderMarkdown()`**: Updates the hidden legacy HTML preview used by compatibility helpers. It converts Markdown with Marked, sanitizes with DOMPurify, applies legacy code decoration, and calls `renderImages()`. The visible Preview always uses the `<wysiwyg-markdown>` component (located in `src/notes_view/markdown-renderer.ts`).
 -   **`renderImages()`**: Finds all `<img>` tags in the preview and loads their `src` from IndexedDB blob URLs (located in `src/notes_view/markdown-renderer.ts`). Preview, image management, and recycle bin views each use scoped blob URL trackers.
--   **`togglePreview()`**: Switches the custom element between editable WYSIWYG Preview and full-document Markdown source editing, and records the change in navigation history (located in `src/notes_view/markdown-renderer.ts`).
+-   **`applyEditorDisplayMode()` / `togglePreview()`**: Uses the same custom element for editable WYSIWYG and read-only Preview, selected by the global `wysiwygPreview` setting, and switches Edit to full-document Markdown source mode (located in `src/notes_view/markdown-renderer.ts`).
 
 #### Settings & Recycle Bin (`settings.ts`, `src/notes_view/`, `src/events/`)
 

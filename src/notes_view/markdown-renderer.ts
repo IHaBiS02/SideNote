@@ -186,6 +186,31 @@ function renderMarkdown(): void {
 }
 
 /**
+ * Applies the current Preview/Edit state to the shared editor component.
+ * Preview uses either the editable or read-only ProseMirror mode according to
+ * the global preference; source mode always exposes the complete Markdown.
+ */
+function applyEditorDisplayMode(): void {
+  htmlPreview.hidden = true;
+  htmlPreview.setAttribute('aria-hidden', 'true');
+  htmlPreview.style.display = 'none';
+  markdownEditor.style.display = 'block';
+
+  if (isPreview) {
+    const previewMode = normalizeGlobalSettings(globalSettings).wysiwygPreview
+      ? 'wysiwyg'
+      : 'readonly';
+    markdownEditor.setMode?.(previewMode);
+    toggleViewButton.textContent = 'Edit';
+    return;
+  }
+
+  markdownEditor.setMode?.('source');
+  toggleViewButton.textContent = 'Preview';
+  markdownEditor.focus();
+}
+
+/**
  * Renders images in the preview.
  */
 // === 이미지 렌더링 ===
@@ -222,21 +247,7 @@ async function renderImages(): Promise<void> {
 function togglePreview(): void {
   const wasEditMode = !isPreview; // 전환 전 edit 모드 여부 저장
   setIsPreview(!isPreview);
-  
-  if (isPreview) {
-    // 직접 편집 가능한 WYSIWYG 미리보기 모드로 전환
-    markdownEditor.setMode?.('wysiwyg');
-    htmlPreview.style.display = 'none';
-    markdownEditor.style.display = 'block';
-    toggleViewButton.textContent = 'Edit';
-  } else {
-    // 전체 Markdown plain-text 편집 모드로 전환
-    markdownEditor.setMode?.('source');
-    htmlPreview.style.display = 'none';
-    markdownEditor.style.display = 'block';
-    toggleViewButton.textContent = 'Preview';
-    markdownEditor.focus();
-  }
+  applyEditorDisplayMode();
 
   // History 처리: edit -> preview 전환 시 이전 노드가 preview면 돌아가기
   if (wasEditMode && isPreview) {
@@ -269,5 +280,6 @@ export {
   decorateCodeBlocks,
   renderMarkdown,
   renderImages,
+  applyEditorDisplayMode,
   togglePreview
 };

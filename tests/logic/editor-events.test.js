@@ -101,4 +101,24 @@ describe('editor events', () => {
 
     expect(mocks.togglePreview).toHaveBeenCalledOnce();
   });
+
+  it('treats readonly editor mode as Preview state', async () => {
+    const state = await import('../../src/state.js');
+    state.setIsPreview(false);
+    const { initializeEditorEvents } = await import('../../src/events/editor.js');
+    const editor = document.getElementById('markdown-editor');
+    initializeEditorEvents();
+
+    editor.dispatchEvent(new CustomEvent('mode-change', {
+      bubbles: true,
+      detail: { mode: 'readonly' },
+    }));
+
+    expect(state.isPreview).toBe(true);
+    expect(document.getElementById('toggle-view-button').textContent).toBe('Edit');
+    expect(mocks.pushToHistory).toHaveBeenCalledWith({
+      view: 'editor',
+      params: { noteId: null, inEditMode: false },
+    });
+  });
 });
