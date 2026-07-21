@@ -95,4 +95,6 @@ editor.use({
 않습니다.
 
 현재 구조와 확장 지점은 [`ARCHITECTURE.md`](./ARCHITECTURE.md)를
-참고하세요.
+참고하세요. WYSIWYG 모드의 기본 Markdown 입력 규칙, 단축키, 붙여넣기 동작은
+[`WYSIWYG_INPUT_BEHAVIORS.ko.md`](./WYSIWYG_INPUT_BEHAVIORS.ko.md)에 정리되어
+있습니다.

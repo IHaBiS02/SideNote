@@ -48,7 +48,7 @@ SideNote is a browser extension that provides a note-taking interface within the
 -   **`tsconfig.extension.json`**: Strict TypeScript configuration that emits readable ES modules and `background.js` into `build/extension-runtime/`.
 -   **`packages/wysiwyg-markdown/`**: The reusable Lit/ProseMirror editor npm workspace:
     -   `src/index.ts`: Public exports and idempotent registration of `<wysiwyg-markdown>`.
-    -   `src/core/markdown.ts`: ProseMirror schema plus Markdown parser and serializer. It covers headings, emphasis, strikethrough, lists/tasks, soft breaks, fenced code, links, and images.
+    -   `src/core/markdown.ts`: ProseMirror schema plus Markdown parser and serializer. It covers headings, emphasis, strikethrough, lists/tasks, soft breaks, fenced code, links, and images. Link serialization uses explicit `[text](destination)` syntax, including when the text and destination are identical.
     -   `src/core/commands.ts`: Standard history, block, and inline-format commands.
     -   `src/element/wysiwyg-markdown.ts`: Form-associated Lit custom element, ProseMirror lifecycle, source modes, node views, events, image hooks, and public API.
     -   `src/element/styles.ts`: Minimal component-owned layout and state CSS. Product styling is supplied by the host through `themeCss`.
@@ -57,6 +57,7 @@ SideNote is a browser extension that provides a note-taking interface within the
     -   `src/extensions/types.ts`: Command, shortcut, and input-rule extension contracts.
     -   `demo/`: Standalone browser demo that does not depend on SideNote storage.
     -   `tests/`: Parser/serializer, Web Component, and extension tests.
+    -   `WYSIWYG_INPUT_BEHAVIORS.ko.md`: Korean reference for built-in Markdown input rules, keyboard/mouse actions, and paste normalization.
     -   `scripts/generate-third-party-licenses.mjs`: Generates the root `LIBRARY_LICENSES.md` from the complete extension and editor runtime dependency graphs.
 -   **`build.js`**: Packages the compiled editor and extension sources for Chrome and Firefox. It reads the editor bundle from `packages/wysiwyg-markdown/dist/`; generated bundles are not checked into Git.
 -   **`scripts/create-amo-source-package.mjs`**: Creates the allow-listed, deterministic source ZIP used for Firefox AMO review.

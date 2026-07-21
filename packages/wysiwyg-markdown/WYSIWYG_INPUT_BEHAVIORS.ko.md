@@ -1,0 +1,81 @@
+# WYSIWYG 입력 동작
+
+이 문서는 SideNote의 Preview(WYSIWYG) 모드에서 기본으로 사용할 수 있는
+Markdown 입력 규칙, 키보드 동작, 붙여넣기 동작을 정리합니다. 아래 변환은
+WYSIWYG 모드에서 문단이나 목록 항목의 시작 부분에 입력할 때 적용됩니다.
+
+## Markdown 입력 규칙
+
+| 입력 | 결과 | 저장되는 Markdown 예시 |
+| --- | --- | --- |
+| `# `부터 `###### ` | 1단계부터 6단계까지의 제목 | `## 제목` |
+| 빈 제목에서 `Backspace` | 제목을 일반 문단으로 되돌림 | 제목의 `#` 표시 제거 |
+| ```` ``` ```` | 코드 블록 | 세 개의 백틱으로 감싼 코드 |
+| `> ` | 인용문 | `> 인용문` |
+| `- `, `+ `, `* ` | 글머리 기호 목록 | `* 항목` |
+| `1. `과 같은 숫자 및 마침표 | 번호 목록 | `1. 항목` |
+| 목록 항목에서 `[ ] ` | 선택하지 않은 작업 항목 | `* [ ] 작업` |
+| 목록 항목에서 `[x] ` 또는 `[X] ` | 선택한 작업 항목 | `* [x] 작업` |
+| `---` | 가로 구분선 | `---` |
+
+입력 표시는 문서 안에서 그대로 남는 텍스트가 아니라 해당 블록 형식으로 즉시
+변환됩니다. 예를 들어 새 문단에서 `## `를 입력하면 커서가 2단계 제목 안으로
+이동합니다. 변환된 빈 제목에서 `Backspace`를 누르면 일반 문단으로 돌아갑니다.
+
+## 키보드와 마우스 동작
+
+| 동작 | 결과 |
+| --- | --- |
+| `Shift+Enter` | 새 문단을 만들지 않고 현재 블록 안에서 한 줄 내림 |
+| `Ctrl+Z` / `Cmd+Z` | 실행 취소 |
+| `Ctrl+Shift+Z` / `Cmd+Shift+Z` | 다시 실행 |
+| `Ctrl+Y` / `Cmd+Y` | 다시 실행 |
+| 문서 더블클릭 | 전체 Markdown을 수정하는 plain text source 모드로 전환 |
+| source 모드에서 `Ctrl+Enter` / `Cmd+Enter` | WYSIWYG 모드로 복귀 |
+| 작업 항목의 체크박스 클릭 | 체크 상태와 Markdown의 `[ ]`/`[x]`를 함께 변경 |
+
+`Shift+Enter`는 코드 블록 안에서도 줄바꿈으로 작동합니다. 일반 `Enter`는 현재
+블록 종류에 맞는 ProseMirror 기본 동작을 사용합니다.
+
+## 붙여넣기 동작
+
+### URL
+
+WYSIWYG 모드가 붙여넣은 URL을 링크로 인식하면 표시 텍스트와 주소가 같더라도
+항상 명시적인 Markdown 링크 문법으로 저장합니다.
+
+```markdown
+[https://example.com](https://example.com)
+```
+
+따라서 다음 URL을 붙여넣으면
+
+```text
+https://youtu.be/YcO-MxPf_Vg?si=--UyINcJ33oxOCE-
+```
+
+Markdown 값은 다음과 같이 저장됩니다.
+
+```markdown
+[https://youtu.be/YcO-MxPf_Vg?si=--UyINcJ33oxOCE-](https://youtu.be/YcO-MxPf_Vg?si=--UyINcJ33oxOCE-)
+```
+
+`<https://example.com>` 형태의 기존 자동 링크를 WYSIWYG 모드로 불러와도 같은
+명시적 링크 문법으로 정규화됩니다. 링크 표시 문구가 주소와 다르면 원래대로
+`[표시 문구](주소)` 형태로 저장됩니다.
+
+### 이미지와 일반 텍스트
+
+- 클립보드의 이미지는 SideNote 이미지 저장소에 저장한 뒤
+  `![파일명](images/...)` 형태로 문서에 삽입합니다.
+- 일반 텍스트는 SideNote의 물결표 처리와 기존 줄바꿈 호환 설정을 적용한 뒤
+  삽입합니다.
+- source 모드에서는 WYSIWYG 입력 규칙을 적용하지 않고 Markdown 원문을 직접
+  편집합니다. 이미지 붙여넣기와 SideNote의 일반 텍스트 변환 설정은 source
+  모드에서도 사용할 수 있습니다.
+
+## 확장 동작
+
+에디터를 사용하는 호스트 앱은 `use()` API로 command, shortcut, input rule을
+추가할 수 있습니다. 확장 API 예시는 [README.ko.md](./README.ko.md)를
+참고하세요.

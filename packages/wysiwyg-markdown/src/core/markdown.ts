@@ -238,6 +238,17 @@ markdownSerializer = new MarkdownSerializer(
   },
   {
     ...defaultMarkdownSerializer.marks,
+    link: {
+      open: '[',
+      close(_state, mark) {
+        const href = mark.attrs.href.replace(/[()\"]/g, '\\$&');
+        const title = mark.attrs.title
+          ? ` "${mark.attrs.title.replace(/"/g, '\\"')}"`
+          : '';
+        return `](${href}${title})`;
+      },
+      mixable: true,
+    },
     strike: {
       open: '~~',
       close: '~~',

@@ -44,7 +44,8 @@ and deterministically regenerates the root `LIBRARY_LICENSES.md` file.
 - `parseMarkdown(markdown)`: Parses a Markdown string into a ProseMirror
   document using markdown-it and `prosemirror-markdown` token handlers.
 - `serializeMarkdown(document)`: Serializes the editor document back to stable
-  Markdown for SideNote persistence.
+  Markdown for SideNote persistence. Links always use explicit
+  `[text](destination)` syntax instead of angle-bracket autolinks.
 
 ### src/core/commands.ts
 
