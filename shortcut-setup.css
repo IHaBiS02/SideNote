@@ -18,10 +18,6 @@ body {
   background: #ffffff;
 }
 
-button {
-  font: inherit;
-}
-
 .shortcut-card {
   display: flex;
   flex-direction: column;
@@ -88,16 +84,6 @@ kbd {
   margin-top: 18px;
 }
 
-button {
-  min-height: 34px;
-  padding: 7px 12px;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-}
-
 button:focus-visible {
   outline: 2px solid #1a73e8;
   outline-offset: 2px;
@@ -108,26 +94,13 @@ button:disabled {
   opacity: 0.65;
 }
 
-.primary-button {
-  background: #1a73e8;
-  color: #ffffff;
-}
-
-.primary-button:hover:not(:disabled) {
-  background: #185abc;
-}
-
-.secondary-button {
-  border-color: #dadce0;
-  background: #ffffff;
-  color: #3c4043;
-}
-
-.secondary-button:hover {
-  background: #f8f9fa;
-}
-
 @media (prefers-color-scheme: dark) {
+  :root {
+    --sidenote-settings-button-background: #333;
+    --sidenote-settings-button-hover-background: #444;
+    --sidenote-settings-button-color: #e0e0e0;
+  }
+
   :root,
   body {
     background: #202124;
@@ -147,16 +120,6 @@ button:disabled {
     border-color: #5f6368;
     background: #303134;
     box-shadow: 0 1px 0 #5f6368;
-  }
-
-  .secondary-button {
-    border-color: #5f6368;
-    background: #303134;
-    color: #e8eaed;
-  }
-
-  .secondary-button:hover {
-    background: #3c4043;
   }
 
   .error-message {

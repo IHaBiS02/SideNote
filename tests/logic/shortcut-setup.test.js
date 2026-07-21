@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const originalBrowser = globalThis.browser;
@@ -27,6 +29,45 @@ describe('shortcut setup popup', () => {
 
     expect(openShortcutSettings).toHaveBeenCalledOnce();
     expect(createTab).not.toHaveBeenCalled();
+  });
+
+  it('shares the settings navigation button skin with the main side panel', async () => {
+    const [sidepanelHtml, shortcutSetupHtml] = await Promise.all([
+      readFile(resolve('sidepanel.html'), 'utf8'),
+      readFile(resolve('shortcut-setup.html'), 'utf8'),
+    ]);
+    const parser = new DOMParser();
+    const sidepanelDocument = parser.parseFromString(sidepanelHtml, 'text/html');
+    const shortcutSetupDocument = parser.parseFromString(shortcutSetupHtml, 'text/html');
+
+    for (const id of [
+      'image-management-button',
+      'recycle-bin-button',
+      'licenses-button',
+    ]) {
+      expect(
+        sidepanelDocument.getElementById(id)?.classList.contains(
+          'sidenote-settings-button',
+        ),
+      ).toBe(true);
+    }
+
+    expect(
+      shortcutSetupDocument
+        .getElementById('dismiss-button')
+        ?.classList.contains('sidenote-settings-button'),
+    ).toBe(true);
+    expect(
+      shortcutSetupDocument
+        .getElementById('open-shortcut-settings-button')
+        ?.classList.contains('sidenote-settings-button'),
+    ).toBe(true);
+    expect(
+      sidepanelDocument.querySelector('link[href="sidenote-controls.css"]'),
+    ).not.toBeNull();
+    expect(
+      shortcutSetupDocument.querySelector('link[href="sidenote-controls.css"]'),
+    ).not.toBeNull();
   });
 
   it('opens Chrome shortcut settings from the popup button when the API is unavailable', async () => {

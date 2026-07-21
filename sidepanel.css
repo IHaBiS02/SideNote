@@ -478,19 +478,6 @@ button:hover {
   margin-bottom: 0;
 }
 
-#recycle-bin-button {
-  background-color: #f0f0f0;
-}
-
-#licenses-button {
-  background-color: #f0f0f0;
-}
-
-#image-management-button,
-#image-recycle-bin-button {
-  background-color: #f0f0f0;
-}
-
 #recycle-bin-view .toolbar {
     justify-content: flex-end;
 }

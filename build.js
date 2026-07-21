@@ -24,6 +24,7 @@ const commonFiles = [
     'dark_mode.css',
     'shortcut-setup.html',
     'shortcut-setup.css',
+    'sidenote-controls.css',
     'images',
     'LICENSE',
     'LIBRARY_LICENSES.md'

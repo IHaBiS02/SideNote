@@ -1,6 +1,9 @@
 body.dark-mode {
     background-color: #1e1e1e;
     color: #e0e0e0;
+    --sidenote-settings-button-background: #333;
+    --sidenote-settings-button-hover-background: #444;
+    --sidenote-settings-button-color: #e0e0e0;
 }
 
 .dark-mode .header {
@@ -71,12 +74,6 @@ body.dark-mode {
 
 .dark-mode button {
     color: #e0e0e0;
-}
-
-.dark-mode #recycle-bin-button,
-.dark-mode #licenses-button,
-.dark-mode #image-management-button {
-  background-color: #333;
 }
 
 .dark-mode .notes-dropdown {

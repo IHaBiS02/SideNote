@@ -75,6 +75,8 @@ npm install
 - **src/import_export.ts**: .snote/.snotes file processing
 - **src/shortcut-setup.ts**: Opens the browser's extension shortcut settings
   from the first-install setup popup
+- **sidenote-controls.css**: Shared settings-style button appearance for the
+  side panel and shortcut setup popup
 - **src/editor/sidenote-editor-adapter.ts**: Connects SideNote storage,
   settings, paste processing, theme CSS, and highlight.js token ranges to the
   reusable editor Web Component
@@ -267,7 +269,8 @@ After changes:
 - No linting configuration - maintain consistent code style
 - Extension uses Manifest V3 (Chrome) with Firefox compatibility
 - Images in notes use markdown format: `![Image](images/[id].png)`
-- The packaged side panel loads `vendor/reset.css`, then `sidepanel.css`
-  explicitly restores the intended heading sizes/weights, semantic margins,
-  form fonts, and line heights. Do not rely on browser UA typography defaults.
+- The packaged side panel loads `vendor/reset.css`, then the shared
+  `sidenote-controls.css`, followed by `sidepanel.css`; the latter explicitly
+  restores the intended heading sizes/weights, semantic margins, form fonts,
+  and line heights. Do not rely on browser UA typography defaults.
 - All file paths must be absolute when using file operations

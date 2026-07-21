@@ -24,6 +24,7 @@ const sourceEntries = [
   'package-lock.json',
   'shortcut-setup.css',
   'shortcut-setup.html',
+  'sidenote-controls.css',
   'sidepanel.css',
   'sidepanel.html',
   'src',

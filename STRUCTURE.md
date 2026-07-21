@@ -11,6 +11,7 @@ SideNote is a browser extension that provides a note-taking interface within the
 -   **`manifest.json`**: The core configuration file for the Chrome extension. It defines permissions, icons, and registers the side panel.
 -   **`sidepanel.html`**: The main HTML file that defines the structure of the user interface, including all views (note list, editor, settings, etc.).
 -   **`shortcut-setup.html` / `shortcut-setup.css`**: Small first-install window that explains an unassigned activation shortcut and links to the browser's shortcut settings.
+-   **`sidenote-controls.css`**: Shared settings-style button skin used by both the main settings view and the shortcut setup window, including matching light/dark hover colors and control geometry.
 -   **`src/`**: This directory contains the TypeScript extension runtime, organized as readable ES modules. `tsc` preserves this module layout when emitting JavaScript for browser packages.
     -   `main.ts`: The main entry point. It runs a deterministic `bootstrap()` sequence that initializes the database, loads settings and notes, handles the one-time migration of notes from `chrome.storage` to `IndexedDB`, cleans expired recycle-bin items, renders the initial view, and calls `initializeAllEvents()` to set up all event listeners.
     -   `types.ts`: Shared note, settings, stored-image, and navigation types.
@@ -44,9 +45,9 @@ SideNote is a browser extension that provides a note-taking interface within the
     -   `utils.ts`: Utility functions for timestamps, filename sanitization, file downloads, scoped blob URL tracking, and image ID extraction.
     -   `text-processors.ts`: Legacy text processing utilities for markdown editing, including tilde escaping, auto line breaks, Enter key handling, and whitespace cleanup.
 -   **`sidepanel.css`**: The primary stylesheet for the extension's UI. It is
-    loaded after `vendor/reset.css` and explicitly defines the heading,
-    semantic margin, form-control font, and line-height baseline shared by
-    Chrome and Firefox.
+    loaded after `vendor/reset.css` and `sidenote-controls.css`, then explicitly
+    defines the heading, semantic margin, form-control font, and line-height
+    baseline shared by Chrome and Firefox.
 -   **`dark_mode.css`**: A supplementary stylesheet containing CSS variables and rules specifically for the dark mode theme.
 -   **`background.ts`**: Cross-browser background source compiled to the packaged `background.js`; it opens Chrome's side panel or Firefox's sidebar from the extension action/command. On initial installation it reads the registered commands and opens the shortcut setup window only when the browser reports the activation command as unassigned.
 -   **`tsconfig.extension.json`**: Strict TypeScript configuration that emits readable ES modules and `background.js` into `build/extension-runtime/`.
