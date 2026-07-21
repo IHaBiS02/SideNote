@@ -108,7 +108,8 @@ The element exposes Shadow DOM parts named `surface`, `placeholder`, `editor`,
 because normal document CSS does not cross the Shadow DOM boundary. A middle
 click on a rendered link opens its destination in a new browser tab. The
 non-content code header keeps its language label out of code selections while
-allowing click-to-edit updates to the code block `params` attribute.
+allowing a stable read-only input to unlock in place and update the code block
+`params` attribute without losing pointer focus.
 
 ### src/extensions
 

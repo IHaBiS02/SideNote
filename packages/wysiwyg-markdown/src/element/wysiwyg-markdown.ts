@@ -704,23 +704,16 @@ export class WysiwygMarkdownElement extends LitElement {
     header.setAttribute('part', 'code-block-header');
     header.contentEditable = 'false';
 
-    const language = document.createElement('span');
-    language.className = 'code-block-language';
-    language.setAttribute('part', 'code-block-language');
-    language.setAttribute('role', 'button');
-    language.setAttribute('aria-label', 'Edit code language');
-    language.title = 'Edit code language';
-    language.tabIndex = 0;
-
     const languageEditor = document.createElement('input');
     languageEditor.type = 'text';
     languageEditor.className = 'code-block-language code-block-language-editor';
     languageEditor.setAttribute('part', 'code-block-language-editor');
     languageEditor.setAttribute('aria-label', 'Code language');
+    languageEditor.title = 'Edit code language';
     languageEditor.placeholder = 'text';
     languageEditor.autocomplete = 'off';
     languageEditor.spellcheck = false;
-    languageEditor.hidden = true;
+    languageEditor.readOnly = true;
 
     const copyButton = document.createElement('button');
     copyButton.type = 'button';
@@ -746,7 +739,7 @@ export class WysiwygMarkdownElement extends LitElement {
     const lineNumberCode = document.createElement('code');
     lineNumbers.append(lineNumberCode);
     body.append(lineNumbers, pre);
-    header.append(language, languageEditor, copyButton);
+    header.append(languageEditor, copyButton);
     container.append(header, body);
 
     let node = initialNode;
@@ -757,8 +750,7 @@ export class WysiwygMarkdownElement extends LitElement {
       const info = String(node.attrs.params ?? '').trim();
       const storedLanguage = info.split(/\s+/)[0] || '';
       const codeLanguage = storedLanguage || 'text';
-      language.textContent = codeLanguage;
-      if (!languageEditing) languageEditor.value = storedLanguage;
+      if (!languageEditing) languageEditor.value = codeLanguage;
       code.dataset.language = codeLanguage;
       header.hidden = !this.showCodeBlockHeader;
       const lines = node.textContent.split('\n');
@@ -771,8 +763,7 @@ export class WysiwygMarkdownElement extends LitElement {
 
     const finishLanguageEdit = (): void => {
       languageEditing = false;
-      language.hidden = false;
-      languageEditor.hidden = true;
+      languageEditor.readOnly = true;
       updatePresentation();
     };
 
@@ -781,8 +772,7 @@ export class WysiwygMarkdownElement extends LitElement {
       languageEditing = true;
       const info = String(node.attrs.params ?? '').trim();
       languageEditor.value = info.split(/\s+/)[0] || '';
-      language.hidden = true;
-      languageEditor.hidden = false;
+      languageEditor.readOnly = false;
       languageEditor.focus();
       const cursor = languageEditor.value.length;
       languageEditor.setSelectionRange(cursor, cursor);
@@ -817,18 +807,17 @@ export class WysiwygMarkdownElement extends LitElement {
     };
 
     const handleLanguageClick = (event: MouseEvent): void => {
-      event.preventDefault();
-      beginLanguageEdit();
-    };
-
-    const handleLanguageLabelKeyDown = (event: KeyboardEvent): void => {
-      if (event.key !== 'Enter' && event.key !== ' ') return;
-      event.preventDefault();
       event.stopPropagation();
       beginLanguageEdit();
     };
 
     const handleLanguageEditorKeyDown = (event: KeyboardEvent): void => {
+      if (!languageEditing && (event.key === 'Enter' || event.key === ' ')) {
+        event.preventDefault();
+        event.stopPropagation();
+        beginLanguageEdit();
+        return;
+      }
       if (event.key === 'Enter') {
         event.preventDefault();
         event.stopPropagation();
@@ -857,8 +846,7 @@ export class WysiwygMarkdownElement extends LitElement {
         showFeedback('!');
       }
     };
-    language.addEventListener('click', handleLanguageClick);
-    language.addEventListener('keydown', handleLanguageLabelKeyDown);
+    languageEditor.addEventListener('click', handleLanguageClick);
     languageEditor.addEventListener('keydown', handleLanguageEditorKeyDown);
     languageEditor.addEventListener('blur', commitLanguageEdit);
     copyButton.addEventListener('click', handleCopy);
@@ -878,8 +866,7 @@ export class WysiwygMarkdownElement extends LitElement {
         lineNumbers.contains(event.target as globalThis.Node),
       destroy: () => {
         if (feedbackTimer) clearTimeout(feedbackTimer);
-        language.removeEventListener('click', handleLanguageClick);
-        language.removeEventListener('keydown', handleLanguageLabelKeyDown);
+        languageEditor.removeEventListener('click', handleLanguageClick);
         languageEditor.removeEventListener('keydown', handleLanguageEditorKeyDown);
         languageEditor.removeEventListener('blur', commitLanguageEdit);
         copyButton.removeEventListener('click', handleCopy);

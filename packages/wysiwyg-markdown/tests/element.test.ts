@@ -102,11 +102,13 @@ describe('wysiwyg-markdown element', () => {
     });
 
     const header = editor.renderRoot.querySelector<HTMLElement>('.code-block-header');
-    const language = editor.renderRoot.querySelector('.code-block-language');
+    const language = editor.renderRoot.querySelector<HTMLInputElement>(
+      '.code-block-language-editor',
+    );
     const copyButton = editor.renderRoot.querySelector<HTMLButtonElement>('.copy-code-button');
 
     expect(header?.hidden).toBe(false);
-    expect(language?.textContent).toBe('text');
+    expect(language?.value).toBe('text');
     copyButton?.click();
     await new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -117,17 +119,23 @@ describe('wysiwyg-markdown element', () => {
   it('edits the fenced code language from the non-content code header', async () => {
     const editor = await createEditor('```javascript\nasdfasdfasdfasdf\n```');
     const header = editor.renderRoot.querySelector<HTMLElement>('.code-block-header');
-    const language = editor.renderRoot.querySelector<HTMLElement>(
-      'span.code-block-language',
-    );
     const languageEditor = editor.renderRoot.querySelector<HTMLInputElement>(
       '.code-block-language-editor',
     );
 
     expect(header?.contentEditable).toBe('false');
-    expect(language?.textContent).toBe('javascript');
-    language?.click();
-    expect(languageEditor?.hidden).toBe(false);
+    expect(languageEditor?.value).toBe('javascript');
+    expect(languageEditor?.readOnly).toBe(true);
+    languageEditor?.dispatchEvent(
+      new MouseEvent('mousedown', { bubbles: true, cancelable: true }),
+    );
+    languageEditor?.dispatchEvent(
+      new MouseEvent('mouseup', { bubbles: true, cancelable: true }),
+    );
+    languageEditor?.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true }),
+    );
+    expect(languageEditor?.readOnly).toBe(false);
 
     languageEditor!.value = 'typescript';
     languageEditor?.dispatchEvent(
@@ -135,35 +143,37 @@ describe('wysiwyg-markdown element', () => {
     );
     await editor.updateComplete;
 
-    expect(languageEditor?.hidden).toBe(true);
-    expect(language?.textContent).toBe('typescript');
+    expect(languageEditor?.readOnly).toBe(true);
+    expect(languageEditor?.value).toBe('typescript');
     expect(editor.value).toBe('```typescript\nasdfasdfasdfasdf\n```');
 
-    language?.click();
+    languageEditor?.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true }),
+    );
     languageEditor!.value = '';
     languageEditor?.blur();
     await editor.updateComplete;
 
-    expect(language?.textContent).toBe('text');
+    expect(languageEditor?.value).toBe('text');
     expect(editor.value).toBe('```\nasdfasdfasdfasdf\n```');
   });
 
   it('cancels fenced code language editing with Escape', async () => {
     const editor = await createEditor('```javascript\nconst value = 1;\n```');
-    const language = editor.renderRoot.querySelector<HTMLElement>(
-      'span.code-block-language',
-    );
     const languageEditor = editor.renderRoot.querySelector<HTMLInputElement>(
       '.code-block-language-editor',
     );
 
-    language?.click();
+    languageEditor?.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true }),
+    );
     languageEditor!.value = 'typescript';
     languageEditor?.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
     );
 
-    expect(language?.textContent).toBe('javascript');
+    expect(languageEditor?.readOnly).toBe(true);
+    expect(languageEditor?.value).toBe('javascript');
     expect(editor.value).toBe('```javascript\nconst value = 1;\n```');
   });
 

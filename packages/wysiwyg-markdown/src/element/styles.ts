@@ -153,10 +153,6 @@ export const editorStyles = css`
     white-space: nowrap;
   }
 
-  span.code-block-language {
-    cursor: text;
-  }
-
   .code-block-language-editor {
     box-sizing: border-box;
     flex: 1 1 auto;
@@ -171,8 +167,10 @@ export const editorStyles = css`
     user-select: text;
   }
 
-  .code-block-language-editor[hidden] {
-    display: none;
+  .code-block-language-editor[readonly] {
+    border-bottom-color: transparent;
+    cursor: text;
+    user-select: none;
   }
 
   .editor-mount .ProseMirror img {
