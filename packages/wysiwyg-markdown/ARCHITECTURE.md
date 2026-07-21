@@ -129,7 +129,7 @@ function, and view.
 
 ## SideNote adapter
 
-`src/editor/sidenote-editor-adapter.js` is the only SideNote-specific bridge.
+`src/editor/sidenote-editor-adapter.ts` is the only SideNote-specific bridge.
 It assigns the host theme through `themeCss`, converts highlight.js spans into
 ProseMirror decoration ranges, configures code headers and line numbers,
 resolves `images/{id}.png` references to scoped Blob URLs, stores pasted image

@@ -26,6 +26,8 @@ interface MarkedGlobal {
 }
 
 declare global {
+  function importScripts(...urls: string[]): void;
+
   var __SIDENOTE_DISABLE_AUTO_BOOTSTRAP__: boolean | undefined;
   const JSZip: typeof JSZipClass;
   const browser: WebExtensionBrowser;

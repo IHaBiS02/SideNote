@@ -1,5 +1,5 @@
 // Import required DOM elements
-import { 
+import {
   markdownEditor,
   htmlPreview,
   toggleViewButton

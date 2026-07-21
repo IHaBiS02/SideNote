@@ -14,7 +14,7 @@ All developing command should run on windows environment, as the development env
 ```bash
 npm run build
 ```
-Builds the editor workspace first, then creates Chrome and Firefox packages in
+Builds the editor workspace and TypeScript extension runtime, then creates Chrome and Firefox packages in
 `build/chrome-*.zip` and `build/firefox-*.zip`, plus the Firefox reviewer source
 archive at `build/sidenote-*-source.zip`.
 
@@ -37,6 +37,12 @@ npm run test:run  # single run
 Runs the editor tests followed by the extension unit/integration tests using
 Vitest, jsdom, and fake-indexeddb.
 
+### Type Check
+```bash
+npm run typecheck
+```
+Checks both the SideNote extension runtime and the editor workspace.
+
 ### Install Dependencies
 ```bash
 npm install
@@ -53,48 +59,52 @@ npm install
 - **chrome.storage.local**: Global settings only (migrated from for notes)
 
 ### Core Modules
-- **src/main.js**: Entry point and application initialization (ES6 module)
-- **src/state.js**: Centralized state management for shared variables
-- **src/constants.js**: Shared constants (`THIRTY_DAYS_MS`, etc.)
-- **src/dom.js**: DOM element references and selections
-- **src/utils.js**: Utility functions (timestamps, file handling, blob URL tracking)
-- **src/ui-helpers.js**: Shared UI utilities (`createDropdown`)
-- **src/settings.js**: Global settings management, theme, and `populateSettingsForm`
-- **src/notes.js**: Note data operations (CRUD, sorting, pin/unpin)
-- **src/history.js**: Navigation history management
-- **src/text-processors.js**: Text processing (tilde escaping, line breaks, checkbox toggle)
-- **src/import_export.js**: .snote/.snotes file processing
-- **src/editor/sidenote-editor-adapter.js**: Connects SideNote storage,
+- **src/main.ts**: Entry point and application initialization (TypeScript ES module)
+- **src/types.ts**: Shared note, settings, image, and navigation types
+- **src/globals.d.ts**: Types for packaged browser globals and reviewer-safe vendor scripts
+- **src/state.ts**: Centralized state management for shared variables
+- **src/constants.ts**: Shared constants (`THIRTY_DAYS_MS`, etc.)
+- **src/dom.ts**: Typed DOM element references and selections
+- **src/utils.ts**: Utility functions (timestamps, file handling, blob URL tracking)
+- **src/ui-helpers.ts**: Shared UI utilities (`createDropdown`)
+- **src/settings.ts**: Global settings management, theme, and `populateSettingsForm`
+- **src/notes.ts**: Note data operations (CRUD, sorting, pin/unpin)
+- **src/history.ts**: Navigation history management
+- **src/text-processors.ts**: Text processing (tilde escaping, line breaks, checkbox toggle)
+- **src/import_export.ts**: .snote/.snotes file processing
+- **src/editor/sidenote-editor-adapter.ts**: Connects SideNote storage,
   settings, paste processing, theme CSS, and highlight.js token ranges to the
   reusable editor Web Component
 - **packages/wysiwyg-markdown/**: Lit/ProseMirror Web Component source, demo,
   tests, and build configuration managed as an npm workspace
 - **build.js**: Packages the compiled editor and extension files for Chrome and
   Firefox
+- **tsconfig.extension.json**: Compiles readable extension ES modules to
+  `build/extension-runtime/` before packaging
 
 ### Database Module (`src/database/`)
-- **init.js**: IndexedDB initialization, `dbTransaction()` helper, `closeDB()`
-- **notes.js**: Note CRUD operations using `dbTransaction`
-- **images.js**: Image CRUD operations using `dbTransaction`
-- **index.js**: Re-exports all database functions
+- **init.ts**: IndexedDB initialization, typed `dbTransaction()` helper, `closeDB()`
+- **notes.ts**: Note CRUD operations using `dbTransaction`
+- **images.ts**: Image CRUD operations using `dbTransaction`
+- **index.ts**: Re-exports all database functions
 
 ### Events Module (`src/events/`)
-- **editor.js**: Editor input, paste, keyboard shortcuts, checkbox clicks
-- **navigation.js**: Back navigation, `saveCurrentEditorIfChanged()`, history dropdown
-- **settings-events.js**: Settings UI event handlers
-- **import-export-events.js**: Import/export button handlers
-- **global-events.js**: Escape key, theme change, dropdown closing
-- **index.js**: Initializes all event listeners
+- **editor.ts**: Editor input, paste, keyboard shortcuts, checkbox clicks
+- **navigation.ts**: Back navigation, `saveCurrentEditorIfChanged()`, history dropdown
+- **settings-events.ts**: Settings UI event handlers
+- **import-export-events.ts**: Import/export button handlers
+- **global-events.ts**: Escape key, theme change, dropdown closing
+- **index.ts**: Initializes all event listeners
 
 ### Notes View Module (`src/notes_view/`)
-- **view-manager.js**: View visibility management (list, editor, settings, etc.)
-- **note-renderer.js**: Note list rendering and note opening
-- **markdown-renderer.js**: Preview/source mode switching plus hidden legacy
+- **view-manager.ts**: View visibility management (list, editor, settings, etc.)
+- **note-renderer.ts**: Note list rendering and note opening
+- **markdown-renderer.ts**: Preview/source mode switching plus hidden legacy
   HTML rendering, sanitization, code decoration, and image loading helpers
-- **image-modal.js**: Fullscreen image preview modal with zoom
-- **image-manager.js**: Image list UI and management
-- **recycle-bin-renderer.js**: Deleted items list rendering
-- **index.js**: Re-exports all view functions
+- **image-modal.ts**: Fullscreen image preview modal with zoom
+- **image-manager.ts**: Image list UI and management
+- **recycle-bin-renderer.ts**: Deleted items list rendering
+- **index.ts**: Re-exports all view functions
 
 ### Key Features Implementation
 - **WYSIWYG Markdown**: The editor workspace parses Markdown into a

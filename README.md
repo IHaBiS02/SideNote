@@ -87,11 +87,12 @@ npm run test:run
 npm run build
 ```
 
+The SideNote runtime is maintained as TypeScript in `background.ts` and `src/`.
 The reusable editor source is part of this repository at
-`packages/wysiwyg-markdown/`. The root build compiles it before packaging the
-extension, then creates the AMO reviewer source archive, so a SideNote checkout
-is sufficient for development and releases. `npm run release:amo` remains an
-alias of `npm run build` for compatibility.
+`packages/wysiwyg-markdown/`. The root build compiles both into JavaScript before
+packaging the extension, then creates the AMO reviewer source archive, so a
+SideNote checkout is sufficient for development and releases.
+`npm run release:amo` remains an alias of `npm run build` for compatibility.
 
 Architecture references:
 

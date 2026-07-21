@@ -1,6 +1,6 @@
 # Functions
 
-This file documents the functions used in the SideNote extension (ES6 modules).
+This file documents the functions used in the SideNote extension (TypeScript ES modules).
 
 ## Build workspace
 
@@ -10,9 +10,11 @@ This file documents the functions used in the SideNote extension (ES6 modules).
 - `npm run build:editor`: Generates the combined extension/editor runtime
   dependency notices, compiles the TypeScript Web Component with Vite, and
   emits declaration files.
-- `npm run build:extension`: Runs `build.js`, which copies extension sources,
-  locked third-party browser assets, and the compiled editor bundle into each
-  browser package.
+- `npm run build:app`: Compiles `background.ts` and `src/**/*.ts` into readable
+  JavaScript under `build/extension-runtime/` while preserving module paths.
+- `npm run build:extension`: Runs `build:app`, then `build.js`, which copies the
+  compiled extension runtime, locked third-party browser assets, and editor
+  bundle into each browser package.
 - `npm run package:amo-source`: Creates an allow-listed, deterministic source
   ZIP with reviewer instructions.
 - `npm run release:amo`: Compatibility alias for `npm run build`.
@@ -119,7 +121,14 @@ An `EditorExtension` can provide `commands`, `shortcuts`, `inputRules`, and a
 numeric `priority`. Structural schema extensions are not dynamically installed;
 the Markdown schema remains fixed for document compatibility.
 
-## src/state.js
+## src/types.ts and src/globals.d.ts
+
+- `types.ts`: Defines the shared `Note`, `NoteSettings`, `GlobalSettings`,
+  `StoredImage`, and `NavigationHistoryState` contracts.
+- `globals.d.ts`: Types the packaged `browser`, JSZip, Marked, DOMPurify, and
+  highlight.js globals without adding runtime imports to browser modules.
+
+## src/state.ts
 
 Central state management for shared variables:
 
@@ -137,14 +146,14 @@ Central state management for shared variables:
 
 IndexedDB operations are now modularized into separate files for better organization:
 
-### src/database/init.js
+### src/database/init.ts
 
 Database initialization and shared instance management:
 
 - `initDB()`: Initializes the IndexedDB database and creates object stores
 - `getDB()`: Gets the shared database instance for other modules
 
-### src/database/notes.js
+### src/database/notes.ts
 
 Note-related database operations:
 
@@ -157,7 +166,7 @@ Note-related database operations:
 **Internal functions** (not exported):
 - `_getNoteObject(id)`: Retrieves a note object from the database by its ID
 
-### src/database/images.js
+### src/database/images.ts
 
 Image-related database operations:
 
@@ -171,14 +180,14 @@ Image-related database operations:
 **Internal functions** (not exported):
 - `_getImageObject(id)`: Retrieves an image object from the database by its ID
 
-### src/database/index.js
+### src/database/index.ts
 
 Unified entry point for backward compatibility:
 
 - Re-exports all functions from the sub-modules for seamless integration
 - Maintains backward compatibility with existing imports
 
-## src/dom.js
+## src/dom.ts
 
 DOM element references (all constants exported):
 
@@ -187,7 +196,7 @@ Contains references to all UI elements used throughout the extension, including:
 - Interactive elements: buttons, inputs, dropdowns
 - Content areas: `noteList`, `markdownEditor`, `htmlPreview`, etc.
 
-## src/utils.js
+## src/utils.ts
 
 Utility functions (all functions exported):
 
@@ -197,7 +206,7 @@ Utility functions (all functions exported):
 - `downloadFile(blob, fileName)`: Downloads a file using blob URL
 - `extractImageIds(content)`: Extracts image IDs from markdown content
 
-## src/text-processors.js
+## src/text-processors.ts
 
 Legacy text processing utilities for markdown editing (all functions exported):
 
@@ -209,9 +218,9 @@ Legacy text processing utilities for markdown editing (all functions exported):
 - `handleEnterKeyInput(textarea, settings, insertTextFunction)`: Processes Enter key input for markdown line breaks with whitespace cleanup
 - `analyzeTextAtCursor(text, cursorPos)`: Analyzes text structure for cursor position and line information
 
-**Note**: Used by `src/events/editor.js` for consistent markdown text processing across different input methods
+**Note**: Used by `src/events/editor.ts` for consistent markdown text processing across different input methods
 
-## src/editor/sidenote-editor-adapter.js
+## src/editor/sidenote-editor-adapter.ts
 
 SideNote integration for the reusable WYSIWYG Markdown Web Component:
 
@@ -220,7 +229,7 @@ SideNote integration for the reusable WYSIWYG Markdown Web Component:
 
 Internal image Markdown paths remain `images/{id}.png`; the adapter resolves them to temporary Blob URLs without changing saved note content.
 
-## src/settings.js
+## src/settings.ts
 
 Settings management (functions exported):
 
@@ -239,7 +248,7 @@ Settings management (functions exported):
 
 **Note**: Uses `globalSettings` from state.js module
 
-## src/notes.js
+## src/notes.ts
 
 Note operations (functions exported):
 
@@ -252,7 +261,7 @@ Note operations (functions exported):
 
 **Note**: These functions mutate in-memory state and persist through the database layer, but they no longer call view renderers directly. Event or view callers are responsible for refreshing affected UI.
 
-## src/history.js
+## src/history.ts
 
 Navigation history management (all functions exported):
 
@@ -270,7 +279,7 @@ Navigation history management (all functions exported):
 **Constants**:
 - `HISTORY_STACK_LIMIT`: Maximum history size (512 items)
 
-## src/import_export.js
+## src/import_export.ts
 
 File processing (functions exported):
 
@@ -290,7 +299,7 @@ File processing (functions exported):
 
 UI rendering and view management is now modularized into separate files for better organization:
 
-### src/notes_view/view-manager.js
+### src/notes_view/view-manager.ts
 
 View switching and navigation management:
 
@@ -301,14 +310,14 @@ View switching and navigation management:
 - `showRecycleBinView(addToHistory)`: Shows the recycle bin view
 - `showImageManagementView(addToHistory)`: Shows the image management view
 
-### src/notes_view/note-renderer.js
+### src/notes_view/note-renderer.ts
 
 Note list and editor functionality:
 
 - `renderNoteList()`: Renders the list of notes in the main view
 - `openNote(noteId, inEditMode, addToHistory)`: Opens a note in the editor
 
-### src/notes_view/markdown-renderer.js
+### src/notes_view/markdown-renderer.ts
 
 Markdown and image rendering functionality:
 
@@ -321,20 +330,20 @@ Markdown and image rendering functionality:
 - `renderImages()`: Renders images in the markdown preview
 - `togglePreview()`: Toggles between editable WYSIWYG Preview and full-document Markdown source editing
 
-### src/notes_view/recycle-bin-renderer.js
+### src/notes_view/recycle-bin-renderer.ts
 
 Recycle bin rendering and management:
 
 - `renderDeletedItemsList()`: Renders the list of deleted items in recycle bin
 
-### src/notes_view/image-manager.js
+### src/notes_view/image-manager.ts
 
 Image modal and management functionality:
 
 - `showImageModal(blobUrl)`: Shows an image in a modal dialog
 - `renderImagesList()`: Renders the list of images in image management
 
-### src/notes_view/index.js
+### src/notes_view/index.ts
 
 Unified entry point for backward compatibility:
 
@@ -345,7 +354,7 @@ Unified entry point for backward compatibility:
 
 Event handling is now modularized into separate files for better organization:
 
-### src/events/navigation.js
+### src/events/navigation.ts
 
 Navigation, history, and back button functionality:
 
@@ -356,7 +365,7 @@ Navigation, history, and back button functionality:
 - `refreshHistoryDropdown()`: Refreshes the history dropdown if open
 - `initializeNavigationEvents()`: Sets up all navigation-related event listeners
 
-### src/events/editor.js
+### src/events/editor.ts
 
 Note creation, markdown editor, and paste handling:
 
@@ -365,7 +374,7 @@ Note creation, markdown editor, and paste handling:
 
 Handles: new note creation (opening directly in editable WYSIWYG Preview), markdown input, image paste, WYSIWYG `Shift+Enter` soft breaks, source-mode preview shortcuts, checkbox interactions, title editing
 
-### src/events/settings-events.js
+### src/events/settings-events.ts
 
 Settings-related event listeners:
 
@@ -373,7 +382,7 @@ Settings-related event listeners:
 
 Handles: note/global settings, licenses, recycle bin, image management, confirmation dropdowns
 
-### src/events/import-export-events.js
+### src/events/import-export-events.ts
 
 Import/export functionality:
 
@@ -383,7 +392,7 @@ Handles: note/global export, file import, .snote/.snotes processing
 
 Right-clicking an export button opens a format dropdown. The `.zip` option can be right-clicked again to show original Markdown and Markdown with two-space line break options above the `.zip` row.
 
-### src/events/global-events.js
+### src/events/global-events.ts
 
 Global keyboard events and system theme detection:
 
@@ -391,14 +400,14 @@ Global keyboard events and system theme detection:
 
 Handles: ESC key, system theme changes, dropdown closing
 
-### src/events/index.js
+### src/events/index.ts
 
 Unified entry point for all event modules:
 
 - `initializeAllEvents()`: Initializes all event listeners from all modules
 - Re-exports utility functions: `navigateToState`, `goBack`, `populateHistoryDropdown`, `showHistoryDropdown`, `refreshHistoryDropdown`, `insertTextAtCursor`
 
-## src/main.js
+## src/main.ts
 
 Application entry point and initialization:
 
@@ -412,10 +421,11 @@ Application entry point and initialization:
 
 ## Module Architecture
 
-The extension now uses ES6 modules with explicit imports/exports:
+The extension source uses TypeScript ES modules with explicit imports/exports;
+`tsc` preserves the module layout and `.js` import specifiers in browser output:
 
-1. **State Management**: Centralized in `state.js` with getter/setter functions
+1. **State Management**: Centralized in `state.ts` with typed live bindings and setter functions
 2. **Dependency Injection**: Modules import only what they need from other modules
-3. **Entry Point**: `main.js` is loaded as `type="module"` in HTML
+3. **Entry Point**: Source `main.ts` is emitted as `src/main.js`, which is loaded as `type="module"` in HTML
 4. **Event Initialization**: Event listeners are organized in `src/events/` modules and initialized via `initializeAllEvents()` call
 5. **Circular Dependencies**: Avoided through careful module structure and state centralization

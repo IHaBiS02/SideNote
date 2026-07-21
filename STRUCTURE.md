@@ -10,39 +10,42 @@ SideNote is a browser extension that provides a note-taking interface within the
 
 -   **`manifest.json`**: The core configuration file for the Chrome extension. It defines permissions, icons, and registers the side panel.
 -   **`sidepanel.html`**: The main HTML file that defines the structure of the user interface, including all views (note list, editor, settings, etc.).
--   **`src/`**: This directory contains all the JavaScript logic for the extension, broken down into modules.
-    -   `main.js`: The main entry point. It runs a deterministic `bootstrap()` sequence that initializes the database, loads settings and notes, handles the one-time migration of notes from `chrome.storage` to `IndexedDB`, cleans expired recycle-bin items, renders the initial view, and calls `initializeAllEvents()` to set up all event listeners.
+-   **`src/`**: This directory contains the TypeScript extension runtime, organized as readable ES modules. `tsc` preserves this module layout when emitting JavaScript for browser packages.
+    -   `main.ts`: The main entry point. It runs a deterministic `bootstrap()` sequence that initializes the database, loads settings and notes, handles the one-time migration of notes from `chrome.storage` to `IndexedDB`, cleans expired recycle-bin items, renders the initial view, and calls `initializeAllEvents()` to set up all event listeners.
+    -   `types.ts`: Shared note, settings, stored-image, and navigation types.
+    -   `globals.d.ts`: Declarations for packaged browser/vendor globals.
     -   `database/`: Directory containing modularized IndexedDB operations:
-        -   `init.js`: Database initialization and shared instance management
-        -   `notes.js`: Note-related database operations and CRUD functions
-        -   `images.js`: Image-related database operations and blob management
-        -   `index.js`: Unified entry point for backward compatibility
+        -   `init.ts`: Database initialization and shared instance management
+        -   `notes.ts`: Note-related database operations and CRUD functions
+        -   `images.ts`: Image-related database operations and blob management
+        -   `index.ts`: Unified entry point for backward compatibility
     -   `editor/`:
-        -   `sidenote-editor-adapter.js`: Connects the reusable `<wysiwyg-markdown>` component to SideNote image storage, paste processing, editor modes, highlight.js syntax token ranges, and the 4.1.14-compatible Preview theme. Preview and source editing share the SideNote-owned `--editor-padding` value.
-    -   `dom.js`: Contains DOM element references as constants for all UI elements used throughout the extension.
-    -   `notes.js`: Contains the core logic for managing notes (sorting, deleting, pinning, restoring, etc.).
+        -   `sidenote-editor-adapter.ts`: Connects the reusable `<wysiwyg-markdown>` component to SideNote image storage, paste processing, editor modes, highlight.js syntax token ranges, and the 4.1.14-compatible Preview theme. Preview and source editing share the SideNote-owned `--editor-padding` value.
+    -   `dom.ts`: Contains typed DOM element references for all UI elements used throughout the extension.
+    -   `notes.ts`: Contains the core logic for managing notes (sorting, deleting, pinning, restoring, etc.).
     -   `notes_view/`: Directory containing modularized UI rendering and view management:
-        -   `view-manager.js`: View switching and navigation management  
-        -   `note-renderer.js`: Note list and editor functionality
-        -   `markdown-renderer.js`: Markdown and image rendering functionality
-        -   `recycle-bin-renderer.js`: Recycle bin rendering and management
-        -   `image-manager.js`: Image modal and management functionality
-        -   `index.js`: Unified entry point for backward compatibility
+        -   `view-manager.ts`: View switching and navigation management
+        -   `note-renderer.ts`: Note list and editor functionality
+        -   `markdown-renderer.ts`: Markdown and image rendering functionality
+        -   `recycle-bin-renderer.ts`: Recycle bin rendering and management
+        -   `image-manager.ts`: Image modal and management functionality
+        -   `index.ts`: Unified entry point for backward compatibility
     -   `events/`: Directory containing modularized event handling:
-        -   `navigation.js`: Navigation, history, and back button functionality
-        -   `editor.js`: Note creation, markdown editor, and paste handling
-        -   `settings-events.js`: Settings-related event listeners
-        -   `import-export-events.js`: Import/export functionality
-        -   `global-events.js`: Global keyboard events and system theme detection
-        -   `index.js`: Unified entry point that exports `initializeAllEvents()` function
-    -   `history.js`: Manages the view navigation history stack, allowing for "back" functionality.
-    -   `settings.js`: Manages global and note-specific settings, including default setting normalization and effective setting resolution.
-    -   `import_export.js`: Contains the logic for parsing `.snote` files, saving parsed imports, and packaging `.snote`/`.snotes` zip archives.
-    -   `utils.js`: Utility functions for timestamps, filename sanitization, file downloads, scoped blob URL tracking, and image ID extraction.
-    -   `text-processors.js`: Legacy text processing utilities for markdown editing, including tilde escaping, auto line breaks, Enter key handling, and whitespace cleanup.
+        -   `navigation.ts`: Navigation, history, and back button functionality
+        -   `editor.ts`: Note creation, markdown editor, and paste handling
+        -   `settings-events.ts`: Settings-related event listeners
+        -   `import-export-events.ts`: Import/export functionality
+        -   `global-events.ts`: Global keyboard events and system theme detection
+        -   `index.ts`: Unified entry point that exports `initializeAllEvents()` function
+    -   `history.ts`: Manages the view navigation history stack, allowing for "back" functionality.
+    -   `settings.ts`: Manages global and note-specific settings, including default setting normalization and effective setting resolution.
+    -   `import_export.ts`: Contains the logic for parsing `.snote` files, saving parsed imports, and packaging `.snote`/`.snotes` zip archives.
+    -   `utils.ts`: Utility functions for timestamps, filename sanitization, file downloads, scoped blob URL tracking, and image ID extraction.
+    -   `text-processors.ts`: Legacy text processing utilities for markdown editing, including tilde escaping, auto line breaks, Enter key handling, and whitespace cleanup.
 -   **`sidepanel.css`**: The primary stylesheet for the extension's UI.
 -   **`dark_mode.css`**: A supplementary stylesheet containing CSS variables and rules specifically for the dark mode theme.
--   **`background.js`**: A service worker script that handles the initial opening of the side panel when the extension icon is clicked.
+-   **`background.ts`**: Cross-browser background source compiled to the packaged `background.js`; it opens Chrome's side panel or Firefox's sidebar from the extension action/command.
+-   **`tsconfig.extension.json`**: Strict TypeScript configuration that emits readable ES modules and `background.js` into `build/extension-runtime/`.
 -   **`packages/wysiwyg-markdown/`**: The reusable Lit/ProseMirror editor npm workspace:
     -   `src/index.ts`: Public exports and idempotent registration of `<wysiwyg-markdown>`.
     -   `src/core/markdown.ts`: ProseMirror schema plus Markdown parser and serializer. It covers headings, emphasis, strikethrough, lists/tasks, soft breaks, fenced code, links, and images.
@@ -82,7 +85,7 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **`#recycle-bin-view`**: Displays a list of deleted items (`#deleted-items-list`), both notes and images, with options to restore or delete them permanently. Includes an "Empty Recycle Bin" button.
 -   **`#image-management-view`**: Displays a list of all images (`#image-list`) with usage information and deletion controls.
 
-## 4. JavaScript Logic
+## 4. TypeScript Extension Logic
 
 ### Core Concepts & State Management
 
@@ -92,7 +95,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   `activeNoteId`: Stores the `id` of the note currently being edited.
     -   `globalSettings`: An object holding all global application settings.
     -   `isPreview`: A boolean flag to track if the editor is in "Preview" or "Edit" mode.
-    -   Navigation history is managed through the `history.js` module.
+    -   Navigation history is managed through the `history.ts` module.
 -   **Data Persistence**:
     -   Notes and images are stored in `IndexedDB`.
     -   `chrome.storage.local` stores `globalSettings` and is also used for the one-time migration of old note data.
@@ -100,57 +103,57 @@ The UI is a single-page application with several distinct "views" that are shown
 
 ### Function Breakdown
 
-#### Initialization & Data Management (`main.js`, `src/database/`)
+#### Initialization & Data Management (`main.ts`, `src/database/`)
 
 -   **`bootstrap()`**: Runs the startup sequence in order: IndexedDB initialization, settings/note load and migration, recycle-bin cleanup, initial UI render, and event binding.
--   **`initDB()`**: Initializes the IndexedDB database and creates the `images` and `notes` object stores (located in `src/database/init.js`).
+-   **`initDB()`**: Initializes the IndexedDB database and creates the `images` and `notes` object stores (located in `src/database/init.ts`).
 -   **`loadAndMigrateData()`**: On startup, this function loads all data from `IndexedDB`. It also handles the one-time migration of notes from `chrome.storage.local` to `IndexedDB`.
--   **`saveNote()` / `getAllNotes()` / `deleteNoteDB()` / etc.**: A set of async functions in `src/database/notes.js` to perform CRUD operations on note data in IndexedDB.
--   **`saveImage()` / `getImage()` / `deleteImage()` / etc.**: A set of async functions in `src/database/images.js` to perform CRUD operations on image data in IndexedDB.
+-   **`saveNote()` / `getAllNotes()` / `deleteNoteDB()` / etc.**: A set of async functions in `src/database/notes.ts` to perform CRUD operations on note data in IndexedDB.
+-   **`saveImage()` / `getImage()` / `deleteImage()` / etc.**: A set of async functions in `src/database/images.ts` to perform CRUD operations on image data in IndexedDB.
 -   **`sortNotes()`**: Sorts the `notes` array based on pin status and the `lastModified` timestamp.
 -   **`cleanupDeletedNotes()` / `cleanupDeletedImages()`**: Automatically and permanently deletes items from the recycle bin that are older than 30 days.
-    -   Note operations mutate state and persist through the database layer. UI refreshes are handled by the event or view caller rather than by `src/notes.js`.
+    -   Note operations mutate state and persist through the database layer. UI refreshes are handled by the event or view caller rather than by `src/notes.ts`.
 
-#### View Management (`src/notes_view/`, `history.js`, `src/events/`)
+#### View Management (`src/notes_view/`, `history.ts`, `src/events/`)
 
--   **`showListView()` / `showEditorView()` / `showSettingsView()` / etc.**: A set of functions in `src/notes_view/view-manager.js` that control UI visibility. They now accept an `addToHistory` parameter and will call `pushToHistory` to record the navigation change.
--   **`pushToHistory()` / `popFromHistory()` / etc.**: Functions in `history.js` for managing the `navigationHistory` stack.
--   **`goBack()`**: A function in `src/events/navigation.js` that is triggered by back buttons or the Escape key. It uses the `navigationHistory` to return the user to the previously visited view.
+-   **`showListView()` / `showEditorView()` / `showSettingsView()` / etc.**: A set of functions in `src/notes_view/view-manager.ts` that control UI visibility. They now accept an `addToHistory` parameter and will call `pushToHistory` to record the navigation change.
+-   **`pushToHistory()` / `popFromHistory()` / etc.**: Functions in `history.ts` for managing the `navigationHistory` stack.
+-   **`goBack()`**: A function in `src/events/navigation.ts` that is triggered by back buttons or the Escape key. It uses the `navigationHistory` to return the user to the previously visited view.
 -   **`backButton` (Context Menu)**: Right-clicking the back button opens a custom dropdown menu displaying the navigation history, allowing the user to jump to a specific previous view.
 -   **`navigateToState(state)`**: Navigates to a specific view state based on the provided state object.
--   **History Dropdown Management**: Functions in `src/events/navigation.js` to show, populate, and refresh the navigation history dropdown.
+-   **History Dropdown Management**: Functions in `src/events/navigation.ts` to show, populate, and refresh the navigation history dropdown.
 
 #### Note List (`src/notes_view/`, `src/events/`)
 
--   **`renderNoteList()`**: Populates the `#note-list` with items from the `notes` array (located in `src/notes_view/note-renderer.js`).
--   **`newNoteButton` (Event Listener)**: Creates a new, empty note object and opens it (handled in `src/events/editor.js`).
+-   **`renderNoteList()`**: Populates the `#note-list` with items from the `notes` array (located in `src/notes_view/note-renderer.ts`).
+-   **`newNoteButton` (Event Listener)**: Creates a new, empty note object and opens it (handled in `src/events/editor.ts`).
 -   **`deleteNote(noteId)`**: Moves a note to the recycle bin by adding a `deletedAt` timestamp.
 -   **`togglePin(noteId)`**: Toggles the pin status of a note.
--   **`emptyRecycleBin()`**: Empties the recycle bin after two-step confirmation (handled in `src/events/settings-events.js`).
+-   **`emptyRecycleBin()`**: Empties the recycle bin after two-step confirmation (handled in `src/events/settings-events.ts`).
 
 #### Editor (`src/notes_view/`, `src/events/`)
 
--   **`openNote(noteId, inEditMode, addToHistory)`**: Sets the `activeNoteId` and populates the editor with the note's content. It now also records the action in the navigation history (located in `src/notes_view/note-renderer.js`).
--   **`markdownEditor` (Event Listeners)** (handled in `src/events/editor.js`):
+-   **`openNote(noteId, inEditMode, addToHistory)`**: Sets the `activeNoteId` and populates the editor with the note's content. It now also records the action in the navigation history (located in `src/notes_view/note-renderer.ts`).
+-   **`markdownEditor` (Event Listeners)** (handled in `src/events/editor.ts`):
     -   `input`: Updates the note content and metadata on every keystroke.
-    -   WYSIWYG paste hooks save images to IndexedDB and apply enabled legacy text formatting through `src/editor/sidenote-editor-adapter.js`.
+    -   WYSIWYG paste hooks save images to IndexedDB and apply enabled legacy text formatting through `src/editor/sidenote-editor-adapter.ts`.
     -   `keydown`: WYSIWYG `Shift+Enter` inserts a single inline soft break; the full-document source editor retains `Shift+Enter` preview switching. The legacy textarea fallback retains its Enter and paste handlers.
--   **`renderMarkdown()`**: Updates the hidden legacy HTML preview used by compatibility helpers. It converts Markdown with Marked, sanitizes with DOMPurify, applies legacy code decoration, and calls `renderImages()`. The visible Preview is the `<wysiwyg-markdown>` component and does not use this HTML as its editable DOM (located in `src/notes_view/markdown-renderer.js`).
--   **`renderImages()`**: Finds all `<img>` tags in the preview and loads their `src` from IndexedDB blob URLs (located in `src/notes_view/markdown-renderer.js`). Preview, image management, and recycle bin views each use scoped blob URL trackers.
--   **`togglePreview()`**: Switches the custom element between editable WYSIWYG Preview and full-document Markdown source editing, and records the change in navigation history (located in `src/notes_view/markdown-renderer.js`).
+-   **`renderMarkdown()`**: Updates the hidden legacy HTML preview used by compatibility helpers. It converts Markdown with Marked, sanitizes with DOMPurify, applies legacy code decoration, and calls `renderImages()`. The visible Preview is the `<wysiwyg-markdown>` component and does not use this HTML as its editable DOM (located in `src/notes_view/markdown-renderer.ts`).
+-   **`renderImages()`**: Finds all `<img>` tags in the preview and loads their `src` from IndexedDB blob URLs (located in `src/notes_view/markdown-renderer.ts`). Preview, image management, and recycle bin views each use scoped blob URL trackers.
+-   **`togglePreview()`**: Switches the custom element between editable WYSIWYG Preview and full-document Markdown source editing, and records the change in navigation history (located in `src/notes_view/markdown-renderer.ts`).
 
-#### Settings & Recycle Bin (`settings.js`, `src/notes_view/`, `src/events/`)
+#### Settings & Recycle Bin (`settings.ts`, `src/notes_view/`, `src/events/`)
 
--   **Settings Listeners**: Update `globalSettings` or note-specific settings (handled in `src/events/settings-events.js`).
+-   **Settings Listeners**: Update `globalSettings` or note-specific settings (handled in `src/events/settings-events.ts`).
 -   **`applyMode(mode)`**: Toggles the `dark-mode` class on the `<body>`.
--   **`renderDeletedItemsList()`**: Fetches all deleted notes and images from `IndexedDB`. It combines them into a single array, sorts them by deletion date, and renders them in the `#deleted-items-list`. Each item has controls to be restored or permanently deleted (located in `src/notes_view/recycle-bin-renderer.js`).
--   **`renderImagesList()`**: Renders the list of images in the image management view, showing usage information and delete controls (located in `src/notes_view/image-manager.js`). Usage detection is based on exact Markdown image references extracted from note content.
+-   **`renderDeletedItemsList()`**: Fetches all deleted notes and images from `IndexedDB`. It combines them into a single array, sorts them by deletion date, and renders them in the `#deleted-items-list`. Each item has controls to be restored or permanently deleted (located in `src/notes_view/recycle-bin-renderer.ts`).
+-   **`renderImagesList()`**: Renders the list of images in the image management view, showing usage information and delete controls (located in `src/notes_view/image-manager.ts`). Usage detection is based on exact Markdown image references extracted from note content.
 -   **`restoreNote(noteId)` / `restoreImage(id)`**: Moves an item from the recycle bin back to the active state.
 -   **`deleteNotePermanently(noteId)` / `deleteImagePermanently(id)`**: Removes an item permanently from storage.
 
-#### Import & Export (`import_export.js`, `src/events/`)
+#### Import & Export (`import_export.ts`, `src/events/`)
 
--   **Export Buttons**: Left-click packages one or all notes into a `.snote` or `.snotes` zip file. Right-click opens an export format dropdown with `.zip` above `.snote`/`.snotes`. Right-clicking the `.zip` option inserts original Markdown and Markdown with two-space line breaks options above the `.zip` row. All-notes `.zip` exports use sanitized note titles as folder names, while `.snotes` keeps note IDs for compatibility. Shared helpers in `src/import_export.js` write note content (`note.md`), metadata (`metadata.json`), and any associated images from IndexedDB.
+-   **Export Buttons**: Left-click packages one or all notes into a `.snote` or `.snotes` zip file. Right-click opens an export format dropdown with `.zip` above `.snote`/`.snotes`. Right-clicking the `.zip` option inserts original Markdown and Markdown with two-space line breaks options above the `.zip` row. All-notes `.zip` exports use sanitized note titles as folder names, while `.snotes` keeps note IDs for compatibility. Shared helpers in `src/import_export.ts` write note content (`note.md`), metadata (`metadata.json`), and any associated images from IndexedDB.
 -   **Import Buttons**: Unzip a `.snote` or `.snotes` file and parse metadata/content/images without saving first. Event handlers then choose whether to create new notes or update the active note.
 
 ## 5. Packaged Runtime Assets (`build/<browser>/vendor/`)
@@ -172,7 +175,9 @@ is first-party generated code and is listed separately.
 -   **`wysiwyg-markdown.js`**: Self-contained Lit/ProseMirror Web Component bundle generated from `packages/wysiwyg-markdown/src/`. Code tokens use the local highlight.js runtime and Atom One color variables without replacing editable DOM. Multi-line code uses a separate non-editable gutter whose line boxes and spacing mirror the editable code body and the 4.1.14 layout; single-line code hides it so copied and saved code remains clean.
 
 The root `npm run build` command first regenerates the combined extension/editor
-dependency notices, builds the editor workspace, and copies the bundle and
-`LIBRARY_LICENSES.md` into the Chrome and Firefox outputs. It then creates the
+dependency notices and builds the editor workspace. It then compiles
+`background.ts` and `src/**/*.ts` into readable JavaScript under
+`build/extension-runtime/`, copies that runtime, the editor bundle, and
+`LIBRARY_LICENSES.md` into the Chrome and Firefox outputs, and creates the
 allow-listed AMO reviewer source ZIP. The repository therefore has one lockfile,
 one build command, and no manual synchronization step.

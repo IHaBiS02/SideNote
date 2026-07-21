@@ -1,15 +1,17 @@
 # SideNote Firefox AMO source submission guide
 
-Checked against Mozilla documentation on 2026-07-20. Review requirements and
+Checked against Mozilla documentation on 2026-07-21. Review requirements and
 the default build environment can change, so verify the linked Mozilla pages
 before submitting a new version.
 
 ## Why source is submitted
 
-SideNote compiles the TypeScript editor under
-`packages/wysiwyg-markdown/src/` into a browser bundle with Vite. Mozilla
-requires readable source, a lockfile, and reproducible build instructions when
-an extension uses bundling, minification, transpilation, or similar processing.
+SideNote compiles its TypeScript extension runtime (`background.ts` and
+`src/**/*.ts`) into readable JavaScript with `tsc`, and compiles the TypeScript
+editor under `packages/wysiwyg-markdown/src/` into a browser bundle with Vite.
+Mozilla requires readable source, a lockfile, and reproducible build
+instructions when an extension uses bundling, minification, transpilation, or
+similar processing.
 
 Official references:
 
@@ -50,9 +52,11 @@ npm ci
 npm run build
 ```
 
-The result is `build/firefox-<version-with-underscores>.zip`. The editor source
-is compiled first and copied directly into the extension package by `build.js`.
-There is no second repository, nested install, or manual synchronization step.
+The result is `build/firefox-<version-with-underscores>.zip`. The editor is
+compiled first, then `tsc` emits the SideNote runtime to
+`build/extension-runtime/`; `build.js` copies only the generated JavaScript into
+the extension package. There is no second repository, nested install, or manual
+synchronization step.
 
 The generated `README-AMO.md` records Mozilla's reviewer environment used when
 this workflow was prepared:
@@ -73,7 +77,8 @@ For each release, upload both:
 
 In Notes for Reviewers, state that the repository is an npm workspace and the
 complete build is `npm ci` followed by `npm run build`. Mention that
-`vendor/wysiwyg-markdown.js` in the built extension is generated from
+`background.js` and `src/**/*.js` in the built extension are generated from the
+root TypeScript sources, while `vendor/wysiwyg-markdown.js` is generated from
 `packages/wysiwyg-markdown/src/`.
 
 The current editor source layout and host boundary are documented in

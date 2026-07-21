@@ -15,7 +15,7 @@ const sourceEntries = [
   'LIBRARY_LICENSES.md',
   'README.md',
   'FIREFOX_AMO_SOURCE_SUBMISSION_GUIDE.md',
-  'background.js',
+  'background.ts',
   'build.js',
   'dark_mode.css',
   'images',
@@ -134,9 +134,10 @@ The command creates:
 - Reviewer source package: \`build/sidenote-${version}-source.zip\`
 
 The first command installs the exact versions in the included workspace
-lockfile. The build then compiles
-\`packages/wysiwyg-markdown/src/**/*.ts\` with Vite and TypeScript before
-packaging the extension. The generated editor bundle is not included as source.
+lockfile. The build compiles \`background.ts\` and \`src/**/*.ts\` with
+TypeScript, then compiles \`packages/wysiwyg-markdown/src/**/*.ts\` with Vite
+and TypeScript before packaging the extension. Generated JavaScript and the
+editor bundle are not included as source.
 
 All third-party dependencies are public, unmodified packages declared in the
 included \`package.json\` files and locked by the root \`package-lock.json\`.
