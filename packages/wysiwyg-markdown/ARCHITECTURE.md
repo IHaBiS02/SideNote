@@ -108,8 +108,10 @@ Built-in input rules recognize:
 - `---` for a horizontal rule.
 
 `Shift+Enter` inserts a soft break in normal inline content and preserves
-newline behavior inside code. SideNote uses full-document source mode when the
-user double-clicks Preview or presses Edit.
+newline behavior inside code. Pressing `Backspace` in an empty heading converts
+it to a paragraph, removing the corresponding Markdown heading marker without
+opening source mode. SideNote uses full-document source mode when the user
+double-clicks Preview or presses Edit.
 
 ## Extensions
 

@@ -59,6 +59,6 @@ https://github.com/IHaBiS02/SideNote/actions/workflows/release.yml
 https://github.com/IHaBiS02/SideNote/releases/tag/v<version>
 ```
 
-예를 들어 버전이 `4.2.14`이면 `v4.2.14` 태그를 사용합니다.
+예를 들어 버전이 `4.2.15`이면 `v4.2.15` 태그를 사용합니다.
 
 > 같은 버전 태그가 이미 원격에 있으면 새 태그를 만들지 않습니다. 먼저 버전을 올린 뒤 다시 실행합니다.

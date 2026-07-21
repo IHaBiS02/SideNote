@@ -92,6 +92,9 @@ editing remains available as an opt-in mode:
 <wysiwyg-markdown source-edit-scope="block"></wysiwyg-markdown>
 ```
 
+When the caret is in an empty heading, `Backspace` converts it to a paragraph
+and removes its `#` heading marker from the Markdown value.
+
 A host application can provide trusted CSS through `themeCss`. Editable syntax
 highlighting uses ProseMirror decorations, so it does not rewrite editable DOM.
 

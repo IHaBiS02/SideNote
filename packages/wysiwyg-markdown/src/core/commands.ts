@@ -22,6 +22,22 @@ function fromProseMirrorCommand(command: Command): EditorCommand {
   return ({ state, dispatch, view }) => command(state, dispatch, view);
 }
 
+export const clearEmptyHeading: Command = (state, dispatch) => {
+  const { selection } = state;
+  const heading = state.schema.nodes.heading;
+  const paragraph = state.schema.nodes.paragraph;
+
+  if (
+    !selection.empty ||
+    selection.$from.parent.type !== heading ||
+    selection.$from.parent.content.size !== 0
+  ) {
+    return false;
+  }
+
+  return setBlockType(paragraph)(state, dispatch);
+};
+
 export const standardCommands: Record<string, EditorCommand> = {
   undo: fromProseMirrorCommand(undo),
   redo: fromProseMirrorCommand(redo),

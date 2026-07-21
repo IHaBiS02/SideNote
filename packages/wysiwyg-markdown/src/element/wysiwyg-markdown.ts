@@ -10,7 +10,11 @@ import {
   EditorView,
   type NodeView,
 } from 'prosemirror-view';
-import { standardCommands, type EditorCommand } from '../core/commands';
+import {
+  clearEmptyHeading,
+  standardCommands,
+  type EditorCommand,
+} from '../core/commands';
 import {
   markdownSchema,
   parseMarkdown,
@@ -111,6 +115,9 @@ export class WysiwygMarkdownElement extends LitElement {
     'Mod-z': undo,
     'Shift-Mod-z': redo,
     'Mod-y': redo,
+  });
+  readonly #blockEditingKeymapPlugin = keymap({
+    Backspace: clearEmptyHeading,
   });
   readonly #lineBreakKeymapPlugin = keymap({
     'Shift-Enter': chainCommands(newlineInCode, (state, dispatch) => {
@@ -475,6 +482,7 @@ export class WysiwygMarkdownElement extends LitElement {
   #createPlugins(): Plugin[] {
     return [
       this.#historyPlugin,
+      this.#blockEditingKeymapPlugin,
       this.#standardInputRulesPlugin,
       this.#codeHighlightPlugin,
       ...this.#registry.plugins(),

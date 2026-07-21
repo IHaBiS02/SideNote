@@ -48,6 +48,8 @@ and deterministically regenerates the root `LIBRARY_LICENSES.md` file.
 
 - `EditorCommand(context)`: Command contract receiving the current state,
   optional dispatch function, and optional view.
+- `clearEmptyHeading(state, dispatch)`: Converts the selected empty heading to
+  a paragraph so Backspace removes its Markdown heading marker.
 - `standardCommands`: Built-in named commands: `undo`, `redo`, `paragraph`,
   `heading1`, `heading2`, `heading3`, `toggleBold`, `toggleItalic`,
   `toggleCode`, `toggleStrike`, and `blockquote`.

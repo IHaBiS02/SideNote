@@ -87,6 +87,9 @@ editor.use({
 모드로 전환됩니다. `Ctrl/Cmd + Enter`로 돌아갈 수 있습니다. 블록 단위 source
 편집은 `source-edit-scope="block"`을 지정할 때만 사용합니다.
 
+커서가 빈 제목에 있을 때 `Backspace`를 누르면 일반 문단으로 돌아가며 Markdown
+값에서도 해당 `#` 제목 표시가 제거됩니다.
+
 호스트 앱은 `themeCss`로 신뢰할 수 있는 CSS를 전달할 수 있습니다. 편집 가능한
 문법 강조는 ProseMirror decoration을 사용하므로 편집 DOM을 다시 작성하지
 않습니다.

@@ -187,6 +187,24 @@ describe('wysiwyg-markdown element', () => {
     expect(editor.value).not.toContain('\n\n');
   });
 
+  it('turns an empty heading into a paragraph with Backspace', async () => {
+    const editor = await createEditor('');
+    const proseMirror = editor.renderRoot.querySelector<HTMLElement>('.ProseMirror');
+
+    expect(editor.execute('heading2')).toBe(true);
+    expect(editor.getMarkdown()).toBe('## ');
+    expect(editor.renderRoot.querySelector('.ProseMirror > h2')).not.toBeNull();
+
+    proseMirror?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }),
+    );
+    await editor.updateComplete;
+
+    expect(editor.renderRoot.querySelector('.ProseMirror > h2')).toBeNull();
+    expect(editor.renderRoot.querySelector('.ProseMirror > p')).not.toBeNull();
+    expect(editor.getMarkdown()).toBe('');
+  });
+
   it('dispatches input events for commands', async () => {
     const editor = await createEditor('paragraph');
     const listener = vi.fn();
