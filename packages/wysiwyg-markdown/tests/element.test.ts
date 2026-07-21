@@ -114,6 +114,59 @@ describe('wysiwyg-markdown element', () => {
     expect(copyButton?.textContent).toBe('✓');
   });
 
+  it('edits the fenced code language from the non-content code header', async () => {
+    const editor = await createEditor('```javascript\nasdfasdfasdfasdf\n```');
+    const header = editor.renderRoot.querySelector<HTMLElement>('.code-block-header');
+    const language = editor.renderRoot.querySelector<HTMLElement>(
+      'span.code-block-language',
+    );
+    const languageEditor = editor.renderRoot.querySelector<HTMLInputElement>(
+      '.code-block-language-editor',
+    );
+
+    expect(header?.contentEditable).toBe('false');
+    expect(language?.textContent).toBe('javascript');
+    language?.click();
+    expect(languageEditor?.hidden).toBe(false);
+
+    languageEditor!.value = 'typescript';
+    languageEditor?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
+    );
+    await editor.updateComplete;
+
+    expect(languageEditor?.hidden).toBe(true);
+    expect(language?.textContent).toBe('typescript');
+    expect(editor.value).toBe('```typescript\nasdfasdfasdfasdf\n```');
+
+    language?.click();
+    languageEditor!.value = '';
+    languageEditor?.blur();
+    await editor.updateComplete;
+
+    expect(language?.textContent).toBe('text');
+    expect(editor.value).toBe('```\nasdfasdfasdfasdf\n```');
+  });
+
+  it('cancels fenced code language editing with Escape', async () => {
+    const editor = await createEditor('```javascript\nconst value = 1;\n```');
+    const language = editor.renderRoot.querySelector<HTMLElement>(
+      'span.code-block-language',
+    );
+    const languageEditor = editor.renderRoot.querySelector<HTMLInputElement>(
+      '.code-block-language-editor',
+    );
+
+    language?.click();
+    languageEditor!.value = 'typescript';
+    languageEditor?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+    );
+
+    expect(language?.textContent).toBe('javascript');
+    expect(editor.value).toBe('```javascript\nconst value = 1;\n```');
+  });
+
   it('can hide code block headers without changing the code block', async () => {
     const editor = await createEditor('```js\nconst value = 1;\n```');
     editor.showCodeBlockHeader = false;

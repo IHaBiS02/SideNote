@@ -106,7 +106,9 @@ Emitted events are bubbling and composed:
 The element exposes Shadow DOM parts named `surface`, `placeholder`, `editor`,
 `source-editor`, and `block-source-panel`. SideNote primarily uses `themeCss`
 because normal document CSS does not cross the Shadow DOM boundary. A middle
-click on a rendered link opens its destination in a new browser tab.
+click on a rendered link opens its destination in a new browser tab. The
+non-content code header keeps its language label out of code selections while
+allowing click-to-edit updates to the code block `params` attribute.
 
 ### src/extensions
 

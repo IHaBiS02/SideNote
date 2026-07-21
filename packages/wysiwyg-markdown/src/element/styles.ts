@@ -139,6 +139,7 @@ export const editorStyles = css`
     display: flex;
     align-items: center;
     justify-content: space-between;
+    user-select: none;
   }
 
   .code-block-header[hidden] {
@@ -146,9 +147,32 @@ export const editorStyles = css`
   }
 
   .code-block-language {
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  span.code-block-language {
+    cursor: text;
+  }
+
+  .code-block-language-editor {
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    border: 0;
+    border-bottom: 1px solid currentColor;
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    outline: none;
+    user-select: text;
+  }
+
+  .code-block-language-editor[hidden] {
+    display: none;
   }
 
   .editor-mount .ProseMirror img {
