@@ -90,7 +90,9 @@ editor.use({
 
 Double-clicking the WYSIWYG document switches the entire document to Markdown
 source mode by default and places the source caret at the corresponding
-Markdown position. Press `Ctrl/Cmd + Enter` to return. Block-level source editing
+Markdown position. The source view scrolls to center that caret whenever the
+document edges allow it. Press `Ctrl/Cmd + Enter` to return; the source caret is
+mapped back into WYSIWYG and centered there as well. Block-level source editing
 remains available as an opt-in mode:
 
 ```html

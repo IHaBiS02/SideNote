@@ -97,7 +97,12 @@ Public methods:
 
 In document source scope, a WYSIWYG double-click resolves the pointer to a
 ProseMirror position and maps it to the canonical Markdown offset. The source
-textarea is then focused with a collapsed selection at that offset.
+textarea is then focused with a collapsed selection at that offset. A
+style-matched offscreen mirror measures wrapped source text so the caret can be
+centered in the textarea, clamped by its scroll limits. Leaving source mode maps
+the source selection back into a ProseMirror position, restores the collapsed
+selection, and centers it in the WYSIWYG scroll viewport with the same edge
+clamping.
 
 Emitted events are bubbling and composed:
 

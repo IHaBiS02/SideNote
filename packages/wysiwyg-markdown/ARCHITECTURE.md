@@ -117,10 +117,14 @@ opening source mode. SideNote uses full-document source mode when the user
 double-clicks Preview or presses Edit. A double-click coordinate is resolved to
 a ProseMirror document position, then mapped into canonical Markdown by
 temporarily inserting a unique text marker during serialization. The source
-textarea opens with its caret at that Markdown offset. Its global
-`wysiwygPreview` preference chooses `wysiwyg` or `readonly` for Preview without
-changing renderers, so both variants retain the same document structure, theme,
-syntax highlighting, and code-block chrome.
+textarea opens with its caret at that Markdown offset and uses a style-matched
+offscreen mirror to measure wrapped caret height for centered scrolling. When
+source mode closes, a marker inserted at the source selection is parsed back to
+a ProseMirror position; the editor restores that selection and centers it in the
+WYSIWYG scroll viewport. Both centering paths clamp at the document edges. Its
+global `wysiwygPreview` preference chooses `wysiwyg` or `readonly` for Preview
+without changing renderers, so both variants retain the same document structure,
+theme, syntax highlighting, and code-block chrome.
 
 ## Extensions
 

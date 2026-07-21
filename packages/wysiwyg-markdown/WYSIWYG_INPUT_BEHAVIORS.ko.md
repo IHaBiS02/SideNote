@@ -37,8 +37,8 @@ source 편집에 들어갈 수 있습니다.
 | `Ctrl+Z` / `Cmd+Z` | 실행 취소 |
 | `Ctrl+Shift+Z` / `Cmd+Shift+Z` | 다시 실행 |
 | `Ctrl+Y` / `Cmd+Y` | 다시 실행 |
-| 문서 더블클릭 | 전체 Markdown을 수정하는 plain text source 모드로 전환하고 대응하는 Markdown 위치에 커서 배치 |
-| source 모드에서 `Ctrl+Enter` / `Cmd+Enter` | 설정된 WYSIWYG Preview 모드로 복귀 |
+| 문서 더블클릭 | 전체 Markdown plain text source 모드로 전환하고 Markdown 커서를 동기화한 뒤 가능한 경우 중앙에 배치 |
+| source 모드에서 `Ctrl+Enter` / `Cmd+Enter` | 설정된 WYSIWYG Preview 모드로 복귀하고 WYSIWYG 커서를 동기화한 뒤 가능한 경우 중앙에 배치 |
 | 작업 항목의 체크박스 클릭 | 체크 상태와 Markdown의 `[ ]`/`[x]`를 함께 변경 |
 | 링크를 마우스 휠로 클릭 | 링크를 새 브라우저 탭으로 열기 |
 | 렌더링된 이미지 클릭 | `image-activate` 이벤트를 보내며 SideNote는 이미지 모달을 열기 |

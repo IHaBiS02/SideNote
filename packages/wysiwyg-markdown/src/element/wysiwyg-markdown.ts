@@ -144,6 +144,8 @@ export class WysiwygMarkdownElement extends LitElement {
   #internals?: ElementInternals;
   #defaultValue = '';
   #sourceReturnMode: Exclude<EditorMode, 'source'> = 'wysiwyg';
+  #pendingSourceOffset?: number;
+  #pendingWysiwygPosition?: number;
 
   constructor() {
     super();
@@ -228,8 +230,26 @@ export class WysiwygMarkdownElement extends LitElement {
     if (!this.hasUpdated && changed.has('value')) {
       this.value = serializeMarkdown(this.#parseOrReport(this.value));
     }
-    if (changed.has('mode') && this.mode === 'source') {
-      this.documentSourceValue = this.value;
+    if (changed.has('mode')) {
+      const previousMode = changed.get('mode');
+      if (this.mode === 'source') {
+        this.documentSourceValue = this.value;
+        if (previousMode !== 'source' && this.#pendingSourceOffset === undefined) {
+          this.#pendingSourceOffset = this.#view
+            ? this.#markdownOffsetAtPosition(this.#view.state.selection.head)
+            : undefined;
+        }
+      } else if (previousMode === 'source') {
+        const source = this.renderRoot.querySelector<HTMLTextAreaElement>(
+          '#document-source',
+        );
+        const markdown = source?.value ?? this.documentSourceValue;
+        const offset = source?.selectionStart ?? markdown.length;
+        this.#pendingWysiwygPosition = this.#proseMirrorPositionAtMarkdownOffset(
+          markdown,
+          offset,
+        );
+      }
     }
   }
 
@@ -286,10 +306,22 @@ export class WysiwygMarkdownElement extends LitElement {
     }
 
     if (changed.has('mode')) {
-      if (changed.get('mode') === 'source' && this.mode !== 'source') {
+      const previousMode = changed.get('mode');
+      const enteringSource = previousMode !== 'source' && this.mode === 'source';
+      const leavingSource = previousMode === 'source' && this.mode !== 'source';
+      if (leavingSource) {
         this.#replaceDocument(this.documentSourceValue, true, 'source-edit');
       }
       this.#view.setProps({ editable: () => this.#isEditable() });
+      if (enteringSource) {
+        const offset = this.#pendingSourceOffset;
+        this.#pendingSourceOffset = undefined;
+        this.#focusSourceAtOffset(offset);
+      } else if (leavingSource) {
+        const position = this.#pendingWysiwygPosition;
+        this.#pendingWysiwygPosition = undefined;
+        if (position !== undefined) this.#focusWysiwygAtPosition(position);
+      }
       this.dispatchEvent(
         new CustomEvent('mode-change', {
           detail: { mode: this.mode },
@@ -360,6 +392,11 @@ export class WysiwygMarkdownElement extends LitElement {
     }
     if (mode === 'source' && this.mode !== 'source') {
       this.#sourceReturnMode = this.mode;
+      if (this.#pendingSourceOffset === undefined && this.#view) {
+        this.#pendingSourceOffset = this.#markdownOffsetAtPosition(
+          this.#view.state.selection.head,
+        );
+      }
     }
     this.mode = mode;
   }
@@ -1047,17 +1084,8 @@ export class WysiwygMarkdownElement extends LitElement {
       }
 
       event.preventDefault();
+      this.#pendingSourceOffset = sourceOffset;
       this.setMode('source');
-      this.updateComplete.then(() => {
-        const source = this.renderRoot.querySelector<HTMLTextAreaElement>(
-          '#document-source',
-        );
-        if (!source) return;
-        source.focus();
-        if (sourceOffset === undefined) return;
-        const offset = Math.min(sourceOffset, source.value.length);
-        source.setSelectionRange(offset, offset);
-      });
       return;
     }
 
@@ -1122,6 +1150,151 @@ export class WysiwygMarkdownElement extends LitElement {
       return withoutMarker === canonicalMarkdown ? markerOffset : undefined;
     } catch {
       return undefined;
+    }
+  }
+
+  #proseMirrorPositionAtMarkdownOffset(markdown: string, offset: number): number {
+    const safeOffset = Math.max(0, Math.min(offset, markdown.length));
+    const parsedDocument = parseMarkdown(markdown);
+    const fallbackPosition = markdown.length
+      ? Math.round((safeOffset / markdown.length) * parsedDocument.content.size)
+      : 0;
+
+    let marker = 'WYSIWYGCURSORMARKER';
+    while (markdown.includes(marker)) marker += 'X';
+
+    try {
+      const markedMarkdown =
+        markdown.slice(0, safeOffset) + marker + markdown.slice(safeOffset);
+      const markedDocument = parseMarkdown(markedMarkdown);
+      let markerPosition: number | undefined;
+      markedDocument.descendants((node, position) => {
+        if (markerPosition !== undefined) return false;
+        if (!node.isText) return true;
+        const index = node.text?.indexOf(marker) ?? -1;
+        if (index < 0) return true;
+        markerPosition = position + index;
+        return false;
+      });
+      if (markerPosition === undefined) return fallbackPosition;
+
+      const canonicalMarkdown = serializeMarkdown(parsedDocument);
+      const markedCanonicalMarkdown = serializeMarkdown(markedDocument);
+      if (markedCanonicalMarkdown.replaceAll(marker, '') !== canonicalMarkdown) {
+        return fallbackPosition;
+      }
+      return Math.min(markerPosition, parsedDocument.content.size);
+    } catch {
+      return fallbackPosition;
+    }
+  }
+
+  #focusSourceAtOffset(offset?: number): void {
+    const source = this.renderRoot.querySelector<HTMLTextAreaElement>(
+      '#document-source',
+    );
+    if (!source) return;
+    const sourceOffset = Math.max(
+      0,
+      Math.min(offset ?? source.selectionStart, source.value.length),
+    );
+    source.focus();
+    source.setSelectionRange(sourceOffset, sourceOffset);
+    this.#centerSourceCaret(source, sourceOffset);
+  }
+
+  #centerSourceCaret(source: HTMLTextAreaElement, offset: number): void {
+    if (source.clientWidth <= 0 || source.clientHeight <= 0) return;
+    const view = source.ownerDocument.defaultView;
+    if (!view) return;
+    const computed = view.getComputedStyle(source);
+    const mirror = source.ownerDocument.createElement('div');
+    const marker = source.ownerDocument.createElement('span');
+    mirror.className = 'source-caret-mirror';
+    marker.className = 'source-caret-marker';
+
+    const copiedProperties = [
+      'direction',
+      'font-family',
+      'font-size',
+      'font-style',
+      'font-variant',
+      'font-weight',
+      'letter-spacing',
+      'line-height',
+      'padding-top',
+      'padding-right',
+      'padding-bottom',
+      'padding-left',
+      'tab-size',
+      'text-align',
+      'text-indent',
+      'text-transform',
+      'white-space',
+      'word-break',
+      'overflow-wrap',
+    ];
+    for (const property of copiedProperties) {
+      mirror.style.setProperty(property, computed.getPropertyValue(property));
+    }
+    mirror.style.position = 'fixed';
+    mirror.style.left = '-10000px';
+    mirror.style.top = '0';
+    mirror.style.boxSizing = 'border-box';
+    mirror.style.width = `${source.clientWidth}px`;
+    mirror.style.height = 'auto';
+    mirror.style.minHeight = '0';
+    mirror.style.overflow = 'hidden';
+    mirror.style.visibility = 'hidden';
+    mirror.style.margin = '0';
+    mirror.textContent = source.value.slice(0, offset);
+    marker.textContent = '\u200b';
+    mirror.append(marker);
+    source.ownerDocument.body.append(mirror);
+
+    try {
+      const mirrorRect = mirror.getBoundingClientRect();
+      const markerRect = marker.getBoundingClientRect();
+      const fontSize = Number.parseFloat(computed.fontSize) || 16;
+      const lineHeight = Number.parseFloat(computed.lineHeight) || fontSize * 1.2;
+      const caretTop = markerRect.top - mirrorRect.top;
+      const desiredScrollTop = caretTop - (source.clientHeight - lineHeight) / 2;
+      const maxScrollTop = Math.max(0, source.scrollHeight - source.clientHeight);
+      source.scrollTop = Math.max(0, Math.min(desiredScrollTop, maxScrollTop));
+    } finally {
+      mirror.remove();
+    }
+  }
+
+  #focusWysiwygAtPosition(position: number): void {
+    if (!this.#view) return;
+    const { doc } = this.#view.state;
+    const safePosition = Math.max(0, Math.min(position, doc.content.size));
+    const selection = Selection.near(doc.resolve(safePosition), 1);
+    this.#view.dispatch(this.#view.state.tr.setSelection(selection));
+    try {
+      this.#view.focus();
+    } catch {
+      this.#view.dom.focus();
+    }
+    this.#centerWysiwygPosition(selection.head);
+  }
+
+  #centerWysiwygPosition(position: number): void {
+    if (!this.#view) return;
+    const mount = this.renderRoot.querySelector<HTMLElement>('#editor-mount');
+    if (!mount || mount.clientHeight <= 0) return;
+
+    try {
+      const caret = this.#view.coordsAtPos(position);
+      const mountRect = mount.getBoundingClientRect();
+      const caretCenter = (caret.top + caret.bottom) / 2;
+      const viewportCenter = mountRect.top + mount.clientHeight / 2;
+      const desiredScrollTop = mount.scrollTop + caretCenter - viewportCenter;
+      const maxScrollTop = Math.max(0, mount.scrollHeight - mount.clientHeight);
+      mount.scrollTop = Math.max(0, Math.min(desiredScrollTop, maxScrollTop));
+    } catch {
+      // Invalid or non-layout positions keep the browser's native scroll state.
     }
   }
 

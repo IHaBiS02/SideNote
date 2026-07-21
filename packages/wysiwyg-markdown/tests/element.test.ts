@@ -153,9 +153,91 @@ describe('wysiwyg-markdown element', () => {
         expect(source?.value).toBe(markdown);
         expect(source?.selectionStart).toBe(expectedOffset);
         expect(source?.selectionEnd).toBe(expectedOffset);
+
+        const selections: Array<{ from: number; to: number }> = [];
+        editor.addEventListener('selection-change', (event) => {
+          selections.push(
+            (event as CustomEvent<{ from: number; to: number }>).detail,
+          );
+        });
+        source!.setSelectionRange(expectedOffset, expectedOffset);
+        editor.setMode('wysiwyg');
+        await editor.updateComplete;
+        expect(selections.at(-1)).toEqual({ from: position, to: position });
         editor.remove();
       }
     } finally {
+      positionAtCoords.mockRestore();
+    }
+  });
+
+  it('centers the synchronized caret when switching in both directions', async () => {
+    const editor = await createEditor('# Heading\n\nParagraph');
+    const source = editor.renderRoot.querySelector<HTMLTextAreaElement>(
+      '#document-source',
+    )!;
+    const mount = editor.renderRoot.querySelector<HTMLElement>('#editor-mount')!;
+    source.style.fontSize = '16px';
+    source.style.lineHeight = '20px';
+    Object.defineProperties(source, {
+      clientWidth: { configurable: true, value: 400 },
+      clientHeight: { configurable: true, value: 200 },
+      scrollHeight: { configurable: true, value: 1000 },
+    });
+    Object.defineProperties(mount, {
+      clientHeight: { configurable: true, value: 200 },
+      scrollHeight: { configurable: true, value: 1000 },
+    });
+
+    const rectangle = (top: number, bottom: number): DOMRect =>
+      ({
+        x: 0,
+        y: top,
+        top,
+        bottom,
+        left: 0,
+        right: 400,
+        width: 400,
+        height: bottom - top,
+        toJSON: () => ({}),
+      }) as DOMRect;
+    const positionAtCoords = vi
+      .spyOn(EditorView.prototype, 'posAtCoords')
+      .mockReturnValue({ pos: 5, inside: 0 });
+    const coordsAtPos = vi.spyOn(EditorView.prototype, 'coordsAtPos').mockReturnValue({
+      top: 500,
+      bottom: 520,
+      left: 0,
+      right: 0,
+    });
+    const boundingRect = vi
+      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+      .mockImplementation(function (this: HTMLElement) {
+        if (this.classList.contains('source-caret-marker')) return rectangle(500, 520);
+        if (this.classList.contains('source-caret-mirror')) return rectangle(0, 1000);
+        if (this.id === 'editor-mount') return rectangle(0, 200);
+        return rectangle(0, 0);
+      });
+
+    try {
+      mount.dispatchEvent(
+        new MouseEvent('dblclick', { bubbles: true, clientX: 40, clientY: 20 }),
+      );
+      await editor.updateComplete;
+
+      expect(source.selectionStart).toBe(6);
+      expect(source.scrollTop).toBe(410);
+
+      source.setSelectionRange(6, 6);
+      mount.scrollTop = 0;
+      editor.setMode('wysiwyg');
+      await editor.updateComplete;
+
+      expect(coordsAtPos).toHaveBeenCalledWith(5);
+      expect(mount.scrollTop).toBe(410);
+    } finally {
+      boundingRect.mockRestore();
+      coordsAtPos.mockRestore();
       positionAtCoords.mockRestore();
     }
   });
