@@ -59,10 +59,11 @@ describe('SideNote WYSIWYG editor adapter', () => {
     expect(editor.themeCss).toContain('pre.code-line-numbers');
     expect(editor.themeCss).toContain('pre.code-line-numbers code');
     expect(editor.themeCss).toContain('.code-block-content[data-line-numbers] > pre');
-    expect(editor.themeCss).toContain('padding-block: 5px');
-    expect(editor.themeCss).toContain('column-gap: 5px');
+    expect(editor.themeCss).toContain('padding: var(--editor-code-content-padding)');
+    expect(editor.themeCss).toContain('padding-block: var(--editor-code-content-padding)');
+    expect(editor.themeCss).toContain('column-gap: var(--editor-code-content-padding)');
     expect(editor.themeCss).toContain('> pre.code-block-body > code');
-    expect(editor.themeCss).toContain('padding-left: 0');
+    expect(editor.themeCss).toContain('padding-inline: 0 var(--editor-code-content-padding)');
     expect(editor.themeCss).toContain('line-height: 1.2');
     expect(editor.themeCss).toContain('word-break: keep-all');
     expect(editor.themeCss).toContain('background: var(--editor-inline-code-background)');
@@ -161,6 +162,7 @@ describe('4.1.14 preview theme compatibility', () => {
   it('keeps the legacy browser monospace font and light code colors', () => {
     expect(lightCss).toContain('--editor-padding: 10px;');
     expect(lightCss).toContain('--editor-code-font-family: monospace;');
+    expect(lightCss).toContain('--editor-code-content-padding: 5px;');
     expect(lightCss).toContain('--editor-code-background: #fafafa;');
     expect(lightCss).toContain('--editor-code-color: #383a42;');
     expect(lightCss).toContain('--editor-code-header-background: #f5f5f5;');

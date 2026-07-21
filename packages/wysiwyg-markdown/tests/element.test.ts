@@ -22,6 +22,12 @@ describe('wysiwyg-markdown element', () => {
     expect(editorStyles.cssText).toContain(
       'background: var(--editor-code-background)',
     );
+    expect(editorStyles.cssText).toContain(
+      '--editor-code-content-padding: 5px',
+    );
+    expect(editorStyles.cssText).toContain(
+      'padding: var(--editor-code-content-padding)',
+    );
   });
 
   it('renders Markdown and exposes its canonical value', async () => {

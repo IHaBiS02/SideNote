@@ -134,7 +134,11 @@ Fenced code blocks apply `--editor-code-background` to the content wrapper,
 line-number `pre`, body `pre`, and nested `code` element. This prevents the
 generic `--editor-muted-background` used by inline code and other muted
 surfaces from showing through code-block padding or grid gaps. The header uses
-the separate `--editor-code-header-background` variable.
+the separate `--editor-code-header-background` variable. The
+`--editor-code-content-padding` variable defaults to `5px` and is applied with
+selectors specific enough to win over the generic Shadow DOM `pre code` rule;
+multi-line blocks reuse it for vertical padding, gutter spacing, and the body
+right edge.
 
 ## SideNote adapter
 

@@ -18,6 +18,7 @@ export const editorStyles = css`
     --editor-line-height: inherit;
     --editor-heading-line-height: inherit;
     --editor-code-padding: 0;
+    --editor-code-content-padding: 5px;
     --editor-code-border-radius: 0;
     --editor-code-white-space: pre-wrap;
     --editor-code-word-break: break-word;
@@ -107,7 +108,7 @@ export const editorStyles = css`
   }
 
   .editor-mount .ProseMirror pre code {
-    padding: 0;
+    padding: var(--editor-code-content-padding);
   }
 
   .editor-mount .ProseMirror .code-block-container pre {

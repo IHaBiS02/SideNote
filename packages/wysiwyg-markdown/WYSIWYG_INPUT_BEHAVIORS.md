@@ -52,7 +52,9 @@ uses the default ProseMirror behavior for the current block type.
 The code body, line-number gutter, and internal spacing use the same
 `--editor-code-background` color. The header keeps its separate
 `--editor-code-header-background` color so only the header is visually
-distinguished from the body.
+distinguished from the body. Code content retains 5px of internal spacing via
+`--editor-code-content-padding`; multi-line blocks use that spacing around the
+body and between the line-number gutter and code text.
 
 ### Editing a Code Block Language
 

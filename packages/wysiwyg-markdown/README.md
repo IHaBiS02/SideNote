@@ -97,6 +97,8 @@ and removes its `#` heading marker from the Markdown value.
 
 A host application can provide trusted CSS through `themeCss`. Editable syntax
 highlighting uses ProseMirror decorations, so it does not rewrite editable DOM.
+Fenced code content uses `--editor-code-content-padding` (`5px` by default) for
+its inner spacing.
 
 See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the current architecture and
 host integration boundaries. Built-in Markdown input rules, shortcuts, mouse

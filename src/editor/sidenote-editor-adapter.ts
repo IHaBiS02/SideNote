@@ -162,7 +162,7 @@ const SIDENOTE_EDITOR_THEME = `
   .editor-mount .ProseMirror pre code {
     display: block;
     min-height: 100%;
-    padding: 5px;
+    padding: var(--editor-code-content-padding);
     white-space: inherit;
     overflow-wrap: inherit;
     word-break: inherit;
@@ -195,7 +195,7 @@ const SIDENOTE_EDITOR_THEME = `
   }
 
   .editor-mount .ProseMirror pre.code-line-numbers code {
-    padding: 5px;
+    padding: var(--editor-code-content-padding);
     background: transparent;
     color: inherit;
     font: inherit;
@@ -205,11 +205,11 @@ const SIDENOTE_EDITOR_THEME = `
   }
 
   .editor-mount .ProseMirror .code-block-content[data-line-numbers] > pre {
-    padding-block: 5px;
+    padding-block: var(--editor-code-content-padding);
   }
 
   .editor-mount .ProseMirror .code-block-content[data-line-numbers] {
-    column-gap: 5px;
+    column-gap: var(--editor-code-content-padding);
   }
 
   .editor-mount .ProseMirror .code-block-content[data-line-numbers] > pre > code {
@@ -219,7 +219,7 @@ const SIDENOTE_EDITOR_THEME = `
 
   .editor-mount .ProseMirror .code-block-content[data-line-numbers]
     > pre.code-block-body > code {
-    padding-left: 0;
+    padding-inline: 0 var(--editor-code-content-padding);
   }
 
   .code-block-header {

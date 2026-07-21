@@ -107,6 +107,8 @@ The element exposes Shadow DOM parts named `surface`, `placeholder`, `editor`,
 `source-editor`, and `block-source-panel`. SideNote primarily uses `themeCss`
 because normal document CSS does not cross the Shadow DOM boundary. A middle
 click on a rendered link opens its destination in a new browser tab. The
+`--editor-code-content-padding` custom property controls fenced-code inner
+spacing and defaults to `5px`. The
 non-content code header keeps its language label out of code selections while
 keeping its language input directly editable in WYSIWYG mode. Committing the
 input updates the code block `params` attribute; source, readonly, and disabled
