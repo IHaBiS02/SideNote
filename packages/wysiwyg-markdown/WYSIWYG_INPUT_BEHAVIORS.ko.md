@@ -46,6 +46,10 @@ source 편집에 들어갈 수 있습니다.
 `Shift+Enter`는 코드 블록 안에서도 줄바꿈으로 작동합니다. 일반 `Enter`는 현재
 블록 종류에 맞는 ProseMirror 기본 동작을 사용합니다.
 
+코드 본문, 줄 번호 영역, 내부 여백은 모두 같은 `--editor-code-background`
+색상을 사용합니다. 헤더만 별도의 `--editor-code-header-background` 색상을
+유지하므로 본문 내부에는 미세하게 다른 배경색이 나타나지 않습니다.
+
 ### 코드 블록 언어 편집
 
 코드 블록 위쪽의 `javascript`, `text` 같은 언어 표시는 코드 본문과 분리되어

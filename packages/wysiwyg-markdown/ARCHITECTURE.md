@@ -130,6 +130,12 @@ An `EditorExtension` can contribute:
 Extension commands are called with the current state, optional dispatch
 function, and view.
 
+Fenced code blocks apply `--editor-code-background` to the content wrapper,
+line-number `pre`, body `pre`, and nested `code` element. This prevents the
+generic `--editor-muted-background` used by inline code and other muted
+surfaces from showing through code-block padding or grid gaps. The header uses
+the separate `--editor-code-header-background` variable.
+
 ## SideNote adapter
 
 `src/editor/sidenote-editor-adapter.ts` is the only SideNote-specific bridge.

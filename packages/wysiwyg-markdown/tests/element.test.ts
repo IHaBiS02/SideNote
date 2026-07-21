@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import '../src/index';
 import type { WysiwygMarkdownElement } from '../src/element/wysiwyg-markdown';
+import { editorStyles } from '../src/element/styles';
 
 async function createEditor(markdown = ''): Promise<WysiwygMarkdownElement> {
   const editor = document.createElement('wysiwyg-markdown');
@@ -11,6 +12,18 @@ async function createEditor(markdown = ''): Promise<WysiwygMarkdownElement> {
 }
 
 describe('wysiwyg-markdown element', () => {
+  it('uses one background variable across every fenced code body layer', () => {
+    expect(editorStyles.cssText).toContain(
+      '--editor-code-background: var(--editor-muted-background)',
+    );
+    expect(editorStyles.cssText).toContain(
+      '.editor-mount .ProseMirror .code-block-content > pre > code',
+    );
+    expect(editorStyles.cssText).toContain(
+      'background: var(--editor-code-background)',
+    );
+  });
+
   it('renders Markdown and exposes its canonical value', async () => {
     const editor = await createEditor('# Hello');
 

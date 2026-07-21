@@ -49,6 +49,11 @@ the converted empty heading changes it back to a paragraph.
 `Shift+Enter` also inserts a line break inside a code block. A normal `Enter`
 uses the default ProseMirror behavior for the current block type.
 
+The code body, line-number gutter, and internal spacing use the same
+`--editor-code-background` color. The header keeps its separate
+`--editor-code-header-background` color so only the header is visually
+distinguished from the body.
+
 ### Editing a Code Block Language
 
 The language label above a code block, such as `javascript` or `text`, is

@@ -8,6 +8,7 @@ export const editorStyles = css`
     --editor-border-radius: 0;
     --editor-border-color: currentColor;
     --editor-muted-background: transparent;
+    --editor-code-background: var(--editor-muted-background);
     --editor-accent: currentColor;
     --editor-font-family: inherit;
     --editor-code-font-family: inherit;
@@ -111,6 +112,12 @@ export const editorStyles = css`
 
   .editor-mount .ProseMirror .code-block-container pre {
     margin-top: 0;
+  }
+
+  .editor-mount .ProseMirror .code-block-content,
+  .editor-mount .ProseMirror .code-block-content > pre,
+  .editor-mount .ProseMirror .code-block-content > pre > code {
+    background: var(--editor-code-background);
   }
 
   .code-block-content[data-line-numbers] {
