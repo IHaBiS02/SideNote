@@ -89,8 +89,9 @@ editor.use({
 ```
 
 Double-clicking the WYSIWYG document switches the entire document to Markdown
-source mode by default. Press `Ctrl/Cmd + Enter` to return. Block-level source
-editing remains available as an opt-in mode:
+source mode by default and places the source caret at the corresponding
+Markdown position. Press `Ctrl/Cmd + Enter` to return. Block-level source editing
+remains available as an opt-in mode:
 
 ```html
 <wysiwyg-markdown source-edit-scope="block"></wysiwyg-markdown>

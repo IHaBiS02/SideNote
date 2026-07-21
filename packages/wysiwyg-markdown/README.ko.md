@@ -88,8 +88,9 @@ editor.use({
 ```
 
 기본적으로 WYSIWYG 문서를 더블클릭하면 문서 전체를 수정하는 Markdown source
-모드로 전환됩니다. `Ctrl/Cmd + Enter`로 돌아갈 수 있습니다. 블록 단위 source
-편집은 `source-edit-scope="block"`을 지정할 때만 사용합니다.
+모드로 전환되며, source 커서는 더블클릭한 내용에 대응하는 Markdown 위치로
+이동합니다. `Ctrl/Cmd + Enter`로 돌아갈 수 있습니다. 블록 단위 source 편집은
+`source-edit-scope="block"`을 지정할 때만 사용합니다.
 
 커서가 빈 제목에 있을 때 `Backspace`를 누르면 일반 문단으로 돌아가며 Markdown
 값에서도 해당 `#` 제목 표시가 제거됩니다.

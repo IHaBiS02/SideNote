@@ -95,6 +95,10 @@ Public methods:
 - `cancelBlockSourceEdit()` / `applyBlockSourceEdit()`: Controls the optional
   block-source panel.
 
+In document source scope, a WYSIWYG double-click resolves the pointer to a
+ProseMirror position and maps it to the canonical Markdown offset. The source
+textarea is then focused with a collapsed selection at that offset.
+
 Emitted events are bubbling and composed:
 
 - `input`: Emitted for document edits; `detail` contains `markdown` and the

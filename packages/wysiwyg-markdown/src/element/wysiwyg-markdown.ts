@@ -3,7 +3,12 @@ import { baseKeymap, chainCommands, newlineInCode } from 'prosemirror-commands';
 import { history, redo, undo } from 'prosemirror-history';
 import { keymap } from 'prosemirror-keymap';
 import type { Node as ProseMirrorNode } from 'prosemirror-model';
-import { EditorState, Plugin, type Transaction } from 'prosemirror-state';
+import {
+  EditorState,
+  Plugin,
+  Selection,
+  type Transaction,
+} from 'prosemirror-state';
 import {
   Decoration,
   DecorationSet,
@@ -1029,9 +1034,30 @@ export class WysiwygMarkdownElement extends LitElement {
     if (!this.#view || this.disabled || this.readonly) return;
 
     if (this.sourceEditScope !== 'block') {
+      let sourceOffset: number | undefined;
+      try {
+        const result = this.#view.posAtCoords({
+          left: event.clientX,
+          top: event.clientY,
+        });
+        if (result) sourceOffset = this.#markdownOffsetAtPosition(result.pos);
+      } catch {
+        // Coordinate lookup can fail in non-layout environments. Source mode
+        // still opens and preserves the textarea's existing selection.
+      }
+
       event.preventDefault();
       this.setMode('source');
-      this.updateComplete.then(() => this.focus());
+      this.updateComplete.then(() => {
+        const source = this.renderRoot.querySelector<HTMLTextAreaElement>(
+          '#document-source',
+        );
+        if (!source) return;
+        source.focus();
+        if (sourceOffset === undefined) return;
+        const offset = Math.min(sourceOffset, source.value.length);
+        source.setSelectionRange(offset, offset);
+      });
       return;
     }
 
@@ -1059,6 +1085,45 @@ export class WysiwygMarkdownElement extends LitElement {
       textarea?.select();
     });
   };
+
+  #markdownOffsetAtPosition(position: number): number | undefined {
+    if (!this.#view) return undefined;
+
+    const { doc, schema } = this.#view.state;
+    const canonicalMarkdown = serializeMarkdown(doc);
+    if (canonicalMarkdown !== this.value) return undefined;
+
+    let insertionPosition = Math.max(0, Math.min(position, doc.content.size));
+    let resolved = doc.resolve(insertionPosition);
+    if (!resolved.parent.inlineContent) {
+      const nearbySelection =
+        Selection.findFrom(resolved, 1, true) ??
+        Selection.findFrom(resolved, -1, true);
+      if (!nearbySelection) return undefined;
+      insertionPosition = nearbySelection.from;
+      resolved = doc.resolve(insertionPosition);
+    }
+
+    let marker = 'WYSIWYGCURSORMARKER';
+    while (canonicalMarkdown.includes(marker)) marker += 'X';
+
+    try {
+      const markerNode = schema.text(marker, resolved.marks());
+      const markedDocument = this.#view.state.tr.insert(
+        insertionPosition,
+        markerNode,
+      ).doc;
+      const markedMarkdown = serializeMarkdown(markedDocument);
+      const markerOffset = markedMarkdown.indexOf(marker);
+      if (markerOffset < 0) return undefined;
+      const withoutMarker =
+        markedMarkdown.slice(0, markerOffset) +
+        markedMarkdown.slice(markerOffset + marker.length);
+      return withoutMarker === canonicalMarkdown ? markerOffset : undefined;
+    } catch {
+      return undefined;
+    }
+  }
 
   #handleLinkAuxClick(event: MouseEvent): boolean {
     if (event.button !== 1) return false;

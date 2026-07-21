@@ -40,7 +40,7 @@ the converted empty heading changes it back to a paragraph.
 | `Ctrl+Z` / `Cmd+Z` | Undo |
 | `Ctrl+Shift+Z` / `Cmd+Shift+Z` | Redo |
 | `Ctrl+Y` / `Cmd+Y` | Redo |
-| Double-click the document | Switch to plain-text source mode for editing the complete Markdown document |
+| Double-click the document | Switch to full-document plain-text source mode and place the caret at the corresponding Markdown position |
 | `Ctrl+Enter` / `Cmd+Enter` in source mode | Return to the configured WYSIWYG Preview mode |
 | Click a task checkbox | Update both the checkbox state and `[ ]`/`[x]` in Markdown |
 | Middle-click a link | Open the link in a new browser tab |

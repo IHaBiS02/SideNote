@@ -114,10 +114,13 @@ Built-in input rules recognize:
 newline behavior inside code. Pressing `Backspace` in an empty heading converts
 it to a paragraph, removing the corresponding Markdown heading marker without
 opening source mode. SideNote uses full-document source mode when the user
-double-clicks Preview or presses Edit. Its global `wysiwygPreview` preference
-chooses `wysiwyg` or `readonly` for Preview without changing renderers, so both
-variants retain the same document structure, theme, syntax highlighting, and
-code-block chrome.
+double-clicks Preview or presses Edit. A double-click coordinate is resolved to
+a ProseMirror document position, then mapped into canonical Markdown by
+temporarily inserting a unique text marker during serialization. The source
+textarea opens with its caret at that Markdown offset. Its global
+`wysiwygPreview` preference chooses `wysiwyg` or `readonly` for Preview without
+changing renderers, so both variants retain the same document structure, theme,
+syntax highlighting, and code-block chrome.
 
 ## Extensions
 

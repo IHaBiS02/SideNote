@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { EditorView } from 'prosemirror-view';
 import '../src/index';
 import type { WysiwygMarkdownElement } from '../src/element/wysiwyg-markdown';
 import { editorStyles } from '../src/element/styles';
@@ -111,6 +112,52 @@ describe('wysiwyg-markdown element', () => {
     );
     await editor.updateComplete;
     expect(editor.mode).toBe('readonly');
+  });
+
+  it('places the source caret at the matching Markdown syntax position', async () => {
+    const cases = [
+      { markdown: '# Heading\n\nParagraph', position: 5, expectedOffset: 6 },
+      {
+        markdown: 'Before [Example](https://example.com) after',
+        position: 18,
+        expectedOffset: 40,
+      },
+      {
+        markdown: '```js\nfirst\nsecond\n```',
+        position: 10,
+        expectedOffset: 15,
+      },
+    ];
+    const positionAtCoords = vi
+      .spyOn(EditorView.prototype, 'posAtCoords')
+      .mockReturnValue({ pos: 0, inside: 0 });
+
+    try {
+      for (const { markdown, position, expectedOffset } of cases) {
+        const editor = await createEditor(markdown);
+        editor.setMode('readonly');
+        await editor.updateComplete;
+        positionAtCoords.mockReturnValue({ pos: position, inside: 0 });
+
+        editor.renderRoot
+          .querySelector<HTMLElement>('#editor-mount')!
+          .dispatchEvent(
+            new MouseEvent('dblclick', { bubbles: true, clientX: 40, clientY: 20 }),
+          );
+        await editor.updateComplete;
+        await Promise.resolve();
+
+        const source = editor.renderRoot.querySelector<HTMLTextAreaElement>(
+          '#document-source',
+        );
+        expect(source?.value).toBe(markdown);
+        expect(source?.selectionStart).toBe(expectedOffset);
+        expect(source?.selectionEnd).toBe(expectedOffset);
+        editor.remove();
+      }
+    } finally {
+      positionAtCoords.mockRestore();
+    }
   });
 
   it('keeps block source editing as an explicit opt-in', async () => {
