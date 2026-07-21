@@ -99,4 +99,6 @@ A host application can provide trusted CSS through `themeCss`. Editable syntax
 highlighting uses ProseMirror decorations, so it does not rewrite editable DOM.
 
 See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the current architecture and
-host integration boundaries.
+host integration boundaries. Built-in Markdown input rules, shortcuts, mouse
+actions, and paste behavior are documented in
+[`WYSIWYG_INPUT_BEHAVIORS.md`](./WYSIWYG_INPUT_BEHAVIORS.md).

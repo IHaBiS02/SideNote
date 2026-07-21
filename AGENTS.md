@@ -109,8 +109,9 @@ npm install
 ### Key Features Implementation
 - **WYSIWYG Markdown**: The editor workspace parses Markdown into a
   ProseMirror document and serializes each change back to Markdown
-- **Preview/Source Modes**: Preview is editable WYSIWYG; double-click or Edit
-  opens the complete document in plain Markdown source mode
+- **Preview/Source Modes**: Preview uses the same WYSIWYG renderer in editable
+  or read-only mode according to settings; double-click or Edit opens the
+  complete document in plain Markdown source mode
 - **Legacy HTML Renderer**: Marked and DOMPurify remain for the hidden
   compatibility preview and preview-only helper paths
 - **Syntax Highlighting**: The SideNote adapter converts highlight.js output
@@ -201,13 +202,30 @@ builds Chrome/Firefox ZIP files and the AMO reviewer source ZIP, creates the
 GitHub Release, and uploads `build/*.zip` as release assets.
 
 ### Documentation Updates
-After significant changes, update:
+Documentation is part of every feature change. Inspect the repository's
+Markdown files and update every document affected by behavior, architecture,
+public API, build, packaging, testing, or release workflow changes. Do not
+limit documentation review to the files listed below, and do not modify
+unrelated documents merely for churn.
+
+When WYSIWYG behavior changes (including input rules, shortcuts, mouse actions,
+paste normalization, Preview modes, or code-block interactions), update both
+of these files in the same change and keep their content semantically aligned:
+
+- **packages/wysiwyg-markdown/WYSIWYG_INPUT_BEHAVIORS.md**: English behavior reference
+- **packages/wysiwyg-markdown/WYSIWYG_INPUT_BEHAVIORS.ko.md**: Korean behavior reference
+
+Also update the following whenever applicable:
+
 - **STRUCTURE.md**: If architecture/file organization changes
 - **Functions.md**: If function signatures or purposes change
 - **packages/wysiwyg-markdown/ARCHITECTURE.md**: If editor internals, the host
   boundary, or build flow changes
 - **packages/wysiwyg-markdown/README.md** and **README.ko.md**: If the public
   editor API or usage changes
+- **README.md**, **RELEASE.md**, and other topical Markdown documents: If their
+  feature, development, build, packaging, submission, or release instructions
+  are affected
 
 ### Git Commit Process
 Use the file-based commit method:

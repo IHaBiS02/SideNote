@@ -57,7 +57,7 @@ SideNote is a browser extension that provides a note-taking interface within the
     -   `src/extensions/types.ts`: Command, shortcut, and input-rule extension contracts.
     -   `demo/`: Standalone browser demo that does not depend on SideNote storage.
     -   `tests/`: Parser/serializer, Web Component, and extension tests.
-    -   `WYSIWYG_INPUT_BEHAVIORS.ko.md`: Korean reference for built-in Markdown input rules, keyboard/mouse actions, and paste normalization.
+    -   `WYSIWYG_INPUT_BEHAVIORS.md` and `WYSIWYG_INPUT_BEHAVIORS.ko.md`: English and Korean references for built-in Markdown input rules, keyboard/mouse actions, Preview modes, and paste normalization; both are updated together.
     -   `scripts/generate-third-party-licenses.mjs`: Generates the root `LIBRARY_LICENSES.md` from the complete extension and editor runtime dependency graphs.
 -   **`build.js`**: Packages the compiled editor and extension sources for Chrome and Firefox. It reads the editor bundle from `packages/wysiwyg-markdown/dist/`; generated bundles are not checked into Git.
 -   **`scripts/create-amo-source-package.mjs`**: Creates the allow-listed, deterministic source ZIP used for Firefox AMO review.

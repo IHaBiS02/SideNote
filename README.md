@@ -99,6 +99,7 @@ Architecture references:
 - [`STRUCTURE.md`](./STRUCTURE.md): repository and SideNote runtime structure
 - [`Functions.md`](./Functions.md): application functions and editor public API
 - [`packages/wysiwyg-markdown/ARCHITECTURE.md`](./packages/wysiwyg-markdown/ARCHITECTURE.md): editor internals and host boundary
+- [`packages/wysiwyg-markdown/WYSIWYG_INPUT_BEHAVIORS.md`](./packages/wysiwyg-markdown/WYSIWYG_INPUT_BEHAVIORS.md) ([한국어](./packages/wysiwyg-markdown/WYSIWYG_INPUT_BEHAVIORS.ko.md)): built-in WYSIWYG input and interaction reference
 
 Build output is written to `build/`. See
 [`FIREFOX_AMO_SOURCE_SUBMISSION_GUIDE.md`](./FIREFOX_AMO_SOURCE_SUBMISSION_GUIDE.md)

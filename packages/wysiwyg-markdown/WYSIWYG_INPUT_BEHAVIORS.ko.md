@@ -1,5 +1,7 @@
 # WYSIWYG 입력 동작
 
+[English](./WYSIWYG_INPUT_BEHAVIORS.md)
+
 이 문서는 SideNote의 Preview(WYSIWYG) 모드에서 기본으로 사용할 수 있는
 Markdown 입력 규칙, 키보드 동작, 붙여넣기 동작을 정리합니다. 아래 변환은
 WYSIWYG 모드에서 문단이나 목록 항목의 시작 부분에 입력할 때 적용됩니다.
@@ -36,7 +38,7 @@ source 편집에 들어갈 수 있습니다.
 | `Ctrl+Shift+Z` / `Cmd+Shift+Z` | 다시 실행 |
 | `Ctrl+Y` / `Cmd+Y` | 다시 실행 |
 | 문서 더블클릭 | 전체 Markdown을 수정하는 plain text source 모드로 전환 |
-| source 모드에서 `Ctrl+Enter` / `Cmd+Enter` | WYSIWYG 모드로 복귀 |
+| source 모드에서 `Ctrl+Enter` / `Cmd+Enter` | 설정된 WYSIWYG Preview 모드로 복귀 |
 | 작업 항목의 체크박스 클릭 | 체크 상태와 Markdown의 `[ ]`/`[x]`를 함께 변경 |
 | 링크를 마우스 휠로 클릭 | 링크를 새 브라우저 탭으로 열기 |
 | 코드 블록 헤더의 언어 입력칸 | fenced code의 언어를 바로 수정 |
