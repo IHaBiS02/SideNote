@@ -34,6 +34,27 @@ import {
   notes,
   activeNoteId
 } from '../state.js';
+import type { ParsedSnote } from '../import_export.js';
+
+interface ExportAllOptions {
+  extension?: 'snotes' | 'zip';
+  addTwoSpaceLineBreaks?: boolean;
+  useTitleFolderNames?: boolean;
+}
+
+interface ExportNoteOptions {
+  extension?: 'snote' | 'zip';
+  addTwoSpaceLineBreaks?: boolean;
+}
+
+type ExportAction = () => Promise<void>;
+type ZipExportAction = (addTwoSpaceLineBreaks: boolean) => Promise<void>;
+
+interface ExportDropdownOptions {
+  archiveExtension: 'snote' | 'snotes';
+  zipExport: ZipExportAction;
+  archiveExport: ExportAction;
+}
 
 // === Import/Export Event Listeners ===
 
@@ -41,7 +62,7 @@ async function exportAllNotes({
   extension = 'snotes',
   addTwoSpaceLineBreaks = false,
   useTitleFolderNames = false
-} = {}) {
+}: ExportAllOptions = {}): Promise<void> {
   const timestamp = getTimestamp();
   const zip = await createAllNotesArchive(notes, {
     addTwoSpaceLineBreaks,
@@ -51,7 +72,10 @@ async function exportAllNotes({
   downloadFile(blob, `notes_${timestamp}.${extension}`);
 }
 
-async function exportCurrentNote({ extension = 'snote', addTwoSpaceLineBreaks = false } = {}) {
+async function exportCurrentNote({
+  extension = 'snote',
+  addTwoSpaceLineBreaks = false,
+}: ExportNoteOptions = {}): Promise<void> {
   const note = notes.find(n => n.id === activeNoteId);
   if (!note) {
     return;
@@ -63,7 +87,10 @@ async function exportCurrentNote({ extension = 'snote', addTwoSpaceLineBreaks = 
   downloadFile(blob, `${sanitizedTitle}.${extension}`);
 }
 
-function positionDropdownNearButton(dropdown, button) {
+function positionDropdownNearButton(
+  dropdown: HTMLDivElement,
+  button: HTMLButtonElement,
+): void {
   const rect = button.getBoundingClientRect();
   const margin = 6;
   const left = Math.min(rect.left, window.innerWidth - dropdown.offsetWidth - margin);
@@ -74,20 +101,27 @@ function positionDropdownNearButton(dropdown, button) {
   setDropdownTop(dropdown, top);
 }
 
-function setDropdownTop(dropdown, top) {
+function setDropdownTop(dropdown: HTMLDivElement, top: number): void {
   const margin = 6;
   const maxTop = window.innerHeight - dropdown.offsetHeight - margin;
   const boundedTop = Math.min(Math.max(margin, top), Math.max(margin, maxTop));
   dropdown.style.top = `${boundedTop}px`;
 }
 
-function keepDropdownBottomStable(dropdown, update) {
+function keepDropdownBottomStable(
+  dropdown: HTMLDivElement,
+  update: () => void,
+): void {
   const previousBottom = dropdown.getBoundingClientRect().bottom;
   update();
   setDropdownTop(dropdown, previousBottom - dropdown.offsetHeight);
 }
 
-function addDropdownItem(dropdown, text, onClick) {
+function addDropdownItem(
+  dropdown: HTMLDivElement,
+  text: string,
+  onClick: ExportAction,
+): HTMLDivElement {
   const item = document.createElement('div');
   item.textContent = text;
   item.tabIndex = 0;
@@ -100,8 +134,11 @@ function addDropdownItem(dropdown, text, onClick) {
   return item;
 }
 
-function showZipLineBreakOptions(parentItem, exportZip) {
-  const dropdown = parentItem.closest('.export-options-dropdown');
+function showZipLineBreakOptions(
+  parentItem: HTMLDivElement,
+  exportZip: ZipExportAction,
+): void {
+  const dropdown = parentItem.closest<HTMLDivElement>('.export-options-dropdown');
   if (!dropdown) {
     return;
   }
@@ -114,7 +151,7 @@ function showZipLineBreakOptions(parentItem, exportZip) {
     return;
   }
 
-  const addZipOption = (text, addTwoSpaceLineBreaks) => {
+  const addZipOption = (text: string, addTwoSpaceLineBreaks: boolean): void => {
     const item = document.createElement('div');
     item.textContent = text;
     item.tabIndex = 0;
@@ -133,7 +170,10 @@ function showZipLineBreakOptions(parentItem, exportZip) {
   });
 }
 
-function showExportOptionsDropdown(button, { archiveExtension, zipExport, archiveExport }) {
+function showExportOptionsDropdown(
+  button: HTMLButtonElement,
+  { archiveExtension, zipExport, archiveExport }: ExportDropdownOptions,
+): void {
   const dropdown = createDropdown({
     className: 'export-options-dropdown',
     populate: (dropdownElement) => {
@@ -155,7 +195,7 @@ function showExportOptionsDropdown(button, { archiveExtension, zipExport, archiv
   }
 }
 
-function initializeImportExportEvents() {
+function initializeImportExportEvents(): void {
   // Export all notes
   globalExportButton.addEventListener('click', async () => {
     await exportAllNotes();
@@ -203,7 +243,7 @@ function initializeImportExportEvents() {
 
   // Global import file selection
   globalImportInput.addEventListener('change', async (e) => {
-    const file = e.target.files[0];
+    const file = globalImportInput.files?.[0];
     if (!file) {
       return;
     }
@@ -222,8 +262,8 @@ function initializeImportExportEvents() {
         notes.push(newNote);
       } else if (file.name.endsWith('.snotes')) {
         // Multiple notes file (.snotes)
-        const parsedNotes = [];
-        const topLevelFolders = new Set();
+        const parsedNotes: ParsedSnote[] = [];
+        const topLevelFolders = new Set<string>();
         
         // Find top-level folders (each folder is one note)
         for (const path in zip.files) {
@@ -233,7 +273,9 @@ function initializeImportExportEvents() {
         }
 
         for (const noteFolder of topLevelFolders) {
-          const parsedNote = await parseSnote(zip.folder(noteFolder));
+          const folder = zip.folder(noteFolder);
+          if (!folder) continue;
+          const parsedNote = await parseSnote(folder);
           parsedNotes.push(parsedNote);
         }
 
@@ -255,7 +297,7 @@ function initializeImportExportEvents() {
 
   // Import note file selection
   importNoteInput.addEventListener('change', async (e) => {
-    const file = e.target.files[0];
+    const file = importNoteInput.files?.[0];
     if (!file) {
       return;
     }

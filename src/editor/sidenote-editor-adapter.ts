@@ -3,10 +3,17 @@ import { resolveLegacyTextProcessingSettings } from '../settings.js';
 import { globalSettings } from '../state.js';
 import { processPastedText } from '../text-processors.js';
 import { markdownEditor } from '../dom.js';
+import type {
+  CodeHighlightToken,
+  EditorMode,
+} from '../../packages/wysiwyg-markdown/src/index.js';
 
 const INTERNAL_IMAGE_PATTERN = /^images\/([^/]+)\.png$/;
 
-function highlightCode(code, requestedLanguage) {
+function highlightCode(
+  code: string,
+  requestedLanguage: string,
+): CodeHighlightToken[] {
   if (
     !globalThis.hljs?.highlight
     || !globalThis.hljs?.highlightAuto
@@ -15,7 +22,7 @@ function highlightCode(code, requestedLanguage) {
     return [];
   }
 
-  let highlighted;
+  let highlighted: string;
   if (!requestedLanguage) {
     highlighted = globalThis.hljs.highlightAuto(code).value;
   } else if (globalThis.hljs.getLanguage(requestedLanguage)) {
@@ -28,19 +35,20 @@ function highlightCode(code, requestedLanguage) {
   }
   const template = document.createElement('template');
   template.innerHTML = highlighted;
-  const ranges = [];
+  const ranges: CodeHighlightToken[] = [];
   let offset = 0;
 
-  function visit(node) {
+  function visit(node: Node): void {
     if (node.nodeType === Node.TEXT_NODE) {
-      offset += node.textContent.length;
+      offset += node.textContent?.length ?? 0;
       return;
     }
     if (node.nodeType !== Node.ELEMENT_NODE) return;
 
+    const element = node as Element;
     const start = offset;
-    Array.from(node.childNodes).forEach(visit);
-    const className = Array.from(node.classList)
+    Array.from(element.childNodes).forEach(visit);
+    const className = Array.from(element.classList)
       .filter(name => name.startsWith('hljs-'))
       .join(' ');
     if (className && offset > start) {
@@ -388,7 +396,7 @@ const SIDENOTE_EDITOR_THEME = `
   }
 `;
 
-function initializeWysiwygMarkdownEditor() {
+function initializeWysiwygMarkdownEditor(): boolean {
   if (!markdownEditor || typeof markdownEditor.setMode !== 'function') {
     return false;
   }
@@ -422,7 +430,7 @@ function initializeWysiwygMarkdownEditor() {
   return true;
 }
 
-function setEditorMode(mode) {
+function setEditorMode(mode: EditorMode): void {
   if (typeof markdownEditor?.setMode === 'function') {
     markdownEditor.setMode(mode);
   }

@@ -14,7 +14,7 @@ import {
 
 // === Global Event Listeners ===
 
-function initializeGlobalEvents() {
+function initializeGlobalEvents(): void {
   // ESC key to close/go back
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
@@ -38,16 +38,18 @@ function initializeGlobalEvents() {
 
   // Close dropdowns in image management screen
   document.addEventListener('click', (e) => {
+      const target = e.target;
+      if (!(target instanceof Element)) return;
       if (imageManagementView.style.display === 'block') {
           // Close notes dropdown when clicking outside usage icon
           const openNotesDropdown = document.querySelector('.notes-dropdown');
-          if (openNotesDropdown && !e.target.closest('.usage-icon')) {
+          if (openNotesDropdown && !target.closest('.usage-icon')) {
               openNotesDropdown.remove();
           }
           
           // Close image title dropdown when clicking outside image name
           const openImageTitleDropdown = document.querySelector('.image-title-dropdown');
-          if (openImageTitleDropdown && !e.target.closest('.image-name')) {
+          if (openImageTitleDropdown && !target.closest('.image-name')) {
               openImageTitleDropdown.remove();
           }
       }

@@ -40,14 +40,15 @@ import {
   getHistoryIndex,
   goToHistoryState
 } from '../history.js';
+import type { NavigationHistoryState } from '../types.js';
 
 // === Navigation utility functions ===
 
 // Save editor content if changed before navigating away
-async function saveCurrentEditorIfChanged() {
+async function saveCurrentEditorIfChanged(): Promise<void> {
     const currentState = getCurrentHistoryState();
     if (currentState && currentState.view === 'editor') {
-        const note = notes.find(n => n.id === currentState.params.noteId);
+        const note = notes.find(n => n.id === currentState.params?.noteId);
         if (note && markdownEditor.value !== originalNoteContent) {
             note.content = markdownEditor.value;
             note.metadata.lastModified = Date.now();
@@ -59,7 +60,9 @@ async function saveCurrentEditorIfChanged() {
 }
 
 // Navigate to a given state (view switching)
-async function navigateToState(state) {
+async function navigateToState(
+  state: NavigationHistoryState | undefined,
+): Promise<void> {
     if (!state) {
         showListView(false);
         return;
@@ -70,14 +73,18 @@ async function navigateToState(state) {
             showListView(false);
             break;
         case 'editor':
-            openNote(state.params.noteId, state.params.inEditMode, false);
+            if (!state.params?.noteId) {
+                showListView(false);
+                return;
+            }
+            openNote(state.params.noteId, state.params.inEditMode ?? false, false);
             break;
         case 'settings':
-            setIsGlobalSettings(state.params.isGlobal);
+            setIsGlobalSettings(state.params?.isGlobal ?? false);
             if (isGlobalSettings) {
                 populateSettingsForm(true);
             } else {
-                const note = notes.find(n => n.id === state.params.noteId);
+                const note = notes.find(n => n.id === state.params?.noteId);
                 if (!note || !populateSettingsForm(false, note)) {
                     showListView(false);
                     return;
@@ -100,7 +107,7 @@ async function navigateToState(state) {
 }
 
 // Go back to previous screen
-async function goBack() {
+async function goBack(): Promise<void> {
     await saveCurrentEditorIfChanged();
 
     const previousState = moveBack();
@@ -125,7 +132,7 @@ async function goBack() {
     }
 }
 
-function populateHistoryDropdown(dropdown) {
+function populateHistoryDropdown(dropdown: Element): void {
     dropdown.innerHTML = ''; // Clear existing items
     const history = getHistory();
     const currentIndex = getHistoryIndex();
@@ -140,9 +147,10 @@ function populateHistoryDropdown(dropdown) {
         const item = document.createElement('div');
         let title = state.view;
         if (state.view === 'editor' && state.params && state.params.noteId) {
-            const note = notes.find(n => n.id === state.params.noteId);
+            const params = state.params;
+            const note = notes.find(n => n.id === params.noteId);
             const noteTitle = note ? note.title : 'Untitled';
-            const mode = state.params.inEditMode ? 'Edit' : 'Preview';
+            const mode = params.inEditMode ? 'Edit' : 'Preview';
             title = `${mode}: ${noteTitle}`;
         } else {
             // Capitalize first letter
@@ -168,7 +176,7 @@ function populateHistoryDropdown(dropdown) {
     });
 }
 
-function showHistoryDropdown(targetButton) {
+function showHistoryDropdown(_targetButton: EventTarget | null): void {
     const history = getHistory();
     if (history.length === 0) return;
 
@@ -179,8 +187,8 @@ function showHistoryDropdown(targetButton) {
     });
 }
 
-function refreshHistoryDropdown() {
-    const existingDropdown = document.querySelector('.history-dropdown');
+function refreshHistoryDropdown(): void {
+    const existingDropdown = document.querySelector<HTMLDivElement>('.history-dropdown');
     if (existingDropdown) {
         populateHistoryDropdown(existingDropdown);
     }
@@ -197,7 +205,7 @@ const backButtons = [
 ];
 
 // Add event listeners to all back buttons
-function initializeNavigationEvents() {
+function initializeNavigationEvents(): void {
     backButtons.forEach(button => {
         button.addEventListener('click', goBack);
         // Show history dropdown on right click

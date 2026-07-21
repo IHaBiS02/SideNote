@@ -20,24 +20,25 @@ import { openNote } from './note-renderer.js';
 
 // Import image modal
 import { showImageModal } from './image-modal.js';
+import type { Note } from '../types.js';
 
 const imageListBlobUrls = createBlobUrlTracker();
 
 /**
  * Renders the list of images.
  */
-async function renderImagesList() {
+async function renderImagesList(): Promise<void> {
   imageListBlobUrls.revokeAll();
   imageList.innerHTML = '';
   try {
     const imageObjects = await getAllImageObjectsFromDB();
-    const imageUsageMap = new Map();
+    const imageUsageMap = new Map<string, Note[]>();
     for (const note of notes) {
       for (const imageId of extractImageIds(note.content || '')) {
         if (!imageUsageMap.has(imageId)) {
           imageUsageMap.set(imageId, []);
         }
-        imageUsageMap.get(imageId).push(note);
+        imageUsageMap.get(imageId)?.push(note);
       }
     }
 
@@ -66,7 +67,7 @@ async function renderImagesList() {
 
       imageName.onclick = (e) => {
         e.stopPropagation();
-        const currentTarget = e.currentTarget;
+        const currentTarget = e.currentTarget as HTMLElement;
         const isAlreadyOpen = currentTarget.querySelector('.image-title-dropdown');
 
         const allImageDropdowns = document.querySelectorAll('.image-title-dropdown');
@@ -124,7 +125,7 @@ async function renderImagesList() {
       if (isUsed) {
         usageIcon.onclick = (e) => {
           e.stopPropagation();
-          const currentTarget = e.currentTarget;
+          const currentTarget = e.currentTarget as HTMLElement;
           const isAlreadyOpen = currentTarget.querySelector('.notes-dropdown');
 
           const allNotesDropdowns = document.querySelectorAll('.notes-dropdown');

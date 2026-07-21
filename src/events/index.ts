@@ -20,7 +20,7 @@ export {
 } from './editor.js';
 
 // Initialize all event listeners
-function initializeAllEvents() {
+function initializeAllEvents(): void {
   initializeWysiwygMarkdownEditor();
   initializeNavigationEvents();
   initializeEditorEvents();

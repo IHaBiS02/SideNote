@@ -1,5 +1,5 @@
 // Import required DOM elements
-import {
+import { 
   markdownEditor,
   htmlPreview,
   toggleViewButton
@@ -19,6 +19,7 @@ import {
   notes,
   setIsPreview
 } from '../state.js';
+import type { Note } from '../types.js';
 
 const previewBlobUrls = createBlobUrlTracker();
 
@@ -27,7 +28,7 @@ const previewBlobUrls = createBlobUrlTracker();
  */
 // === 마크다운 렌더링 ===
 
-function getCodeBlockLanguage(block) {
+function getCodeBlockLanguage(block: Element): string {
   const languageClass = Array.from(block.classList).find((className) => className.startsWith('language-'));
   if (!languageClass) {
     return 'text';
@@ -36,7 +37,7 @@ function getCodeBlockLanguage(block) {
   return languageClass.replace('language-', '') || 'text';
 }
 
-async function copyTextToClipboard(text) {
+async function copyTextToClipboard(text: string): Promise<void> {
   if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
     await navigator.clipboard.writeText(text);
     return;
@@ -56,7 +57,7 @@ async function copyTextToClipboard(text) {
   }
 }
 
-function showCopyFeedback(button, text) {
+function showCopyFeedback(button: HTMLButtonElement, text: string): void {
   const originalText = button.dataset.defaultText || button.textContent;
   button.textContent = text;
   setTimeout(() => {
@@ -64,7 +65,11 @@ function showCopyFeedback(button, text) {
   }, 1000);
 }
 
-function addCodeBlockHeader(block, language, codeText) {
+function addCodeBlockHeader(
+  block: Element,
+  language: string,
+  codeText: string,
+): void {
   const pre = block.parentElement;
   if (!pre || pre.classList.contains('code-block-body')) {
     return;
@@ -102,25 +107,25 @@ function addCodeBlockHeader(block, language, codeText) {
   header.appendChild(copyButton);
 
   pre.classList.add('code-block-body');
-  pre.parentNode.insertBefore(container, pre);
+  pre.parentNode?.insertBefore(container, pre);
   container.appendChild(header);
   container.appendChild(pre);
 }
 
-function getActiveNote() {
+function getActiveNote(): Note | undefined {
   return notes.find(note => note.id === activeNoteId);
 }
 
-function configureMarkdownRenderer() {
+function configureMarkdownRenderer(): void {
   // 커스텀 렌더러 설정 (체크박스 지원)
   const renderer = new marked.Renderer();
-  renderer.listitem = function(text, task, checked) {
+  renderer.listitem = function(text: unknown, task: unknown) {
     if (task) {
-      return '<li class="task-list-item">' + text + '</li>';
+      return '<li class="task-list-item">' + String(text) + '</li>';
     }
-    return '<li>' + text + '</li>';
+    return '<li>' + String(text) + '</li>';
   };
-  renderer.checkbox = function(checked) {
+  renderer.checkbox = function(checked: unknown) {
     return `<input type="checkbox" ${checked ? 'checked' : ''}>`;
   };
 
@@ -129,7 +134,7 @@ function configureMarkdownRenderer() {
     gfm: true,        // GitHub Flavored Markdown 사용
     breaks: !normalizeGlobalSettings(globalSettings).legacyLineBreakMode,
     renderer: renderer,
-    highlight: function(code, lang) {
+    highlight: function(code: string, lang: string) {
       // 코드 하이라이팅 (highlight.js 사용)
       const language = hljs.getLanguage(lang) ? lang : 'plaintext';
       return hljs.highlight(code, { language }).value;
@@ -137,7 +142,7 @@ function configureMarkdownRenderer() {
   });
 }
 
-function renderMarkdownToHtml(markdown) {
+function renderMarkdownToHtml(markdown: string): string {
   configureMarkdownRenderer();
   const dirtyHtml = marked.parse(markdown);
   return DOMPurify.sanitize(dirtyHtml, {
@@ -146,19 +151,22 @@ function renderMarkdownToHtml(markdown) {
   });
 }
 
-function decorateCodeBlocks(container, note = getActiveNote()) {
+function decorateCodeBlocks(
+  container: ParentNode,
+  note: Note | undefined = getActiveNote(),
+): void {
   // 코드 블록에 줄 번호 추가
   container.querySelectorAll('pre code').forEach((block) => {
-    const codeText = block.textContent;
+    const codeText = block.textContent ?? '';
     const language = getCodeBlockLanguage(block);
 
     // 줄 수 계산
     const lineCount = codeText.split('\n').length;
     // 줄 수에 따라 다른 스타일 적용
     if (lineCount === 2) {
-      block.parentElement.classList.add('single-line-code');
+      block.parentElement?.classList.add('single-line-code');
     } else {
-      block.parentElement.classList.add('multi-line-code');
+      block.parentElement?.classList.add('multi-line-code');
     }
 
     if (isCodeBlockHeaderEnabled(note)) {
@@ -171,7 +179,7 @@ function decorateCodeBlocks(container, note = getActiveNote()) {
   hljs.highlightAll();
 }
 
-function renderMarkdown() {
+function renderMarkdown(): void {
   htmlPreview.innerHTML = renderMarkdownToHtml(markdownEditor.value);
   decorateCodeBlocks(htmlPreview, getActiveNote());
   renderImages();
@@ -182,7 +190,7 @@ function renderMarkdown() {
  */
 // === 이미지 렌더링 ===
 
-async function renderImages() {
+async function renderImages(): Promise<void> {
   previewBlobUrls.revokeAll();
   const images = htmlPreview.querySelectorAll('img');
   for (const img of images) {
@@ -211,7 +219,7 @@ async function renderImages() {
  * Toggles between the editor and preview modes.
  */
 // 편집/미리보기 모드 전환
-function togglePreview() {
+function togglePreview(): void {
   const wasEditMode = !isPreview; // 전환 전 edit 모드 여부 저장
   setIsPreview(!isPreview);
   

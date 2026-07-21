@@ -7,10 +7,11 @@ import { showListView } from './notes_view/index.js';
 import { deletedNotes, globalSettings, setNotes, setDeletedNotes, setGlobalSettings } from './state.js';
 // Import events initialization function
 import { initializeAllEvents } from './events/index.js';
+import type { GlobalSettings, Note } from './types.js';
 
 // === 애플리케이션 초기화 ===
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
   await initDB();
   await loadAndMigrateData();
   await cleanupDeletedImages();
@@ -18,9 +19,10 @@ async function bootstrap() {
   initializeAllEvents();
 }
 
-function initializeInitialView() {
-  applyMode(globalSettings.mode);
-  applyFontSize(globalSettings.fontSize);
+function initializeInitialView(): void {
+  const settings = normalizeGlobalSettings(globalSettings);
+  applyMode(settings.mode);
+  applyFontSize(settings.fontSize);
   updateLegacyLineBreakControls();
   updateTildeReplacementButton();
   showListView();
@@ -29,14 +31,14 @@ function initializeInitialView() {
 /**
  * Loads data from storage and migrates it to IndexedDB if necessary.
  */
-async function loadAndMigrateData() {
+async function loadAndMigrateData(): Promise<void> {
   // chrome.storage.local에서 설정 및 노트 데이터 로드
   const data = await browser.storage.local.get(['globalSettings', 'notes', 'deletedNotes']);
-  const loadedSettings = data.globalSettings;
+  const loadedSettings = data.globalSettings as Partial<GlobalSettings> | undefined;
   setGlobalSettings(normalizeGlobalSettings(loadedSettings));
 
-  const loadedNotes = data.notes;
-  const loadedDeletedNotes = data.deletedNotes;
+  const loadedNotes = data.notes as Note[] | undefined;
+  const loadedDeletedNotes = data.deletedNotes as Note[] | undefined;
 
   // chrome.storage.local에서 IndexedDB로 일회성 마이그레이션
   if (loadedNotes || loadedDeletedNotes) {
@@ -70,7 +72,7 @@ async function loadAndMigrateData() {
  */
 // === 정리 함수 ===
 
-async function cleanupDeletedImages() {
+async function cleanupDeletedImages(): Promise<void> {
     const thirtyDaysAgo = Date.now() - THIRTY_DAYS_MS; // 30일 전 타임스탬프
     const imageObjects = await getAllImageObjectsFromDB();
     // 30일 이상 오래된 삭제 이미지 찾기
@@ -84,16 +86,22 @@ async function cleanupDeletedImages() {
 /**
  * Deletes notes that have been in the recycle bin for more than 30 days.
  */
-async function cleanupDeletedNotes() {
+async function cleanupDeletedNotes(): Promise<void> {
     const thirtyDaysAgo = Date.now() - THIRTY_DAYS_MS; // 30일 전 타임스탬프
     // 30일 이상 오래된 삭제 노트 찾기
-    const notesToDelete = deletedNotes.filter(note => note.metadata.deletedAt < thirtyDaysAgo);
+    const notesToDelete = deletedNotes.filter(
+      note => typeof note.metadata.deletedAt === 'number'
+        && note.metadata.deletedAt < thirtyDaysAgo,
+    );
     // 영구 삭제
     for (const note of notesToDelete) {
         await deleteNotePermanentlyDB(note.id);
     }
     // 메모리에서도 제거
-    setDeletedNotes(deletedNotes.filter(note => note.metadata.deletedAt >= thirtyDaysAgo));
+    setDeletedNotes(deletedNotes.filter(
+      note => typeof note.metadata.deletedAt === 'number'
+        && note.metadata.deletedAt >= thirtyDaysAgo,
+    ));
 }
 
 if (!globalThis.__SIDENOTE_DISABLE_AUTO_BOOTSTRAP__) {

@@ -43,5 +43,9 @@ export interface StoredImage {
 
 export interface NavigationHistoryState {
   view: string;
-  params?: Record<string, unknown>;
+  params?: {
+    noteId?: string | null;
+    inEditMode?: boolean;
+    isGlobal?: boolean;
+  };
 }

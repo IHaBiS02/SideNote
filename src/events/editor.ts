@@ -33,36 +33,41 @@ import {
   isPreview,
   setIsPreview
 } from '../state.js';
+import type { WysiwygMarkdownElement } from '../../packages/wysiwyg-markdown/src/index.js';
 
 // === Editor utility functions ===
 
 // Insert text at cursor position (replaces deprecated document.execCommand)
-function insertTextAtCursor(textarea, text) {
-  if (typeof textarea.replaceSelection === 'function') {
-    textarea.replaceSelection(text);
+function insertTextAtCursor(
+  editor: HTMLTextAreaElement | WysiwygMarkdownElement,
+  text: string,
+): void {
+  if ('replaceSelection' in editor && typeof editor.replaceSelection === 'function') {
+    editor.replaceSelection(text);
     return;
   }
+  if (!(editor instanceof HTMLTextAreaElement)) return;
 
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  const value = textarea.value;
+  const start = editor.selectionStart;
+  const end = editor.selectionEnd;
+  const value = editor.value;
   
   // Insert text
-  textarea.value = value.substring(0, start) + text + value.substring(end);
+  editor.value = value.substring(0, start) + text + value.substring(end);
   
   // Adjust cursor position
-  textarea.selectionStart = textarea.selectionEnd = start + text.length;
+  editor.selectionStart = editor.selectionEnd = start + text.length;
   
   // Trigger input event (for auto-save etc.)
-  textarea.dispatchEvent(new Event('input', { bubbles: true }));
+  editor.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
 // === Editor Event Listeners ===
 
-function initializeEditorEvents() {
+function initializeEditorEvents(): void {
   // A double-click in WYSIWYG mode opens the component's full source editor.
   markdownEditor.addEventListener('mode-change', (event) => {
-    const mode = event.detail?.mode;
+    const mode = (event as CustomEvent<{ mode?: string }>).detail?.mode;
     if (mode !== 'source' && mode !== 'wysiwyg') return;
 
     const nextIsPreview = mode === 'wysiwyg';
@@ -127,14 +132,16 @@ function initializeEditorEvents() {
   // Legacy textarea paste path. The WYSIWYG editor handles this through its adapter.
   if (typeof markdownEditor.replaceSelection !== 'function') {
     markdownEditor.addEventListener('paste', async (e) => {
+      const clipboardEvent = e as ClipboardEvent;
       e.preventDefault();
 
-      const items = Array.from(e.clipboardData.items);
+      const items = Array.from(clipboardEvent.clipboardData?.items ?? []);
       const imageItem = items.find(item => item.kind === 'file' && item.type.startsWith('image/'));
 
       // Handle image paste
       if (imageItem) {
         const imageFile = imageItem.getAsFile();
+        if (!imageFile) return;
         const imageId = crypto.randomUUID();
 
         try {
@@ -147,7 +154,7 @@ function initializeEditorEvents() {
         }
       } else {
         // Handle text paste
-        const rawText = e.clipboardData.getData('text/plain');
+        const rawText = clipboardEvent.clipboardData?.getData('text/plain') ?? '';
         const processedText = processPastedText(rawText, resolveLegacyTextProcessingSettings(globalSettings));
         insertTextAtCursor(markdownEditor, processedText);
       }
@@ -162,7 +169,11 @@ function initializeEditorEvents() {
     // Auto add two spaces at end of line when pressing Enter
     if (typeof markdownEditor.replaceSelection !== 'function' &&
         e.key === 'Enter' && !e.isComposing && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
-      const result = handleEnterKeyInput(markdownEditor, resolveLegacyTextProcessingSettings(globalSettings), insertTextAtCursor);
+      const result = handleEnterKeyInput(
+        markdownEditor as unknown as HTMLTextAreaElement,
+        resolveLegacyTextProcessingSettings(globalSettings),
+        insertTextAtCursor,
+      );
       if (result.handled) {
         e.preventDefault();
       }
@@ -178,10 +189,12 @@ function initializeEditorEvents() {
 
   // Preview area click events
   htmlPreview.addEventListener('click', async (e) => {
+    const target = e.target;
+    if (!(target instanceof HTMLElement)) return;
     // Handle checkbox clicks
-    if (e.target.tagName === 'INPUT' && e.target.type === 'checkbox') {
+    if (target instanceof HTMLInputElement && target.type === 'checkbox') {
       const checkboxes = Array.from(htmlPreview.querySelectorAll('input[type="checkbox"]'));
-      const checkboxIndex = checkboxes.indexOf(e.target);
+      const checkboxIndex = checkboxes.indexOf(target);
 
       const newMarkdown = toggleMarkdownCheckbox(markdownEditor.value, checkboxIndex);
       if (newMarkdown !== null) {
@@ -198,9 +211,9 @@ function initializeEditorEvents() {
           renderNoteList();
         }
       }
-    } else if (e.target.tagName === 'IMG') {
+    } else if (target instanceof HTMLImageElement) {
       // Show image modal when clicking on images
-      showImageModal(e.target.src);
+      showImageModal(target.src);
     }
   });
 
@@ -225,7 +238,7 @@ function initializeEditorEvents() {
 
         let editingFinished = false;
 
-        const finishEditing = async () => {
+        const finishEditing = async (): Promise<void> => {
           if (editingFinished) return;
           editingFinished = true;
 
@@ -238,7 +251,7 @@ function initializeEditorEvents() {
           input.replaceWith(editorTitle);
         };
 
-        const handleKeyDown = (e) => {
+        const handleKeyDown = (e: KeyboardEvent): void => {
           if (e.key === 'Enter' && !e.isComposing) {
             e.preventDefault();
             finishEditing();

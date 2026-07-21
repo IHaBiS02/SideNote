@@ -51,10 +51,11 @@ import {
   activeNoteId,
   setIsGlobalSettings
 } from '../state.js';
+import type { ThemeMode } from '../types.js';
 
 // === Settings Event Listeners ===
 
-function initializeSettingsEvents() {
+function initializeSettingsEvents(): void {
   // Open note settings
   settingsButton.addEventListener('click', () => {
     setIsGlobalSettings(false);
@@ -103,7 +104,7 @@ function initializeSettingsEvents() {
               eraseAction.textContent = 'Erase All Notes';
               eraseAction.classList.add('delete-action');
 
-              const handleFirstClick = (event) => {
+              const handleFirstClick = (event: MouseEvent): void => {
                   event.stopPropagation();
 
                   const confirmAction = document.createElement('div');
@@ -128,7 +129,7 @@ function initializeSettingsEvents() {
 
   // Mode setting change
   modeSetting.addEventListener('change', () => {
-    const value = modeSetting.value;
+    const value = modeSetting.value as ThemeMode;
     globalSettings.mode = value;
     saveGlobalSettings();
     applyMode(value);

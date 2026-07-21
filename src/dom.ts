@@ -1,4 +1,6 @@
 // === 메인 뷰 요소 ===
+import type { WysiwygMarkdownElement } from '../packages/wysiwyg-markdown/src/index.js';
+
 const listView = document.getElementById('list-view') as HTMLDivElement;
 const editorView = document.getElementById('editor-view') as HTMLDivElement;
 const noteList = document.getElementById('note-list') as HTMLUListElement;
@@ -7,7 +9,7 @@ const backButton = document.getElementById('back-button') as HTMLButtonElement;
 const deleteNoteButton = document.getElementById('delete-note-button') as HTMLButtonElement;
 // === 에디터 관련 요소 ===
 const editorTitle = document.getElementById('editor-title') as HTMLHeadingElement;
-const markdownEditor = document.getElementById('markdown-editor') as HTMLElement;
+const markdownEditor = document.getElementById('markdown-editor') as WysiwygMarkdownElement;
 const htmlPreview = document.getElementById('html-preview') as HTMLDivElement;
 const toggleViewButton = document.getElementById('toggle-view-button') as HTMLButtonElement;
 // === 설정 및 라이선스 뷰 요소 ===

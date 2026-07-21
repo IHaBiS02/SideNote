@@ -41,7 +41,7 @@ import { showEditorView } from './view-manager.js';
  */
 // === 노트 목록 렌더링 ===
 
-function renderNoteList() {
+function renderNoteList(): void {
   noteList.innerHTML = '';
   if (!Array.isArray(notes)) return;
   notes.forEach(note => {
@@ -91,7 +91,11 @@ function renderNoteList() {
  */
 // === 노트 열기 및 편집 ===
 
-function openNote(noteId, inEditMode = false, addToHistory = true) {
+function openNote(
+  noteId: string,
+  inEditMode = false,
+  addToHistory = true,
+): void {
   const note = notes.find(n => n.id === noteId);
   if (note) {
     setActiveNoteId(noteId);

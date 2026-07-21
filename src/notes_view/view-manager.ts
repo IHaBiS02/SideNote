@@ -30,7 +30,7 @@ import { renderImagesList } from './image-manager.js';
  * Shows the list view.
  * @param {boolean} addToHistory Whether to add this action to the history.
  */
-function showListView(addToHistory = true) {
+function showListView(addToHistory = true): void {
   setActiveNoteId(null);
   // 모든 뷰 숨기고 노트 목록만 표시
   listView.style.display = 'block';
@@ -50,7 +50,7 @@ function showListView(addToHistory = true) {
  * Shows the editor view.
  * @param {boolean} addToHistory Whether to add this action to the history.
  */
-function showEditorView(addToHistory = true) {
+function showEditorView(addToHistory = true): void {
   listView.style.display = 'none';
   editorView.style.display = 'block';
   settingsView.style.display = 'none';
@@ -66,7 +66,7 @@ function showEditorView(addToHistory = true) {
  * Shows the settings view.
  * @param {boolean} addToHistory Whether to add this action to the history.
  */
-function showSettingsView(addToHistory = true) {
+function showSettingsView(addToHistory = true): void {
   listView.style.display = 'none';
   editorView.style.display = 'none';
   settingsView.style.display = 'block';
@@ -82,7 +82,7 @@ function showSettingsView(addToHistory = true) {
  * Shows the license view.
  * @param {boolean} addToHistory Whether to add this action to the history.
  */
-function showLicenseView(addToHistory = true) {
+function showLicenseView(addToHistory = true): void {
   listView.style.display = 'none';
   editorView.style.display = 'none';
   settingsView.style.display = 'none';
@@ -98,7 +98,7 @@ function showLicenseView(addToHistory = true) {
  * Shows the recycle bin view.
  * @param {boolean} addToHistory Whether to add this action to the history.
  */
-function showRecycleBinView(addToHistory = true) {
+function showRecycleBinView(addToHistory = true): void {
   listView.style.display = 'none';
   editorView.style.display = 'none';
   settingsView.style.display = 'none';
@@ -115,7 +115,7 @@ function showRecycleBinView(addToHistory = true) {
  * Shows the image management view.
  * @param {boolean} addToHistory Whether to add this action to the history.
  */
-function showImageManagementView(addToHistory = true) {
+function showImageManagementView(addToHistory = true): void {
   listView.style.display = 'none';
   editorView.style.display = 'none';
   settingsView.style.display = 'none';

@@ -2,7 +2,7 @@
  * Shows an image in a modal.
  * @param {string} blobUrl The blob URL of the image to show.
  */
-function showImageModal(blobUrl) {
+function showImageModal(blobUrl: string): void {
   const modal = document.createElement('div');
   modal.classList.add('image-preview-modal');
   modal.style.position = 'fixed';
@@ -24,7 +24,7 @@ function showImageModal(blobUrl) {
   const modalImg = document.createElement('img');
   modalImg.src = blobUrl;
 
-  let zoomState = 0; // 0: fit to screen, 1: native size
+  let zoomState: 0 | 1 = 0; // 0: fit to screen, 1: native size
 
   modalImg.onload = () => {
       const naturalWidth = modalImg.naturalWidth;
@@ -35,7 +35,7 @@ function showImageModal(blobUrl) {
       const availableWidth = viewportWidth * (1 - 2 * paddingPercent);
       const availableHeight = viewportHeight * (1 - 2 * paddingPercent);
 
-      const setZoomState = (state) => {
+      const setZoomState = (state: 0 | 1): void => {
           if (state === 0) {
               modal.style.justifyContent = 'center';
               modal.style.alignItems = 'center';
@@ -45,7 +45,7 @@ function showImageModal(blobUrl) {
               const scaleWidth = availableWidth / naturalWidth;
               const scaledHeight = naturalHeight * scaleWidth;
 
-              let finalScale;
+              let finalScale: number;
               if (scaledHeight <= availableHeight) {
                   finalScale = scaleWidth;
               } else {
@@ -87,7 +87,7 @@ function showImageModal(blobUrl) {
       setZoomState(zoomState);
 
       modalImg.onclick = () => {
-          zoomState = (zoomState + 1) % 2;
+          zoomState = zoomState === 0 ? 1 : 0;
           setZoomState(zoomState);
       };
   };

@@ -21,6 +21,19 @@ import { createBlobUrlTracker } from '../utils.js';
 
 // Import image modal function
 import { showImageModal } from './image-manager.js';
+import type { Note, StoredImage } from '../types.js';
+
+type DeletedNoteItem = Note & {
+  type: 'note';
+  deletedAt: number;
+};
+
+type DeletedImageItem = StoredImage & {
+  type: 'image';
+  deletedAt: number;
+};
+
+type DeletedItem = DeletedNoteItem | DeletedImageItem;
 
 const recycleBinBlobUrls = createBlobUrlTracker();
 
@@ -29,7 +42,7 @@ const recycleBinBlobUrls = createBlobUrlTracker();
  */
 // === 휴지통 항목 렌더링 ===
 
-async function renderDeletedItemsList() {
+async function renderDeletedItemsList(): Promise<void> {
   recycleBinBlobUrls.revokeAll();
   deletedItemsList.innerHTML = '';
 
@@ -37,9 +50,17 @@ async function renderDeletedItemsList() {
   const deletedImageObjects = (await getAllImageObjectsFromDB()).filter(img => img.deletedAt);
   
   // 2. 노트와 이미지를 합쳐서 정렬
-  const deletedItems = [
-    ...deletedNotes.map(n => ({ ...n, type: 'note', deletedAt: n.metadata.deletedAt })),
-    ...deletedImageObjects.map(i => ({ ...i, type: 'image', deletedAt: i.deletedAt }))
+  const deletedItems: DeletedItem[] = [
+    ...deletedNotes.map(n => ({
+      ...n,
+      type: 'note' as const,
+      deletedAt: n.metadata.deletedAt as number,
+    })),
+    ...deletedImageObjects.map(i => ({
+      ...i,
+      type: 'image' as const,
+      deletedAt: i.deletedAt as number,
+    }))
   ];
   deletedItems.sort((a, b) => b.deletedAt - a.deletedAt);
 
