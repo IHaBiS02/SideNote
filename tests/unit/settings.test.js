@@ -3,6 +3,7 @@ import {
   DEFAULT_SETTINGS,
   applyMode,
   normalizeGlobalSettings,
+  normalizeLineHeight,
   resolveEffectiveSettings,
   resolveLegacyTextProcessingSettings
 } from '../../src/settings.js';
@@ -21,6 +22,7 @@ describe('settings model helpers', () => {
     });
 
     expect(settings.fontSize).toBe(18);
+    expect(settings.lineHeight).toBe(1.5);
     expect(settings.mode).toBe('dark');
     expect(settings.wysiwygPreview).toBe(true);
     expect(settings.title).toBe(DEFAULT_SETTINGS.title);
@@ -30,10 +32,19 @@ describe('settings model helpers', () => {
     expect(settings).not.toHaveProperty('autoAddSpaces');
   });
 
+  it('normalizes line spacing to the supported range and precision', () => {
+    expect(normalizeLineHeight(undefined)).toBe(1.5);
+    expect(normalizeLineHeight(0.5)).toBe(1);
+    expect(normalizeLineHeight(2.04)).toBe(2);
+    expect(normalizeLineHeight(2.06)).toBe(2.1);
+    expect(normalizeLineHeight(4)).toBe(3);
+  });
+
   it('resolves note-specific settings over normalized global settings', () => {
     setGlobalSettings({
       title: 'custom',
       fontSize: 14,
+      lineHeight: 1.7,
       codeBlockHeader: false,
       mode: 'dark',
     });
@@ -41,12 +52,14 @@ describe('settings model helpers', () => {
     const effective = resolveEffectiveSettings({
       settings: {
         fontSize: 20,
+        lineHeight: 2.1,
         codeBlockHeader: true,
       },
     });
 
     expect(effective.title).toBe('custom');
     expect(effective.fontSize).toBe(20);
+    expect(effective.lineHeight).toBe(2.1);
     expect(effective.codeBlockHeader).toBe(true);
     expect(effective.mode).toBe('dark');
   });

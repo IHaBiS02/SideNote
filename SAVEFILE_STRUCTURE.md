@@ -9,12 +9,12 @@ This document describes the file structure for SideNote's import/export function
 A `.snote` file is a ZIP archive containing a single note with its metadata and associated images. The structure is:
 
 ```
-note.zip/
+note.snote/
 ├── note.md          # The note content in Markdown format
 ├── metadata.json    # Note metadata and settings
 └── images/          # Directory containing all images used in the note
-    ├── image_[id1].[ext]
-    ├── image_[id2].[ext]
+    ├── [id1].png
+    ├── [id2].png
     └── ...
 ```
 
@@ -23,13 +23,15 @@ note.zip/
 ```json
 {
   "title": "Note Title",
-  "created": "2024-01-01T00:00:00.000Z",
-  "lastModified": "2024-01-01T00:00:00.000Z",
   "settings": {
-    "autoLineBreak": true,
-    "tildeReplacement": false,
-    "customTitle": "Custom Title",
-    "isPinned": false
+    "title": "custom",
+    "fontSize": 14,
+    "lineHeight": 1.8,
+    "codeBlockHeader": true
+  },
+  "metadata": {
+    "createdAt": 1704067200000,
+    "lastModified": 1704067200000
   }
 }
 ```
@@ -56,9 +58,9 @@ notes.zip/
 ## Image Handling
 
 - Images are stored in IndexedDB with unique IDs
-- In Markdown, images are referenced using the custom protocol: `sidenote-image://[id]`
-- When exporting, images are saved as files with names like `image_[id].[extension]`
-- The original file extension is preserved when available
+- In Markdown, images are referenced as `images/[id].png`
+- When exporting, matching blobs are saved as `images/[id].png`
+- Imported images receive new IDs when needed, and Markdown references are rewritten to match
 
 ## Import Behavior
 
@@ -77,15 +79,19 @@ Notes and images are stored in separate object stores:
     id: "unique-id",
     title: "Note Title",
     content: "Markdown content",
-    created: timestamp,
-    lastModified: timestamp,
-    deletedAt: timestamp, // Only present for deleted notes
     settings: {
-      autoLineBreak: boolean,
-      tildeReplacement: boolean,
-      customTitle: string,
-      isPinned: boolean
-    }
+      title?: string,
+      fontSize?: number,
+      lineHeight?: number,
+      codeBlockHeader?: boolean
+    },
+    metadata: {
+      createdAt: timestamp,
+      lastModified: timestamp,
+      deletedAt?: timestamp
+    },
+    isPinned: boolean,
+    pinnedAt?: timestamp
   }
   ```
 
@@ -94,7 +100,6 @@ Notes and images are stored in separate object stores:
   {
     id: "unique-id",
     blob: Blob,
-    created: timestamp,
-    deletedAt: timestamp // Only present for deleted images
+    deletedAt: timestamp | null
   }
   ```

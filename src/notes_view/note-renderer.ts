@@ -13,6 +13,7 @@ import {
 
 import { 
   applyFontSize,
+  applyLineHeight,
   isCodeBlockHeaderEnabled,
   resolveEffectiveSettings,
   updateLegacyLineBreakControls,
@@ -101,9 +102,10 @@ function openNote(
     editorTitle.textContent = note.title;
     markdownEditor.value = note.content;
     markdownEditor.showCodeBlockHeader = isCodeBlockHeaderEnabled(note);
-    // 노트 설정 적용 (폰트 크기 등)
-    const fontSize = resolveEffectiveSettings(note).fontSize;
-    applyFontSize(fontSize);
+    // 노트 설정 적용 (폰트 크기, 줄 간격 등)
+    const effectiveSettings = resolveEffectiveSettings(note);
+    applyFontSize(effectiveSettings.fontSize);
+    applyLineHeight(effectiveSettings.lineHeight);
     updateLegacyLineBreakControls();
     updateTildeReplacementButton();
     showEditorView(false);

@@ -3,12 +3,14 @@ export type ThemeMode = 'system' | 'light' | 'dark';
 export interface NoteSettings {
   title?: string;
   fontSize?: number;
+  lineHeight?: number;
   codeBlockHeader?: boolean;
 }
 
 export interface GlobalSettings {
   title: string;
   fontSize: number;
+  lineHeight: number;
   wysiwygPreview: boolean;
   legacyLineBreakMode: boolean;
   autoLineBreak: boolean;

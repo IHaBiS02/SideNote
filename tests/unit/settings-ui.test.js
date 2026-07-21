@@ -9,6 +9,7 @@ function renderSettingsDom() {
     <input type="checkbox" id="legacy-line-break-mode-checkbox">
     <select id="title-setting"></select>
     <input type="number" id="font-size-setting">
+    <input type="number" id="line-height-setting">
     <select id="mode-setting"></select>
     <input type="checkbox" id="code-block-header-checkbox">
     <input type="checkbox" id="wysiwyg-preview-checkbox">
@@ -95,5 +96,32 @@ describe('settings UI helpers', () => {
 
     expect(populateSettingsForm(true)).toBe(true);
     expect(document.getElementById('wysiwyg-preview-checkbox').checked).toBe(true);
+  });
+
+  it('populates and applies the configured prose line spacing', async () => {
+    const { applyLineHeight, populateSettingsForm } = await loadSettingsModule({
+      lineHeight: 1.8,
+    });
+
+    expect(populateSettingsForm(true)).toBe(true);
+    expect(document.getElementById('line-height-setting').value).toBe('1.8');
+
+    applyLineHeight(2.2);
+    const editorStyle = document.getElementById('markdown-editor').style;
+    expect(editorStyle.getPropertyValue('--sidenote-line-height')).toBe('2.2');
+    expect(editorStyle.getPropertyValue('--editor-line-height')).toBe('2.2');
+    expect(editorStyle.getPropertyValue('--editor-heading-line-height')).toBe('2.2');
+    expect(editorStyle.getPropertyValue('--editor-source-line-height')).toBe('');
+    expect(editorStyle.getPropertyValue('--editor-code-line-height')).toBe('');
+  });
+
+  it('uses a note-specific line spacing value when present', async () => {
+    const { populateSettingsForm } = await loadSettingsModule({ lineHeight: 1.6 });
+
+    expect(populateSettingsForm(false, {
+      id: 'note-1',
+      settings: { lineHeight: 2.4 },
+    })).toBe(true);
+    expect(document.getElementById('line-height-setting').value).toBe('2.4');
   });
 });

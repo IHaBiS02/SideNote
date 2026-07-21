@@ -8,6 +8,7 @@ import {
   emptyRecycleBinButton,
   titleSetting,
   fontSizeSetting,
+  lineHeightSetting,
   modeSetting,
   autoLineBreakButton,
   tildeReplacementButton,
@@ -33,7 +34,11 @@ import {
 import {
   saveGlobalSettings,
   applyFontSize,
+  applyLineHeight,
   applyMode,
+  MIN_LINE_HEIGHT,
+  MAX_LINE_HEIGHT,
+  normalizeLineHeight,
   updateAutoLineBreakButton,
   updateTildeReplacementButton,
   updateLegacyLineBreakControls,
@@ -174,6 +179,35 @@ function initializeSettingsEvents(): void {
         note.settings.fontSize = value;
         note.metadata.lastModified = Date.now();
         applyFontSize(value);
+        sortNotes();
+        await saveNote(note);
+      }
+    }
+  });
+
+  // Prose and heading line spacing setting
+  lineHeightSetting.addEventListener('input', async () => {
+    const parsedValue = Number.parseFloat(lineHeightSetting.value);
+    if (
+      !Number.isFinite(parsedValue)
+      || parsedValue < MIN_LINE_HEIGHT
+      || parsedValue > MAX_LINE_HEIGHT
+    ) {
+      return;
+    }
+
+    const value = normalizeLineHeight(parsedValue);
+    applyLineHeight(value);
+
+    if (isGlobalSettings) {
+      globalSettings.lineHeight = value;
+      saveGlobalSettings();
+    } else {
+      const note = notes.find(n => n.id === activeNoteId);
+      if (note) {
+        note.settings = note.settings || {};
+        note.settings.lineHeight = value;
+        note.metadata.lastModified = Date.now();
         sortNotes();
         await saveNote(note);
       }

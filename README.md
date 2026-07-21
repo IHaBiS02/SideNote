@@ -62,7 +62,7 @@ A simple notes browser extension that provides a note-taking interface in the br
 You can paste image on the clipboard directly into notes by Ctrl+V.  
 Legacy text-processing options are available in settings for older Markdown workflows that used trailing spaces for line breaks.
 
-In settings, you can choose theme, Mode of Title (Default use first line as title, Custom let user type own title by double-click title in note), text size, whether Preview is directly editable, code block header behavior, image deletion behavior, and legacy Markdown line-break behavior. Editable WYSIWYG Preview is enabled by default; disabling it keeps the same rendering and switches Preview to read-only mode.
+In settings, you can choose theme, Mode of Title (Default use first line as title, Custom let user type own title by double-click title in note), text size, prose line spacing, whether Preview is directly editable, code block header behavior, image deletion behavior, and legacy Markdown line-break behavior. Line spacing can be set from `1.0` to `3.0` globally or per note; full-document Markdown source and fenced code blocks retain their compact `1.2` spacing. Editable WYSIWYG Preview is enabled by default; disabling it keeps the same rendering and switches Preview to read-only mode.
 
 Images button show all images used in the notes, showing that which one is used in which note.
 Recycle bin shows all soft-deleted notes and images, and let user delete all at once.

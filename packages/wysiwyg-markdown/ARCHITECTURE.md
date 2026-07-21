@@ -160,6 +160,9 @@ override the line heights through `--editor-line-height` and
 Full-document source mode and fenced code blocks default to `1.2`, exposed
 separately through `--editor-source-line-height` and
 `--editor-code-line-height` so their compact layout does not affect prose.
+SideNote's global and note-specific Line Spacing setting writes the prose and
+heading variables at the component host. It accepts `1.0` through `3.0` in
+`0.1` increments and intentionally leaves the source and code variables alone.
 
 ## SideNote adapter
 

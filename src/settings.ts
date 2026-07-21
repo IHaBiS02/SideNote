@@ -7,6 +7,7 @@ import {
   legacyLineBreakModeCheckbox,
   titleSetting,
   fontSizeSetting,
+  lineHeightSetting,
   modeSetting,
   codeBlockHeaderCheckbox,
   wysiwygPreviewCheckbox,
@@ -17,9 +18,14 @@ import {
 import { globalSettings, setActiveNoteId } from './state.js';
 import type { GlobalSettings, Note, ThemeMode } from './types.js';
 
+const DEFAULT_LINE_HEIGHT = 1.5;
+const MIN_LINE_HEIGHT = 1;
+const MAX_LINE_HEIGHT = 3;
+
 const DEFAULT_SETTINGS: Readonly<GlobalSettings> = Object.freeze({
   title: 'default',
   fontSize: 12,
+  lineHeight: DEFAULT_LINE_HEIGHT,
   wysiwygPreview: true,
   legacyLineBreakMode: false,
   autoLineBreak: false,
@@ -37,7 +43,16 @@ function normalizeGlobalSettings(settings: Partial<GlobalSettings> = {}): Global
   };
   // Remove the retired textarea-only setting from data saved by older versions.
   delete (normalizedSettings as GlobalSettings & { autoAddSpaces?: unknown }).autoAddSpaces;
+  normalizedSettings.lineHeight = normalizeLineHeight(normalizedSettings.lineHeight);
   return normalizedSettings;
+}
+
+function normalizeLineHeight(value: unknown): number {
+  const numericValue = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(numericValue)) return DEFAULT_LINE_HEIGHT;
+
+  const clampedValue = Math.min(MAX_LINE_HEIGHT, Math.max(MIN_LINE_HEIGHT, numericValue));
+  return Math.round(clampedValue * 10) / 10;
 }
 
 function resolveEffectiveSettings(note?: Note | null): GlobalSettings {
@@ -46,6 +61,9 @@ function resolveEffectiveSettings(note?: Note | null): GlobalSettings {
 
   if (noteSettings.title !== undefined) effectiveSettings.title = noteSettings.title;
   if (noteSettings.fontSize !== undefined) effectiveSettings.fontSize = noteSettings.fontSize;
+  if (noteSettings.lineHeight !== undefined) {
+    effectiveSettings.lineHeight = normalizeLineHeight(noteSettings.lineHeight);
+  }
   if (noteSettings.codeBlockHeader !== undefined) {
     effectiveSettings.codeBlockHeader = noteSettings.codeBlockHeader;
   }
@@ -91,6 +109,18 @@ function saveGlobalSettings(): void {
 function applyFontSize(size: number): void {
   markdownEditor.style.fontSize = `${size}px`;
   markdownEditor.style.setProperty('--editor-font-size', `${size}px`);
+}
+
+/**
+ * Applies the prose and heading line spacing while keeping source and fenced
+ * code blocks on their dedicated compact line-height variables.
+ */
+function applyLineHeight(lineHeight: number): void {
+  const normalizedLineHeight = normalizeLineHeight(lineHeight);
+  const value = String(normalizedLineHeight);
+  markdownEditor.style.setProperty('--sidenote-line-height', value);
+  markdownEditor.style.setProperty('--editor-line-height', value);
+  markdownEditor.style.setProperty('--editor-heading-line-height', value);
 }
 
 /**
@@ -151,6 +181,7 @@ function populateSettingsForm(isGlobal: boolean, note?: Note | null): boolean {
   if (isGlobal) {
     titleSetting.value = effectiveGlobalSettings.title;
     fontSizeSetting.value = String(effectiveGlobalSettings.fontSize);
+    lineHeightSetting.value = String(effectiveGlobalSettings.lineHeight);
     codeBlockHeaderCheckbox.checked = effectiveGlobalSettings.codeBlockHeader !== false;
   } else {
     if (!note) return false;
@@ -159,6 +190,7 @@ function populateSettingsForm(isGlobal: boolean, note?: Note | null): boolean {
     setActiveNoteId(note.id);
     titleSetting.value = effectiveNoteSettings.title;
     fontSizeSetting.value = String(effectiveNoteSettings.fontSize);
+    lineHeightSetting.value = String(effectiveNoteSettings.lineHeight);
     codeBlockHeaderCheckbox.checked = effectiveNoteSettings.codeBlockHeader !== false;
   }
   wysiwygPreviewCheckbox.checked = effectiveGlobalSettings.wysiwygPreview !== false;
@@ -174,11 +206,15 @@ function populateSettingsForm(isGlobal: boolean, note?: Note | null): boolean {
 // Export functions
 export {
   DEFAULT_SETTINGS,
+  MIN_LINE_HEIGHT,
+  MAX_LINE_HEIGHT,
   normalizeGlobalSettings,
+  normalizeLineHeight,
   resolveEffectiveSettings,
   resolveLegacyTextProcessingSettings,
   saveGlobalSettings,
   applyFontSize,
+  applyLineHeight,
   applyMode,
   updateAutoLineBreakButton,
   updateTildeReplacementButton,

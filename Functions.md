@@ -260,16 +260,18 @@ Settings management (functions exported):
 
 - `DEFAULT_SETTINGS`: Default global settings used to normalize missing settings
 - `normalizeGlobalSettings(settings)`: Merges partial global settings with defaults
+- `normalizeLineHeight(value)`: Clamps line spacing to `1.0`–`3.0` and rounds it to `0.1` precision, falling back to `1.5`
 - `resolveEffectiveSettings(note)`: Resolves note-specific settings with global/default fallback
 - `resolveLegacyTextProcessingSettings(settings)`: Returns legacy paste-processing settings, forcing the two-space line-break transform off unless legacy mode is enabled
 - `saveGlobalSettings()`: Saves the global settings to chrome.storage.local
 - `applyFontSize(size)`: Applies font size to the editor Web Component through `--editor-font-size`
+- `applyLineHeight(lineHeight)`: Applies prose and heading spacing through `--sidenote-line-height`, `--editor-line-height`, and `--editor-heading-line-height`; source and fenced-code spacing remain independently fixed at `1.2`
 - `applyMode(mode)`: Applies color mode (light/dark/system) to the document
 - `updateAutoLineBreakButton()`: Updates the legacy auto line break toolbar button state
 - `updateTildeReplacementButton()`: Updates the tilde replacement toolbar button visibility and state
 - `updateLegacyLineBreakControls()`: Updates the legacy line-break mode checkbox and dependent controls
 - `isCodeBlockHeaderEnabled(note)`: Resolves the effective code block header setting from note settings with global fallback
-- `populateSettingsForm(isGlobal, note)`: Populates settings fields for either global or note-specific settings, including the global `wysiwygPreview` preference (enabled by default)
+- `populateSettingsForm(isGlobal, note)`: Populates settings fields for either global or note-specific settings, including effective font size and line spacing plus the global `wysiwygPreview` preference (enabled by default)
 
 **Note**: Uses `globalSettings` from state.js module
 
@@ -402,7 +404,7 @@ Settings-related event listeners:
 
 - `initializeSettingsEvents()`: Sets up all settings-related event listeners
 
-Handles: note/global settings, licenses, recycle bin, image management, confirmation dropdowns
+Handles: note/global settings (including live line-spacing updates), licenses, recycle bin, image management, confirmation dropdowns
 
 ### src/events/import-export-events.ts
 
