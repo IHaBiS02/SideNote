@@ -98,8 +98,11 @@ editor.use({
 문법 강조는 ProseMirror decoration을 사용하므로 편집 DOM을 다시 작성하지
 않습니다. fenced code 내용의 내부 여백은 `--editor-code-content-padding`
 (기본값 `5px`)으로 설정할 수 있습니다. 컴포넌트의 본문 및 제목 줄 높이
-기본값은 `1.5`이며, 브라우저별 UA 스타일을 상속하지 않도록 제목 크기·굵기·
-여백도 명시적으로 정의합니다.
+기본값은 `1.5`이며, 전체 문서 plain-text 모드와 여러 줄 fenced code의 줄 높이는
+`1.2`입니다. 호스트는 `--editor-line-height`, `--editor-heading-line-height`,
+`--editor-source-line-height`, `--editor-code-line-height`로 각각 재정의할 수
+있습니다. 브라우저별 UA 스타일을 상속하지 않도록 제목 크기·굵기·여백도
+명시적으로 정의합니다.
 
 현재 구조와 확장 지점은 [`ARCHITECTURE.md`](./ARCHITECTURE.md)를
 참고하세요. WYSIWYG 모드의 기본 Markdown 입력 규칙, 단축키, 붙여넣기 동작은

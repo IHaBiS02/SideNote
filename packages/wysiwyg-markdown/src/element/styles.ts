@@ -17,6 +17,8 @@ export const editorStyles = css`
     --editor-padding: 0;
     --editor-line-height: 1.5;
     --editor-heading-line-height: 1.5;
+    --editor-source-line-height: 1.2;
+    --editor-code-line-height: 1.2;
     --editor-code-padding: 0;
     --editor-code-content-padding: 5px;
     --editor-code-border-radius: 0;
@@ -178,6 +180,7 @@ export const editorStyles = css`
 
   .code-block-content[data-line-numbers] > pre > code {
     padding-block: 0;
+    line-height: var(--editor-code-line-height);
   }
 
   .code-block-content[data-line-numbers] > pre.code-block-body > code {
@@ -190,7 +193,7 @@ export const editorStyles = css`
 
   .code-line-numbers {
     font-family: var(--editor-code-font-family);
-    line-height: var(--editor-line-height);
+    line-height: var(--editor-code-line-height);
     vertical-align: top;
     white-space: pre;
     word-break: keep-all;
@@ -332,7 +335,7 @@ export const editorStyles = css`
     color: var(--editor-color);
     font: inherit;
     font-family: var(--editor-code-font-family);
-    line-height: var(--editor-line-height);
+    line-height: var(--editor-source-line-height);
     tab-size: 2;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
@@ -360,7 +363,7 @@ export const editorStyles = css`
     color: var(--editor-color);
     font-family: var(--editor-code-font-family);
     font-size: 0.9em;
-    line-height: 1.5;
+    line-height: var(--editor-source-line-height);
   }
 
   .block-source-actions {

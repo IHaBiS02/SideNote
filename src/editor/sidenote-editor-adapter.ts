@@ -184,7 +184,7 @@ const SIDENOTE_EDITOR_THEME = `
     padding: 0;
     color: var(--editor-code-line-number-color);
     font-family: var(--editor-code-font-family);
-    line-height: var(--editor-line-height);
+    line-height: var(--editor-code-line-height);
     text-align: right;
     vertical-align: top;
     white-space: pre;
@@ -202,7 +202,7 @@ const SIDENOTE_EDITOR_THEME = `
   }
 
   .editor-mount .ProseMirror .code-block-content[data-line-numbers] > pre > code {
-    line-height: 1.2;
+    line-height: var(--editor-code-line-height);
   }
 
   .code-block-header {
@@ -347,7 +347,7 @@ const SIDENOTE_EDITOR_THEME = `
   .source-editor {
     min-height: 100%;
     padding: var(--editor-padding);
-    line-height: var(--editor-line-height);
+    line-height: var(--editor-source-line-height);
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }

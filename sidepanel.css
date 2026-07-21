@@ -339,6 +339,8 @@ textarea {
   --editor-font-family: var(--sidenote-font-family);
   --editor-line-height: var(--sidenote-line-height);
   --editor-heading-line-height: var(--sidenote-line-height);
+  --editor-source-line-height: 1.2;
+  --editor-code-line-height: 1.2;
   --editor-background: transparent;
   --editor-color: inherit;
   --editor-border: 0;

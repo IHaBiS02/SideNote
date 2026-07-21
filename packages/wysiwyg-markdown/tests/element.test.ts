@@ -36,6 +36,14 @@ describe('wysiwyg-markdown element', () => {
     );
     expect(editorStyles.cssText).toContain('--editor-line-height: 1.5');
     expect(editorStyles.cssText).toContain('--editor-heading-line-height: 1.5');
+    expect(editorStyles.cssText).toContain('--editor-source-line-height: 1.2');
+    expect(editorStyles.cssText).toContain('--editor-code-line-height: 1.2');
+    expect(editorStyles.cssText).toContain(
+      'line-height: var(--editor-source-line-height)',
+    );
+    expect(editorStyles.cssText).toContain(
+      'line-height: var(--editor-code-line-height)',
+    );
     expect(editorStyles.cssText).toContain('margin-block: 0.67em');
     expect(editorStyles.cssText).toContain('font-weight: 700');
   });

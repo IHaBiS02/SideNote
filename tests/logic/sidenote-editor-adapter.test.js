@@ -59,7 +59,8 @@ describe('SideNote WYSIWYG editor adapter', () => {
     expect(editor.themeCss).toContain('pre.code-line-numbers');
     expect(editor.themeCss).toContain('pre.code-line-numbers code');
     expect(editor.themeCss).toContain('.code-block-content[data-line-numbers] > pre');
-    expect(editor.themeCss).toContain('line-height: 1.2');
+    expect(editor.themeCss).toContain('line-height: var(--editor-code-line-height)');
+    expect(editor.themeCss).toContain('line-height: var(--editor-source-line-height)');
     expect(editor.themeCss).toContain('word-break: keep-all');
     expect(editor.themeCss).toContain('background: var(--editor-inline-code-background)');
     return { adapter, editor };
@@ -162,6 +163,8 @@ describe('4.1.14 packaged Preview theme compatibility', () => {
     expect(lightCss).toContain('font-weight: 700;');
     expect(lightCss).toContain('--editor-line-height: var(--sidenote-line-height);');
     expect(lightCss).toContain('--editor-heading-line-height: var(--sidenote-line-height);');
+    expect(lightCss).toContain('--editor-source-line-height: 1.2;');
+    expect(lightCss).toContain('--editor-code-line-height: 1.2;');
   });
 
   it('keeps the legacy browser monospace font and light code colors', () => {
