@@ -153,9 +153,24 @@ export const editorStyles = css`
     white-space: nowrap;
   }
 
+  .code-block-language-control {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .code-block-language-display {
+    display: block;
+    user-select: none;
+  }
+
   .code-block-language-editor {
     box-sizing: border-box;
-    flex: 1 1 auto;
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     border: 0;
     padding: 0;
     background: transparent;
@@ -163,11 +178,19 @@ export const editorStyles = css`
     font: inherit;
     line-height: inherit;
     outline: none;
+    opacity: 0;
+    cursor: text;
     user-select: none;
   }
 
-  .code-block-language-editor:focus {
+  .code-block-language-editor:not([readonly]):focus {
+    opacity: 1;
     user-select: text;
+  }
+
+  .code-block-language-editor:not([readonly]):focus
+    + .code-block-language-display {
+    visibility: hidden;
   }
 
   .code-block-language-editor[readonly] {

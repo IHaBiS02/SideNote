@@ -122,9 +122,14 @@ describe('wysiwyg-markdown element', () => {
     const languageEditor = editor.renderRoot.querySelector<HTMLInputElement>(
       '.code-block-language-editor',
     );
+    const languageDisplay = editor.renderRoot.querySelector<HTMLElement>(
+      '.code-block-language-display',
+    );
 
     expect(header?.contentEditable).toBe('false');
     expect(languageEditor?.value).toBe('javascript');
+    expect(languageDisplay?.textContent).toBe('javascript');
+    expect(languageEditor?.nextElementSibling).toBe(languageDisplay);
     expect(languageEditor?.readOnly).toBe(false);
     languageEditor?.focus();
     expect((editor.renderRoot as ShadowRoot).activeElement).toBe(languageEditor);
@@ -143,6 +148,7 @@ describe('wysiwyg-markdown element', () => {
 
     expect(languageEditor?.readOnly).toBe(false);
     expect(languageEditor?.value).toBe('typescript');
+    expect(languageDisplay?.textContent).toBe('typescript');
     expect(editor.value).toBe('```typescript\nasdfasdfasdfasdf\n```');
     expect(inputListener).toHaveBeenCalledTimes(1);
 
@@ -153,6 +159,7 @@ describe('wysiwyg-markdown element', () => {
 
     expect(languageEditor?.value).toBe('');
     expect(languageEditor?.placeholder).toBe('text');
+    expect(languageDisplay?.textContent).toBe('text');
     expect(editor.value).toBe('```\nasdfasdfasdfasdf\n```');
   });
 

@@ -710,6 +710,10 @@ export class WysiwygMarkdownElement extends LitElement {
     header.setAttribute('part', 'code-block-header');
     header.contentEditable = 'false';
 
+    const languageControl = document.createElement('span');
+    languageControl.className = 'code-block-language-control';
+    languageControl.setAttribute('part', 'code-block-language-control');
+
     const languageEditor = document.createElement('input');
     languageEditor.type = 'text';
     languageEditor.className = 'code-block-language code-block-language-editor';
@@ -720,6 +724,12 @@ export class WysiwygMarkdownElement extends LitElement {
     languageEditor.autocomplete = 'off';
     languageEditor.spellcheck = false;
     languageEditor.readOnly = !this.#isEditable();
+
+    const languageDisplay = document.createElement('span');
+    languageDisplay.className = 'code-block-language code-block-language-display';
+    languageDisplay.setAttribute('part', 'code-block-language');
+    languageDisplay.setAttribute('aria-hidden', 'true');
+    languageControl.append(languageEditor, languageDisplay);
 
     const copyButton = document.createElement('button');
     copyButton.type = 'button';
@@ -745,7 +755,7 @@ export class WysiwygMarkdownElement extends LitElement {
     const lineNumberCode = document.createElement('code');
     lineNumbers.append(lineNumberCode);
     body.append(lineNumbers, pre);
-    header.append(languageEditor, copyButton);
+    header.append(languageControl, copyButton);
     container.append(header, body);
 
     let node = initialNode;
@@ -756,6 +766,7 @@ export class WysiwygMarkdownElement extends LitElement {
       const storedLanguage = info.split(/\s+/)[0] || '';
       const codeLanguage = storedLanguage || 'text';
       if (!languageEditor.matches(':focus')) languageEditor.value = storedLanguage;
+      languageDisplay.textContent = codeLanguage;
       code.dataset.language = codeLanguage;
       header.hidden = !this.showCodeBlockHeader;
       const lines = node.textContent.split('\n');

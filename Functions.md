@@ -110,7 +110,9 @@ click on a rendered link opens its destination in a new browser tab. The
 non-content code header keeps its language label out of code selections while
 keeping its language input directly editable in WYSIWYG mode. Committing the
 input updates the code block `params` attribute; source, readonly, and disabled
-modes lock the control.
+modes lock the control. An unselectable display label sits behind the stable
+input while it is unfocused, hiding browser selection paint from ranges that
+cross the non-content header.
 
 ### src/extensions
 
