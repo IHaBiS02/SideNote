@@ -74,14 +74,14 @@ const SIDENOTE_EDITOR_THEME = `
   .editor-mount .ProseMirror {
     min-height: 100%;
     padding: var(--editor-padding);
-    font-family: sans-serif;
-    line-height: inherit;
+    font-family: var(--editor-font-family);
+    line-height: var(--editor-line-height);
     overflow-wrap: anywhere;
     word-break: break-word;
   }
 
   .editor-mount .ProseMirror p {
-    line-height: inherit;
+    line-height: var(--editor-line-height);
   }
 
   .editor-mount .ProseMirror a {
@@ -184,7 +184,7 @@ const SIDENOTE_EDITOR_THEME = `
     padding: 0;
     color: var(--editor-code-line-number-color);
     font-family: var(--editor-code-font-family);
-    line-height: inherit;
+    line-height: var(--editor-line-height);
     text-align: right;
     vertical-align: top;
     white-space: pre;
@@ -347,7 +347,7 @@ const SIDENOTE_EDITOR_THEME = `
   .source-editor {
     min-height: 100%;
     padding: var(--editor-padding);
-    line-height: 1.5;
+    line-height: var(--editor-line-height);
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }

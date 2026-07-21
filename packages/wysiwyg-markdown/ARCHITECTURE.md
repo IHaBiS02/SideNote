@@ -145,6 +145,12 @@ selectors specific enough to win over the generic Shadow DOM `pre code` rule;
 multi-line blocks reuse it for vertical padding, gutter spacing, and the body
 right edge.
 
+The Shadow DOM stylesheet also owns a deterministic semantic typography
+baseline: body and heading line heights default to `1.2`, and heading sizes,
+weights, margins, paragraph margins, and list margins are explicit. A host can
+override the line heights through `--editor-line-height` and
+`--editor-heading-line-height` without depending on browser UA defaults.
+
 ## SideNote adapter
 
 `src/editor/sidenote-editor-adapter.ts` is the only SideNote-specific bridge.

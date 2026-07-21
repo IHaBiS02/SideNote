@@ -34,6 +34,10 @@ describe('wysiwyg-markdown element', () => {
     expect(editorStyles.cssText).toContain(
       'padding-inline: 0 var(--editor-code-content-padding)',
     );
+    expect(editorStyles.cssText).toContain('--editor-line-height: 1.2');
+    expect(editorStyles.cssText).toContain('--editor-heading-line-height: 1.2');
+    expect(editorStyles.cssText).toContain('margin-block: 0.67em');
+    expect(editorStyles.cssText).toContain('font-weight: 700');
   });
 
   it('renders Markdown and exposes its canonical value', async () => {

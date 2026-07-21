@@ -102,7 +102,9 @@ and removes its `#` heading marker from the Markdown value.
 A host application can provide trusted CSS through `themeCss`. Editable syntax
 highlighting uses ProseMirror decorations, so it does not rewrite editable DOM.
 Fenced code content uses `--editor-code-content-padding` (`5px` by default) for
-its inner spacing.
+its inner spacing. The component defines `1.2` as the default body and heading
+line height and explicitly sets semantic heading sizes, weights, and margins so
+hosts do not inherit browser-specific UA typography.
 
 See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the current architecture and
 host integration boundaries. Built-in Markdown input rules, shortcuts, mouse

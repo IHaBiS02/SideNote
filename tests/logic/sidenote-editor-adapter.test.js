@@ -155,8 +155,13 @@ describe('4.1.14 packaged Preview theme compatibility', () => {
   const darkCss = readFileSync(resolve('dark_mode.css'), 'utf8');
   const sidePanelHtml = readFileSync(resolve('sidepanel.html'), 'utf8');
 
-  it('preserves browser heading and line-height defaults without a CSS reset', () => {
-    expect(sidePanelHtml).not.toContain('reset.css');
+  it('loads reset CSS before an explicit cross-browser typography baseline', () => {
+    expect(sidePanelHtml).toContain('vendor/reset.css');
+    expect(lightCss).toContain('--sidenote-font-family: Arial, sans-serif;');
+    expect(lightCss).toContain('--sidenote-line-height: 1.2;');
+    expect(lightCss).toContain('font-weight: 700;');
+    expect(lightCss).toContain('--editor-line-height: var(--sidenote-line-height);');
+    expect(lightCss).toContain('--editor-heading-line-height: var(--sidenote-line-height);');
   });
 
   it('keeps the legacy browser monospace font and light code colors', () => {

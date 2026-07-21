@@ -15,8 +15,8 @@ export const editorStyles = css`
     --editor-font-size: inherit;
     --editor-min-height: 240px;
     --editor-padding: 0;
-    --editor-line-height: inherit;
-    --editor-heading-line-height: inherit;
+    --editor-line-height: 1.2;
+    --editor-heading-line-height: 1.2;
     --editor-code-padding: 0;
     --editor-code-content-padding: 5px;
     --editor-code-border-radius: 0;
@@ -71,6 +71,7 @@ export const editorStyles = css`
   }
 
   .editor-mount .ProseMirror p {
+    margin-block: 1em;
     line-height: var(--editor-line-height);
   }
 
@@ -80,11 +81,55 @@ export const editorStyles = css`
   .editor-mount .ProseMirror h4,
   .editor-mount .ProseMirror h5,
   .editor-mount .ProseMirror h6 {
+    font-weight: 700;
     line-height: var(--editor-heading-line-height);
   }
 
+  .editor-mount .ProseMirror h1 {
+    margin-block: 0.67em;
+    font-size: 2em;
+  }
+
+  .editor-mount .ProseMirror h2 {
+    margin-block: 0.83em;
+    font-size: 1.5em;
+  }
+
+  .editor-mount .ProseMirror h3 {
+    margin-block: 1em;
+    font-size: 1.17em;
+  }
+
+  .editor-mount .ProseMirror h4 {
+    margin-block: 1.33em;
+    font-size: 1em;
+  }
+
+  .editor-mount .ProseMirror h5 {
+    margin-block: 1.67em;
+    font-size: 0.83em;
+  }
+
+  .editor-mount .ProseMirror h6 {
+    margin-block: 2.33em;
+    font-size: 0.67em;
+  }
+
+  .editor-mount .ProseMirror strong {
+    font-weight: 700;
+  }
+
+  .editor-mount .ProseMirror em {
+    font-style: italic;
+  }
+
+  .editor-mount .ProseMirror ul,
+  .editor-mount .ProseMirror ol {
+    margin-block: 1em;
+  }
+
   .editor-mount .ProseMirror blockquote {
-    margin-left: 0;
+    margin: 1em 40px 1em 0;
     padding-left: 0;
   }
 

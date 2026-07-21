@@ -1,6 +1,6 @@
 {
   "name": "simple-notes-extension",
-  "version": "4.2.29",
+  "version": "4.2.30",
   "description": "A simple notes extension using the side panel.",
   "private": true,
   "workspaces": [
@@ -35,6 +35,7 @@
     "dompurify": "^3.4.12",
     "jszip": "^3.10.1",
     "marked": "^10.0.0",
+    "reset-css": "^5.0.2",
     "webextension-polyfill": "^0.10.0"
   }
 }

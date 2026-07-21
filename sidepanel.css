@@ -1,8 +1,100 @@
+:root {
+  --sidenote-font-family: Arial, sans-serif;
+  --sidenote-line-height: 1.2;
+  --sidenote-control-font-size: 13.3333px;
+}
+
 body {
   margin: 0;
-  font-family: sans-serif;
+  font-family: var(--sidenote-font-family);
   overflow-x: hidden;
   font-size: 75%;
+  line-height: var(--sidenote-line-height);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+  line-height: var(--sidenote-line-height);
+}
+
+h1 {
+  margin: 0.67em 0;
+  font-size: 2em;
+}
+
+h2 {
+  margin: 0.83em 0;
+  font-size: 1.5em;
+}
+
+h3 {
+  margin: 1em 0;
+  font-size: 1.17em;
+}
+
+h4 {
+  margin: 1.33em 0;
+  font-size: 1em;
+}
+
+h5 {
+  margin: 1.67em 0;
+  font-size: 0.83em;
+}
+
+h6 {
+  margin: 2.33em 0;
+  font-size: 0.67em;
+}
+
+p,
+pre {
+  margin: 1em 0;
+}
+
+b,
+strong {
+  font-weight: 700;
+}
+
+i,
+em {
+  font-style: italic;
+}
+
+pre,
+code,
+kbd,
+samp {
+  font-family: monospace;
+  font-size: 1em;
+}
+
+button,
+input,
+select,
+textarea {
+  box-sizing: border-box;
+  margin: 0;
+  font-family: var(--sidenote-font-family);
+  font-size: var(--sidenote-control-font-size);
+  line-height: var(--sidenote-line-height);
+}
+
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+  border: 1px solid #767676;
+  border-radius: 2px;
+  padding: 2px 4px;
+  background-color: white;
+  color: black;
 }
 
 .header {
@@ -25,6 +117,8 @@ body {
 #image-recycle-bin-title {
   margin: 0;
   font-size: 18px;
+  font-weight: 700;
+  line-height: var(--sidenote-line-height);
 }
 
 #note-list, #deleted-items-list, #image-list {
@@ -232,8 +326,8 @@ body {
   box-sizing: border-box;
   border: none;
   outline: none;
-  font-family: sans-serif;
-  line-height: inherit;
+  font-family: var(--sidenote-font-family);
+  line-height: var(--sidenote-line-height);
   word-wrap: break-word;
 }
 
@@ -242,6 +336,9 @@ body {
   --editor-min-height: 100%;
   --editor-padding: 10px;
   --editor-font-size: inherit;
+  --editor-font-family: var(--sidenote-font-family);
+  --editor-line-height: var(--sidenote-line-height);
+  --editor-heading-line-height: var(--sidenote-line-height);
   --editor-background: transparent;
   --editor-color: inherit;
   --editor-border: 0;
@@ -411,6 +508,9 @@ button:hover {
   transform: translateX(-50%);
   text-align: center;
   width: 60%;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: var(--sidenote-line-height);
 }
 
 /* 전체 스크롤바의 영역 */
@@ -461,7 +561,7 @@ a:active {
 blockquote {
   border-left: 4px solid #ccc;
   padding-left: 10px;
-  margin-left: 0;
+  margin: 1em 40px 1em 0;
 }
 
 /* 인라인 코드 스타일 */
@@ -482,7 +582,16 @@ input[type="checkbox"] {
 
 /* 리스트 스타일 */
 ul, ol {
+  margin: 1em 0;
   padding-left: 15px;
+}
+
+ul {
+  list-style-type: disc;
+}
+
+ol {
+  list-style-type: decimal;
 }
 
 li.task-list-item {
