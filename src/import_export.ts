@@ -2,13 +2,45 @@
 import { getImage, saveImage, saveNote } from './database/index.js';
 import { extractImageIds, sanitizeFilename } from './utils.js';
 import { addAutoLineBreaks } from './text-processors.js';
+import type JSZipType from 'jszip';
+import type { Note, NoteMetadata, NoteSettings } from './types.js';
+
+interface ParsedImage {
+  id: string;
+  blob: Blob;
+}
+
+export interface ParsedSnote {
+  title: string;
+  content: string;
+  settings: NoteSettings;
+  metadata: Pick<NoteMetadata, 'createdAt' | 'lastModified'>;
+  images: ParsedImage[];
+}
+
+interface ParsedSnoteOverrides {
+  id?: string;
+  metadata?: Partial<NoteMetadata>;
+  isPinned?: boolean;
+}
+
+interface ExportOptions {
+  addTwoSpaceLineBreaks?: boolean;
+  useTitleFolderNames?: boolean;
+}
+
+interface ArchivedNoteMetadata {
+  title: string;
+  settings?: NoteSettings;
+  metadata?: Partial<NoteMetadata>;
+}
 
 /**
  * Parses a .snote zip without saving notes or images.
  * @param {JSZip} zip The JSZip object representing one note archive.
  * @returns {Promise<object>} Parsed note data and image blobs.
  */
-async function parseSnote(zip) {
+async function parseSnote(zip: JSZipType): Promise<ParsedSnote> {
   // 필수 파일 확인: metadata.json과 note.md
   const metadataFile = zip.file('metadata.json');
   const noteFile = zip.file('note.md');
@@ -19,19 +51,23 @@ async function parseSnote(zip) {
   }
 
   // 메타데이터와 노트 내용 읽기
-  const metadata = JSON.parse(await metadataFile.async('string'));
+  const metadata = JSON.parse(
+    await metadataFile.async('string'),
+  ) as ArchivedNoteMetadata;
   const content = await noteFile.async('string');
   const now = Date.now();
-  const images = [];
+  const images: ParsedImage[] = [];
   
   // 이미지 폴더가 있으면 모든 이미지 처리
   const imagesFolder = zip.folder('images');
   if (imagesFolder) {
-    const imagePromises = [];
+    const imagePromises: Promise<void>[] = [];
     imagesFolder.forEach((relativePath, imageFile) => {
         if (!imageFile.dir) {  // 파일일 경우만 처리 (폴더 제외)
             // 이미지 ID 추출 (images/[id].png 형식)
-            const imageId = imageFile.name.split('/').pop().replace('.png', '');
+            const fileName = imageFile.name.split('/').pop();
+            if (!fileName) return;
+            const imageId = fileName.replace('.png', '');
             const promise = imageFile.async('blob').then(blob => {
                 images.push({ id: imageId, blob });
             });
@@ -53,12 +89,15 @@ async function parseSnote(zip) {
   };
 }
 
-async function saveParsedSnoteImages(parsedNote) {
+async function saveParsedSnoteImages(parsedNote: ParsedSnote): Promise<void> {
   const imagePromises = (parsedNote.images || []).map(image => saveImage(image.id, image.blob));
   await Promise.all(imagePromises);
 }
 
-function createNoteFromParsedSnote(parsedNote, overrides = {}) {
+function createNoteFromParsedSnote(
+  parsedNote: ParsedSnote,
+  overrides: ParsedSnoteOverrides = {},
+): Note {
   const now = Date.now();
   const metadata = {
     createdAt: parsedNote.metadata?.createdAt || now,
@@ -79,7 +118,10 @@ function createNoteFromParsedSnote(parsedNote, overrides = {}) {
   return newNote;
 }
 
-async function saveParsedSnote(parsedNote, overrides = {}) {
+async function saveParsedSnote(
+  parsedNote: ParsedSnote,
+  overrides: ParsedSnoteOverrides = {},
+): Promise<Note> {
   await saveParsedSnoteImages(parsedNote);
   const newNote = createNoteFromParsedSnote(parsedNote, overrides);
   // 데이터베이스에 저장
@@ -87,15 +129,15 @@ async function saveParsedSnote(parsedNote, overrides = {}) {
   return newNote;
 }
 
-async function processSnote(zip) {
+async function processSnote(zip: JSZipType): Promise<Note> {
   const parsedNote = await parseSnote(zip);
   return saveParsedSnote(parsedNote);
 }
 
-async function saveImportedNotes(parsedNotes) {
+async function saveImportedNotes(parsedNotes: ParsedSnote[]): Promise<Note[]> {
   parsedNotes.sort((a, b) => a.metadata.lastModified - b.metadata.lastModified);
   const now = Date.now();
-  const savedNotes = [];
+  const savedNotes: Note[] = [];
   for (let i = 0; i < parsedNotes.length; i++) {
     const savedNote = await saveParsedSnote(parsedNotes[i], {
       metadata: {
@@ -108,7 +150,7 @@ async function saveImportedNotes(parsedNotes) {
   return savedNotes;
 }
 
-function getExportContent(note, options = {}) {
+function getExportContent(note: Note, options: ExportOptions = {}): string {
   const content = note.content;
   if (options.addTwoSpaceLineBreaks) {
     return addAutoLineBreaks(content);
@@ -117,7 +159,11 @@ function getExportContent(note, options = {}) {
   return content;
 }
 
-function createNoteFolderName(note, usedFolderNames, options = {}) {
+function createNoteFolderName(
+  note: Note,
+  usedFolderNames: Set<string>,
+  options: ExportOptions = {},
+): string {
   if (!options.useTitleFolderNames) {
     return note.id;
   }
@@ -136,7 +182,11 @@ function createNoteFolderName(note, usedFolderNames, options = {}) {
   return folderName;
 }
 
-async function addNoteToZip(zipTarget, note, options = {}) {
+async function addNoteToZip(
+  zipTarget: JSZipType,
+  note: Note,
+  options: ExportOptions = {},
+): Promise<void> {
   const metadata = {
     title: note.title,
     settings: note.settings,
@@ -151,6 +201,7 @@ async function addNoteToZip(zipTarget, note, options = {}) {
   }
 
   const imagesFolder = zipTarget.folder('images');
+  if (!imagesFolder) return;
   for (const imageId of imageIds) {
     try {
       const imageBlob = await getImage(imageId);
@@ -163,18 +214,26 @@ async function addNoteToZip(zipTarget, note, options = {}) {
   }
 }
 
-async function createSingleNoteArchive(note, options = {}) {
+async function createSingleNoteArchive(
+  note: Note,
+  options: ExportOptions = {},
+): Promise<JSZipType> {
   const zip = new JSZip();
   await addNoteToZip(zip, note, options);
   return zip;
 }
 
-async function createAllNotesArchive(notes, options = {}) {
+async function createAllNotesArchive(
+  notes: Note[],
+  options: ExportOptions = {},
+): Promise<JSZipType> {
   const zip = new JSZip();
-  const usedFolderNames = new Set();
+  const usedFolderNames = new Set<string>();
   for (const note of notes) {
     const folderName = createNoteFolderName(note, usedFolderNames, options);
-    await addNoteToZip(zip.folder(folderName), note, options);
+    const noteFolder = zip.folder(folderName);
+    if (!noteFolder) throw new Error(`Could not create ZIP folder: ${folderName}`);
+    await addNoteToZip(noteFolder, note, options);
   }
   return zip;
 }

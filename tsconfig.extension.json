@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["webextension-polyfill"],
+    "strict": true,
+    "allowJs": true,
+    "checkJs": false,
+    "noEmitOnError": true,
+    "rootDir": ".",
+    "outDir": "build/extension-runtime",
+    "skipLibCheck": true
+  },
+  "include": [
+    "background.js",
+    "background.ts",
+    "src/**/*.js",
+    "src/**/*.ts",
+    "src/**/*.d.ts"
+  ]
+}

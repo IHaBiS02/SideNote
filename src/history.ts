@@ -1,6 +1,8 @@
 // src/history.js
 // 네비게이션 히스토리를 관리하는 모듈
-let navigationHistory = [];  // 네비게이션 히스토리 스택
+import type { NavigationHistoryState } from './types.js';
+
+let navigationHistory: NavigationHistoryState[] = [];  // 네비게이션 히스토리 스택
 let historyIndex = -1; // 현재 히스토리 상태를 가리키는 인덱스
 const HISTORY_STACK_LIMIT = 512;  // 히스토리 최대 크기 제한
 
@@ -9,7 +11,7 @@ const HISTORY_STACK_LIMIT = 512;  // 히스토리 최대 크기 제한
  * If we are not at the end of the history, future states are cleared.
  * @param {object} state The state object to push.
  */
-function pushToHistory(state) {
+function pushToHistory(state: NavigationHistoryState): void {
     const currentState = getCurrentHistoryState();
     // 동일한 상태가 연속적으로 추가되는 것 방지
     if (currentState && currentState.view === state.view && JSON.stringify(currentState.params || {}) === JSON.stringify(state.params || {})) {
@@ -38,7 +40,7 @@ function pushToHistory(state) {
  * Moves back in the history.
  * @returns {object | undefined} The previous state or undefined if at the beginning.
  */
-function moveBack() {
+function moveBack(): NavigationHistoryState | undefined {
     if (canMoveBack()) {
         historyIndex--;  // 인덱스를 하나 감소
         return getCurrentHistoryState();
@@ -50,7 +52,7 @@ function moveBack() {
  * Moves forward in the history.
  * @returns {object | undefined} The next state or undefined if at the end.
  */
-function moveForward() {
+function moveForward(): NavigationHistoryState | undefined {
     if (canMoveForward()) {
         historyIndex++;
         return getCurrentHistoryState();
@@ -62,7 +64,7 @@ function moveForward() {
  * Checks if it's possible to go back.
  * @returns {boolean}
  */
-function canMoveBack() {
+function canMoveBack(): boolean {
     return historyIndex > 0;
 }
 
@@ -70,7 +72,7 @@ function canMoveBack() {
  * Checks if it's possible to go forward.
  * @returns {boolean}
  */
-function canMoveForward() {
+function canMoveForward(): boolean {
     return historyIndex < navigationHistory.length - 1;
 }
 
@@ -79,7 +81,7 @@ function canMoveForward() {
  * Gets the current state from the navigation history without moving the pointer.
  * @returns {object | undefined} The current state or undefined if history is empty.
  */
-function getCurrentHistoryState() {
+function getCurrentHistoryState(): NavigationHistoryState | undefined {
     if (historyIndex >= 0 && historyIndex < navigationHistory.length) {
         return navigationHistory[historyIndex];
     }
@@ -89,7 +91,7 @@ function getCurrentHistoryState() {
 /**
  * Clears the navigation history.
  */
-function clearHistory() {
+function clearHistory(): void {
     navigationHistory = [];
     historyIndex = -1;
 }
@@ -98,7 +100,7 @@ function clearHistory() {
  * Returns the entire navigation history stack.
  * @returns {Array} The navigation history.
  */
-function getHistory() {
+function getHistory(): NavigationHistoryState[] {
     return [...navigationHistory];
 }
 
@@ -106,7 +108,7 @@ function getHistory() {
  * Returns the current index in the history.
  * @returns {number}
  */
-function getHistoryIndex() {
+function getHistoryIndex(): number {
     return historyIndex;
 }
 
@@ -114,7 +116,7 @@ function getHistoryIndex() {
  * Navigates to a specific index in the history.
  * @param {number} index The index to navigate to.
  */
-function goToHistoryState(index) {
+function goToHistoryState(index: number): void {
     // 유효한 인덱스 범위 확인 후 이동
     if (index >= 0 && index < navigationHistory.length) {
         historyIndex = index;

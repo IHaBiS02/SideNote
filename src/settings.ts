@@ -17,8 +17,9 @@ import {
 
 // Import state from state module
 import { globalSettings, setActiveNoteId } from './state.js';
+import type { GlobalSettings, Note, ThemeMode } from './types.js';
 
-const DEFAULT_SETTINGS = Object.freeze({
+const DEFAULT_SETTINGS: Readonly<GlobalSettings> = Object.freeze({
   title: 'default',
   fontSize: 12,
   legacyLineBreakMode: false,
@@ -31,29 +32,29 @@ const DEFAULT_SETTINGS = Object.freeze({
   mode: 'system'
 });
 
-const NOTE_SETTING_KEYS = ['title', 'fontSize', 'codeBlockHeader'];
-
-function normalizeGlobalSettings(settings = {}) {
+function normalizeGlobalSettings(settings: Partial<GlobalSettings> = {}): GlobalSettings {
   return {
     ...DEFAULT_SETTINGS,
     ...(settings || {})
   };
 }
 
-function resolveEffectiveSettings(note) {
+function resolveEffectiveSettings(note?: Note | null): GlobalSettings {
   const effectiveSettings = normalizeGlobalSettings(globalSettings);
   const noteSettings = note?.settings || {};
 
-  for (const key of NOTE_SETTING_KEYS) {
-    if (noteSettings[key] !== undefined) {
-      effectiveSettings[key] = noteSettings[key];
-    }
+  if (noteSettings.title !== undefined) effectiveSettings.title = noteSettings.title;
+  if (noteSettings.fontSize !== undefined) effectiveSettings.fontSize = noteSettings.fontSize;
+  if (noteSettings.codeBlockHeader !== undefined) {
+    effectiveSettings.codeBlockHeader = noteSettings.codeBlockHeader;
   }
 
   return effectiveSettings;
 }
 
-function resolveLegacyTextProcessingSettings(settings = globalSettings) {
+function resolveLegacyTextProcessingSettings(
+  settings: Partial<GlobalSettings> = globalSettings,
+): GlobalSettings {
   const normalizedSettings = normalizeGlobalSettings(settings);
   const tildeReplacement = normalizedSettings.showTildeReplacementButton && normalizedSettings.tildeReplacement;
   if (!normalizedSettings.legacyLineBreakMode) {
@@ -76,7 +77,7 @@ function resolveLegacyTextProcessingSettings(settings = globalSettings) {
  */
 // === 설정 저장 함수 ===
 
-function saveGlobalSettings() {
+function saveGlobalSettings(): void {
   // chrome.storage.local에 전역 설정 저장
   browser.storage.local.set({ globalSettings });
 }
@@ -87,7 +88,7 @@ function saveGlobalSettings() {
  */
 // === UI 설정 적용 함수 ===
 
-function applyFontSize(size) {
+function applyFontSize(size: number): void {
   // 에디터와 미리보기 모두에 글꼴 크기 적용
   const editorElements = [markdownEditor, htmlPreview];
   editorElements.forEach(el => {
@@ -100,8 +101,9 @@ function applyFontSize(size) {
  * Applies the color mode to the document body.
  * @param {string} mode The color mode to apply.
  */
-function applyMode(mode) {
-  const themeStylesheet = document.getElementById('theme-stylesheet');
+function applyMode(mode: ThemeMode): void {
+  const themeStylesheet = document.getElementById('theme-stylesheet') as HTMLLinkElement | null;
+  if (!themeStylesheet) return;
   if (mode === 'dark') {
     // 다크 모드
     document.body.classList.add('dark-mode');
@@ -127,7 +129,7 @@ function applyMode(mode) {
  */
 // === 버튼 상태 업데이트 함수 ===
 
-function updateAutoLineBreakButton() {
+function updateAutoLineBreakButton(): void {
   // 자동 줄바꿈 버튼 아이콘 및 툴팁 업데이트
   const settings = normalizeGlobalSettings(globalSettings);
   autoLineBreakButton.hidden = !settings.legacyLineBreakMode;
@@ -139,7 +141,7 @@ function updateAutoLineBreakButton() {
 /**
  * Updates the tilde replacement checkbox state and title.
  */
-function updateTildeReplacementButton() {
+function updateTildeReplacementButton(): void {
   // 틸데(~) 자동 변환 버튼 아이콘 및 툴팁 업데이트
   const settings = normalizeGlobalSettings(globalSettings);
   tildeReplacementButton.hidden = !settings.showTildeReplacementButton;
@@ -148,7 +150,7 @@ function updateTildeReplacementButton() {
   tildeReplacementButton.title = settings.tildeReplacement ? 'Tilde Replacement Enabled' : 'Tilde Replacement Disabled';
 }
 
-function updateLegacyLineBreakControls() {
+function updateLegacyLineBreakControls(): void {
   const settings = normalizeGlobalSettings(globalSettings);
   const legacyLineBreakModeEnabled = settings.legacyLineBreakMode;
   legacyLineBreakModeCheckbox.checked = settings.legacyLineBreakMode;
@@ -158,7 +160,7 @@ function updateLegacyLineBreakControls() {
   updateAutoLineBreakButton();
 }
 
-function isCodeBlockHeaderEnabled(note) {
+function isCodeBlockHeaderEnabled(note?: Note | null): boolean {
   return resolveEffectiveSettings(note).codeBlockHeader !== false;
 }
 
@@ -168,11 +170,11 @@ function isCodeBlockHeaderEnabled(note) {
  * @param {object} [note] The note object (required when isGlobal is false).
  * @returns {boolean} True if form was populated, false if note not found.
  */
-function populateSettingsForm(isGlobal, note) {
+function populateSettingsForm(isGlobal: boolean, note?: Note | null): boolean {
   const effectiveGlobalSettings = normalizeGlobalSettings(globalSettings);
   if (isGlobal) {
     titleSetting.value = effectiveGlobalSettings.title;
-    fontSizeSetting.value = effectiveGlobalSettings.fontSize;
+    fontSizeSetting.value = String(effectiveGlobalSettings.fontSize);
     codeBlockHeaderCheckbox.checked = effectiveGlobalSettings.codeBlockHeader !== false;
   } else {
     if (!note) return false;
@@ -180,7 +182,7 @@ function populateSettingsForm(isGlobal, note) {
     const effectiveNoteSettings = resolveEffectiveSettings(note);
     setActiveNoteId(note.id);
     titleSetting.value = effectiveNoteSettings.title;
-    fontSizeSetting.value = effectiveNoteSettings.fontSize;
+    fontSizeSetting.value = String(effectiveNoteSettings.fontSize);
     codeBlockHeaderCheckbox.checked = effectiveNoteSettings.codeBlockHeader !== false;
   }
   modeSetting.value = effectiveGlobalSettings.mode;

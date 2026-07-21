@@ -1,7 +1,14 @@
 // === Blob URL 추적 ===
 
-function createBlobUrlTracker() {
-  const trackedBlobUrls = new Set();
+export interface BlobUrlTracker {
+  create(blob: Blob): string;
+  revokeAll(): void;
+  revoke(url: string): void;
+  getCount(): number;
+}
+
+function createBlobUrlTracker(): BlobUrlTracker {
+  const trackedBlobUrls = new Set<string>();
 
   return {
     create(blob) {
@@ -37,14 +44,14 @@ const defaultBlobUrlTracker = createBlobUrlTracker();
  * @param {Blob} blob The blob to create a URL for.
  * @returns {string} The created blob URL.
  */
-function createTrackedBlobUrl(blob) {
+function createTrackedBlobUrl(blob: Blob): string {
   return defaultBlobUrlTracker.create(blob);
 }
 
 /**
  * Revokes all tracked blob URLs and clears the tracking set.
  */
-function revokeAllBlobUrls() {
+function revokeAllBlobUrls(): void {
   defaultBlobUrlTracker.revokeAll();
 }
 
@@ -52,7 +59,7 @@ function revokeAllBlobUrls() {
  * Revokes a single tracked blob URL.
  * @param {string} url The blob URL to revoke.
  */
-function revokeTrackedBlobUrl(url) {
+function revokeTrackedBlobUrl(url: string): void {
   defaultBlobUrlTracker.revoke(url);
 }
 
@@ -60,7 +67,7 @@ function revokeTrackedBlobUrl(url) {
  * Returns the current count of tracked blob URLs (for testing).
  * @returns {number}
  */
-function getTrackedBlobUrlCount() {
+function getTrackedBlobUrlCount(): number {
   return defaultBlobUrlTracker.getCount();
 }
 
@@ -70,7 +77,7 @@ function getTrackedBlobUrlCount() {
  * Gets a timestamp string.
  * @returns {string} The timestamp string.
  */
-function getTimestamp() {
+function getTimestamp(): string {
   // 날짜/시간을 YYYY_MM_DD_HH_MM_SS 형식으로 변환
   const now = new Date();
   const year = now.getFullYear();
@@ -87,7 +94,7 @@ function getTimestamp() {
  * @param {string} filename The filename to sanitize.
  * @returns {string} The sanitized filename.
  */
-function sanitizeFilename(filename) {
+function sanitizeFilename(filename: string): string {
   // 파일명에 사용할 수 없는 문자를 언더스코어(_)로 대체
   return filename.replace(/[/\\?%*:|"<>]/g, '_');
 }
@@ -97,7 +104,7 @@ function sanitizeFilename(filename) {
  * @param {Blob} blob The blob to download.
  * @param {string} fileName The name of the file.
  */
-function downloadFile(blob, fileName) {
+function downloadFile(blob: Blob, fileName: string): void {
   // 임시 <a> 태그를 생성하여 파일 다운로드
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);  // Blob을 URL로 변환
@@ -111,11 +118,11 @@ function downloadFile(blob, fileName) {
  * @param {string} content The content to extract image IDs from.
  * @returns {Array<string>} An array of image IDs.
  */
-function extractImageIds(content) {
+function extractImageIds(content: string): string[] {
   // 마크다운 이미지 문법에서 이미지 ID 추출
   const imageRegex = /!\[.*?\]\(images\/(.*?)\.png\)/g;
-  const ids = new Set();  // 중복 제거를 위해 Set 사용
-  let match;
+  const ids = new Set<string>();  // 중복 제거를 위해 Set 사용
+  let match: RegExpExecArray | null;
   while ((match = imageRegex.exec(content)) !== null) {
     ids.add(match[1]);  // 캡쳐그룹에서 이미지 ID 추출
   }

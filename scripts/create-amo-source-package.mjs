@@ -26,6 +26,7 @@ const sourceEntries = [
   'sidepanel.html',
   'src',
   'tests',
+  'tsconfig.extension.json',
   'vitest.config.js',
   'scripts/create-amo-source-package.mjs',
   'packages/wysiwyg-markdown/LICENSE',

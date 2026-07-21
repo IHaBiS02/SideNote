@@ -10,11 +10,12 @@ import {
 
 // Import state from state module
 import { notes, deletedNotes, setDeletedNotes } from './state.js';
+import type { Note } from './types.js';
 
 /**
  * Sorts the notes array.
  */
-function sortNotes() {
+function sortNotes(): void {
   notes.sort((a, b) => {
     // 고정된 노트는 항상 위에 표시
     if (a.isPinned && !b.isPinned) return -1;
@@ -32,7 +33,7 @@ function sortNotes() {
  * Deletes a note.
  * @param {string} noteId The ID of the note to delete.
  */
-async function deleteNote(noteId) {
+async function deleteNote(noteId: string): Promise<Note | null> {
   const noteIndex = notes.findIndex(n => n.id === noteId);
   if (noteIndex > -1) {
     const [deletedNote] = notes.splice(noteIndex, 1);
@@ -48,7 +49,7 @@ async function deleteNote(noteId) {
  * Toggles the pin status of a note.
  * @param {string} noteId The ID of the note to toggle.
  */
-async function togglePin(noteId) {
+async function togglePin(noteId: string): Promise<Note | null> {
     const note = notes.find(n => n.id === noteId);
     if (note) {
         // 고정 상태 토글
@@ -71,7 +72,7 @@ async function togglePin(noteId) {
  * Restores a deleted note.
  * @param {string} noteId The ID of the note to restore.
  */
-async function restoreNote(noteId) {
+async function restoreNote(noteId: string): Promise<Note | null> {
   const noteIndex = deletedNotes.findIndex(n => n.id === noteId);
   if (noteIndex > -1) {
     const [restoredNote] = deletedNotes.splice(noteIndex, 1);
@@ -89,7 +90,7 @@ async function restoreNote(noteId) {
  * Permanently deletes a note.
  * @param {string} noteId The ID of the note to delete permanently.
  */
-async function deleteNotePermanently(noteId) {
+async function deleteNotePermanently(noteId: string): Promise<void> {
   setDeletedNotes(deletedNotes.filter(n => n.id !== noteId));
   await deleteNotePermanentlyDB(noteId);
 }
@@ -97,7 +98,10 @@ async function deleteNotePermanently(noteId) {
 /**
  * Empties the recycle bin.
  */
-async function emptyRecycleBin() {
+async function emptyRecycleBin(): Promise<{
+  deletedNotesCount: number;
+  deletedImagesCount: number;
+}> {
     const deletedNotesCount = deletedNotes.length;
     // 모든 삭제된 노트 영구 삭제
     for (const note of deletedNotes) {

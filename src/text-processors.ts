@@ -10,7 +10,33 @@
  * @param {string} text - Input text
  * @returns {string} Text with tildes escaped
  */
-function escapeTildes(text) {
+interface PastedTextSettings {
+  tildeReplacement?: boolean;
+  autoLineBreak?: boolean;
+}
+
+interface EnterKeySettings {
+  autoAddSpaces?: boolean;
+}
+
+export interface EnterKeyResult {
+  handled: boolean;
+  action: 'default' | 'empty_line' | 'whitespace_cleanup' | 'normal_processing';
+}
+
+export interface CursorAnalysis {
+  currentLineStart: number;
+  lineEndIndex: number;
+  fullCurrentLine: string;
+  beforeCursor: string;
+  afterCursor: string;
+  cursorPositionInLine: number;
+  isAfterCursorOnlyWhitespace: boolean;
+}
+
+type InsertTextFunction = (textarea: HTMLTextAreaElement, text: string) => void;
+
+function escapeTildes(text: string): string {
   return text.replace(/~/g, '\\~');
 }
 
@@ -19,7 +45,7 @@ function escapeTildes(text) {
  * @param {string} text - Input text
  * @returns {string} Text with line break spaces added
  */
-function addAutoLineBreaks(text) {
+function addAutoLineBreaks(text: string): string {
   const lines = text.split(/\r?\n/);
   if (lines.length <= 1) {
     return text;
@@ -44,7 +70,7 @@ function addAutoLineBreaks(text) {
  * @param {boolean} settings.autoLineBreak - Whether to add line break spaces
  * @returns {string} Processed text
  */
-function processPastedText(text, settings = {}) {
+function processPastedText(text: string, settings: PastedTextSettings = {}): string {
   let processedText = text;
   
   // Auto-escape tilde (~) characters
@@ -65,7 +91,7 @@ function processPastedText(text, settings = {}) {
  * @param {string} text - Input text
  * @returns {number} Number of trailing spaces
  */
-function countTrailingSpaces(text) {
+function countTrailingSpaces(text: string): number {
   const trailingSpacesMatch = text.match(/\s*$/);
   return trailingSpacesMatch ? trailingSpacesMatch[0].length : 0;
 }
@@ -76,7 +102,7 @@ function countTrailingSpaces(text) {
  * @param {number} targetSpaces - Desired number of trailing spaces (default: 2)
  * @returns {string} Text with normalized trailing spaces
  */
-function normalizeTrailingSpaces(text, targetSpaces = 2) {
+function normalizeTrailingSpaces(text: string, targetSpaces = 2): string {
   const trimmed = text.trimEnd();
   return trimmed + ' '.repeat(targetSpaces);
 }
@@ -89,7 +115,11 @@ function normalizeTrailingSpaces(text, targetSpaces = 2) {
  * @param {Function} insertTextFunction - Function to insert text at cursor
  * @returns {Object} Processing result with action taken
  */
-function handleEnterKeyInput(textarea, settings = {}, insertTextFunction) {
+function handleEnterKeyInput(
+  textarea: HTMLTextAreaElement,
+  settings: EnterKeySettings = {},
+  insertTextFunction: InsertTextFunction,
+): EnterKeyResult {
   if (!settings.autoAddSpaces) {
     return { handled: false, action: 'default' };
   }
@@ -156,7 +186,7 @@ function handleEnterKeyInput(textarea, settings = {}, insertTextFunction) {
  * @param {number} cursorPos - Cursor position
  * @returns {Object} Analysis result with line information
  */
-function analyzeTextAtCursor(text, cursorPos) {
+function analyzeTextAtCursor(text: string, cursorPos: number): CursorAnalysis {
   const textUpToCursor = text.substring(0, cursorPos);
   const textFromCursor = text.substring(cursorPos);
   
@@ -186,12 +216,12 @@ function analyzeTextAtCursor(text, cursorPos) {
  * @param {number} checkboxIndex - The 0-based index of the checkbox to toggle.
  * @returns {string|null} The updated markdown, or null if index is invalid.
  */
-function toggleMarkdownCheckbox(markdown, checkboxIndex) {
+function toggleMarkdownCheckbox(markdown: string, checkboxIndex: number): string | null {
   if (checkboxIndex < 0) return null;
 
   const regex = /\[[x ]\]/g;
   let match;
-  const matches = [];
+  const matches: RegExpExecArray[] = [];
   while ((match = regex.exec(markdown)) !== null) {
     matches.push(match);
   }

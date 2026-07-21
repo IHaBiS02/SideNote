@@ -4,6 +4,7 @@ const glob = require('glob');
 const archiver = require('archiver');
 
 const buildDir = 'build';
+const compiledRuntimeDir = path.join(buildDir, 'extension-runtime');
 const chromeDir = path.join(buildDir, 'chrome');
 const firefoxDir = path.join(buildDir, 'firefox');
 const outputDirectories = [chromeDir, firefoxDir];
@@ -13,12 +14,10 @@ for (const outputDirectory of outputDirectories) {
 }
 
 const commonFiles = [
-    'src',
     'sidepanel.html',
     'sidepanel.css',
     'dark_mode.css',
     'images',
-    'background.js',
     'LICENSE',
     'LIBRARY_LICENSES.md'
 ];
@@ -26,6 +25,25 @@ const commonFiles = [
 for (const file of commonFiles) {
     for (const outputDirectory of outputDirectories) {
         fs.cpSync(file, path.join(outputDirectory, file), { recursive: true });
+    }
+}
+
+const runtimeArtifacts = [
+    { source: path.join(compiledRuntimeDir, 'src'), destination: 'src' },
+    { source: path.join(compiledRuntimeDir, 'background.js'), destination: 'background.js' }
+];
+
+for (const artifact of runtimeArtifacts) {
+    if (!fs.existsSync(artifact.source)) {
+        throw new Error(`Required compiled runtime artifact is missing: ${artifact.source}`);
+    }
+
+    for (const outputDirectory of outputDirectories) {
+        fs.cpSync(
+            artifact.source,
+            path.join(outputDirectory, artifact.destination),
+            { recursive: true }
+        );
     }
 }
 

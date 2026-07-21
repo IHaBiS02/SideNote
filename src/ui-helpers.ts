@@ -6,7 +6,17 @@
  * @param {string[]} [options.excludeFromClose] - CSS selectors to exclude from outside-click closing.
  * @returns {HTMLDivElement} The dropdown element.
  */
-function createDropdown({ className, populate, excludeFromClose = [] }) {
+interface DropdownOptions {
+  className: string;
+  populate: (dropdown: HTMLDivElement) => void;
+  excludeFromClose?: string[];
+}
+
+function createDropdown({
+  className,
+  populate,
+  excludeFromClose = [],
+}: DropdownOptions): HTMLDivElement | null {
   // Remove any existing dropdown of the same class
   const existing = document.querySelector(`.${className}`);
   if (existing) {
@@ -24,12 +34,15 @@ function createDropdown({ className, populate, excludeFromClose = [] }) {
   // Close when clicking outside
   setTimeout(() => {
     document.addEventListener('click', function closeDropdown(event) {
+      const target = event.target;
       // Check if click is on the dropdown itself
-      if (dropdown.contains(event.target)) return;
+      if (target instanceof Node && dropdown.contains(target)) return;
 
       // Check if click is on any excluded selectors
-      for (const selector of excludeFromClose) {
-        if (event.target.matches(selector) || event.target.closest(selector)) return;
+      if (target instanceof Element) {
+        for (const selector of excludeFromClose) {
+          if (target.matches(selector) || target.closest(selector)) return;
+        }
       }
 
       dropdown.remove();
