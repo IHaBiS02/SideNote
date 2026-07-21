@@ -2,7 +2,7 @@
 import { initDB, saveNote, getAllNotes, getAllImageObjectsFromDB, deleteNotePermanentlyDB, deleteImagePermanently } from './database/index.js';
 import { THIRTY_DAYS_MS } from './constants.js';
 import { sortNotes } from './notes.js';
-import { applyFontSize, applyLineHeight, applyMode, normalizeGlobalSettings, updateLegacyLineBreakControls, updateTildeReplacementButton } from './settings.js';
+import { applyFontSize, applyLineHeightSettings, applyMode, normalizeGlobalSettings, updateLegacyLineBreakControls, updateTildeReplacementButton } from './settings.js';
 import { showListView } from './notes_view/index.js';
 import { deletedNotes, globalSettings, setNotes, setDeletedNotes, setGlobalSettings } from './state.js';
 // Import events initialization function
@@ -23,7 +23,7 @@ function initializeInitialView(): void {
   const settings = normalizeGlobalSettings(globalSettings);
   applyMode(settings.mode);
   applyFontSize(settings.fontSize);
-  applyLineHeight(settings.lineHeight);
+  applyLineHeightSettings(settings);
   updateLegacyLineBreakControls();
   updateTildeReplacementButton();
   showListView();

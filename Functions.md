@@ -260,18 +260,21 @@ Settings management (functions exported):
 
 - `DEFAULT_SETTINGS`: Default global settings used to normalize missing settings
 - `normalizeGlobalSettings(settings)`: Merges partial global settings with defaults
-- `normalizeLineHeight(value)`: Clamps line spacing to `1.0`–`3.0` and rounds it to `0.1` precision, falling back to `1.5`
+- `normalizeLineHeight(value, fallback)`: Clamps line spacing to `1.0`–`3.0` and rounds it to `0.1` precision, using the supplied fallback (`1.5` by default)
 - `resolveEffectiveSettings(note)`: Resolves note-specific settings with global/default fallback
 - `resolveLegacyTextProcessingSettings(settings)`: Returns legacy paste-processing settings, forcing the two-space line-break transform off unless legacy mode is enabled
 - `saveGlobalSettings()`: Saves the global settings to chrome.storage.local
 - `applyFontSize(size)`: Applies font size to the editor Web Component through `--editor-font-size`
-- `applyLineHeight(lineHeight)`: Applies prose and heading spacing through `--sidenote-line-height`, `--editor-line-height`, and `--editor-heading-line-height`; source and fenced-code spacing remain independently fixed at `1.2`
+- `applyLineHeight(lineHeight)`: Applies WYSIWYG prose and heading spacing through `--sidenote-line-height`, `--editor-line-height`, and `--editor-heading-line-height`
+- `applySourceLineHeight(lineHeight)`: Applies full-document plain-text spacing through `--editor-source-line-height`
+- `applyCodeLineHeight(lineHeight)`: Applies fenced code-block spacing through `--editor-code-line-height`
+- `applyLineHeightSettings(settings)`: Applies all three effective line-spacing values together during startup and note opening
 - `applyMode(mode)`: Applies color mode (light/dark/system) to the document
 - `updateAutoLineBreakButton()`: Updates the legacy auto line break toolbar button state
 - `updateTildeReplacementButton()`: Updates the tilde replacement toolbar button visibility and state
 - `updateLegacyLineBreakControls()`: Updates the legacy line-break mode checkbox and dependent controls
 - `isCodeBlockHeaderEnabled(note)`: Resolves the effective code block header setting from note settings with global fallback
-- `populateSettingsForm(isGlobal, note)`: Populates settings fields for either global or note-specific settings, including effective font size and line spacing plus the global `wysiwygPreview` preference (enabled by default)
+- `populateSettingsForm(isGlobal, note)`: Populates settings fields for either global or note-specific settings, including effective font size and all three line-spacing values plus the global `wysiwygPreview` preference (enabled by default)
 
 **Note**: Uses `globalSettings` from state.js module
 

@@ -18,12 +18,14 @@ const mocks = vi.hoisted(() => {
     deleteImagePermanently: vi.fn(async () => calls.push('deleteImagePermanently')),
     sortNotes: vi.fn(() => calls.push('sortNotes')),
     applyFontSize: vi.fn(() => calls.push('applyFontSize')),
-    applyLineHeight: vi.fn(() => calls.push('applyLineHeight')),
+    applyLineHeightSettings: vi.fn(() => calls.push('applyLineHeightSettings')),
     applyMode: vi.fn(() => calls.push('applyMode')),
     normalizeGlobalSettings: vi.fn((settings = {}) => ({
       title: 'default',
       fontSize: 12,
       lineHeight: 1.5,
+      sourceLineHeight: 1.2,
+      codeLineHeight: 1.2,
       wysiwygPreview: true,
       legacyLineBreakMode: false,
       autoLineBreak: false,
@@ -56,7 +58,7 @@ vi.mock('../../src/notes.js', () => ({
 
 vi.mock('../../src/settings.js', () => ({
   applyFontSize: mocks.applyFontSize,
-  applyLineHeight: mocks.applyLineHeight,
+  applyLineHeightSettings: mocks.applyLineHeightSettings,
   applyMode: mocks.applyMode,
   normalizeGlobalSettings: mocks.normalizeGlobalSettings,
   updateLegacyLineBreakControls: mocks.updateLegacyLineBreakControls,
@@ -95,7 +97,7 @@ describe('main bootstrap', () => {
       'getAllImageObjectsFromDB',
       'applyMode',
       'applyFontSize',
-      'applyLineHeight',
+      'applyLineHeightSettings',
       'updateLegacyLineBreakControls',
       'updateTildeReplacementButton',
       'showListView',

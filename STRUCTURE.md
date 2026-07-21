@@ -80,7 +80,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   A toolbar with buttons for toggling the view and note-specific import/export/settings.
 -   **`#settings-view`**: The screen for configuring settings.
     -   Can be accessed globally (from list view) or for a specific note (from editor view).
-    -   Controls for UI Mode (Light/Dark), Title behavior, Font Size, prose Line Spacing (`1.0`–`3.0`), and other options. Font size and line spacing support global values plus note-specific overrides.
+    -   Controls for UI Mode (Light/Dark), Title behavior, Font Size, and independent WYSIWYG, Plain Text, and Code Block Line Spacing (`1.0`–`3.0`). Font size and all three spacing values support global values plus note-specific overrides.
     -   Checkbox for "Prevent deletion of used images".
     -   Legacy controls for adding two trailing spaces to pasted lines and tilde escaping.
     -   Buttons to navigate to Image Management, Recycle Bin, and Licenses pages.
@@ -96,7 +96,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   `notes`: An array of note objects. Each object contains an `id`, `title`, `content`, `settings`, and `metadata` (timestamps).
     -   `deletedNotes`: An array of note objects that have been moved to the recycle bin.
     -   `activeNoteId`: Stores the `id` of the note currently being edited.
-    -   `globalSettings`: An object holding all global application settings, including `lineHeight` (default `1.5`) and `wysiwygPreview` (default `true`) for editable versus read-only Preview.
+    -   `globalSettings`: An object holding all global application settings, including WYSIWYG `lineHeight` (default `1.5`), `sourceLineHeight` and `codeLineHeight` (default `1.2`), and `wysiwygPreview` (default `true`) for editable versus read-only Preview.
     -   `isPreview`: A boolean flag to track if the editor is in "Preview" or "Edit" mode.
     -   Navigation history is managed through the `history.ts` module.
 -   **Data Persistence**:
@@ -148,7 +148,7 @@ The UI is a single-page application with several distinct "views" that are shown
 #### Settings & Recycle Bin (`settings.ts`, `src/notes_view/`, `src/events/`)
 
 -   **Settings Listeners**: Update `globalSettings` or note-specific settings (handled in `src/events/settings-events.ts`).
--   **`applyLineHeight(lineHeight)`**: Applies global or note-specific prose and heading spacing through editor CSS variables while source mode and fenced code keep their separate `1.2` line height.
+-   **Line-height applicators**: `applyLineHeight()`, `applySourceLineHeight()`, and `applyCodeLineHeight()` update the WYSIWYG, plain-text source, and fenced-code CSS variables independently. `applyLineHeightSettings()` applies the effective trio when a note opens or SideNote starts.
 -   **`applyMode(mode)`**: Toggles the `dark-mode` class on the `<body>`.
 -   **`renderDeletedItemsList()`**: Fetches all deleted notes and images from `IndexedDB`. It combines them into a single array, sorts them by deletion date, and renders them in the `#deleted-items-list`. Each item has controls to be restored or permanently deleted (located in `src/notes_view/recycle-bin-renderer.ts`).
 -   **`renderImagesList()`**: Renders the list of images in the image management view, showing usage information and delete controls (located in `src/notes_view/image-manager.ts`). Usage detection is based on exact Markdown image references extracted from note content.

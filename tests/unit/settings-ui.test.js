@@ -10,6 +10,8 @@ function renderSettingsDom() {
     <select id="title-setting"></select>
     <input type="number" id="font-size-setting">
     <input type="number" id="line-height-setting">
+    <input type="number" id="source-line-height-setting">
+    <input type="number" id="code-line-height-setting">
     <select id="mode-setting"></select>
     <input type="checkbox" id="code-block-header-checkbox">
     <input type="checkbox" id="wysiwyg-preview-checkbox">
@@ -98,30 +100,48 @@ describe('settings UI helpers', () => {
     expect(document.getElementById('wysiwyg-preview-checkbox').checked).toBe(true);
   });
 
-  it('populates and applies the configured prose line spacing', async () => {
-    const { applyLineHeight, populateSettingsForm } = await loadSettingsModule({
+  it('populates and applies all configured editor line spacing values', async () => {
+    const { applyLineHeightSettings, populateSettingsForm } = await loadSettingsModule({
       lineHeight: 1.8,
+      sourceLineHeight: 1.3,
+      codeLineHeight: 1.4,
     });
 
     expect(populateSettingsForm(true)).toBe(true);
     expect(document.getElementById('line-height-setting').value).toBe('1.8');
+    expect(document.getElementById('source-line-height-setting').value).toBe('1.3');
+    expect(document.getElementById('code-line-height-setting').value).toBe('1.4');
 
-    applyLineHeight(2.2);
+    applyLineHeightSettings({
+      lineHeight: 2.2,
+      sourceLineHeight: 1.6,
+      codeLineHeight: 1.7,
+    });
     const editorStyle = document.getElementById('markdown-editor').style;
     expect(editorStyle.getPropertyValue('--sidenote-line-height')).toBe('2.2');
     expect(editorStyle.getPropertyValue('--editor-line-height')).toBe('2.2');
     expect(editorStyle.getPropertyValue('--editor-heading-line-height')).toBe('2.2');
-    expect(editorStyle.getPropertyValue('--editor-source-line-height')).toBe('');
-    expect(editorStyle.getPropertyValue('--editor-code-line-height')).toBe('');
+    expect(editorStyle.getPropertyValue('--editor-source-line-height')).toBe('1.6');
+    expect(editorStyle.getPropertyValue('--editor-code-line-height')).toBe('1.7');
   });
 
-  it('uses a note-specific line spacing value when present', async () => {
-    const { populateSettingsForm } = await loadSettingsModule({ lineHeight: 1.6 });
+  it('uses note-specific line spacing values when present', async () => {
+    const { populateSettingsForm } = await loadSettingsModule({
+      lineHeight: 1.6,
+      sourceLineHeight: 1.2,
+      codeLineHeight: 1.2,
+    });
 
     expect(populateSettingsForm(false, {
       id: 'note-1',
-      settings: { lineHeight: 2.4 },
+      settings: {
+        lineHeight: 2.4,
+        sourceLineHeight: 1.8,
+        codeLineHeight: 1.9,
+      },
     })).toBe(true);
     expect(document.getElementById('line-height-setting').value).toBe('2.4');
+    expect(document.getElementById('source-line-height-setting').value).toBe('1.8');
+    expect(document.getElementById('code-line-height-setting').value).toBe('1.9');
   });
 });

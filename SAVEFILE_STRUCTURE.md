@@ -27,6 +27,8 @@ note.snote/
     "title": "custom",
     "fontSize": 14,
     "lineHeight": 1.8,
+    "sourceLineHeight": 1.3,
+    "codeLineHeight": 1.4,
     "codeBlockHeader": true
   },
   "metadata": {
@@ -83,6 +85,8 @@ Notes and images are stored in separate object stores:
       title?: string,
       fontSize?: number,
       lineHeight?: number,
+      sourceLineHeight?: number,
+      codeLineHeight?: number,
       codeBlockHeader?: boolean
     },
     metadata: {

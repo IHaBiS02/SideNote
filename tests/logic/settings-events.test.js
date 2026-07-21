@@ -32,7 +32,11 @@ async function initializeSettings({ isGlobal, notes = [] }) {
   document.documentElement.innerHTML = readFileSync('sidepanel.html', 'utf8');
 
   const state = await import('../../src/state.js');
-  state.setGlobalSettings({ lineHeight: 1.5 });
+  state.setGlobalSettings({
+    lineHeight: 1.5,
+    sourceLineHeight: 1.2,
+    codeLineHeight: 1.2,
+  });
   state.setNotes(notes);
   state.setActiveNoteId(notes[0]?.id ?? null);
   state.setIsGlobalSettings(isGlobal);
@@ -48,23 +52,34 @@ describe('line spacing settings events', () => {
     vi.clearAllMocks();
   });
 
-  it('stores a global line spacing value and applies it to the editor', async () => {
+  it('stores global line spacing values and applies them to each editor surface', async () => {
     const state = await initializeSettings({ isGlobal: true });
-    const input = document.getElementById('line-height-setting');
     const editor = document.getElementById('markdown-editor');
 
-    input.value = '2.2';
-    input.dispatchEvent(new Event('input'));
+    const values = [
+      ['line-height-setting', '2.2'],
+      ['source-line-height-setting', '1.6'],
+      ['code-line-height-setting', '1.7'],
+    ];
+    for (const [id, value] of values) {
+      const input = document.getElementById(id);
+      input.value = value;
+      input.dispatchEvent(new Event('input'));
+    }
 
     expect(state.globalSettings.lineHeight).toBe(2.2);
+    expect(state.globalSettings.sourceLineHeight).toBe(1.6);
+    expect(state.globalSettings.codeLineHeight).toBe(1.7);
     expect(editor.style.getPropertyValue('--editor-line-height')).toBe('2.2');
     expect(editor.style.getPropertyValue('--editor-heading-line-height')).toBe('2.2');
+    expect(editor.style.getPropertyValue('--editor-source-line-height')).toBe('1.6');
+    expect(editor.style.getPropertyValue('--editor-code-line-height')).toBe('1.7');
     await expect(browser.storage.local.get('globalSettings')).resolves.toEqual({
       globalSettings: state.globalSettings,
     });
   });
 
-  it('stores a note-specific line spacing value without changing the global value', async () => {
+  it('stores note-specific line spacing values without changing global values', async () => {
     const note = {
       id: 'note-1',
       title: 'Note',
@@ -74,24 +89,34 @@ describe('line spacing settings events', () => {
       isPinned: false,
     };
     const state = await initializeSettings({ isGlobal: false, notes: [note] });
-    const input = document.getElementById('line-height-setting');
+    const values = [
+      ['line-height-setting', '1.9'],
+      ['source-line-height-setting', '1.4'],
+      ['code-line-height-setting', '1.5'],
+    ];
+    for (const [id, value] of values) {
+      const input = document.getElementById(id);
+      input.value = value;
+      input.dispatchEvent(new Event('input'));
+    }
 
-    input.value = '1.9';
-    input.dispatchEvent(new Event('input'));
-
-    await vi.waitFor(() => expect(mocks.saveNote).toHaveBeenCalledWith(note));
+    await vi.waitFor(() => expect(mocks.saveNote).toHaveBeenCalledTimes(3));
     expect(note.settings.lineHeight).toBe(1.9);
+    expect(note.settings.sourceLineHeight).toBe(1.4);
+    expect(note.settings.codeLineHeight).toBe(1.5);
     expect(state.globalSettings.lineHeight).toBe(1.5);
-    expect(mocks.sortNotes).toHaveBeenCalledOnce();
+    expect(state.globalSettings.sourceLineHeight).toBe(1.2);
+    expect(state.globalSettings.codeLineHeight).toBe(1.2);
+    expect(mocks.sortNotes).toHaveBeenCalledTimes(3);
   });
 
   it('ignores values outside the supported range', async () => {
     const state = await initializeSettings({ isGlobal: true });
-    const input = document.getElementById('line-height-setting');
+    const input = document.getElementById('code-line-height-setting');
 
     input.value = '4';
     input.dispatchEvent(new Event('input'));
 
-    expect(state.globalSettings.lineHeight).toBe(1.5);
+    expect(state.globalSettings.codeLineHeight).toBe(1.2);
   });
 });

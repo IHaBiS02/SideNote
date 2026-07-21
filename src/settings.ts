@@ -8,6 +8,8 @@ import {
   titleSetting,
   fontSizeSetting,
   lineHeightSetting,
+  sourceLineHeightSetting,
+  codeLineHeightSetting,
   modeSetting,
   codeBlockHeaderCheckbox,
   wysiwygPreviewCheckbox,
@@ -19,6 +21,8 @@ import { globalSettings, setActiveNoteId } from './state.js';
 import type { GlobalSettings, Note, ThemeMode } from './types.js';
 
 const DEFAULT_LINE_HEIGHT = 1.5;
+const DEFAULT_SOURCE_LINE_HEIGHT = 1.2;
+const DEFAULT_CODE_LINE_HEIGHT = 1.2;
 const MIN_LINE_HEIGHT = 1;
 const MAX_LINE_HEIGHT = 3;
 
@@ -26,6 +30,8 @@ const DEFAULT_SETTINGS: Readonly<GlobalSettings> = Object.freeze({
   title: 'default',
   fontSize: 12,
   lineHeight: DEFAULT_LINE_HEIGHT,
+  sourceLineHeight: DEFAULT_SOURCE_LINE_HEIGHT,
+  codeLineHeight: DEFAULT_CODE_LINE_HEIGHT,
   wysiwygPreview: true,
   legacyLineBreakMode: false,
   autoLineBreak: false,
@@ -44,12 +50,20 @@ function normalizeGlobalSettings(settings: Partial<GlobalSettings> = {}): Global
   // Remove the retired textarea-only setting from data saved by older versions.
   delete (normalizedSettings as GlobalSettings & { autoAddSpaces?: unknown }).autoAddSpaces;
   normalizedSettings.lineHeight = normalizeLineHeight(normalizedSettings.lineHeight);
+  normalizedSettings.sourceLineHeight = normalizeLineHeight(
+    normalizedSettings.sourceLineHeight,
+    DEFAULT_SOURCE_LINE_HEIGHT,
+  );
+  normalizedSettings.codeLineHeight = normalizeLineHeight(
+    normalizedSettings.codeLineHeight,
+    DEFAULT_CODE_LINE_HEIGHT,
+  );
   return normalizedSettings;
 }
 
-function normalizeLineHeight(value: unknown): number {
+function normalizeLineHeight(value: unknown, fallback = DEFAULT_LINE_HEIGHT): number {
   const numericValue = typeof value === 'number' ? value : Number(value);
-  if (!Number.isFinite(numericValue)) return DEFAULT_LINE_HEIGHT;
+  if (!Number.isFinite(numericValue)) return fallback;
 
   const clampedValue = Math.min(MAX_LINE_HEIGHT, Math.max(MIN_LINE_HEIGHT, numericValue));
   return Math.round(clampedValue * 10) / 10;
@@ -62,7 +76,22 @@ function resolveEffectiveSettings(note?: Note | null): GlobalSettings {
   if (noteSettings.title !== undefined) effectiveSettings.title = noteSettings.title;
   if (noteSettings.fontSize !== undefined) effectiveSettings.fontSize = noteSettings.fontSize;
   if (noteSettings.lineHeight !== undefined) {
-    effectiveSettings.lineHeight = normalizeLineHeight(noteSettings.lineHeight);
+    effectiveSettings.lineHeight = normalizeLineHeight(
+      noteSettings.lineHeight,
+      effectiveSettings.lineHeight,
+    );
+  }
+  if (noteSettings.sourceLineHeight !== undefined) {
+    effectiveSettings.sourceLineHeight = normalizeLineHeight(
+      noteSettings.sourceLineHeight,
+      effectiveSettings.sourceLineHeight,
+    );
+  }
+  if (noteSettings.codeLineHeight !== undefined) {
+    effectiveSettings.codeLineHeight = normalizeLineHeight(
+      noteSettings.codeLineHeight,
+      effectiveSettings.codeLineHeight,
+    );
   }
   if (noteSettings.codeBlockHeader !== undefined) {
     effectiveSettings.codeBlockHeader = noteSettings.codeBlockHeader;
@@ -112,8 +141,7 @@ function applyFontSize(size: number): void {
 }
 
 /**
- * Applies the prose and heading line spacing while keeping source and fenced
- * code blocks on their dedicated compact line-height variables.
+ * Applies the WYSIWYG prose and heading line spacing.
  */
 function applyLineHeight(lineHeight: number): void {
   const normalizedLineHeight = normalizeLineHeight(lineHeight);
@@ -121,6 +149,26 @@ function applyLineHeight(lineHeight: number): void {
   markdownEditor.style.setProperty('--sidenote-line-height', value);
   markdownEditor.style.setProperty('--editor-line-height', value);
   markdownEditor.style.setProperty('--editor-heading-line-height', value);
+}
+
+/** Applies the full-document plain-text editor line spacing. */
+function applySourceLineHeight(lineHeight: number): void {
+  const value = String(normalizeLineHeight(lineHeight, DEFAULT_SOURCE_LINE_HEIGHT));
+  markdownEditor.style.setProperty('--editor-source-line-height', value);
+}
+
+/** Applies fenced code-block line spacing. */
+function applyCodeLineHeight(lineHeight: number): void {
+  const value = String(normalizeLineHeight(lineHeight, DEFAULT_CODE_LINE_HEIGHT));
+  markdownEditor.style.setProperty('--editor-code-line-height', value);
+}
+
+function applyLineHeightSettings(
+  settings: Pick<GlobalSettings, 'lineHeight' | 'sourceLineHeight' | 'codeLineHeight'>,
+): void {
+  applyLineHeight(settings.lineHeight);
+  applySourceLineHeight(settings.sourceLineHeight);
+  applyCodeLineHeight(settings.codeLineHeight);
 }
 
 /**
@@ -182,6 +230,8 @@ function populateSettingsForm(isGlobal: boolean, note?: Note | null): boolean {
     titleSetting.value = effectiveGlobalSettings.title;
     fontSizeSetting.value = String(effectiveGlobalSettings.fontSize);
     lineHeightSetting.value = String(effectiveGlobalSettings.lineHeight);
+    sourceLineHeightSetting.value = String(effectiveGlobalSettings.sourceLineHeight);
+    codeLineHeightSetting.value = String(effectiveGlobalSettings.codeLineHeight);
     codeBlockHeaderCheckbox.checked = effectiveGlobalSettings.codeBlockHeader !== false;
   } else {
     if (!note) return false;
@@ -191,6 +241,8 @@ function populateSettingsForm(isGlobal: boolean, note?: Note | null): boolean {
     titleSetting.value = effectiveNoteSettings.title;
     fontSizeSetting.value = String(effectiveNoteSettings.fontSize);
     lineHeightSetting.value = String(effectiveNoteSettings.lineHeight);
+    sourceLineHeightSetting.value = String(effectiveNoteSettings.sourceLineHeight);
+    codeLineHeightSetting.value = String(effectiveNoteSettings.codeLineHeight);
     codeBlockHeaderCheckbox.checked = effectiveNoteSettings.codeBlockHeader !== false;
   }
   wysiwygPreviewCheckbox.checked = effectiveGlobalSettings.wysiwygPreview !== false;
@@ -215,6 +267,9 @@ export {
   saveGlobalSettings,
   applyFontSize,
   applyLineHeight,
+  applySourceLineHeight,
+  applyCodeLineHeight,
+  applyLineHeightSettings,
   applyMode,
   updateAutoLineBreakButton,
   updateTildeReplacementButton,

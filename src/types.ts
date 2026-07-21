@@ -4,6 +4,8 @@ export interface NoteSettings {
   title?: string;
   fontSize?: number;
   lineHeight?: number;
+  sourceLineHeight?: number;
+  codeLineHeight?: number;
   codeBlockHeader?: boolean;
 }
 
@@ -11,6 +13,8 @@ export interface GlobalSettings {
   title: string;
   fontSize: number;
   lineHeight: number;
+  sourceLineHeight: number;
+  codeLineHeight: number;
   wysiwygPreview: boolean;
   legacyLineBreakMode: boolean;
   autoLineBreak: boolean;

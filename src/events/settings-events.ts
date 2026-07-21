@@ -9,6 +9,8 @@ import {
   titleSetting,
   fontSizeSetting,
   lineHeightSetting,
+  sourceLineHeightSetting,
+  codeLineHeightSetting,
   modeSetting,
   autoLineBreakButton,
   tildeReplacementButton,
@@ -35,6 +37,8 @@ import {
   saveGlobalSettings,
   applyFontSize,
   applyLineHeight,
+  applySourceLineHeight,
+  applyCodeLineHeight,
   applyMode,
   MIN_LINE_HEIGHT,
   MAX_LINE_HEIGHT,
@@ -56,6 +60,43 @@ import {
   setIsGlobalSettings
 } from '../state.js';
 import type { ThemeMode } from '../types.js';
+
+type LineHeightSettingKey = 'lineHeight' | 'sourceLineHeight' | 'codeLineHeight';
+
+function registerLineHeightSetting(
+  input: HTMLInputElement,
+  settingKey: LineHeightSettingKey,
+  applyValue: (value: number) => void,
+): void {
+  input.addEventListener('input', async () => {
+    const parsedValue = Number.parseFloat(input.value);
+    if (
+      !Number.isFinite(parsedValue)
+      || parsedValue < MIN_LINE_HEIGHT
+      || parsedValue > MAX_LINE_HEIGHT
+    ) {
+      return;
+    }
+
+    const value = normalizeLineHeight(parsedValue);
+    if (isGlobalSettings) {
+      globalSettings[settingKey] = value;
+      applyValue(value);
+      saveGlobalSettings();
+      return;
+    }
+
+    const note = notes.find(n => n.id === activeNoteId);
+    if (note) {
+      note.settings = note.settings || {};
+      note.settings[settingKey] = value;
+      note.metadata.lastModified = Date.now();
+      applyValue(value);
+      sortNotes();
+      await saveNote(note);
+    }
+  });
+}
 
 // === Settings Event Listeners ===
 
@@ -185,34 +226,13 @@ function initializeSettingsEvents(): void {
     }
   });
 
-  // Prose and heading line spacing setting
-  lineHeightSetting.addEventListener('input', async () => {
-    const parsedValue = Number.parseFloat(lineHeightSetting.value);
-    if (
-      !Number.isFinite(parsedValue)
-      || parsedValue < MIN_LINE_HEIGHT
-      || parsedValue > MAX_LINE_HEIGHT
-    ) {
-      return;
-    }
-
-    const value = normalizeLineHeight(parsedValue);
-    applyLineHeight(value);
-
-    if (isGlobalSettings) {
-      globalSettings.lineHeight = value;
-      saveGlobalSettings();
-    } else {
-      const note = notes.find(n => n.id === activeNoteId);
-      if (note) {
-        note.settings = note.settings || {};
-        note.settings.lineHeight = value;
-        note.metadata.lastModified = Date.now();
-        sortNotes();
-        await saveNote(note);
-      }
-    }
-  });
+  registerLineHeightSetting(lineHeightSetting, 'lineHeight', applyLineHeight);
+  registerLineHeightSetting(
+    sourceLineHeightSetting,
+    'sourceLineHeight',
+    applySourceLineHeight,
+  );
+  registerLineHeightSetting(codeLineHeightSetting, 'codeLineHeight', applyCodeLineHeight);
 
   // Code block header setting
   codeBlockHeaderCheckbox.addEventListener('change', async () => {

@@ -24,6 +24,8 @@ const licenseContent = document.getElementById('license-content') as HTMLDivElem
 const titleSetting = document.getElementById('title-setting') as HTMLSelectElement;
 const fontSizeSetting = document.getElementById('font-size-setting') as HTMLInputElement;
 const lineHeightSetting = document.getElementById('line-height-setting') as HTMLInputElement;
+const sourceLineHeightSetting = document.getElementById('source-line-height-setting') as HTMLInputElement;
+const codeLineHeightSetting = document.getElementById('code-line-height-setting') as HTMLInputElement;
 const modeSetting = document.getElementById('mode-setting') as HTMLSelectElement;
 const autoLineBreakButton = document.getElementById('auto-line-break-button') as HTMLButtonElement;
 const tildeReplacementButton = document.getElementById('tilde-replacement-button') as HTMLButtonElement;
@@ -74,6 +76,8 @@ export {
   titleSetting,
   fontSizeSetting,
   lineHeightSetting,
+  sourceLineHeightSetting,
+  codeLineHeightSetting,
   modeSetting,
   autoLineBreakButton,
   tildeReplacementButton,

@@ -23,6 +23,8 @@ describe('settings model helpers', () => {
 
     expect(settings.fontSize).toBe(18);
     expect(settings.lineHeight).toBe(1.5);
+    expect(settings.sourceLineHeight).toBe(1.2);
+    expect(settings.codeLineHeight).toBe(1.2);
     expect(settings.mode).toBe('dark');
     expect(settings.wysiwygPreview).toBe(true);
     expect(settings.title).toBe(DEFAULT_SETTINGS.title);
@@ -38,6 +40,7 @@ describe('settings model helpers', () => {
     expect(normalizeLineHeight(2.04)).toBe(2);
     expect(normalizeLineHeight(2.06)).toBe(2.1);
     expect(normalizeLineHeight(4)).toBe(3);
+    expect(normalizeLineHeight(undefined, 1.2)).toBe(1.2);
   });
 
   it('resolves note-specific settings over normalized global settings', () => {
@@ -45,6 +48,8 @@ describe('settings model helpers', () => {
       title: 'custom',
       fontSize: 14,
       lineHeight: 1.7,
+      sourceLineHeight: 1.3,
+      codeLineHeight: 1.4,
       codeBlockHeader: false,
       mode: 'dark',
     });
@@ -53,6 +58,8 @@ describe('settings model helpers', () => {
       settings: {
         fontSize: 20,
         lineHeight: 2.1,
+        sourceLineHeight: 1.8,
+        codeLineHeight: 1.9,
         codeBlockHeader: true,
       },
     });
@@ -60,6 +67,8 @@ describe('settings model helpers', () => {
     expect(effective.title).toBe('custom');
     expect(effective.fontSize).toBe(20);
     expect(effective.lineHeight).toBe(2.1);
+    expect(effective.sourceLineHeight).toBe(1.8);
+    expect(effective.codeLineHeight).toBe(1.9);
     expect(effective.codeBlockHeader).toBe(true);
     expect(effective.mode).toBe('dark');
   });

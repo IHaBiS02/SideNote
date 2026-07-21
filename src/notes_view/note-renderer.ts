@@ -13,7 +13,7 @@ import {
 
 import { 
   applyFontSize,
-  applyLineHeight,
+  applyLineHeightSettings,
   isCodeBlockHeaderEnabled,
   resolveEffectiveSettings,
   updateLegacyLineBreakControls,
@@ -105,7 +105,7 @@ function openNote(
     // 노트 설정 적용 (폰트 크기, 줄 간격 등)
     const effectiveSettings = resolveEffectiveSettings(note);
     applyFontSize(effectiveSettings.fontSize);
-    applyLineHeight(effectiveSettings.lineHeight);
+    applyLineHeightSettings(effectiveSettings);
     updateLegacyLineBreakControls();
     updateTildeReplacementButton();
     showEditorView(false);
