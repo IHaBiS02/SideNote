@@ -44,6 +44,9 @@ describe('wysiwyg-markdown element', () => {
     expect(editorStyles.cssText).toContain(
       'line-height: var(--editor-code-line-height)',
     );
+    expect(editorStyles.cssText).toContain(
+      '.editor-mount .ProseMirror pre.code-block-body',
+    );
     expect(editorStyles.cssText).toContain('margin-block: 0.67em');
     expect(editorStyles.cssText).toContain('font-weight: 700');
   });

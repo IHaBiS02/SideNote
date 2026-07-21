@@ -114,7 +114,7 @@ click on a rendered link opens its destination in a new browser tab. The
 `--editor-line-height` and `--editor-heading-line-height` variables default to
 `1.5`, with semantic heading sizes and margins defined by the component.
 `--editor-source-line-height` and `--editor-code-line-height` default to `1.2`
-for full-document plain-text editing and multi-line fenced code. The
+for full-document plain-text editing and fenced code blocks. The
 `--editor-code-content-padding` custom property controls fenced-code inner
 spacing and defaults to `5px`. The
 non-content code header keeps its language label out of code selections while

@@ -103,7 +103,7 @@ A host application can provide trusted CSS through `themeCss`. Editable syntax
 highlighting uses ProseMirror decorations, so it does not rewrite editable DOM.
 Fenced code content uses `--editor-code-content-padding` (`5px` by default) for
 its inner spacing. The component defines `1.5` as the default body and heading
-line height, while full-document source mode and multi-line fenced code use
+line height, while full-document source mode and fenced code blocks use
 `1.2`. Hosts can override these independently with `--editor-line-height`,
 `--editor-heading-line-height`, `--editor-source-line-height`, and
 `--editor-code-line-height`. Semantic heading sizes, weights, and margins are

@@ -168,6 +168,11 @@ export const editorStyles = css`
     background: var(--editor-code-background);
   }
 
+  .editor-mount .ProseMirror pre.code-block-body,
+  .editor-mount .ProseMirror pre.code-block-body > code {
+    line-height: var(--editor-code-line-height);
+  }
+
   .code-block-content[data-line-numbers] {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
@@ -180,7 +185,6 @@ export const editorStyles = css`
 
   .code-block-content[data-line-numbers] > pre > code {
     padding-block: 0;
-    line-height: var(--editor-code-line-height);
   }
 
   .code-block-content[data-line-numbers] > pre.code-block-body > code {
