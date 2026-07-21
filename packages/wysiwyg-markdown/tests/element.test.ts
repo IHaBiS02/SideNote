@@ -205,6 +205,28 @@ describe('wysiwyg-markdown element', () => {
     expect(editor.getMarkdown()).toBe('');
   });
 
+  it('opens a link in a new tab on middle click', async () => {
+    const editor = await createEditor('[Example](https://example.com/path)');
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const link = editor.renderRoot.querySelector<HTMLAnchorElement>('a');
+
+    link?.dispatchEvent(
+      new MouseEvent('auxclick', {
+        button: 1,
+        bubbles: true,
+        composed: true,
+        cancelable: true,
+      }),
+    );
+
+    expect(open).toHaveBeenCalledWith(
+      'https://example.com/path',
+      '_blank',
+      'noopener,noreferrer',
+    );
+    open.mockRestore();
+  });
+
   it('dispatches input events for commands', async () => {
     const editor = await createEditor('paragraph');
     const listener = vi.fn();

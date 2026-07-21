@@ -250,6 +250,7 @@ export class WysiwygMarkdownElement extends LitElement {
           this.#emitChange('keyboard');
           return false;
         },
+        auxclick: (_view, event) => this.#handleLinkAuxClick(event),
       },
       nodeViews: {
         code_block: (node) => this.#createCodeBlockNodeView(node),
@@ -964,6 +965,18 @@ export class WysiwygMarkdownElement extends LitElement {
       textarea?.select();
     });
   };
+
+  #handleLinkAuxClick(event: MouseEvent): boolean {
+    if (event.button !== 1) return false;
+    const link = event
+      .composedPath()
+      .find((target): target is HTMLAnchorElement => target instanceof HTMLAnchorElement);
+    if (!link?.href) return false;
+
+    event.preventDefault();
+    window.open(link.href, '_blank', 'noopener,noreferrer');
+    return true;
+  }
 
   #handleDocumentSourceInput = (event: InputEvent): void => {
     this.documentSourceValue = (event.currentTarget as HTMLTextAreaElement).value;
