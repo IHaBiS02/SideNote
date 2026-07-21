@@ -146,7 +146,7 @@ multi-line blocks reuse it for vertical padding, gutter spacing, and the body
 right edge.
 
 The Shadow DOM stylesheet also owns a deterministic semantic typography
-baseline: body and heading line heights default to `1.2`, and heading sizes,
+baseline: body and heading line heights default to `1.5`, and heading sizes,
 weights, margins, paragraph margins, and list margins are explicit. A host can
 override the line heights through `--editor-line-height` and
 `--editor-heading-line-height` without depending on browser UA defaults.

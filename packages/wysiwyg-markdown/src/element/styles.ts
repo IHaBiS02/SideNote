@@ -15,8 +15,8 @@ export const editorStyles = css`
     --editor-font-size: inherit;
     --editor-min-height: 240px;
     --editor-padding: 0;
-    --editor-line-height: 1.2;
-    --editor-heading-line-height: 1.2;
+    --editor-line-height: 1.5;
+    --editor-heading-line-height: 1.5;
     --editor-code-padding: 0;
     --editor-code-content-padding: 5px;
     --editor-code-border-radius: 0;

@@ -158,7 +158,7 @@ describe('4.1.14 packaged Preview theme compatibility', () => {
   it('loads reset CSS before an explicit cross-browser typography baseline', () => {
     expect(sidePanelHtml).toContain('vendor/reset.css');
     expect(lightCss).toContain('--sidenote-font-family: Arial, sans-serif;');
-    expect(lightCss).toContain('--sidenote-line-height: 1.2;');
+    expect(lightCss).toContain('--sidenote-line-height: 1.5;');
     expect(lightCss).toContain('font-weight: 700;');
     expect(lightCss).toContain('--editor-line-height: var(--sidenote-line-height);');
     expect(lightCss).toContain('--editor-heading-line-height: var(--sidenote-line-height);');
