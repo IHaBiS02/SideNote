@@ -300,7 +300,13 @@ export class WysiwygMarkdownElement extends LitElement {
       this.#refreshTaskCheckboxes();
     }
 
-    if (changed.has('showCodeBlockHeader') || changed.has('showCodeLineNumbers')) {
+    if (
+      changed.has('showCodeBlockHeader') ||
+      changed.has('showCodeLineNumbers') ||
+      changed.has('mode') ||
+      changed.has('readonly') ||
+      changed.has('disabled')
+    ) {
       this.#refreshCodeBlockChrome();
     }
 
@@ -713,7 +719,7 @@ export class WysiwygMarkdownElement extends LitElement {
     languageEditor.placeholder = 'text';
     languageEditor.autocomplete = 'off';
     languageEditor.spellcheck = false;
-    languageEditor.readOnly = true;
+    languageEditor.readOnly = !this.#isEditable();
 
     const copyButton = document.createElement('button');
     copyButton.type = 'button';
@@ -744,13 +750,12 @@ export class WysiwygMarkdownElement extends LitElement {
 
     let node = initialNode;
     let feedbackTimer: ReturnType<typeof setTimeout> | undefined;
-    let languageEditing = false;
 
     const updatePresentation = (): void => {
       const info = String(node.attrs.params ?? '').trim();
       const storedLanguage = info.split(/\s+/)[0] || '';
       const codeLanguage = storedLanguage || 'text';
-      if (!languageEditing) languageEditor.value = codeLanguage;
+      if (!languageEditor.matches(':focus')) languageEditor.value = storedLanguage;
       code.dataset.language = codeLanguage;
       header.hidden = !this.showCodeBlockHeader;
       const lines = node.textContent.split('\n');
@@ -761,32 +766,14 @@ export class WysiwygMarkdownElement extends LitElement {
       body.toggleAttribute('data-line-numbers', showLineNumbers);
     };
 
-    const finishLanguageEdit = (): void => {
-      languageEditing = false;
-      languageEditor.readOnly = true;
-      updatePresentation();
-    };
-
-    const beginLanguageEdit = (): void => {
-      if (!this.#isEditable() || languageEditing) return;
-      languageEditing = true;
-      const info = String(node.attrs.params ?? '').trim();
-      languageEditor.value = info.split(/\s+/)[0] || '';
-      languageEditor.readOnly = false;
-      languageEditor.focus();
-      const cursor = languageEditor.value.length;
-      languageEditor.setSelectionRange(cursor, cursor);
-    };
-
     const commitLanguageEdit = (): void => {
-      if (!languageEditing) return;
+      if (languageEditor.readOnly) return;
       const currentParams = String(node.attrs.params ?? '').trim();
       const currentLanguage = currentParams.split(/\s+/)[0] || '';
       const nextLanguage = (languageEditor.value.trim().split(/\s+/)[0] || '')
         .replaceAll('`', '');
       const suffix = currentParams.slice(currentLanguage.length);
       const nextParams = nextLanguage ? `${nextLanguage}${suffix}`.trim() : '';
-      finishLanguageEdit();
       if (nextParams === currentParams) return;
 
       const position = getPos();
@@ -802,31 +789,25 @@ export class WysiwygMarkdownElement extends LitElement {
     };
 
     const cancelLanguageEdit = (): void => {
-      if (!languageEditing) return;
-      finishLanguageEdit();
-    };
-
-    const handleLanguageClick = (event: MouseEvent): void => {
-      event.stopPropagation();
-      beginLanguageEdit();
+      const currentParams = String(node.attrs.params ?? '').trim();
+      languageEditor.value = currentParams.split(/\s+/)[0] || '';
+      languageEditor.blur();
     };
 
     const handleLanguageEditorKeyDown = (event: KeyboardEvent): void => {
-      if (!languageEditing && (event.key === 'Enter' || event.key === ' ')) {
-        event.preventDefault();
-        event.stopPropagation();
-        beginLanguageEdit();
-        return;
-      }
       if (event.key === 'Enter') {
         event.preventDefault();
         event.stopPropagation();
-        commitLanguageEdit();
+        languageEditor.blur();
       } else if (event.key === 'Escape') {
         event.preventDefault();
         event.stopPropagation();
         cancelLanguageEdit();
       }
+    };
+
+    const handleLanguageEditorInput = (event: Event): void => {
+      event.stopPropagation();
     };
 
     const showFeedback = (text: string): void => {
@@ -846,7 +827,7 @@ export class WysiwygMarkdownElement extends LitElement {
         showFeedback('!');
       }
     };
-    languageEditor.addEventListener('click', handleLanguageClick);
+    languageEditor.addEventListener('input', handleLanguageEditorInput);
     languageEditor.addEventListener('keydown', handleLanguageEditorKeyDown);
     languageEditor.addEventListener('blur', commitLanguageEdit);
     copyButton.addEventListener('click', handleCopy);
@@ -866,7 +847,7 @@ export class WysiwygMarkdownElement extends LitElement {
         lineNumbers.contains(event.target as globalThis.Node),
       destroy: () => {
         if (feedbackTimer) clearTimeout(feedbackTimer);
-        languageEditor.removeEventListener('click', handleLanguageClick);
+        languageEditor.removeEventListener('input', handleLanguageEditorInput);
         languageEditor.removeEventListener('keydown', handleLanguageEditorKeyDown);
         languageEditor.removeEventListener('blur', commitLanguageEdit);
         copyButton.removeEventListener('click', handleCopy);
@@ -902,10 +883,18 @@ export class WysiwygMarkdownElement extends LitElement {
         const header = container.querySelector<HTMLElement>('.code-block-header');
         const body = container.querySelector<HTMLElement>('.code-block-content');
         const lineNumbers = container.querySelector<HTMLElement>('.code-line-numbers');
+        const languageEditor = container.querySelector<HTMLInputElement>(
+          '.code-block-language-editor',
+        );
         const showLineNumbers =
           this.showCodeLineNumbers && Number(body?.dataset.lineCount ?? 0) > 1;
+        const editable = this.#isEditable();
         if (header) header.hidden = !this.showCodeBlockHeader;
         if (lineNumbers) lineNumbers.hidden = !showLineNumbers;
+        if (languageEditor) {
+          if (!editable && !languageEditor.readOnly) languageEditor.blur();
+          languageEditor.readOnly = !editable;
+        }
         body?.toggleAttribute('data-line-numbers', showLineNumbers);
       },
     );

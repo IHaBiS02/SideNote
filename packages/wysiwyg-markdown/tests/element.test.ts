@@ -125,36 +125,34 @@ describe('wysiwyg-markdown element', () => {
 
     expect(header?.contentEditable).toBe('false');
     expect(languageEditor?.value).toBe('javascript');
-    expect(languageEditor?.readOnly).toBe(true);
-    languageEditor?.dispatchEvent(
-      new MouseEvent('mousedown', { bubbles: true, cancelable: true }),
-    );
-    languageEditor?.dispatchEvent(
-      new MouseEvent('mouseup', { bubbles: true, cancelable: true }),
-    );
-    languageEditor?.dispatchEvent(
-      new MouseEvent('click', { bubbles: true, cancelable: true }),
-    );
     expect(languageEditor?.readOnly).toBe(false);
+    languageEditor?.focus();
+    expect((editor.renderRoot as ShadowRoot).activeElement).toBe(languageEditor);
+    const inputListener = vi.fn();
+    editor.addEventListener('input', inputListener);
 
     languageEditor!.value = 'typescript';
+    languageEditor?.dispatchEvent(
+      new InputEvent('input', { bubbles: true, composed: true }),
+    );
+    expect(inputListener).not.toHaveBeenCalled();
     languageEditor?.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
     );
     await editor.updateComplete;
 
-    expect(languageEditor?.readOnly).toBe(true);
+    expect(languageEditor?.readOnly).toBe(false);
     expect(languageEditor?.value).toBe('typescript');
     expect(editor.value).toBe('```typescript\nasdfasdfasdfasdf\n```');
+    expect(inputListener).toHaveBeenCalledTimes(1);
 
-    languageEditor?.dispatchEvent(
-      new MouseEvent('click', { bubbles: true, cancelable: true }),
-    );
+    languageEditor?.focus();
     languageEditor!.value = '';
     languageEditor?.blur();
     await editor.updateComplete;
 
-    expect(languageEditor?.value).toBe('text');
+    expect(languageEditor?.value).toBe('');
+    expect(languageEditor?.placeholder).toBe('text');
     expect(editor.value).toBe('```\nasdfasdfasdfasdf\n```');
   });
 
@@ -164,17 +162,32 @@ describe('wysiwyg-markdown element', () => {
       '.code-block-language-editor',
     );
 
-    languageEditor?.dispatchEvent(
-      new MouseEvent('click', { bubbles: true, cancelable: true }),
-    );
+    expect(languageEditor?.readOnly).toBe(false);
+    languageEditor?.focus();
     languageEditor!.value = 'typescript';
     languageEditor?.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
     );
 
-    expect(languageEditor?.readOnly).toBe(true);
+    expect(languageEditor?.readOnly).toBe(false);
     expect(languageEditor?.value).toBe('javascript');
     expect(editor.value).toBe('```javascript\nconst value = 1;\n```');
+  });
+
+  it('locks code language controls outside editable WYSIWYG mode', async () => {
+    const editor = await createEditor('```javascript\nconst value = 1;\n```');
+    const languageEditor = editor.renderRoot.querySelector<HTMLInputElement>(
+      '.code-block-language-editor',
+    );
+
+    expect(languageEditor?.readOnly).toBe(false);
+    editor.setMode('readonly');
+    await editor.updateComplete;
+    expect(languageEditor?.readOnly).toBe(true);
+
+    editor.setMode('wysiwyg');
+    await editor.updateComplete;
+    expect(languageEditor?.readOnly).toBe(false);
   });
 
   it('can hide code block headers without changing the code block', async () => {
