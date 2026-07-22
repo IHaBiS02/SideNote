@@ -1,6 +1,9 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-function createPointerEvent(type, { x, y, pointerId = 1 }) {
+function createPointerEvent(
+  type,
+  { x, y, pointerId = 1, pointerType = 'mouse' },
+) {
   const event = new MouseEvent(type, {
     bubbles: true,
     cancelable: true,
@@ -9,6 +12,7 @@ function createPointerEvent(type, { x, y, pointerId = 1 }) {
     clientY: y,
   });
   Object.defineProperty(event, 'pointerId', { value: pointerId });
+  Object.defineProperty(event, 'pointerType', { value: pointerType });
   return event;
 }
 
@@ -17,13 +21,20 @@ function transformScale(image) {
 }
 
 describe('image preview modal', () => {
-  beforeEach(() => {
+  let imageModal;
+
+  beforeEach(async () => {
+    imageModal = await import('../../src/notes_view/image-modal.js');
+    imageModal.closeImageModal();
     document.body.innerHTML = '';
   });
 
+  afterEach(() => {
+    imageModal.closeImageModal();
+  });
+
   async function openLoadedModal({ width = 1200, height = 600 } = {}) {
-    const { showImageModal } = await import('../../src/notes_view/image-modal.js');
-    showImageModal('blob:preview');
+    imageModal.showImageModal('blob:preview');
 
     const modal = document.querySelector('.image-preview-modal');
     const image = modal.querySelector('img');
@@ -62,7 +73,7 @@ describe('image preview modal', () => {
       deltaY: -100,
     });
 
-    modal.dispatchEvent(ordinaryWheel);
+    window.dispatchEvent(ordinaryWheel);
     expect(ordinaryWheel.defaultPrevented).toBe(false);
     expect(image.style.transform).toBe(initialTransform);
 
@@ -74,7 +85,7 @@ describe('image preview modal', () => {
       clientX: 400,
       clientY: 300,
     });
-    modal.dispatchEvent(zoomIn);
+    window.dispatchEvent(zoomIn);
     const enlargedScale = transformScale(image);
 
     expect(zoomIn.defaultPrevented).toBe(true);
@@ -89,7 +100,7 @@ describe('image preview modal', () => {
       clientX: 400,
       clientY: 300,
     });
-    modal.dispatchEvent(zoomOut);
+    window.dispatchEvent(zoomOut);
 
     expect(zoomOut.defaultPrevented).toBe(true);
     expect(transformScale(image)).toBeLessThan(enlargedScale);
@@ -105,7 +116,7 @@ describe('image preview modal', () => {
     expect(first.image.style.transform).toBe('translate(35px, 50px) scale(1)');
     expect(first.image.style.cursor).toBe('grab');
 
-    first.modal.dispatchEvent(new WheelEvent('wheel', {
+    window.dispatchEvent(new WheelEvent('wheel', {
       bubbles: true,
       cancelable: true,
       ctrlKey: true,
@@ -120,5 +131,77 @@ describe('image preview modal', () => {
 
     const reopened = await openLoadedModal();
     expect(reopened.image.style.transform).toBe('translate(0px, 0px) scale(1)');
+  });
+
+  it('handles a touchscreen two-pointer pinch and centroid movement', async () => {
+    const { image } = await openLoadedModal();
+
+    image.dispatchEvent(createPointerEvent('pointerdown', {
+      pointerId: 1,
+      pointerType: 'touch',
+      x: 300,
+      y: 300,
+    }));
+    image.dispatchEvent(createPointerEvent('pointerdown', {
+      pointerId: 2,
+      pointerType: 'touch',
+      x: 500,
+      y: 300,
+    }));
+
+    const pinchOut = createPointerEvent('pointermove', {
+      pointerId: 2,
+      pointerType: 'touch',
+      x: 550,
+      y: 320,
+    });
+    image.dispatchEvent(pinchOut);
+
+    expect(pinchOut.defaultPrevented).toBe(true);
+    expect(transformScale(image)).toBeGreaterThan(1);
+    expect(image.style.transform).not.toContain('translate(0px, 0px)');
+
+    const scaleAfterPinchOut = transformScale(image);
+    image.dispatchEvent(createPointerEvent('pointermove', {
+      pointerId: 2,
+      pointerType: 'touch',
+      x: 450,
+      y: 320,
+    }));
+
+    expect(transformScale(image)).toBeLessThan(scaleAfterPinchOut);
+
+    image.dispatchEvent(createPointerEvent('pointerup', {
+      pointerId: 2,
+      pointerType: 'touch',
+      x: 450,
+      y: 320,
+    }));
+    image.dispatchEvent(createPointerEvent('pointerup', {
+      pointerId: 1,
+      pointerType: 'touch',
+      x: 300,
+      y: 300,
+    }));
+
+    expect(image.style.cursor).toBe('grab');
+  });
+
+  it('stops handling global pinch-wheel events after the modal closes', async () => {
+    const { modal } = await openLoadedModal();
+
+    expect(imageModal.closeImageModal()).toBe(true);
+    expect(document.body.contains(modal)).toBe(false);
+
+    const pinchWheel = new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: true,
+      deltaY: -100,
+    });
+    window.dispatchEvent(pinchWheel);
+
+    expect(pinchWheel.defaultPrevented).toBe(false);
+    expect(imageModal.closeImageModal()).toBe(false);
   });
 });

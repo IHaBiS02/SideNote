@@ -402,14 +402,21 @@ Recycle bin rendering and management:
 
 - `renderDeletedItemsList()`: Renders the list of deleted items in recycle bin
 
-### src/notes_view/image-manager.ts
+### src/notes_view/image-modal.ts and image-manager.ts
 
 Image modal and management functionality:
 
 - `showImageModal(blobUrl)`: Opens an image fitted and centered in a modal.
-  `Ctrl+wheel` and touchpad pinch events zoom around the pointer, pointer drag
-  pans, backdrop click closes, and every new modal starts from the centered
-  fitted view. A normal image click no longer toggles zoom.
+  A startup-time, capture-phase, non-passive root wheel listener handles
+  `Ctrl+wheel` and the synthetic wheel events emitted for touchpad pinch.
+  Two touchscreen pointers use their changing distance and centroid for direct
+  pinch zoom and pan. Mouse or single-touch pointer drag pans, backdrop click
+  closes, and every new modal starts from the centered fitted view. A normal
+  image click does not toggle zoom.
+- `closeImageModal()`: Removes the active modal, clears its transient gesture
+  controller, and reports whether a connected modal was closed. Backdrop and
+  global `Escape` handling share this function so stale zoom state cannot
+  survive an external close path.
 - `renderImagesList()`: Renders the image-management list and uses the
   component's `scrollToImage()` API when navigating to an image occurrence
 

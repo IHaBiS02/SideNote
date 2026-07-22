@@ -107,8 +107,9 @@ npm install
 - **pinned-note-drag.ts**: Long-press pointer reordering for pinned note rows
 - **editor-mode.ts**: Switches the shared editor between editable/read-only
   Preview and full-document Markdown source modes
-- **image-modal.ts**: Centered fullscreen image preview with
-  `Ctrl+wheel`/touchpad-pinch zoom, pointer dragging, and fresh-open reset
+- **image-modal.ts**: Centered fullscreen image preview with a startup-time
+  non-passive wheel bridge for `Ctrl+wheel`/touchpad pinch, direct two-pointer
+  touchscreen pinch, pointer dragging, and fresh-open reset
 - **image-manager.ts**: Image list UI and management
 - **recycle-bin-renderer.ts**: Deleted items list rendering
 - **index.ts**: Re-exports all view functions

@@ -74,8 +74,11 @@ The component emits bubbling, composed `input`, `change`, `mode-change`,
 when a rendered image is clicked.
 
 SideNote uses `displaySource` to open a fitted, centered image modal. Modal image
-clicks do not toggle zoom; `Ctrl+wheel` and touchpad pinch gestures zoom around
-the pointer, while press-drag pans. Closing and reopening resets the view.
+clicks do not toggle zoom. `Ctrl+wheel` and browser-synthesized touchpad pinch
+wheel events zoom around the pointer, direct two-pointer touchscreen pinch
+zooms and follows the moving centroid, and mouse or single-finger press-drag
+pans. Closing through the backdrop or `Escape` clears gesture state, so
+reopening resets the view.
 
 Extensions can contribute named commands, shortcuts, and input rules:
 

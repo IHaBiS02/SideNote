@@ -5,6 +5,27 @@ const WHEEL_ZOOM_SPEED = 0.01;
 const MIN_WHEEL_ZOOM_STEP = 0.01;
 const MAX_WHEEL_ZOOM_STEP = 0.2;
 
+interface GesturePoint {
+  x: number;
+  y: number;
+}
+
+interface PinchSnapshot {
+  center: GesturePoint;
+  distance: number;
+}
+
+interface ActiveImageModal {
+  modal: HTMLDivElement;
+  zoomBetween(
+    fromClientPoint: GesturePoint,
+    toClientPoint: GesturePoint,
+    factor: number,
+  ): void;
+}
+
+let activeImageModal: ActiveImageModal | null = null;
+
 function clamp(value: number, minimum: number, maximum: number): number {
   return Math.min(maximum, Math.max(minimum, value));
 }
@@ -32,11 +53,65 @@ function wheelZoomFactor(event: WheelEvent): number {
   return Math.exp(exponent);
 }
 
+function handleImageModalWheel(event: WheelEvent): void {
+  if (!activeImageModal) return;
+  if (!activeImageModal.modal.isConnected) {
+    activeImageModal = null;
+    return;
+  }
+  if (!event.ctrlKey) return;
+
+  event.preventDefault();
+  const pointer = { x: event.clientX, y: event.clientY };
+  activeImageModal.zoomBetween(pointer, pointer, wheelZoomFactor(event));
+}
+
+// Chromium and Firefox expose touchpad pinch as a synthetic Ctrl+wheel event.
+// Register before a modal opens so Chromium can treat the root listener as a
+// blocking wheel target as soon as the extension view is initialized.
+window.addEventListener('wheel', handleImageModalWheel, {
+  capture: true,
+  passive: false,
+});
+
+function getPinchSnapshot(
+  touchPointers: Map<number, GesturePoint>,
+): PinchSnapshot | null {
+  const [first, second] = Array.from(touchPointers.values());
+  if (!first || !second) return null;
+
+  return {
+    center: {
+      x: (first.x + second.x) / 2,
+      y: (first.y + second.y) / 2,
+    },
+    distance: Math.hypot(second.x - first.x, second.y - first.y),
+  };
+}
+
 /**
- * Shows an image in a centered modal with gesture zoom and pointer panning.
+ * Closes the active image modal and clears all transient gesture state.
+ * @returns Whether a connected modal was closed.
+ */
+function closeImageModal(): boolean {
+  if (!activeImageModal) return false;
+
+  const { modal } = activeImageModal;
+  activeImageModal = null;
+  if (!modal.isConnected) return false;
+
+  modal.remove();
+  return true;
+}
+
+/**
+ * Shows an image in a centered modal with cross-browser gesture zoom and
+ * pointer panning.
  * @param {string} blobUrl The blob URL of the image to show.
  */
 function showImageModal(blobUrl: string): void {
+  closeImageModal();
+
   const modal = document.createElement('div');
   modal.classList.add('image-preview-modal');
   modal.setAttribute('role', 'dialog');
@@ -77,10 +152,37 @@ function showImageModal(blobUrl: string): void {
   let dragStartY = 0;
   let dragOriginX = 0;
   let dragOriginY = 0;
+  let pinchSnapshot: PinchSnapshot | null = null;
+  const touchPointers = new Map<number, GesturePoint>();
 
   const applyTransform = (): void => {
     modalImg.style.transform =
       `translate(${offsetX}px, ${offsetY}px) scale(${zoom})`;
+  };
+
+  const toModalPoint = (clientPoint: GesturePoint): GesturePoint => {
+    const bounds = modal.getBoundingClientRect();
+    return {
+      x: clientPoint.x - (bounds.left + bounds.width / 2),
+      y: clientPoint.y - (bounds.top + bounds.height / 2),
+    };
+  };
+
+  const zoomBetween = (
+    fromClientPoint: GesturePoint,
+    toClientPoint: GesturePoint,
+    factor: number,
+  ): void => {
+    const nextZoom = clamp(zoom * factor, MIN_ZOOM, MAX_ZOOM);
+    if (nextZoom === zoom) return;
+
+    const fromPoint = toModalPoint(fromClientPoint);
+    const toPoint = toModalPoint(toClientPoint);
+    const ratio = nextZoom / zoom;
+    offsetX = toPoint.x - (fromPoint.x - offsetX) * ratio;
+    offsetY = toPoint.y - (fromPoint.y - offsetY) * ratio;
+    zoom = nextZoom;
+    applyTransform();
   };
 
   const resetView = (): void => {
@@ -104,49 +206,96 @@ function showImageModal(blobUrl: string): void {
     applyTransform();
   };
 
+  const beginDrag = (pointerId: number, point: GesturePoint): void => {
+    dragging = true;
+    dragPointerId = pointerId;
+    dragStartX = point.x;
+    dragStartY = point.y;
+    dragOriginX = offsetX;
+    dragOriginY = offsetY;
+    modalImg.style.cursor = 'grabbing';
+  };
+
+  const finishDrag = (pointerId: number): void => {
+    if (!dragging || pointerId !== dragPointerId) return;
+    dragging = false;
+    dragPointerId = -1;
+    modalImg.style.cursor = 'grab';
+  };
+
+  const finishTouchPointer = (pointerId: number): void => {
+    if (!touchPointers.has(pointerId)) return;
+
+    touchPointers.delete(pointerId);
+    pinchSnapshot = null;
+
+    const remainingPointer = touchPointers.entries().next().value as
+      | [number, GesturePoint]
+      | undefined;
+    if (remainingPointer) {
+      beginDrag(remainingPointer[0], remainingPointer[1]);
+    } else {
+      dragging = false;
+      dragPointerId = -1;
+      modalImg.style.cursor = 'grab';
+    }
+  };
+
   modal.addEventListener('click', (event) => {
-    if (event.target === modal) modal.remove();
+    if (event.target === modal) closeImageModal();
   });
-
-  modal.addEventListener(
-    'wheel',
-    (event) => {
-      if (!event.ctrlKey) return;
-      event.preventDefault();
-
-      const nextZoom = clamp(
-        zoom * wheelZoomFactor(event),
-        MIN_ZOOM,
-        MAX_ZOOM,
-      );
-      if (nextZoom === zoom) return;
-
-      const bounds = modal.getBoundingClientRect();
-      const pointerX = event.clientX - (bounds.left + bounds.width / 2);
-      const pointerY = event.clientY - (bounds.top + bounds.height / 2);
-      const ratio = nextZoom / zoom;
-      offsetX = pointerX - (pointerX - offsetX) * ratio;
-      offsetY = pointerY - (pointerY - offsetY) * ratio;
-      zoom = nextZoom;
-      applyTransform();
-    },
-    { passive: false },
-  );
 
   modalImg.addEventListener('pointerdown', (event) => {
     if (event.button !== 0) return;
     event.preventDefault();
-    dragging = true;
-    dragPointerId = event.pointerId;
-    dragStartX = event.clientX;
-    dragStartY = event.clientY;
-    dragOriginX = offsetX;
-    dragOriginY = offsetY;
-    modalImg.style.cursor = 'grabbing';
+
+    const point = { x: event.clientX, y: event.clientY };
     modalImg.setPointerCapture?.(event.pointerId);
+
+    if (event.pointerType === 'touch') {
+      touchPointers.set(event.pointerId, point);
+      if (touchPointers.size === 1) {
+        beginDrag(event.pointerId, point);
+      } else {
+        dragging = false;
+        dragPointerId = -1;
+        pinchSnapshot = getPinchSnapshot(touchPointers);
+        modalImg.style.cursor = 'grabbing';
+      }
+      return;
+    }
+
+    beginDrag(event.pointerId, point);
   });
 
   modalImg.addEventListener('pointermove', (event) => {
+    if (event.pointerType === 'touch') {
+      if (!touchPointers.has(event.pointerId)) return;
+      event.preventDefault();
+      touchPointers.set(event.pointerId, {
+        x: event.clientX,
+        y: event.clientY,
+      });
+
+      if (touchPointers.size >= 2) {
+        const nextSnapshot = getPinchSnapshot(touchPointers);
+        if (
+          pinchSnapshot
+          && nextSnapshot
+          && pinchSnapshot.distance > 0
+          && nextSnapshot.distance > 0
+        ) {
+          zoomBetween(
+            pinchSnapshot.center,
+            nextSnapshot.center,
+            nextSnapshot.distance / pinchSnapshot.distance,
+          );
+        }
+        pinchSnapshot = nextSnapshot;
+        return;
+      }
+    }
+
     if (!dragging || event.pointerId !== dragPointerId) return;
     event.preventDefault();
     offsetX = dragOriginX + event.clientX - dragStartX;
@@ -154,22 +303,27 @@ function showImageModal(blobUrl: string): void {
     applyTransform();
   });
 
-  const finishDrag = (event: PointerEvent): void => {
-    if (!dragging || event.pointerId !== dragPointerId) return;
-    dragging = false;
-    dragPointerId = -1;
-    modalImg.style.cursor = 'grab';
+  const finishPointer = (event: PointerEvent): void => {
+    if (event.pointerType === 'touch') {
+      finishTouchPointer(event.pointerId);
+      return;
+    }
+    finishDrag(event.pointerId);
   };
 
-  modalImg.addEventListener('pointerup', finishDrag);
-  modalImg.addEventListener('pointercancel', finishDrag);
-  modalImg.addEventListener('lostpointercapture', finishDrag);
+  modalImg.addEventListener('pointerup', finishPointer);
+  modalImg.addEventListener('pointercancel', finishPointer);
+  modalImg.addEventListener('lostpointercapture', finishPointer);
   modalImg.addEventListener('dragstart', (event) => event.preventDefault());
   modalImg.addEventListener('load', resetView);
 
   modal.appendChild(modalImg);
   document.body.appendChild(modal);
+  activeImageModal = { modal, zoomBetween };
   modalImg.src = blobUrl;
 }
 
-export { showImageModal };
+export {
+  closeImageModal,
+  showImageModal,
+};

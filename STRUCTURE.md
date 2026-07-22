@@ -31,7 +31,7 @@ SideNote is a browser extension that provides a note-taking interface within the
         -   `pinned-note-drag.ts`: Long-press pointer controller that reorders only pinned note rows and reports the resulting order for persistence
         -   `editor-mode.ts`: Editable/read-only Preview and full-document source-mode switching
         -   `recycle-bin-renderer.ts`: Recycle bin rendering and management
-        -   `image-modal.ts`: Centered image preview with `Ctrl+wheel`/touchpad-pinch zoom, pointer dragging, and fresh-open reset
+        -   `image-modal.ts`: Centered image preview with startup-time `Ctrl+wheel`/touchpad-pinch capture, direct two-pointer touchscreen pinch, pointer dragging, shared close cleanup, and fresh-open reset
         -   `image-manager.ts`: Image list, usage, navigation, and deletion management
         -   `index.ts`: Unified entry point for backward compatibility
     -   `events/`: Directory containing modularized event handling:
@@ -151,7 +151,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   `image-activate`: Opens the SideNote image modal using the display URL supplied by the component.
     -   Custom title editing: `Enter` or `Escape` commits the title input; `Escape` is consumed before global back navigation so the note stays open.
 -   **`applyEditorDisplayMode()` / `togglePreview()`**: Uses the same custom element for editable WYSIWYG and read-only Preview, selected by the global `wysiwygPreview` setting, and switches Edit to full-document Markdown source mode (located in `src/notes_view/editor-mode.ts`).
--   **Image integration**: The component resolves stored images through the adapter, emits `image-activate` for modal opening, and exposes `scrollToImage()` so image management can navigate without reaching into the component Shadow DOM. The modal initially fits and centers each image, uses `Ctrl+wheel` or touchpad pinch for pointer-anchored zoom, supports hold-drag panning, and resets when reopened.
+-   **Image integration**: The component resolves stored images through the adapter, emits `image-activate` for modal opening, and exposes `scrollToImage()` so image management can navigate without reaching into the component Shadow DOM. The host modal initially fits and centers each image. A capture-phase, non-passive `window` listener registered when `image-modal.ts` loads handles `Ctrl+wheel` and browser-synthesized touchpad-pinch wheel events. Direct touchscreen input tracks two Pointer Events to zoom from their distance and pan from their moving centroid; mouse and single-touch dragging remain available. Backdrop and `Escape` close through the same state-clearing function, and reopening starts from the fitted center.
 
 #### Settings & Recycle Bin (`settings.ts`, `src/notes_view/`, `src/events/`)
 

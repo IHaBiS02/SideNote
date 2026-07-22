@@ -6,6 +6,7 @@ import {
 // Import functions from other modules
 import { applyMode } from '../settings.js';
 import { goBack } from './navigation.js';
+import { closeImageModal } from '../notes_view/image-modal.js';
 
 // Import state from state module
 import {
@@ -19,11 +20,7 @@ function initializeGlobalEvents(): void {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       // Close image modal if open first
-      const imagePreviewModal = document.querySelector('.image-preview-modal');
-      if (imagePreviewModal) {
-        document.body.removeChild(imagePreviewModal);
-        return;
-      }
+      if (closeImageModal()) return;
       // Otherwise go back
       goBack();
     }
