@@ -47,7 +47,7 @@ async function initializeSettings({ isGlobal, notes = [] }) {
   return state;
 }
 
-describe('line spacing settings events', () => {
+describe('settings events', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -118,5 +118,20 @@ describe('line spacing settings events', () => {
     input.dispatchEvent(new Event('input'));
 
     expect(state.globalSettings.codeLineHeight).toBe(1.2);
+  });
+
+  it('stores the pinned-note hold delay only from global settings', async () => {
+    const globalState = await initializeSettings({ isGlobal: true });
+    const input = document.getElementById('pinned-note-drag-delay-setting');
+
+    input.value = '450';
+    input.dispatchEvent(new Event('input'));
+    expect(globalState.globalSettings.pinnedNoteDragDelayMs).toBe(450);
+
+    const noteState = await initializeSettings({ isGlobal: false });
+    const noteInput = document.getElementById('pinned-note-drag-delay-setting');
+    noteInput.value = '700';
+    noteInput.dispatchEvent(new Event('input'));
+    expect(noteState.globalSettings.pinnedNoteDragDelayMs).toBeUndefined();
   });
 });

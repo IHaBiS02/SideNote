@@ -12,6 +12,9 @@ function renderSettingsDom() {
     <input type="number" id="line-height-setting">
     <input type="number" id="source-line-height-setting">
     <input type="number" id="code-line-height-setting">
+    <div id="pinned-note-drag-delay-container">
+      <input type="number" id="pinned-note-drag-delay-setting">
+    </div>
     <select id="mode-setting"></select>
     <input type="checkbox" id="code-block-header-checkbox">
     <input type="checkbox" id="wysiwyg-preview-checkbox">
@@ -98,6 +101,22 @@ describe('settings UI helpers', () => {
 
     expect(populateSettingsForm(true)).toBe(true);
     expect(document.getElementById('wysiwyg-preview-checkbox').checked).toBe(true);
+  });
+
+  it('shows the pinned-note hold delay only in global settings', async () => {
+    const { populateSettingsForm } = await loadSettingsModule({});
+    const container = document.getElementById('pinned-note-drag-delay-container');
+    const input = document.getElementById('pinned-note-drag-delay-setting');
+
+    expect(populateSettingsForm(true)).toBe(true);
+    expect(container.hidden).toBe(false);
+    expect(input.value).toBe('300');
+
+    expect(populateSettingsForm(false, {
+      id: 'note-1',
+      settings: {},
+    })).toBe(true);
+    expect(container.hidden).toBe(true);
   });
 
   it('populates and applies all configured editor line spacing values', async () => {

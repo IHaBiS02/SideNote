@@ -66,7 +66,7 @@ A simple notes browser extension that provides a note-taking interface in the br
    to Preview. While editing a custom title, Enter or Escape finishes only the
    title edit and keeps the current note open.
 
-Pinned notes remain above regular notes. Hold a pinned note for about 400 ms,
+Pinned notes remain above regular notes. Hold a pinned note for about 300 ms,
 then drag the smaller floating card vertically. An animated rounded gap opens
 at the current drop position, and the drag continues outside the original row.
 Stable row-center boundaries and a 10px hysteresis zone keep the gap from
@@ -74,6 +74,8 @@ reopening repeatedly when the pointer rests near a boundary.
 A short click still opens the note, and dragging from the pin or delete buttons
 does not start reordering. Cancelling the pointer or leaving the extension
 window restores the original order.
+The hold delay is a global-only setting adjustable from 100 to 2000ms; it
+defaults to 300ms and applies the next time the note list is shown.
 
 The image modal supports physical touchpad pinch in Firefox. Chromium extension
 Side Panels can consume that gesture before a DOM wheel event reaches SideNote,

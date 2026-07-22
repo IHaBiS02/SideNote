@@ -26,6 +26,8 @@ const fontSizeSetting = document.getElementById('font-size-setting') as HTMLInpu
 const lineHeightSetting = document.getElementById('line-height-setting') as HTMLInputElement;
 const sourceLineHeightSetting = document.getElementById('source-line-height-setting') as HTMLInputElement;
 const codeLineHeightSetting = document.getElementById('code-line-height-setting') as HTMLInputElement;
+const pinnedNoteDragDelaySetting = document.getElementById('pinned-note-drag-delay-setting') as HTMLInputElement;
+const pinnedNoteDragDelayContainer = document.getElementById('pinned-note-drag-delay-container') as HTMLDivElement;
 const modeSetting = document.getElementById('mode-setting') as HTMLSelectElement;
 const autoLineBreakButton = document.getElementById('auto-line-break-button') as HTMLButtonElement;
 const tildeReplacementButton = document.getElementById('tilde-replacement-button') as HTMLButtonElement;
@@ -78,6 +80,8 @@ export {
   lineHeightSetting,
   sourceLineHeightSetting,
   codeLineHeightSetting,
+  pinnedNoteDragDelaySetting,
+  pinnedNoteDragDelayContainer,
   modeSetting,
   autoLineBreakButton,
   tildeReplacementButton,

@@ -4,6 +4,7 @@ import {
   applyMode,
   normalizeGlobalSettings,
   normalizeLineHeight,
+  normalizePinnedNoteDragDelay,
   resolveEffectiveSettings,
   resolveLegacyTextProcessingSettings
 } from '../../src/settings.js';
@@ -25,6 +26,7 @@ describe('settings model helpers', () => {
     expect(settings.lineHeight).toBe(1.5);
     expect(settings.sourceLineHeight).toBe(1.2);
     expect(settings.codeLineHeight).toBe(1.2);
+    expect(settings.pinnedNoteDragDelayMs).toBe(300);
     expect(settings.mode).toBe('dark');
     expect(settings.wysiwygPreview).toBe(true);
     expect(settings.title).toBe(DEFAULT_SETTINGS.title);
@@ -41,6 +43,13 @@ describe('settings model helpers', () => {
     expect(normalizeLineHeight(2.06)).toBe(2.1);
     expect(normalizeLineHeight(4)).toBe(3);
     expect(normalizeLineHeight(undefined, 1.2)).toBe(1.2);
+  });
+
+  it('normalizes the pinned-note hold delay to an integer from 100 to 2000ms', () => {
+    expect(normalizePinnedNoteDragDelay(undefined)).toBe(300);
+    expect(normalizePinnedNoteDragDelay(50)).toBe(100);
+    expect(normalizePinnedNoteDragDelay(450.6)).toBe(451);
+    expect(normalizePinnedNoteDragDelay(2500)).toBe(2000);
   });
 
   it('resolves note-specific settings over normalized global settings', () => {

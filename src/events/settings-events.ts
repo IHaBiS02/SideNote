@@ -11,6 +11,7 @@ import {
   lineHeightSetting,
   sourceLineHeightSetting,
   codeLineHeightSetting,
+  pinnedNoteDragDelaySetting,
   modeSetting,
   autoLineBreakButton,
   tildeReplacementButton,
@@ -42,7 +43,10 @@ import {
   applyMode,
   MIN_LINE_HEIGHT,
   MAX_LINE_HEIGHT,
+  MIN_PINNED_NOTE_DRAG_DELAY_MS,
+  MAX_PINNED_NOTE_DRAG_DELAY_MS,
   normalizeLineHeight,
+  normalizePinnedNoteDragDelay,
   updateAutoLineBreakButton,
   updateTildeReplacementButton,
   updateLegacyLineBreakControls,
@@ -233,6 +237,25 @@ function initializeSettingsEvents(): void {
     applySourceLineHeight,
   );
   registerLineHeightSetting(codeLineHeightSetting, 'codeLineHeight', applyCodeLineHeight);
+
+  // This affects note-list interaction only and is intentionally global-only.
+  pinnedNoteDragDelaySetting.addEventListener('input', () => {
+    if (!isGlobalSettings) return;
+
+    const parsedValue = Number.parseInt(pinnedNoteDragDelaySetting.value, 10);
+    if (
+      !Number.isFinite(parsedValue)
+      || parsedValue < MIN_PINNED_NOTE_DRAG_DELAY_MS
+      || parsedValue > MAX_PINNED_NOTE_DRAG_DELAY_MS
+    ) {
+      return;
+    }
+
+    globalSettings.pinnedNoteDragDelayMs = normalizePinnedNoteDragDelay(
+      parsedValue,
+    );
+    saveGlobalSettings();
+  });
 
   // Code block header setting
   codeBlockHeaderCheckbox.addEventListener('change', async () => {

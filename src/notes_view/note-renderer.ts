@@ -22,6 +22,7 @@ import {
   applyFontSize,
   applyLineHeightSettings,
   isCodeBlockHeaderEnabled,
+  normalizeGlobalSettings,
   resolveEffectiveSettings,
   updateLegacyLineBreakControls,
   updateTildeReplacementButton 
@@ -32,6 +33,7 @@ import { pushToHistory } from '../history.js';
 // Import state from state module
 import { 
   notes, 
+  globalSettings,
   activeNoteId, 
   setActiveNoteId,
   setOriginalNoteContent,
@@ -98,6 +100,10 @@ function renderNoteList(): void {
     noteList,
     async (orderedNoteIds) => {
       if (await reorderPinnedNotes(orderedNoteIds)) renderNoteList();
+    },
+    {
+      longPressDelayMs: normalizeGlobalSettings(globalSettings)
+        .pinnedNoteDragDelayMs,
     },
   );
 }

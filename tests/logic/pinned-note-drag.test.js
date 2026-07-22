@@ -56,6 +56,24 @@ describe('pinned note long-press dragging', () => {
     vi.useRealTimers();
   });
 
+  it('uses a 300ms long-press delay by default', () => {
+    const list = document.querySelector('#note-list');
+    const pinned = noteItem('pinned', true);
+    list.append(pinned);
+    setBounds(pinned, 0);
+    const controller = createPinnedNoteDragController(list, vi.fn());
+
+    pinned.dispatchEvent(createPointerEvent('pointerdown', { x: 10, y: 10 }));
+    vi.advanceTimersByTime(299);
+    expect(pinned.classList.contains('pinned-note-dragging')).toBe(false);
+
+    vi.advanceTimersByTime(1);
+    expect(pinned.classList.contains('pinned-note-dragging')).toBe(true);
+
+    window.dispatchEvent(createPointerEvent('pointercancel', { x: 10, y: 10 }));
+    controller.destroy();
+  });
+
   it('reorders pinned notes after a long press and suppresses the drop click', () => {
     const list = document.querySelector('#note-list');
     const first = noteItem('pinned-1', true);

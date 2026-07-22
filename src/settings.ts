@@ -10,6 +10,8 @@ import {
   lineHeightSetting,
   sourceLineHeightSetting,
   codeLineHeightSetting,
+  pinnedNoteDragDelaySetting,
+  pinnedNoteDragDelayContainer,
   modeSetting,
   codeBlockHeaderCheckbox,
   wysiwygPreviewCheckbox,
@@ -19,6 +21,11 @@ import {
 // Import state from state module
 import { globalSettings, setActiveNoteId } from './state.js';
 import type { GlobalSettings, Note, ThemeMode } from './types.js';
+import {
+  DEFAULT_PINNED_NOTE_DRAG_DELAY_MS,
+  MAX_PINNED_NOTE_DRAG_DELAY_MS,
+  MIN_PINNED_NOTE_DRAG_DELAY_MS,
+} from './constants.js';
 
 const DEFAULT_LINE_HEIGHT = 1.5;
 const DEFAULT_SOURCE_LINE_HEIGHT = 1.2;
@@ -32,6 +39,7 @@ const DEFAULT_SETTINGS: Readonly<GlobalSettings> = Object.freeze({
   lineHeight: DEFAULT_LINE_HEIGHT,
   sourceLineHeight: DEFAULT_SOURCE_LINE_HEIGHT,
   codeLineHeight: DEFAULT_CODE_LINE_HEIGHT,
+  pinnedNoteDragDelayMs: DEFAULT_PINNED_NOTE_DRAG_DELAY_MS,
   wysiwygPreview: true,
   legacyLineBreakMode: false,
   autoLineBreak: false,
@@ -58,6 +66,9 @@ function normalizeGlobalSettings(settings: Partial<GlobalSettings> = {}): Global
     normalizedSettings.codeLineHeight,
     DEFAULT_CODE_LINE_HEIGHT,
   );
+  normalizedSettings.pinnedNoteDragDelayMs = normalizePinnedNoteDragDelay(
+    normalizedSettings.pinnedNoteDragDelayMs,
+  );
   return normalizedSettings;
 }
 
@@ -67,6 +78,19 @@ function normalizeLineHeight(value: unknown, fallback = DEFAULT_LINE_HEIGHT): nu
 
   const clampedValue = Math.min(MAX_LINE_HEIGHT, Math.max(MIN_LINE_HEIGHT, numericValue));
   return Math.round(clampedValue * 10) / 10;
+}
+
+function normalizePinnedNoteDragDelay(
+  value: unknown,
+  fallback = DEFAULT_PINNED_NOTE_DRAG_DELAY_MS,
+): number {
+  const numericValue = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(numericValue)) return fallback;
+
+  return Math.round(Math.min(
+    MAX_PINNED_NOTE_DRAG_DELAY_MS,
+    Math.max(MIN_PINNED_NOTE_DRAG_DELAY_MS, numericValue),
+  ));
 }
 
 function resolveEffectiveSettings(note?: Note | null): GlobalSettings {
@@ -226,12 +250,16 @@ function isCodeBlockHeaderEnabled(note?: Note | null): boolean {
  */
 function populateSettingsForm(isGlobal: boolean, note?: Note | null): boolean {
   const effectiveGlobalSettings = normalizeGlobalSettings(globalSettings);
+  pinnedNoteDragDelayContainer.hidden = !isGlobal;
   if (isGlobal) {
     titleSetting.value = effectiveGlobalSettings.title;
     fontSizeSetting.value = String(effectiveGlobalSettings.fontSize);
     lineHeightSetting.value = String(effectiveGlobalSettings.lineHeight);
     sourceLineHeightSetting.value = String(effectiveGlobalSettings.sourceLineHeight);
     codeLineHeightSetting.value = String(effectiveGlobalSettings.codeLineHeight);
+    pinnedNoteDragDelaySetting.value = String(
+      effectiveGlobalSettings.pinnedNoteDragDelayMs,
+    );
     codeBlockHeaderCheckbox.checked = effectiveGlobalSettings.codeBlockHeader !== false;
   } else {
     if (!note) return false;
@@ -260,8 +288,11 @@ export {
   DEFAULT_SETTINGS,
   MIN_LINE_HEIGHT,
   MAX_LINE_HEIGHT,
+  MIN_PINNED_NOTE_DRAG_DELAY_MS,
+  MAX_PINNED_NOTE_DRAG_DELAY_MS,
   normalizeGlobalSettings,
   normalizeLineHeight,
+  normalizePinnedNoteDragDelay,
   resolveEffectiveSettings,
   resolveLegacyTextProcessingSettings,
   saveGlobalSettings,

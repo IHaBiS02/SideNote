@@ -199,6 +199,13 @@ Central state management for shared variables:
   - `setOriginalNoteContent(content)`: Sets original note content for change detection
   - `setIsPreview(value)`: Sets preview mode state
 
+## src/constants.ts
+
+- `THIRTY_DAYS_MS`: Recycle-bin retention period
+- `DEFAULT_PINNED_NOTE_DRAG_DELAY_MS`: Default pinned-note hold delay (`300ms`)
+- `MIN_PINNED_NOTE_DRAG_DELAY_MS` / `MAX_PINNED_NOTE_DRAG_DELAY_MS`: Allowed
+  global hold-delay range (`100`–`2000ms`)
+
 ## src/database/
 
 IndexedDB operations are now modularized into separate files for better organization:
@@ -291,6 +298,8 @@ Settings management (functions exported):
 - `DEFAULT_SETTINGS`: Default global settings used to normalize missing settings
 - `normalizeGlobalSettings(settings)`: Merges partial global settings with defaults
 - `normalizeLineHeight(value, fallback)`: Clamps line spacing to `1.0`–`3.0` and rounds it to `0.1` precision, using the supplied fallback (`1.5` by default)
+- `normalizePinnedNoteDragDelay(value, fallback)`: Normalizes the global-only
+  pinned-note hold delay to an integer from 100 to 2000ms, defaulting to 300ms
 - `resolveEffectiveSettings(note)`: Resolves note-specific settings with global/default fallback
 - `resolveLegacyTextProcessingSettings(settings)`: Returns legacy paste-processing settings, forcing the two-space line-break transform off unless legacy mode is enabled
 - `saveGlobalSettings()`: Saves the global settings to chrome.storage.local
@@ -304,7 +313,10 @@ Settings management (functions exported):
 - `updateTildeReplacementButton()`: Updates the tilde replacement toolbar button visibility and state
 - `updateLegacyLineBreakControls()`: Updates the legacy line-break mode checkbox and dependent controls
 - `isCodeBlockHeaderEnabled(note)`: Resolves the effective code block header setting from note settings with global fallback
-- `populateSettingsForm(isGlobal, note)`: Populates settings fields for either global or note-specific settings, including effective font size and all three line-spacing values plus the global `wysiwygPreview` preference (enabled by default)
+- `populateSettingsForm(isGlobal, note)`: Populates settings fields for either
+  global or note-specific settings, including effective font size and all three
+  line-spacing values. The global form also shows the pinned-note hold delay;
+  the note-specific form hides it.
 
 **Note**: Uses `globalSettings` from state.js module
 
@@ -385,7 +397,8 @@ Note list and editor functionality:
 ### src/notes_view/pinned-note-drag.ts
 
 - `createPinnedNoteDragController(list, onReorder, options)`: Distinguishes a
-  short click/scroll from a long press and reorders only pinned list items with
+  short click/scroll from a configurable long press (300ms by default) and
+  reorders only pinned list items with
   Pointer Events. Once active, the grabbed row becomes a smaller fixed floating
   card and a rounded animated placeholder moves through the list to create the
   drop gap. The card itself is not reinserted during movement, so DOM relocation
@@ -472,7 +485,9 @@ Settings-related event listeners:
 
 - `initializeSettingsEvents()`: Sets up all settings-related event listeners
 
-Handles: note/global settings (including live line-spacing updates), licenses, recycle bin, image management, confirmation dropdowns
+Handles: note/global settings (including live line-spacing updates and the
+global-only pinned-note hold delay), licenses, recycle bin, image management,
+confirmation dropdowns
 
 ### src/events/import-export-events.ts
 

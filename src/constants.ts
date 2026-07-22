@@ -1,1 +1,5 @@
 export const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+
+export const DEFAULT_PINNED_NOTE_DRAG_DELAY_MS = 300;
+export const MIN_PINNED_NOTE_DRAG_DELAY_MS = 100;
+export const MAX_PINNED_NOTE_DRAG_DELAY_MS = 2000;

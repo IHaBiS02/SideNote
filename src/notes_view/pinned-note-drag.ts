@@ -1,4 +1,5 @@
-const DEFAULT_LONG_PRESS_DELAY_MS = 400;
+import { DEFAULT_PINNED_NOTE_DRAG_DELAY_MS } from '../constants.js';
+
 const DEFAULT_MOVE_TOLERANCE_PX = 8;
 const DEFAULT_DROP_HYSTERESIS_PX = 10;
 const SUPPRESS_CLICK_DURATION_MS = 600;
@@ -115,7 +116,7 @@ function createPinnedNoteDragController(
   options: PinnedNoteDragOptions = {},
 ): PinnedNoteDragController {
   const longPressDelayMs = options.longPressDelayMs
-    ?? DEFAULT_LONG_PRESS_DELAY_MS;
+    ?? DEFAULT_PINNED_NOTE_DRAG_DELAY_MS;
   const moveTolerancePx = options.moveTolerancePx
     ?? DEFAULT_MOVE_TOLERANCE_PX;
   const dropHysteresisPx = options.dropHysteresisPx
