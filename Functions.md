@@ -390,7 +390,7 @@ Note list and editor functionality:
   card and a rounded animated placeholder moves through the list to create the
   drop gap. The card itself is not reinserted during movement, so DOM relocation
   cannot prematurely end pointer capture when the pointer leaves its old row.
-  Drop slots use row-center snapshots plus a small hysteresis zone, and the
+  Drop slots use row-center snapshots plus a 10px hysteresis zone, and the
   placeholder is reinserted only when the slot changes; this prevents repeated
   CSS gap animations while the pointer rests near a boundary.
   `pointerup` moves the card to the placeholder and reports the final pinned ID

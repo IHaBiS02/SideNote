@@ -153,7 +153,6 @@ describe('pinned note long-press dragging', () => {
     const insertBeforeSpy = vi.spyOn(list, 'insertBefore');
     const controller = createPinnedNoteDragController(list, vi.fn(), {
       longPressDelayMs: 100,
-      dropHysteresisPx: 6,
     });
 
     first.dispatchEvent(createPointerEvent('pointerdown', { x: 20, y: 20 }));
@@ -161,25 +160,25 @@ describe('pinned note long-press dragging', () => {
 
     expect(insertBeforeSpy).toHaveBeenCalledTimes(1);
 
-    window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 65 }));
-    window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 64 }));
+    window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 69 }));
+    window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 68 }));
     expect(insertBeforeSpy).toHaveBeenCalledTimes(1);
 
-    window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 67 }));
+    window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 71 }));
     expect(insertBeforeSpy).toHaveBeenCalledTimes(2);
     expect(list.querySelector('.pinned-note-drop-placeholder').nextSibling)
       .toBe(third);
 
-    window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 61 }));
-    window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 60 }));
+    window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 51 }));
+    window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 50 }));
     expect(insertBeforeSpy).toHaveBeenCalledTimes(2);
 
-    window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 53 }));
+    window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 49 }));
     expect(insertBeforeSpy).toHaveBeenCalledTimes(3);
     expect(list.querySelector('.pinned-note-drop-placeholder').nextSibling)
       .toBe(second);
 
-    window.dispatchEvent(createPointerEvent('pointerup', { x: 20, y: 53 }));
+    window.dispatchEvent(createPointerEvent('pointerup', { x: 20, y: 49 }));
     controller.destroy();
   });
 

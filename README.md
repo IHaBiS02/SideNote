@@ -69,7 +69,7 @@ A simple notes browser extension that provides a note-taking interface in the br
 Pinned notes remain above regular notes. Hold a pinned note for about 400 ms,
 then drag the smaller floating card vertically. An animated rounded gap opens
 at the current drop position, and the drag continues outside the original row.
-Stable row-center boundaries and a small hysteresis zone keep the gap from
+Stable row-center boundaries and a 10px hysteresis zone keep the gap from
 reopening repeatedly when the pointer rests near a boundary.
 A short click still opens the note, and dragging from the pin or delete buttons
 does not start reordering. Cancelling the pointer or leaving the extension
