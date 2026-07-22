@@ -385,9 +385,14 @@ Note list and editor functionality:
 ### src/notes_view/pinned-note-drag.ts
 
 - `createPinnedNoteDragController(list, onReorder, options)`: Distinguishes a
-  short click/scroll from a long press, reorders only pinned list items with
-  Pointer Events, suppresses the click generated after a drop, and reports the
-  final pinned-note ID order for persistence. Pin/delete controls are excluded.
+  short click/scroll from a long press and reorders only pinned list items with
+  Pointer Events. Once active, the grabbed row becomes a smaller fixed floating
+  card and a rounded animated placeholder moves through the list to create the
+  drop gap. The card itself is not reinserted during movement, so DOM relocation
+  cannot prematurely end pointer capture when the pointer leaves its old row.
+  `pointerup` moves the card to the placeholder and reports the final pinned ID
+  order; pointer cancellation or window blur restores the original position.
+  The generated drop click is suppressed and pin/delete controls are excluded.
 
 ### src/notes_view/editor-mode.ts
 

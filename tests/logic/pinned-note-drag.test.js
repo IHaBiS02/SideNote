@@ -9,11 +9,13 @@ function createPointerEvent(type, {
   y,
   pointerId = 1,
   button = 0,
+  buttons = type === 'pointerup' ? 0 : 1,
 } = {}) {
   const event = new MouseEvent(type, {
     bubbles: true,
     cancelable: true,
     button,
+    buttons,
     clientX: x,
     clientY: y,
   });
@@ -75,9 +77,24 @@ describe('pinned note long-press dragging', () => {
 
     expect(second.classList.contains('pinned-note-dragging')).toBe(true);
     expect(second.getAttribute('aria-grabbed')).toBe('true');
+    expect(second.style.left).toBe('8px');
+    expect(second.style.width).toBe('184px');
+    expect(list.querySelector('.pinned-note-drop-placeholder')).not.toBeNull();
 
     vi.advanceTimersByTime(1_000);
     window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 5 }));
+    second.dispatchEvent(createPointerEvent('lostpointercapture', {
+      x: 20,
+      y: 5,
+      buttons: 1,
+    }));
+
+    expect(second.classList.contains('pinned-note-dragging')).toBe(true);
+    expect(
+      list.firstElementChild.classList.contains('pinned-note-drop-placeholder'),
+    ).toBe(true);
+    expect(second.style.top).toBe('-15px');
+
     window.dispatchEvent(createPointerEvent('pointerup', { x: 20, y: 5 }));
 
     expect(Array.from(list.children, item => item.dataset.noteId)).toEqual([
@@ -88,6 +105,9 @@ describe('pinned note long-press dragging', () => {
     expect(onReorder).toHaveBeenCalledWith(['pinned-2', 'pinned-1']);
     expect(second.classList.contains('pinned-note-dragging')).toBe(false);
     expect(second.hasAttribute('aria-grabbed')).toBe(false);
+    expect(second.style.left).toBe('');
+    expect(second.style.top).toBe('');
+    expect(list.querySelector('.pinned-note-drop-placeholder')).toBeNull();
 
     const click = new MouseEvent('click', { bubbles: true, cancelable: true });
     second.dispatchEvent(click);
@@ -135,6 +155,35 @@ describe('pinned note long-press dragging', () => {
     window.dispatchEvent(createPointerEvent('pointerup', { x: 10, y: 10 }));
 
     expect(pinned.classList.contains('pinned-note-dragging')).toBe(false);
+    expect(onReorder).not.toHaveBeenCalled();
+    controller.destroy();
+  });
+
+  it('restores the original order when an active pointer is cancelled', () => {
+    const list = document.querySelector('#note-list');
+    const first = noteItem('pinned-1', true);
+    const second = noteItem('pinned-2', true);
+    const unpinned = noteItem('regular', false);
+    list.append(first, second, unpinned);
+    setBounds(first, 0);
+    setBounds(second, 40);
+    const onReorder = vi.fn();
+    const controller = createPinnedNoteDragController(list, onReorder, {
+      longPressDelayMs: 100,
+    });
+
+    second.dispatchEvent(createPointerEvent('pointerdown', { x: 20, y: 60 }));
+    vi.advanceTimersByTime(100);
+    window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 5 }));
+    window.dispatchEvent(createPointerEvent('pointercancel', { x: 20, y: 5 }));
+
+    expect(Array.from(list.children, item => item.dataset.noteId)).toEqual([
+      'pinned-1',
+      'pinned-2',
+      'regular',
+    ]);
+    expect(second.classList.contains('pinned-note-dragging')).toBe(false);
+    expect(list.querySelector('.pinned-note-drop-placeholder')).toBeNull();
     expect(onReorder).not.toHaveBeenCalled();
     controller.destroy();
   });

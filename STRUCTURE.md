@@ -28,7 +28,7 @@ SideNote is a browser extension that provides a note-taking interface within the
     -   `notes_view/`: Directory containing modularized UI rendering and view management:
         -   `view-manager.ts`: View switching and navigation management
         -   `note-renderer.ts`: Note list and editor functionality
-        -   `pinned-note-drag.ts`: Long-press pointer controller that reorders only pinned note rows and reports the resulting order for persistence
+        -   `pinned-note-drag.ts`: Long-press pointer controller with a fixed floating card, animated drop-gap placeholder, cancellation restore, and persisted pinned-note ordering
         -   `editor-mode.ts`: Editable/read-only Preview and full-document source-mode switching
         -   `recycle-bin-renderer.ts`: Recycle bin rendering and management
         -   `image-modal.ts`: Centered image preview with startup-time `Ctrl+wheel`/touchpad-pinch capture, direct two-pointer touchscreen pinch, pointer dragging, shared close cleanup, and fresh-open reset
@@ -135,7 +135,7 @@ The UI is a single-page application with several distinct "views" that are shown
 #### Note List (`src/notes_view/`, `src/events/`)
 
 -   **`renderNoteList()`**: Populates the `#note-list` with items from the `notes` array (located in `src/notes_view/note-renderer.ts`).
--   **Pinned-note drag ordering**: Holding a pinned row for 400 ms activates `pinned-note-drag.ts`; vertical pointer movement rearranges only the pinned section, and `reorderPinnedNotes()` saves normalized positions to IndexedDB. Short taps and movements made before activation preserve normal click and scroll behavior.
+-   **Pinned-note drag ordering**: Holding a pinned row for 400 ms activates `pinned-note-drag.ts`. The grabbed row becomes a slightly inset, rounded fixed card that follows the pointer, while a separate animated placeholder moves through the pinned section and opens the current drop gap. Keeping the captured row at one DOM position until `pointerup` prevents Chromium from ending the drag when reordering or leaving the original row. A completed drop replaces the placeholder and `reorderPinnedNotes()` saves normalized positions to IndexedDB; pointer cancellation or window blur restores the original position. Short taps and movements made before activation preserve normal click and scroll behavior.
 -   **`newNoteButton` (Event Listener)**: Creates a new, empty note object and opens it (handled in `src/events/editor.ts`).
 -   **`deleteNote(noteId)`**: Moves a note to the recycle bin by adding a `deletedAt` timestamp.
 -   **`togglePin(noteId)`**: Toggles the pin status of a note.

@@ -14,8 +14,8 @@ A simple notes browser extension that provides a note-taking interface in the br
 - **Code Blocks**: Language/copy headers, editable highlight.js syntax
   highlighting, and aligned multi-line line numbers
 - **Dark/Light Mode**: Toggle between themes for comfortable viewing
-- **Pinned Note Ordering**: Hold a pinned note, then drag it to arrange the
-  pinned section; the order is restored on the next launch
+- **Pinned Note Ordering**: Hold a pinned note, then drag its lifted card into
+  the animated gap between pinned rows; the order is restored on next launch
 - **Import/Export**: Save and load notes in `.snote` and `.snotes` formats
 - **Image Support**: Paste and embed images directly into notes; the centered
   preview modal supports `Ctrl+wheel` and touchpad-pinch zoom, direct
@@ -67,8 +67,11 @@ A simple notes browser extension that provides a note-taking interface in the br
    title edit and keeps the current note open.
 
 Pinned notes remain above regular notes. Hold a pinned note for about 400 ms,
-then drag it vertically to change its position. A short click still opens the
-note, and dragging from the pin or delete buttons does not start reordering.
+then drag the smaller floating card vertically. An animated rounded gap opens
+at the current drop position, and the drag continues outside the original row.
+A short click still opens the note, and dragging from the pin or delete buttons
+does not start reordering. Cancelling the pointer or leaving the extension
+window restores the original order.
 
 On a new installation, SideNote checks the browser's registered command. If
 the shortcut is unassigned, a small setup window links directly to the browser's

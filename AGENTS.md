@@ -104,7 +104,8 @@ npm install
 ### Notes View Module (`src/notes_view/`)
 - **view-manager.ts**: View visibility management (list, editor, settings, etc.)
 - **note-renderer.ts**: Note list rendering and note opening
-- **pinned-note-drag.ts**: Long-press pointer reordering for pinned note rows
+- **pinned-note-drag.ts**: Long-press pointer reordering with a floating pinned
+  row, animated drop-gap placeholder, window-level movement, and cancel restore
 - **editor-mode.ts**: Switches the shared editor between editable/read-only
   Preview and full-document Markdown source modes
 - **image-modal.ts**: Centered fullscreen image preview with a startup-time
@@ -128,8 +129,9 @@ npm install
 - **Host Styling**: SideNote injects its 4.1.14-compatible theme through
   `themeCss` because document CSS does not cross the editor Shadow DOM
 - **Image Handling**: Images pasted/imported are stored as blobs in IndexedDB; blob URLs are tracked and revoked on re-render to prevent memory leaks
-- **Pinned Note Ordering**: Pinned rows use delayed Pointer Events for drag
-  ordering and persist normalized `pinOrder` values to IndexedDB
+- **Pinned Note Ordering**: Pinned rows use delayed Pointer Events, a floating
+  drag card, and an animated placeholder gap; completed drops persist
+  normalized `pinOrder` values to IndexedDB while cancellation restores order
 - **Recycle Bin**: Soft delete with 30-day auto-cleanup (`THIRTY_DAYS_MS`)
 - **Shortcut Setup**: `background.ts` checks the activation command only on a
   fresh install and opens `shortcut-setup.html` when the browser reports no
