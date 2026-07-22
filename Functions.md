@@ -106,8 +106,10 @@ Public methods:
 - `cancelBlockSourceEdit()` / `applyBlockSourceEdit()`: Controls the optional
   block-source panel.
 
-The built-in keymaps run `splitListItem()` for `Enter` in bullet and ordered
-lists, producing the next bullet or number. `Shift+Enter` inserts a `soft_break`
+The built-in keymaps run `splitListItem()` for `Enter`, `sinkListItem()` for
+`Tab`, and `liftListItem()` for `Shift+Tab` in bullet and ordered lists. Enter
+produces the next bullet or number, Tab nests the current item under a preceding
+sibling, and Shift+Tab moves it outward. `Shift+Enter` inserts a `soft_break`
 inside the current item; an empty list item falls through to the base keymap so
 `Enter` exits the list.
 

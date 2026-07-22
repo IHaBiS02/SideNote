@@ -40,6 +40,8 @@ the converted empty heading changes it back to a paragraph.
 | `Enter` in a non-empty bullet-list item | Create the next bullet-list item |
 | `Enter` in a non-empty ordered-list item | Create the next item with the following number |
 | `Enter` in an empty list item | Exit the current list |
+| `Tab` in a bullet or ordered-list item | Nest the current item one level under its previous item |
+| `Shift+Tab` in a nested list item | Move the current item one level outward |
 | `Ctrl+Z` / `Cmd+Z` | Undo |
 | `Ctrl+Shift+Z` / `Cmd+Shift+Z` | Redo |
 | `Ctrl+Y` / `Cmd+Y` | Redo |
@@ -53,8 +55,11 @@ the converted empty heading changes it back to a paragraph.
 Inside bullet and ordered lists, `Enter` creates the next list item while
 `Shift+Enter` inserts a line break inside the current item. Ordered-list
 numbers advance automatically. Pressing `Enter` in an empty list item exits
-the list, matching common Markdown editor behavior. `Shift+Enter` also inserts
-a line break inside a code block; other blocks retain their normal ProseMirror
+the list, matching common Markdown editor behavior. When a previous list item
+is available, `Tab` nests the current bullet or numbered item beneath it;
+`Shift+Tab` moves a nested item back outward. A first item with no preceding
+sibling cannot be nested and remains unchanged. `Shift+Enter` also inserts a
+line break inside a code block; other blocks retain their normal ProseMirror
 behavior.
 
 The code body, line-number gutter, and internal spacing use the same

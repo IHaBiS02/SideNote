@@ -536,6 +536,93 @@ describe('wysiwyg-markdown element', () => {
     },
   );
 
+  it.each([
+    [
+      'bullet',
+      '* Parent\n* Child',
+      'ul',
+      /\* Parent\n\s+\* Child/,
+      /\* Parent\n\n?\* Child/,
+    ],
+    [
+      'ordered',
+      '1. Parent\n2. Child',
+      'ol',
+      /1\. Parent\n\s+1\. Child/,
+      /1\. Parent\n\n?2\. Child/,
+    ],
+  ])(
+    'indents and outdents a %s list item with Tab and Shift+Tab',
+    async (
+      _kind,
+      markdown,
+      listSelector,
+      nestedMarkdownPattern,
+      flatMarkdownPattern,
+    ) => {
+      const editor = await createEditor(markdown);
+      const proseMirror = editor.renderRoot.querySelector<HTMLElement>('.ProseMirror');
+      selectDocumentEnd(editor);
+
+      const indentEvent = new KeyboardEvent('keydown', {
+        key: 'Tab',
+        bubbles: true,
+        cancelable: true,
+      });
+      proseMirror?.dispatchEvent(indentEvent);
+      await editor.updateComplete;
+
+      expect(indentEvent.defaultPrevented).toBe(true);
+      expect(
+        editor.renderRoot.querySelectorAll(
+          `${listSelector} > li > ${listSelector} > li`,
+        ),
+      ).toHaveLength(1);
+      expect(editor.value).toMatch(nestedMarkdownPattern);
+
+      const outdentEvent = new KeyboardEvent('keydown', {
+        key: 'Tab',
+        shiftKey: true,
+        bubbles: true,
+        cancelable: true,
+      });
+      proseMirror?.dispatchEvent(outdentEvent);
+      await editor.updateComplete;
+
+      expect(outdentEvent.defaultPrevented).toBe(true);
+      expect(
+        editor.renderRoot.querySelectorAll(`${listSelector} > li`),
+      ).toHaveLength(2);
+      expect(
+        editor.renderRoot.querySelector(`${listSelector} > li > ${listSelector}`),
+      ).toBeNull();
+      expect(editor.value).toMatch(flatMarkdownPattern);
+    },
+  );
+
+  it.each([
+    ['bullet', '* Only item'],
+    ['ordered', '1. Only item'],
+  ])(
+    'does not alter a first %s list item when it cannot be indented',
+    async (_kind, markdown) => {
+      const editor = await createEditor(markdown);
+      const proseMirror = editor.renderRoot.querySelector<HTMLElement>('.ProseMirror');
+      selectDocumentEnd(editor);
+
+      proseMirror?.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'Tab',
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+      await editor.updateComplete;
+
+      expect(editor.value).toBe(markdown);
+    },
+  );
+
   it('turns an empty heading into a paragraph with Backspace', async () => {
     const editor = await createEditor('');
     const proseMirror = editor.renderRoot.querySelector<HTMLElement>('.ProseMirror');

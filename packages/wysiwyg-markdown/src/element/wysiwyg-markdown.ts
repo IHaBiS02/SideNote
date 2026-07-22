@@ -3,7 +3,11 @@ import { baseKeymap, chainCommands, newlineInCode } from 'prosemirror-commands';
 import { history, redo, undo } from 'prosemirror-history';
 import { keymap } from 'prosemirror-keymap';
 import type { Node as ProseMirrorNode } from 'prosemirror-model';
-import { splitListItem } from 'prosemirror-schema-list';
+import {
+  liftListItem,
+  sinkListItem,
+  splitListItem,
+} from 'prosemirror-schema-list';
 import {
   EditorState,
   Plugin,
@@ -143,6 +147,8 @@ export class WysiwygMarkdownElement extends LitElement {
   });
   readonly #listEditingKeymapPlugin = keymap({
     Enter: splitListItem(markdownSchema.nodes.list_item),
+    Tab: sinkListItem(markdownSchema.nodes.list_item),
+    'Shift-Tab': liftListItem(markdownSchema.nodes.list_item),
   });
   readonly #baseKeymapPlugin = keymap(baseKeymap);
   #internals?: ElementInternals;
