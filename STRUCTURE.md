@@ -24,10 +24,11 @@ SideNote is a browser extension that provides a note-taking interface within the
     -   `editor/`:
         -   `sidenote-editor-adapter.ts`: Connects the reusable `<wysiwyg-markdown>` component to SideNote image storage, paste processing, editor modes, highlight.js syntax token ranges, and the 4.1.14-compatible Preview theme. Preview and source editing share the SideNote-owned `--editor-padding` value.
     -   `dom.ts`: Contains typed DOM element references for all UI elements used throughout the extension.
-    -   `notes.ts`: Contains the core logic for managing notes (sorting, deleting, pinning, restoring, etc.).
+    -   `notes.ts`: Contains the core logic for managing notes (sorting, deleting, pinning, persistent pinned-note ordering, restoring, etc.).
     -   `notes_view/`: Directory containing modularized UI rendering and view management:
         -   `view-manager.ts`: View switching and navigation management
         -   `note-renderer.ts`: Note list and editor functionality
+        -   `pinned-note-drag.ts`: Long-press pointer controller that reorders only pinned note rows and reports the resulting order for persistence
         -   `editor-mode.ts`: Editable/read-only Preview and full-document source-mode switching
         -   `recycle-bin-renderer.ts`: Recycle bin rendering and management
         -   `image-modal.ts`: Centered image preview with `Ctrl+wheel`/touchpad-pinch zoom, pointer dragging, and fresh-open reset
@@ -98,7 +99,7 @@ The UI is a single-page application with several distinct "views" that are shown
 ### Core Concepts & State Management
 
 -   **State Variables**:
-    -   `notes`: An array of note objects. Each object contains an `id`, `title`, `content`, `settings`, and `metadata` (timestamps).
+    -   `notes`: An array of note objects. Each object contains an `id`, `title`, `content`, `settings`, and `metadata` (timestamps). Pinned notes may include `pinOrder`; older records fall back to `pinnedAt`.
     -   `deletedNotes`: An array of note objects that have been moved to the recycle bin.
     -   `activeNoteId`: Stores the `id` of the note currently being edited.
     -   `globalSettings`: An object holding all global application settings, including WYSIWYG `lineHeight` (default `1.5`), `sourceLineHeight` and `codeLineHeight` (default `1.2`), and `wysiwygPreview` (default `true`) for editable versus read-only Preview.
@@ -118,7 +119,7 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **`loadAndMigrateData()`**: On startup, this function loads all data from `IndexedDB`. It also handles the one-time migration of notes from `chrome.storage.local` to `IndexedDB`.
 -   **`saveNote()` / `getAllNotes()` / `deleteNoteDB()` / etc.**: A set of async functions in `src/database/notes.ts` to perform CRUD operations on note data in IndexedDB.
 -   **`saveImage()` / `getImage()` / `deleteImage()` / etc.**: A set of async functions in `src/database/images.ts` to perform CRUD operations on image data in IndexedDB.
--   **`sortNotes()`**: Sorts the `notes` array based on pin status and the `lastModified` timestamp.
+-   **`sortNotes()`**: Keeps pinned notes first using persisted `pinOrder` (or legacy `pinnedAt`) and sorts regular notes by `lastModified`.
 -   **`cleanupDeletedNotes()` / `cleanupDeletedImages()`**: Automatically and permanently deletes items from the recycle bin that are older than 30 days.
     -   Note operations mutate state and persist through the database layer. UI refreshes are handled by the event or view caller rather than by `src/notes.ts`.
 
@@ -134,6 +135,7 @@ The UI is a single-page application with several distinct "views" that are shown
 #### Note List (`src/notes_view/`, `src/events/`)
 
 -   **`renderNoteList()`**: Populates the `#note-list` with items from the `notes` array (located in `src/notes_view/note-renderer.ts`).
+-   **Pinned-note drag ordering**: Holding a pinned row for 400 ms activates `pinned-note-drag.ts`; vertical pointer movement rearranges only the pinned section, and `reorderPinnedNotes()` saves normalized positions to IndexedDB. Short taps and movements made before activation preserve normal click and scroll behavior.
 -   **`newNoteButton` (Event Listener)**: Creates a new, empty note object and opens it (handled in `src/events/editor.ts`).
 -   **`deleteNote(noteId)`**: Moves a note to the recycle bin by adding a `deletedAt` timestamp.
 -   **`togglePin(noteId)`**: Toggles the pin status of a note.

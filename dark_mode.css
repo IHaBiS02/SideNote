@@ -24,6 +24,11 @@ body.dark-mode {
     background-color: #333;
 }
 
+.dark-mode #note-list li.pinned-note-dragging {
+    background-color: #31435a;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55);
+}
+
 .dark-mode .delete-note-icon:hover, .dark-mode .restore-note-icon:hover, .dark-mode .pin-note-icon:hover {
     background-color: #444;
 }

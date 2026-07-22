@@ -39,6 +39,7 @@ export interface Note {
   metadata: NoteMetadata;
   isPinned: boolean;
   pinnedAt?: number;
+  pinOrder?: number;
 }
 
 export interface StoredImage {

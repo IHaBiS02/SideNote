@@ -95,9 +95,13 @@ Notes and images are stored in separate object stores:
       deletedAt?: timestamp
     },
     isPinned: boolean,
-    pinnedAt?: timestamp
+    pinnedAt?: timestamp,
+    pinOrder?: number
   }
   ```
+
+  `pinOrder` stores the user-arranged position within the pinned section.
+  Existing records without it remain compatible and are ordered by `pinnedAt`.
 
 - **images** object store: Contains image objects with the following structure:
   ```javascript

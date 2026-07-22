@@ -180,7 +180,8 @@ the Markdown schema remains fixed for document compatibility.
 ## src/types.ts and src/globals.d.ts
 
 - `types.ts`: Defines the shared `Note`, `NoteSettings`, `GlobalSettings`,
-  `StoredImage`, and `NavigationHistoryState` contracts.
+  `StoredImage`, and `NavigationHistoryState` contracts. Pinned notes can store
+  an optional `pinOrder`; legacy records without it fall back to `pinnedAt`.
 - `globals.d.ts`: Types the packaged `browser`, JSZip, Marked, DOMPurify, and
   highlight.js globals without adding runtime imports to browser modules.
 
@@ -311,9 +312,13 @@ Settings management (functions exported):
 
 Note operations (functions exported):
 
-- `sortNotes()`: Sorts the notes array (pinned first, then by last modified)
+- `sortNotes()`: Sorts pinned notes by `pinOrder` (falling back to legacy
+  `pinnedAt`), followed by unpinned notes ordered by last modified time
 - `deleteNote(noteId)`: Soft deletes a note (moves to recycle bin)
-- `togglePin(noteId)`: Toggles the pin status of a note
+- `togglePin(noteId)`: Toggles the pin status of a note and appends a newly
+  pinned note to the pinned section
+- `reorderPinnedNotes(orderedNoteIds)`: Validates a complete pinned-note order,
+  normalizes `pinOrder`, updates in-memory order, and persists every pinned note
 - `restoreNote(noteId)`: Restores a deleted note from recycle bin
 - `deleteNotePermanently(noteId)`: Permanently deletes a note
 - `emptyRecycleBin()`: Empties the recycle bin (permanent deletion of all items)
@@ -373,8 +378,16 @@ View switching and navigation management:
 
 Note list and editor functionality:
 
-- `renderNoteList()`: Renders the list of notes in the main view
+- `renderNoteList()`: Renders the list of notes in the main view and attaches
+  long-press dragging to pinned entries
 - `openNote(noteId, inEditMode, addToHistory)`: Opens a note in the editor
+
+### src/notes_view/pinned-note-drag.ts
+
+- `createPinnedNoteDragController(list, onReorder, options)`: Distinguishes a
+  short click/scroll from a long press, reorders only pinned list items with
+  Pointer Events, suppresses the click generated after a drop, and reports the
+  final pinned-note ID order for persistence. Pin/delete controls are excluded.
 
 ### src/notes_view/editor-mode.ts
 

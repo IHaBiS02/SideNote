@@ -49,9 +49,14 @@ Expected shape:
     deletedAt?: number
   },
   isPinned: boolean,
-  pinnedAt?: number
+  pinnedAt?: number,
+  pinOrder?: number
 }
 ```
+
+`pinOrder` persists manual long-press drag ordering for pinned notes. Records
+created before this field was introduced continue to use `pinnedAt` as the
+fallback order.
 
 An active note has no `metadata.deletedAt`. A deleted note remains in the same object store with `metadata.deletedAt` set and is shown in the recycle bin.
 
@@ -124,7 +129,7 @@ This layer is relatively simple and already a good candidate to keep stable duri
 
 ### Note and Settings Modules
 
-- `src/notes.js`: sorting, soft delete, pin/unpin, restore, permanent delete, and empty recycle bin.
+- `src/notes.ts`: sorting, soft delete, pin/unpin, persistent pinned-note reordering, restore, permanent delete, and empty recycle bin.
 - `src/settings.js`: global settings defaults, effective setting resolution, persistence, theme/font application, toolbar button state, code block header resolution, and settings form population.
 - `src/import_export.js`: `.snote` parsing, parsed import saving, imported-note timestamp normalization, and `.snote`/`.snotes` archive packaging helpers.
 
@@ -144,7 +149,8 @@ The event modules are the highest-churn area because they coordinate DOM, state,
 ### View Modules
 
 - `src/notes_view/view-manager.js`: shows/hides app views and pushes navigation history.
-- `src/notes_view/note-renderer.js`: renders note list items and opens notes in the editor.
+- `src/notes_view/note-renderer.ts`: renders note list items, connects pinned-note dragging, and opens notes in the editor.
+- `src/notes_view/pinned-note-drag.ts`: isolates delayed pointer activation, pinned-row DOM reordering, and post-drop click suppression.
 - `src/notes_view/markdown-renderer.js`: configures Marked, converts Markdown to sanitized HTML, decorates code blocks, loads embedded images from IndexedDB with preview-scoped blob URLs, and toggles preview/edit mode.
 - `src/notes_view/image-modal.js`: fullscreen image preview with zoom states.
 - `src/notes_view/image-manager.js`: image management list, image usage dropdowns, copy Markdown action, image deletion, and note opening from image usage.

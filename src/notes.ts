@@ -12,6 +12,10 @@ import {
 import { notes, deletedNotes, setDeletedNotes } from './state.js';
 import type { Note } from './types.js';
 
+function pinnedOrderValue(note: Note): number {
+  return note.pinOrder ?? note.pinnedAt ?? 0;
+}
+
 /**
  * Sorts the notes array.
  */
@@ -20,9 +24,9 @@ function sortNotes(): void {
     // 고정된 노트는 항상 위에 표시
     if (a.isPinned && !b.isPinned) return -1;
     if (!a.isPinned && b.isPinned) return 1;
-    // 둘 다 고정된 경우 고정된 시간 순서대로
+    // 둘 다 고정된 경우 사용자 지정 순서, 기존 데이터는 고정 시간 순서대로
     if (a.isPinned && b.isPinned) {
-        return (a.pinnedAt || 0) - (b.pinnedAt || 0);
+        return pinnedOrderValue(a) - pinnedOrderValue(b);
     }
     // 일반 노트는 최근 수정 시간 순서대로
     return b.metadata.lastModified - a.metadata.lastModified;
@@ -52,20 +56,63 @@ async function deleteNote(noteId: string): Promise<Note | null> {
 async function togglePin(noteId: string): Promise<Note | null> {
     const note = notes.find(n => n.id === noteId);
     if (note) {
-        // 고정 상태 토글
-        note.isPinned = !note.isPinned;
-        if (note.isPinned) {
-            // 고정 시간 기록
+        if (!note.isPinned) {
+            const lastPinnedOrder = notes
+              .filter(candidate => candidate.isPinned)
+              .reduce(
+                (maximum, candidate) => Math.max(
+                  maximum,
+                  pinnedOrderValue(candidate),
+                ),
+                -1,
+              );
+            note.isPinned = true;
             note.pinnedAt = Date.now();
+            note.pinOrder = lastPinnedOrder + 1;
         } else {
-            // 고정 해제 시 시간 정보 삭제
+            note.isPinned = false;
             delete note.pinnedAt;
+            delete note.pinOrder;
         }
         sortNotes();
         await saveNote(note);
         return note;
     }
     return null;
+}
+
+/**
+ * Reorders all pinned notes and persists their normalized order values.
+ * @param {string[]} orderedNoteIds Pinned note IDs in their desired order.
+ */
+async function reorderPinnedNotes(
+  orderedNoteIds: string[],
+): Promise<boolean> {
+  const pinnedNotes = notes.filter(note => note.isPinned);
+  const uniqueIds = new Set(orderedNoteIds);
+  const pinnedById = new Map(pinnedNotes.map(note => [note.id, note]));
+  const isCompleteOrder = orderedNoteIds.length === pinnedNotes.length
+    && uniqueIds.size === pinnedNotes.length
+    && orderedNoteIds.every(noteId => pinnedById.has(noteId));
+  if (!isCompleteOrder) return false;
+
+  const currentOrder = pinnedNotes.map(note => note.id);
+  const orderChanged = currentOrder.some(
+    (noteId, index) => noteId !== orderedNoteIds[index],
+  );
+  if (!orderChanged) return false;
+
+  const orderedPinnedNotes = orderedNoteIds.map(
+    noteId => pinnedById.get(noteId) as Note,
+  );
+  orderedPinnedNotes.forEach((note, index) => {
+    note.pinOrder = index;
+  });
+
+  const unpinnedNotes = notes.filter(note => !note.isPinned);
+  notes.splice(0, notes.length, ...orderedPinnedNotes, ...unpinnedNotes);
+  await Promise.all(orderedPinnedNotes.map(note => saveNote(note)));
+  return true;
 }
 
 /**
@@ -127,6 +174,7 @@ export {
   sortNotes,
   deleteNote,
   togglePin,
+  reorderPinnedNotes,
   restoreNote,
   deleteNotePermanently,
   emptyRecycleBin

@@ -8,8 +8,15 @@ import {
 // Import required functions from other modules
 import { 
   togglePin, 
-  deleteNote
+  deleteNote,
+  reorderPinnedNotes,
 } from '../notes.js';
+import {
+  createPinnedNoteDragController,
+} from './pinned-note-drag.js';
+import type {
+  PinnedNoteDragController,
+} from './pinned-note-drag.js';
 
 import { 
   applyFontSize,
@@ -40,12 +47,18 @@ import { applyEditorDisplayMode } from './editor-mode.js';
  */
 // === 노트 목록 렌더링 ===
 
+let pinnedNoteDragController: PinnedNoteDragController | null = null;
+
 function renderNoteList(): void {
+  pinnedNoteDragController?.destroy();
+  pinnedNoteDragController = null;
   noteList.innerHTML = '';
   if (!Array.isArray(notes)) return;
   notes.forEach(note => {
     const li = document.createElement('li');
     li.dataset.noteId = note.id;
+    li.dataset.pinned = note.isPinned ? 'true' : 'false';
+    if (note.isPinned) li.title = 'Hold and drag to reorder pinned notes';
     li.addEventListener('click', () => openNote(note.id));
 
     const titleSpan = document.createElement('span');
@@ -80,6 +93,13 @@ function renderNoteList(): void {
     li.appendChild(buttonContainer);
     noteList.appendChild(li);
   });
+
+  pinnedNoteDragController = createPinnedNoteDragController(
+    noteList,
+    async (orderedNoteIds) => {
+      if (await reorderPinnedNotes(orderedNoteIds)) renderNoteList();
+    },
+  );
 }
 
 /**

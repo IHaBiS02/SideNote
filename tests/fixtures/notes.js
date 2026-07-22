@@ -14,6 +14,7 @@ export function createSampleNote(overrides = {}) {
     },
     isPinned: overrides.isPinned || false,
     ...(overrides.pinnedAt ? { pinnedAt: overrides.pinnedAt } : {}),
+    ...(overrides.pinOrder !== undefined ? { pinOrder: overrides.pinOrder } : {}),
   };
 }
 

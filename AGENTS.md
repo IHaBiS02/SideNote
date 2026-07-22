@@ -68,7 +68,7 @@ npm install
 - **src/utils.ts**: Utility functions (timestamps, file handling, blob URL tracking)
 - **src/ui-helpers.ts**: Shared UI utilities (`createDropdown`)
 - **src/settings.ts**: Global settings management, theme, and `populateSettingsForm`
-- **src/notes.ts**: Note data operations (CRUD, sorting, pin/unpin)
+- **src/notes.ts**: Note data operations (CRUD, sorting, pin/unpin, persistent pinned ordering)
 - **src/history.ts**: Navigation history management
 - **src/text-processors.ts**: Plain-text paste processing (tilde escaping and
   optional legacy two-space line breaks)
@@ -104,6 +104,7 @@ npm install
 ### Notes View Module (`src/notes_view/`)
 - **view-manager.ts**: View visibility management (list, editor, settings, etc.)
 - **note-renderer.ts**: Note list rendering and note opening
+- **pinned-note-drag.ts**: Long-press pointer reordering for pinned note rows
 - **editor-mode.ts**: Switches the shared editor between editable/read-only
   Preview and full-document Markdown source modes
 - **image-modal.ts**: Centered fullscreen image preview with
@@ -126,6 +127,8 @@ npm install
 - **Host Styling**: SideNote injects its 4.1.14-compatible theme through
   `themeCss` because document CSS does not cross the editor Shadow DOM
 - **Image Handling**: Images pasted/imported are stored as blobs in IndexedDB; blob URLs are tracked and revoked on re-render to prevent memory leaks
+- **Pinned Note Ordering**: Pinned rows use delayed Pointer Events for drag
+  ordering and persist normalized `pinOrder` values to IndexedDB
 - **Recycle Bin**: Soft delete with 30-day auto-cleanup (`THIRTY_DAYS_MS`)
 - **Shortcut Setup**: `background.ts` checks the activation command only on a
   fresh install and opens `shortcut-setup.html` when the browser reports no
@@ -161,6 +164,7 @@ tests/
     ├── import-export-events.test.js
     ├── main.test.js
     ├── notes.test.js
+    ├── pinned-note-drag.test.js
     └── shortcut-setup.test.js
 ```
 

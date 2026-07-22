@@ -14,6 +14,8 @@ A simple notes browser extension that provides a note-taking interface in the br
 - **Code Blocks**: Language/copy headers, editable highlight.js syntax
   highlighting, and aligned multi-line line numbers
 - **Dark/Light Mode**: Toggle between themes for comfortable viewing
+- **Pinned Note Ordering**: Hold a pinned note, then drag it to arrange the
+  pinned section; the order is restored on the next launch
 - **Import/Export**: Save and load notes in `.snote` and `.snotes` formats
 - **Image Support**: Paste and embed images directly into notes; the centered
   preview modal supports `Ctrl+wheel`/touchpad-pinch zoom and hold-drag panning
@@ -62,6 +64,10 @@ A simple notes browser extension that provides a note-taking interface in the br
 4. In full Markdown source mode, press Shift+Enter or Ctrl/Cmd+Enter to return
    to Preview. While editing a custom title, Enter or Escape finishes only the
    title edit and keeps the current note open.
+
+Pinned notes remain above regular notes. Hold a pinned note for about 400 ms,
+then drag it vertically to change its position. A short click still opens the
+note, and dragging from the pin or delete buttons does not start reordering.
 
 On a new installation, SideNote checks the browser's registered command. If
 the shortcut is unassigned, a small setup window links directly to the browser's

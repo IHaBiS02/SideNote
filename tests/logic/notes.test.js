@@ -10,9 +10,9 @@ vi.mock('../../src/database/index.js', () => ({
   getAllImageObjectsFromDB: vi.fn().mockResolvedValue([]),
 }));
 
-import { sortNotes, deleteNote, togglePin, restoreNote, deleteNotePermanently, emptyRecycleBin } from '../../src/notes.js';
+import { sortNotes, deleteNote, togglePin, reorderPinnedNotes, restoreNote, deleteNotePermanently, emptyRecycleBin } from '../../src/notes.js';
 import { setNotes, setDeletedNotes, notes, deletedNotes } from '../../src/state.js';
-import { deleteNoteDB, restoreNoteDB, deleteNotePermanentlyDB, getAllImageObjectsFromDB, deleteImagePermanently } from '../../src/database/index.js';
+import { saveNote, deleteNoteDB, restoreNoteDB, deleteNotePermanentlyDB, getAllImageObjectsFromDB, deleteImagePermanently } from '../../src/database/index.js';
 
 describe('notes business logic', () => {
   beforeEach(() => {
@@ -40,6 +40,15 @@ describe('notes business logic', () => {
       sortNotes();
       expect(notes[0].id).toBe('2');
       expect(notes[1].id).toBe('1');
+    });
+
+    it('should prefer an explicit pinOrder over the legacy pinnedAt value', () => {
+      setNotes([
+        { id: '1', isPinned: true, pinnedAt: 100, pinOrder: 1, metadata: { lastModified: 100 } },
+        { id: '2', isPinned: true, pinnedAt: 200, pinOrder: 0, metadata: { lastModified: 50 } },
+      ]);
+      sortNotes();
+      expect(notes.map(note => note.id)).toEqual(['2', '1']);
     });
 
     it('should sort unpinned notes by lastModified descending', () => {
@@ -76,20 +85,53 @@ describe('notes business logic', () => {
   describe('togglePin', () => {
     it('should pin an unpinned note', async () => {
       setNotes([
+        { id: 'pinned', isPinned: true, pinOrder: 2, metadata: { lastModified: 200 } },
         { id: 'n1', isPinned: false, metadata: { lastModified: 100 } },
       ]);
       await togglePin('n1');
-      expect(notes[0].isPinned).toBe(true);
-      expect(notes[0].pinnedAt).toBeDefined();
+      const pinnedNote = notes.find(note => note.id === 'n1');
+      expect(pinnedNote.isPinned).toBe(true);
+      expect(pinnedNote.pinnedAt).toBeDefined();
+      expect(pinnedNote.pinOrder).toBe(3);
     });
 
     it('should unpin a pinned note', async () => {
       setNotes([
-        { id: 'n1', isPinned: true, pinnedAt: 100, metadata: { lastModified: 100 } },
+        { id: 'n1', isPinned: true, pinnedAt: 100, pinOrder: 0, metadata: { lastModified: 100 } },
       ]);
       await togglePin('n1');
       expect(notes[0].isPinned).toBe(false);
       expect(notes[0].pinnedAt).toBeUndefined();
+      expect(notes[0].pinOrder).toBeUndefined();
+    });
+  });
+
+  describe('reorderPinnedNotes', () => {
+    it('reorders only pinned notes and persists normalized positions', async () => {
+      setNotes([
+        { id: 'p1', isPinned: true, pinOrder: 0, metadata: { lastModified: 100 } },
+        { id: 'p2', isPinned: true, pinOrder: 1, metadata: { lastModified: 200 } },
+        { id: 'u1', isPinned: false, metadata: { lastModified: 300 } },
+      ]);
+
+      await expect(reorderPinnedNotes(['p2', 'p1'])).resolves.toBe(true);
+
+      expect(notes.map(note => note.id)).toEqual(['p2', 'p1', 'u1']);
+      expect(notes[0].pinOrder).toBe(0);
+      expect(notes[1].pinOrder).toBe(1);
+      expect(saveNote).toHaveBeenCalledTimes(2);
+    });
+
+    it('rejects incomplete pinned orders without changing state', async () => {
+      setNotes([
+        { id: 'p1', isPinned: true, pinOrder: 0, metadata: { lastModified: 100 } },
+        { id: 'p2', isPinned: true, pinOrder: 1, metadata: { lastModified: 200 } },
+      ]);
+
+      await expect(reorderPinnedNotes(['p2'])).resolves.toBe(false);
+
+      expect(notes.map(note => note.id)).toEqual(['p1', 'p2']);
+      expect(saveNote).not.toHaveBeenCalled();
     });
   });
 
