@@ -95,6 +95,13 @@ describe('wysiwyg-markdown element', () => {
     const cells = editor.renderRoot.querySelectorAll('td');
 
     expect(editorStyles.cssText).toContain('text-align: center');
+    expect(editorStyles.cssText).toContain('--editor-table-aligned-cell-padding: 5px');
+    expect(editorStyles.cssText).toContain(
+      'padding-left: var(--editor-table-aligned-cell-padding)',
+    );
+    expect(editorStyles.cssText).toContain(
+      'padding-right: var(--editor-table-aligned-cell-padding)',
+    );
     expect(headers[0]?.getAttribute('style')).toBeNull();
     expect(headers[1]?.getAttribute('style')).toContain('text-align: left');
     expect(headers[2]?.getAttribute('style')).toContain('text-align: right');

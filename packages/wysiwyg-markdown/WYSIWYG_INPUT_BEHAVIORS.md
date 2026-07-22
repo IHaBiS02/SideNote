@@ -72,7 +72,10 @@ Markdown tables use collapsed 1px cell borders controlled by
 theme and white in the dark theme so each row and column remains distinct.
 Cell content is centered when a Markdown column has no alignment marker.
 Explicit left (`:---`), center (`:---:`), and right (`---:`) alignment markers
-continue to override that visual default.
+continue to override that visual default. Left-aligned cells keep 5px between
+their content and the left border, while right-aligned cells keep 5px from the
+right border. Hosts can override this spacing with
+`--editor-table-aligned-cell-padding`.
 
 The code body, line-number gutter, and internal spacing use the same
 `--editor-code-background` color. The header keeps its separate

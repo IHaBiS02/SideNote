@@ -10,6 +10,7 @@ export const editorStyles = css`
     --editor-muted-background: transparent;
     --editor-list-marker-color: color-mix(in srgb, currentColor 60%, transparent);
     --editor-table-border-color: currentColor;
+    --editor-table-aligned-cell-padding: 5px;
     --editor-code-background: var(--editor-muted-background);
     --editor-accent: currentColor;
     --editor-font-family: inherit;
@@ -328,6 +329,16 @@ export const editorStyles = css`
     padding: 0;
     text-align: center;
     vertical-align: top;
+  }
+
+  .editor-mount .ProseMirror th[style*='text-align: left'],
+  .editor-mount .ProseMirror td[style*='text-align: left'] {
+    padding-left: var(--editor-table-aligned-cell-padding);
+  }
+
+  .editor-mount .ProseMirror th[style*='text-align: right'],
+  .editor-mount .ProseMirror td[style*='text-align: right'] {
+    padding-right: var(--editor-table-aligned-cell-padding);
   }
 
   .editor-mount .ProseMirror th {

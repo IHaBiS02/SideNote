@@ -117,7 +117,8 @@ light- or dark-theme value. Markdown table cells use collapsed 1px borders
 whose color is exposed as `--editor-table-border-color`; its default follows
 the current text color. Columns without a Markdown alignment marker center their
 cell content by default, while explicit left, center, and right markers remain
-authoritative.
+authoritative. Left- and right-aligned cells keep 5px of padding from their
+respective aligned edge through `--editor-table-aligned-cell-padding`.
 
 See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the current architecture and
 host integration boundaries. Built-in Markdown input rules, shortcuts, mouse
