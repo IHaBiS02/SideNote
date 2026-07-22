@@ -66,6 +66,9 @@ ProseMirror 동작을 유지합니다.
 Markdown 표는 `--editor-table-border-color`로 지정하는 1px 셀 테두리를 겹치지
 않게 표시합니다. SideNote는 각 행과 열이 분명하게 구분되도록 라이트 테마에서는
 검은색, 다크 테마에서는 흰색 테두리를 사용합니다.
+Markdown 열에 정렬 표시가 없으면 셀 내용을 기본적으로 가운데 정렬합니다.
+왼쪽(`:---`), 가운데(`:---:`), 오른쪽(`---:`) 정렬을 명시한 열은 해당 설정이
+기본값보다 우선합니다.
 
 코드 본문, 줄 번호 영역, 내부 여백은 모두 같은 `--editor-code-background`
 색상을 사용합니다. 헤더만 별도의 `--editor-code-header-background` 색상을

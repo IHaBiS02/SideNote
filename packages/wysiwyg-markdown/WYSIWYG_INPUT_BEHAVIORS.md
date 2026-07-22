@@ -70,6 +70,9 @@ provides subdued gray marker colors for both light and dark themes.
 Markdown tables use collapsed 1px cell borders controlled by
 `--editor-table-border-color`. SideNote sets the border to black in the light
 theme and white in the dark theme so each row and column remains distinct.
+Cell content is centered when a Markdown column has no alignment marker.
+Explicit left (`:---`), center (`:---:`), and right (`---:`) alignment markers
+continue to override that visual default.
 
 The code body, line-number gutter, and internal spacing use the same
 `--editor-code-background` color. The header keeps its separate

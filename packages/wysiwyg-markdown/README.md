@@ -115,7 +115,9 @@ ordered-list markers use `--editor-list-marker-color`; its default derives a
 subdued color from the current text color, and hosts can provide an explicit
 light- or dark-theme value. Markdown table cells use collapsed 1px borders
 whose color is exposed as `--editor-table-border-color`; its default follows
-the current text color.
+the current text color. Columns without a Markdown alignment marker center their
+cell content by default, while explicit left, center, and right markers remain
+authoritative.
 
 See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the current architecture and
 host integration boundaries. Built-in Markdown input rules, shortcuts, mouse

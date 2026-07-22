@@ -168,6 +168,9 @@ hosts such as SideNote provide explicit light- and dark-theme values.
 Markdown table cells use collapsed 1px borders through
 `--editor-table-border-color`. The reusable default follows `currentColor`,
 while SideNote supplies black for its light theme and white for its dark theme.
+Unspecified table columns center their cell content in the Shadow DOM
+stylesheet. Markdown alignment attributes are emitted as inline cell styles,
+so explicit left, center, and right columns override the shared default.
 Full-document source mode and fenced code blocks default to `1.2`, exposed
 separately through `--editor-source-line-height` and
 `--editor-code-line-height` so their compact layout does not affect prose.

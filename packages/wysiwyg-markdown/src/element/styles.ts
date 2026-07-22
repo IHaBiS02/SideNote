@@ -326,7 +326,7 @@ export const editorStyles = css`
     min-width: 4em;
     border: 1px solid var(--editor-table-border-color);
     padding: 0;
-    text-align: left;
+    text-align: center;
     vertical-align: top;
   }
 

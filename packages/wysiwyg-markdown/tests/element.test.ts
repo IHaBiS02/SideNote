@@ -85,6 +85,24 @@ describe('wysiwyg-markdown element', () => {
     expect(editor.renderRoot.querySelector('h1')?.textContent).toBe('Hello');
   });
 
+  it('centers default table cells while preserving explicit Markdown alignment', async () => {
+    const editor = await createEditor([
+      '| Default | Left | Right |',
+      '| --- | :--- | ---: |',
+      '| one | two | three |',
+    ].join('\n'));
+    const headers = editor.renderRoot.querySelectorAll('th');
+    const cells = editor.renderRoot.querySelectorAll('td');
+
+    expect(editorStyles.cssText).toContain('text-align: center');
+    expect(headers[0]?.getAttribute('style')).toBeNull();
+    expect(headers[1]?.getAttribute('style')).toContain('text-align: left');
+    expect(headers[2]?.getAttribute('style')).toContain('text-align: right');
+    expect(cells[0]?.getAttribute('style')).toBeNull();
+    expect(cells[1]?.getAttribute('style')).toContain('text-align: left');
+    expect(cells[2]?.getAttribute('style')).toContain('text-align: right');
+  });
+
   it('updates the document through setMarkdown', async () => {
     const editor = await createEditor('Initial');
 

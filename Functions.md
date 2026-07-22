@@ -145,7 +145,9 @@ for full-document plain-text editing and fenced code blocks. The
 `--editor-code-content-padding` custom property controls fenced-code inner
 spacing and defaults to `5px`. Markdown table cells use collapsed 1px borders;
 `--editor-table-border-color` defaults to the current text color and can be
-overridden by the host theme. The
+overridden by the host theme. Table columns without Markdown alignment metadata
+center their cell content, while explicit alignment remains encoded as inline
+cell styles. The
 non-content code header keeps its language label out of code selections while
 keeping its language input directly editable in WYSIWYG mode. Committing the
 input updates the code block `params` attribute; source, readonly, and disabled
