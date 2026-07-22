@@ -787,6 +787,22 @@ describe('wysiwyg-markdown element', () => {
     expect(editor.value).toContain('* [x] open');
   });
 
+  it('does not open source mode when a task checkbox is double-clicked', async () => {
+    const editor = await createEditor('- [ ] task');
+    const checkbox = editor.renderRoot.querySelector<HTMLInputElement>(
+      'li[data-task] > input[type="checkbox"]',
+    );
+
+    checkbox!.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
+    await editor.updateComplete;
+
+    const source = editor.renderRoot.querySelector<HTMLTextAreaElement>(
+      '#document-source',
+    );
+    expect(editor.mode).toBe('wysiwyg');
+    expect(source?.hidden).toBe(true);
+  });
+
   it('can be disconnected and connected again', async () => {
     const editor = await createEditor('# Reconnect');
     editor.remove();

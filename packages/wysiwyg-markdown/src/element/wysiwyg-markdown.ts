@@ -1081,6 +1081,14 @@ export class WysiwygMarkdownElement extends LitElement {
   #handleEditorDoubleClick = (event: MouseEvent): void => {
     if (!this.#view || this.disabled || this.readonly) return;
 
+    const target = event.target;
+    if (
+      target instanceof HTMLInputElement &&
+      target.matches('li[data-task] > input[type="checkbox"]')
+    ) {
+      return;
+    }
+
     if (this.sourceEditScope !== 'block') {
       let sourceOffset: number | undefined;
       try {

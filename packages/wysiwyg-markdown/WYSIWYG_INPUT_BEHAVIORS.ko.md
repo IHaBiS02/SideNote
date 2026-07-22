@@ -46,6 +46,7 @@ source 편집에 들어갈 수 있습니다.
 | source 모드에서 `Ctrl+Enter` / `Cmd+Enter` | 설정된 WYSIWYG Preview 모드로 복귀하고 WYSIWYG 커서를 동기화한 뒤 가능한 경우 중앙에 배치 |
 | SideNote의 custom 제목 입력칸에서 `Enter` 또는 `Escape` | 제목 수정을 저장하고 현재 노트에 머무름. `Escape`는 전역 뒤로 가기를 실행하지 않음 |
 | 작업 항목의 체크박스 클릭 | 체크 상태와 Markdown의 `[ ]`/`[x]`를 함께 변경 |
+| 작업 항목의 체크박스 더블클릭 | 체크박스 조작으로만 처리하고 전체 Markdown source 모드를 열지 않음 |
 | 링크를 마우스 휠로 클릭 | 링크를 새 브라우저 탭으로 열기 |
 | 렌더링된 이미지 클릭 | `image-activate` 이벤트를 보내며 SideNote는 이미지 모달을 열기 |
 | 코드 블록 헤더의 언어 입력칸 | fenced code의 언어를 바로 수정 |

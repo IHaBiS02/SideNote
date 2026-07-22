@@ -49,6 +49,7 @@ the converted empty heading changes it back to a paragraph.
 | `Ctrl+Enter` / `Cmd+Enter` in source mode | Return to the configured WYSIWYG Preview mode, synchronize the WYSIWYG caret, and center it when possible |
 | `Enter` or `Escape` in SideNote's custom-title field | Commit the title edit and remain on the current note; `Escape` does not trigger global back navigation |
 | Click a task checkbox | Update both the checkbox state and `[ ]`/`[x]` in Markdown |
+| Double-click a task checkbox | Keep the interaction on the checkbox; do not open full-document source mode |
 | Middle-click a link | Open the link in a new browser tab |
 | Click a rendered image | Emit `image-activate`; SideNote opens the image modal |
 | Code language field in a code-block header | Edit the fenced-code language directly |

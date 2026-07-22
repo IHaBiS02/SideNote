@@ -95,6 +95,9 @@ document edges allow it. Press `Ctrl/Cmd + Enter` to return; the source caret is
 mapped back into WYSIWYG and centered there as well. Block-level source editing
 remains available as an opt-in mode:
 
+Double-clicks originating from task checkboxes stay with the checkbox, so
+rapid checkbox clicks do not open source mode.
+
 ```html
 <wysiwyg-markdown source-edit-scope="block"></wysiwyg-markdown>
 ```

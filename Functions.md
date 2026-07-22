@@ -121,6 +121,8 @@ centered in the textarea, clamped by its scroll limits. Leaving source mode maps
 the source selection back into a ProseMirror position, restores the collapsed
 selection, and centers it in the WYSIWYG scroll viewport with the same edge
 clamping.
+Task-checkbox double-click targets return before coordinate mapping so rapid
+checkbox interaction cannot open document source mode.
 
 Emitted events are bubbling and composed:
 
