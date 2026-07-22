@@ -67,6 +67,10 @@ Bullet and ordered-list markers use `--editor-list-marker-color` so they remain
 visually distinct from item text without changing the text color. SideNote
 provides subdued gray marker colors for both light and dark themes.
 
+Markdown tables use collapsed 1px cell borders controlled by
+`--editor-table-border-color`. SideNote sets the border to black in the light
+theme and white in the dark theme so each row and column remains distinct.
+
 The code body, line-number gutter, and internal spacing use the same
 `--editor-code-background` color. The header keeps its separate
 `--editor-code-header-background` color so only the header is visually

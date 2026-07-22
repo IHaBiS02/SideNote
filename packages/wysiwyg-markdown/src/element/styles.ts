@@ -9,6 +9,7 @@ export const editorStyles = css`
     --editor-border-color: currentColor;
     --editor-muted-background: transparent;
     --editor-list-marker-color: color-mix(in srgb, currentColor 60%, transparent);
+    --editor-table-border-color: currentColor;
     --editor-code-background: var(--editor-muted-background);
     --editor-accent: currentColor;
     --editor-font-family: inherit;
@@ -323,6 +324,7 @@ export const editorStyles = css`
   .editor-mount .ProseMirror th,
   .editor-mount .ProseMirror td {
     min-width: 4em;
+    border: 1px solid var(--editor-table-border-color);
     padding: 0;
     text-align: left;
     vertical-align: top;

@@ -41,6 +41,7 @@ body.dark-mode {
     --editor-color: #e0e0e0;
     --editor-muted-background: #2a2a2a;
     --editor-list-marker-color: #a8a8a8;
+    --editor-table-border-color: #fff;
     --editor-border-color: #444;
     --editor-code-background: #2d2d2d;
     --editor-code-color: #abb2bf;

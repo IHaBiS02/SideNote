@@ -113,7 +113,9 @@ line height, while full-document source mode and fenced code blocks use
 explicit so hosts do not inherit browser-specific UA typography. Bullet and
 ordered-list markers use `--editor-list-marker-color`; its default derives a
 subdued color from the current text color, and hosts can provide an explicit
-light- or dark-theme value.
+light- or dark-theme value. Markdown table cells use collapsed 1px borders
+whose color is exposed as `--editor-table-border-color`; its default follows
+the current text color.
 
 See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the current architecture and
 host integration boundaries. Built-in Markdown input rules, shortcuts, mouse

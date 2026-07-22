@@ -165,6 +165,9 @@ override the line heights through `--editor-line-height` and
 Native bullet and ordered-list markers are styled inside the Shadow DOM through
 `--editor-list-marker-color`; the default is derived from `currentColor`, while
 hosts such as SideNote provide explicit light- and dark-theme values.
+Markdown table cells use collapsed 1px borders through
+`--editor-table-border-color`. The reusable default follows `currentColor`,
+while SideNote supplies black for its light theme and white for its dark theme.
 Full-document source mode and fenced code blocks default to `1.2`, exposed
 separately through `--editor-source-line-height` and
 `--editor-code-line-height` so their compact layout does not affect prose.
@@ -184,7 +187,8 @@ files in IndexedDB, and applies enabled legacy text transformations.
 The adapter intentionally does not modify the editor's default CSS source.
 SideNote controls fonts, colors, product-specific borders, and light/dark
 themes through the injected trusted CSS string and shared CSS variables. The
-editor keeps reusable code-block grid and padding rules in its base stylesheet.
+editor keeps reusable code-block grid and padding rules, plus the default table
+cell grid, in its base stylesheet.
 
 ## Code blocks
 

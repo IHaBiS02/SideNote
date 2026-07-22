@@ -328,15 +328,15 @@ const SIDENOTE_EDITOR_THEME = `
   .editor-mount .ProseMirror table {
     width: auto;
     margin: 0;
-    border-collapse: separate;
-    border-spacing: 2px;
+    border-collapse: collapse;
+    border-spacing: 0;
     table-layout: auto;
   }
 
   .editor-mount .ProseMirror th,
   .editor-mount .ProseMirror td {
     min-width: 0;
-    border: 0;
+    border: 1px solid var(--editor-table-border-color);
     padding: 1px;
     overflow-wrap: anywhere;
   }

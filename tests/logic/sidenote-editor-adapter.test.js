@@ -63,6 +63,10 @@ describe('SideNote WYSIWYG editor adapter', () => {
     expect(editor.themeCss).toContain('line-height: var(--editor-source-line-height)');
     expect(editor.themeCss).toContain('word-break: keep-all');
     expect(editor.themeCss).toContain('background: var(--editor-inline-code-background)');
+    expect(editor.themeCss).toContain('border-collapse: collapse');
+    expect(editor.themeCss).toContain(
+      'border: 1px solid var(--editor-table-border-color)'
+    );
     return { adapter, editor };
   }
 
@@ -170,6 +174,7 @@ describe('4.1.14 packaged Preview theme compatibility', () => {
   it('keeps the legacy browser monospace font and light code colors', () => {
     expect(lightCss).toContain('--editor-padding: 10px;');
     expect(lightCss).toContain('--editor-list-marker-color: #8a8a8a;');
+    expect(lightCss).toContain('--editor-table-border-color: #000;');
     expect(lightCss).toContain('--editor-code-font-family: monospace;');
     expect(lightCss).toContain('--editor-code-content-padding: 5px;');
     expect(lightCss).toContain('--editor-code-background: #fafafa;');
@@ -180,6 +185,7 @@ describe('4.1.14 packaged Preview theme compatibility', () => {
 
   it('keeps the legacy dark code surfaces and Atom One token colors', () => {
     expect(darkCss).toContain('--editor-list-marker-color: #a8a8a8;');
+    expect(darkCss).toContain('--editor-table-border-color: #fff;');
     expect(darkCss).toContain('--editor-code-background: #2d2d2d;');
     expect(darkCss).toContain('--editor-code-header-background: #252525;');
     expect(darkCss).toContain('--editor-code-color: #abb2bf;');
