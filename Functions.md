@@ -416,8 +416,10 @@ Note creation and editor interaction handling:
 
 Handles: new note creation (opening in the configured editable or read-only
 WYSIWYG Preview), Markdown autosave, mode history, source-mode preview
-shortcuts, image activation, and title editing. Component-owned paste,
-checkbox, and WYSIWYG keyboard behavior stays inside the editor package.
+shortcuts, image activation, and title editing. Enter or Escape commits the
+active custom-title input; Escape stops before the global navigation handler so
+the current note remains open. Component-owned paste, checkbox, and WYSIWYG
+keyboard behavior stays inside the editor package.
 
 ### src/events/settings-events.ts
 

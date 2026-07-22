@@ -47,6 +47,7 @@ the converted empty heading changes it back to a paragraph.
 | `Ctrl+Y` / `Cmd+Y` | Redo |
 | Double-click the document | Switch to full-document plain-text source mode, synchronize the Markdown caret, and center it when document edges allow |
 | `Ctrl+Enter` / `Cmd+Enter` in source mode | Return to the configured WYSIWYG Preview mode, synchronize the WYSIWYG caret, and center it when possible |
+| `Enter` or `Escape` in SideNote's custom-title field | Commit the title edit and remain on the current note; `Escape` does not trigger global back navigation |
 | Click a task checkbox | Update both the checkbox state and `[ ]`/`[x]` in Markdown |
 | Middle-click a link | Open the link in a new browser tab |
 | Click a rendered image | Emit `image-activate`; SideNote opens the image modal |

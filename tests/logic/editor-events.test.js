@@ -137,4 +137,42 @@ describe('editor events', () => {
 
     expect(mocks.showImageModal).toHaveBeenCalledWith('blob:example');
   });
+
+  it('finishes title editing on Escape without bubbling to global navigation', async () => {
+    const state = await import('../../src/state.js');
+    const note = {
+      id: 'note-1',
+      title: 'Before',
+      content: '',
+      settings: { title: 'custom' },
+      metadata: { createdAt: 1, lastModified: 1 },
+      isPinned: false,
+    };
+    state.setNotes([note]);
+    state.setActiveNoteId(note.id);
+    const { initializeEditorEvents } = await import('../../src/events/editor.js');
+    initializeEditorEvents();
+
+    const title = document.getElementById('editor-title');
+    title.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
+    const input = document.querySelector('.title-input');
+    input.value = 'After';
+    const globalKeydown = vi.fn();
+    document.addEventListener('keydown', globalKeydown);
+
+    const event = new KeyboardEvent('keydown', {
+      key: 'Escape',
+      bubbles: true,
+      cancelable: true,
+    });
+    input.dispatchEvent(event);
+    document.removeEventListener('keydown', globalKeydown);
+
+    expect(event.defaultPrevented).toBe(true);
+    expect(globalKeydown).not.toHaveBeenCalled();
+    await vi.waitFor(() => expect(document.querySelector('.title-input')).toBeNull());
+    expect(document.getElementById('editor-title')?.textContent).toBe('After');
+    expect(note.title).toBe('After');
+    expect(mocks.saveNote).toHaveBeenCalled();
+  });
 });

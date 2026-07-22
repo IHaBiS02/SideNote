@@ -146,9 +146,11 @@ function initializeEditorEvents(): void {
         const handleKeyDown = (e: KeyboardEvent): void => {
           if (e.key === 'Enter' && !e.isComposing) {
             e.preventDefault();
-            finishEditing();
+            void finishEditing();
           } else if (e.key === 'Escape') {
-            finishEditing();
+            e.preventDefault();
+            e.stopPropagation();
+            void finishEditing();
           }
         };
 

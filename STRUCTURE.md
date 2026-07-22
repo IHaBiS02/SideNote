@@ -146,6 +146,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   WYSIWYG paste hooks save images to IndexedDB and apply enabled legacy text formatting through `src/editor/sidenote-editor-adapter.ts`.
     -   `keydown`: WYSIWYG `Enter` continues bullet and ordered lists with the next item, `Tab`/`Shift+Tab` changes the current list-item nesting level, and `Shift+Enter` inserts a single inline soft break inside the current list item or block; the full-document source editor retains `Shift+Enter` preview switching.
     -   `image-activate`: Opens the SideNote image modal using the display URL supplied by the component.
+    -   Custom title editing: `Enter` or `Escape` commits the title input; `Escape` is consumed before global back navigation so the note stays open.
 -   **`applyEditorDisplayMode()` / `togglePreview()`**: Uses the same custom element for editable WYSIWYG and read-only Preview, selected by the global `wysiwygPreview` setting, and switches Edit to full-document Markdown source mode (located in `src/notes_view/editor-mode.ts`).
 -   **Image integration**: The component resolves stored images through the adapter, emits `image-activate` for modal opening, and exposes `scrollToImage()` so image management can navigate without reaching into the component Shadow DOM.
 

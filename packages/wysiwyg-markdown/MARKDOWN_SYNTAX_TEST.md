@@ -208,6 +208,7 @@ console.log('nested fence');
 - [ ] 코드 블록의 복사 버튼과 여러 줄 코드의 줄 번호 정렬 확인
 - [ ] 문서를 더블클릭하면 같은 위치의 전체 Markdown source가 열리는지 확인
 - [ ] source에서 `Ctrl+Enter` 또는 `Cmd+Enter`로 Preview에 돌아오는지 확인
+- [ ] custom 제목 수정 중 `Escape`를 누르면 제목 수정만 끝나고 노트가 열린 상태로 유지되는지 확인
 - [ ] 실행 취소와 다시 실행 단축키 확인
 
 ---

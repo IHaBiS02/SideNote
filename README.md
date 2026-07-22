@@ -58,7 +58,9 @@ A simple notes browser extension that provides a note-taking interface in the br
 1. Click the SideNote icon in your browser toolbar or use `Shift+Alt+W`
 2. The side panel will open with the notes interface
 3. Make a new note and write notes
-4. Press ESC or Shift+Enter to save edit and return to preview
+4. In full Markdown source mode, press Shift+Enter or Ctrl/Cmd+Enter to return
+   to Preview. While editing a custom title, Enter or Escape finishes only the
+   title edit and keeps the current note open.
 
 On a new installation, SideNote checks the browser's registered command. If
 the shortcut is unassigned, a small setup window links directly to the browser's
