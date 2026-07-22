@@ -37,6 +37,9 @@ the converted empty heading changes it back to a paragraph.
 | Action | Result |
 | --- | --- |
 | `Shift+Enter` | Insert a line break inside the current block without creating a new paragraph |
+| `Enter` in a non-empty bullet-list item | Create the next bullet-list item |
+| `Enter` in a non-empty ordered-list item | Create the next item with the following number |
+| `Enter` in an empty list item | Exit the current list |
 | `Ctrl+Z` / `Cmd+Z` | Undo |
 | `Ctrl+Shift+Z` / `Cmd+Shift+Z` | Redo |
 | `Ctrl+Y` / `Cmd+Y` | Redo |
@@ -47,8 +50,12 @@ the converted empty heading changes it back to a paragraph.
 | Click a rendered image | Emit `image-activate`; SideNote opens the image modal |
 | Code language field in a code-block header | Edit the fenced-code language directly |
 
-`Shift+Enter` also inserts a line break inside a code block. A normal `Enter`
-uses the default ProseMirror behavior for the current block type.
+Inside bullet and ordered lists, `Enter` creates the next list item while
+`Shift+Enter` inserts a line break inside the current item. Ordered-list
+numbers advance automatically. Pressing `Enter` in an empty list item exits
+the list, matching common Markdown editor behavior. `Shift+Enter` also inserts
+a line break inside a code block; other blocks retain their normal ProseMirror
+behavior.
 
 The code body, line-number gutter, and internal spacing use the same
 `--editor-code-background` color. The header keeps its separate

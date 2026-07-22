@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { Selection } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 import '../src/index';
 import type { WysiwygMarkdownElement } from '../src/element/wysiwyg-markdown';
@@ -10,6 +11,21 @@ async function createEditor(markdown = ''): Promise<WysiwygMarkdownElement> {
   document.body.append(editor);
   await editor.updateComplete;
   return editor;
+}
+
+function selectDocumentEnd(editor: WysiwygMarkdownElement): void {
+  editor.use({
+    name: 'test-select-document-end',
+    commands: {
+      selectDocumentEnd: ({ state, dispatch }) => {
+        if (dispatch) {
+          dispatch(state.tr.setSelection(Selection.atEnd(state.doc)));
+        }
+        return true;
+      },
+    },
+  });
+  editor.execute('selectDocumentEnd');
 }
 
 describe('wysiwyg-markdown element', () => {
@@ -438,6 +454,87 @@ describe('wysiwyg-markdown element', () => {
     expect(editor.value).toContain('\n');
     expect(editor.value).not.toContain('\n\n');
   });
+
+  it.each([
+    ['bullet', '* Item', 'ul', /\* Next/],
+    ['ordered', '1. Item', 'ol', /2\. Next/],
+  ])(
+    'continues a %s list with the next item when Enter is pressed',
+    async (_kind, markdown, listSelector, nextItemPattern) => {
+      const editor = await createEditor(markdown);
+      const proseMirror = editor.renderRoot.querySelector<HTMLElement>('.ProseMirror');
+      selectDocumentEnd(editor);
+
+      proseMirror?.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'Enter',
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+      await editor.updateComplete;
+
+      expect(
+        editor.renderRoot.querySelectorAll(`${listSelector} > li`),
+      ).toHaveLength(2);
+      expect(editor.insertText('Next')).toBe(true);
+      await editor.updateComplete;
+      expect(editor.value).toMatch(nextItemPattern);
+    },
+  );
+
+  it.each([
+    ['bullet', '* Item', 'ul'],
+    ['ordered', '1. Item', 'ol'],
+  ])(
+    'keeps Shift+Enter inside the current %s list item',
+    async (_kind, markdown, listSelector) => {
+      const editor = await createEditor(markdown);
+      const proseMirror = editor.renderRoot.querySelector<HTMLElement>('.ProseMirror');
+      selectDocumentEnd(editor);
+
+      proseMirror?.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'Enter',
+          shiftKey: true,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+      await editor.updateComplete;
+
+      expect(
+        editor.renderRoot.querySelectorAll(`${listSelector} > li`),
+      ).toHaveLength(1);
+      expect(
+        editor.renderRoot.querySelector(`${listSelector} br[data-soft-break]`),
+      ).not.toBeNull();
+    },
+  );
+
+  it.each([
+    ['bullet', '* ', 'ul'],
+    ['ordered', '1. ', 'ol'],
+  ])(
+    'exits an empty %s list item when Enter is pressed',
+    async (_kind, markdown, listSelector) => {
+      const editor = await createEditor(markdown);
+      const proseMirror = editor.renderRoot.querySelector<HTMLElement>('.ProseMirror');
+      selectDocumentEnd(editor);
+
+      proseMirror?.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'Enter',
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+      await editor.updateComplete;
+
+      expect(editor.renderRoot.querySelector(listSelector)).toBeNull();
+      expect(editor.renderRoot.querySelector('.ProseMirror > p')).not.toBeNull();
+    },
+  );
 
   it('turns an empty heading into a paragraph with Backspace', async () => {
     const editor = await createEditor('');

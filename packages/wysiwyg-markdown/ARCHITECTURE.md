@@ -110,10 +110,13 @@ Built-in input rules recognize:
 - `[ ]` and `[x]` inside list items;
 - `---` for a horizontal rule.
 
-`Shift+Enter` inserts a soft break in normal inline content and preserves
-newline behavior inside code. Pressing `Backspace` in an empty heading converts
-it to a paragraph, removing the corresponding Markdown heading marker without
-opening source mode. SideNote uses full-document source mode when the user
+The built-in list keymap runs `splitListItem` before the base keymap, so Enter
+continues bullet and ordered lists while an empty item can fall through to the
+base list-exit behavior. `Shift+Enter` inserts a soft break inside the current
+list item or other normal inline content and preserves newline behavior inside
+code. Pressing `Backspace` in an empty heading converts it to a paragraph,
+removing the corresponding Markdown heading marker without opening source
+mode. SideNote uses full-document source mode when the user
 double-clicks Preview or presses Edit. A double-click coordinate is resolved to
 a ProseMirror document position, then mapped into canonical Markdown by
 temporarily inserting a unique text marker during serialization. The source

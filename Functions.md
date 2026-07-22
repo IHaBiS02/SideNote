@@ -106,6 +106,11 @@ Public methods:
 - `cancelBlockSourceEdit()` / `applyBlockSourceEdit()`: Controls the optional
   block-source panel.
 
+The built-in keymaps run `splitListItem()` for `Enter` in bullet and ordered
+lists, producing the next bullet or number. `Shift+Enter` inserts a `soft_break`
+inside the current item; an empty list item falls through to the base keymap so
+`Enter` exits the list.
+
 In document source scope, a WYSIWYG double-click resolves the pointer to a
 ProseMirror position and maps it to the canonical Markdown offset. The source
 textarea is then focused with a collapsed selection at that offset. A

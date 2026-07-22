@@ -38,6 +38,7 @@
     "prosemirror-keymap": "^1.2.0",
     "prosemirror-markdown": "^1.13.0",
     "prosemirror-model": "^1.25.0",
+    "prosemirror-schema-list": "^1.5.1",
     "prosemirror-state": "^1.4.0",
     "prosemirror-view": "^1.40.0"
   },

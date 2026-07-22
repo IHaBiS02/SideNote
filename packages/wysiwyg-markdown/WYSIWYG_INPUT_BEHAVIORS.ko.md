@@ -34,6 +34,9 @@ source 편집에 들어갈 수 있습니다.
 | 동작 | 결과 |
 | --- | --- |
 | `Shift+Enter` | 새 문단을 만들지 않고 현재 블록 안에서 한 줄 내림 |
+| 내용이 있는 글머리 기호 목록 항목에서 `Enter` | 다음 글머리 기호 항목 생성 |
+| 내용이 있는 번호 목록 항목에서 `Enter` | 다음 번호의 목록 항목 생성 |
+| 빈 목록 항목에서 `Enter` | 현재 목록 종료 |
 | `Ctrl+Z` / `Cmd+Z` | 실행 취소 |
 | `Ctrl+Shift+Z` / `Cmd+Shift+Z` | 다시 실행 |
 | `Ctrl+Y` / `Cmd+Y` | 다시 실행 |
@@ -44,8 +47,11 @@ source 편집에 들어갈 수 있습니다.
 | 렌더링된 이미지 클릭 | `image-activate` 이벤트를 보내며 SideNote는 이미지 모달을 열기 |
 | 코드 블록 헤더의 언어 입력칸 | fenced code의 언어를 바로 수정 |
 
-`Shift+Enter`는 코드 블록 안에서도 줄바꿈으로 작동합니다. 일반 `Enter`는 현재
-블록 종류에 맞는 ProseMirror 기본 동작을 사용합니다.
+글머리 기호 및 번호 목록 안에서 `Enter`는 다음 목록 항목을 만들고,
+`Shift+Enter`는 현재 항목 안에서만 한 줄 내립니다. 번호 목록의 숫자는 자동으로
+증가합니다. 빈 목록 항목에서 `Enter`를 누르면 일반적인 Markdown 에디터처럼
+목록을 종료합니다. `Shift+Enter`는 코드 블록 안에서도 줄바꿈으로 작동하며,
+그 밖의 블록은 기존 ProseMirror 동작을 유지합니다.
 
 코드 본문, 줄 번호 영역, 내부 여백은 모두 같은 `--editor-code-background`
 색상을 사용합니다. 헤더만 별도의 `--editor-code-header-background` 색상을
