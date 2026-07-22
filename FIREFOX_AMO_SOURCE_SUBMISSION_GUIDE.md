@@ -39,9 +39,10 @@ build/sidenote-<version>-source.zip
 ```
 
 The source ZIP is built from an allow-list. It includes SideNote and editor
-source, build configuration, package manifests, the workspace lockfile, and an
-automatically generated `README-AMO.md`. It excludes `.git`, `node_modules`,
-existing `build`/`dist` output, and the generated editor bundle.
+source, build configuration, package manifests, the workspace lockfile, editor
+tests and their `MARKDOWN_SYNTAX_TEST.md` fixture, and an automatically generated
+`README-AMO.md`. It excludes `.git`, `node_modules`, existing `build`/`dist`
+output, and the generated editor bundle.
 
 ## Reproduce from the submitted source ZIP
 

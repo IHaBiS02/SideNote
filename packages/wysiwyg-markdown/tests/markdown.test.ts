@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import syntaxTestMarkdown from '../MARKDOWN_SYNTAX_TEST.md?raw';
 import { parseMarkdown, serializeMarkdown } from '../src/core/markdown';
 
 describe('Markdown conversion', () => {
@@ -66,5 +67,41 @@ describe('Markdown conversion', () => {
     expect(
       serializeMarkdown(parseMarkdown('[Example 방문하기](https://example.com)')),
     ).toBe('[Example 방문하기](https://example.com)');
+  });
+
+  it('keeps the manual syntax test document in sync with every supported node and mark', () => {
+    const document = parseMarkdown(syntaxTestMarkdown);
+    const nodeTypes = new Set<string>([document.type.name]);
+    const markTypes = new Set<string>();
+
+    document.descendants((node) => {
+      nodeTypes.add(node.type.name);
+      node.marks.forEach((mark) => markTypes.add(mark.type.name));
+    });
+
+    expect(nodeTypes).toEqual(
+      new Set([
+        'doc',
+        'paragraph',
+        'blockquote',
+        'horizontal_rule',
+        'heading',
+        'code_block',
+        'ordered_list',
+        'bullet_list',
+        'list_item',
+        'text',
+        'image',
+        'hard_break',
+        'soft_break',
+        'table',
+        'table_row',
+        'table_header',
+        'table_cell',
+      ]),
+    );
+    expect(markTypes).toEqual(
+      new Set(['em', 'strong', 'link', 'code', 'strike']),
+    );
   });
 });

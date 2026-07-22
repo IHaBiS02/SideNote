@@ -119,3 +119,5 @@ See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the current architecture and
 host integration boundaries. Built-in Markdown input rules, shortcuts, mouse
 actions, and paste behavior are documented in
 [`WYSIWYG_INPUT_BEHAVIORS.md`](./WYSIWYG_INPUT_BEHAVIORS.md).
+Use [`MARKDOWN_SYNTAX_TEST.md`](./MARKDOWN_SYNTAX_TEST.md) as a complete manual
+rendering and interaction test note covering every supported node and mark.
