@@ -18,7 +18,7 @@ A simple notes browser extension that provides a note-taking interface in the br
   the animated gap between pinned rows; the order is restored on next launch
 - **Import/Export**: Save and load notes in `.snote` and `.snotes` formats
 - **Image Support**: Paste and embed images directly into notes; the centered
-  preview modal supports `Ctrl+wheel` and touchpad-pinch zoom, direct
+  preview modal supports `Ctrl+wheel`, Firefox touchpad-pinch zoom, direct
   two-finger touchscreen pinch, and mouse or single-finger drag panning
 - **Recycle Bin**: Soft delete with 30-day auto-cleanup
 - **Browser Integration**: Works in Chrome **AND** Firefox ~~(Firefox is in development)~~
@@ -69,9 +69,16 @@ A simple notes browser extension that provides a note-taking interface in the br
 Pinned notes remain above regular notes. Hold a pinned note for about 400 ms,
 then drag the smaller floating card vertically. An animated rounded gap opens
 at the current drop position, and the drag continues outside the original row.
+Stable row-center boundaries and a small hysteresis zone keep the gap from
+reopening repeatedly when the pointer rests near a boundary.
 A short click still opens the note, and dragging from the pin or delete buttons
 does not start reordering. Cancelling the pointer or leaving the extension
 window restores the original order.
+
+The image modal supports physical touchpad pinch in Firefox. Chromium extension
+Side Panels can consume that gesture before a DOM wheel event reaches SideNote,
+so touchpad pinch is not supported there; use `Ctrl+wheel` instead. Direct
+two-finger touchscreen pinch remains handled through Pointer Events.
 
 On a new installation, SideNote checks the browser's registered command. If
 the shortcut is unassigned, a small setup window links directly to the browser's

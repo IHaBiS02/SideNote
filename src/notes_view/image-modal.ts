@@ -66,9 +66,10 @@ function handleImageModalWheel(event: WheelEvent): void {
   activeImageModal.zoomBetween(pointer, pointer, wheelZoomFactor(event));
 }
 
-// Chromium and Firefox expose touchpad pinch as a synthetic Ctrl+wheel event.
-// Register before a modal opens so Chromium can treat the root listener as a
-// blocking wheel target as soon as the extension view is initialized.
+// Ctrl+wheel works in both browser families, and Firefox exposes touchpad
+// pinch through the same event shape. Chromium extension Side Panels may
+// consume physical touchpad pinch before it reaches the DOM, so that gesture
+// is intentionally not treated as supported there.
 window.addEventListener('wheel', handleImageModalWheel, {
   capture: true,
   passive: false,

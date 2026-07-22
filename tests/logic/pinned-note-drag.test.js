@@ -140,6 +140,49 @@ describe('pinned note long-press dragging', () => {
     controller.destroy();
   });
 
+  it('moves the drop gap only after crossing a stable boundary', () => {
+    const list = document.querySelector('#note-list');
+    const first = noteItem('pinned-1', true);
+    const second = noteItem('pinned-2', true);
+    const third = noteItem('pinned-3', true);
+    const unpinned = noteItem('regular', false);
+    list.append(first, second, third, unpinned);
+    setBounds(first, 0);
+    setBounds(second, 40);
+    setBounds(third, 80);
+    const insertBeforeSpy = vi.spyOn(list, 'insertBefore');
+    const controller = createPinnedNoteDragController(list, vi.fn(), {
+      longPressDelayMs: 100,
+      dropHysteresisPx: 6,
+    });
+
+    first.dispatchEvent(createPointerEvent('pointerdown', { x: 20, y: 20 }));
+    vi.advanceTimersByTime(100);
+
+    expect(insertBeforeSpy).toHaveBeenCalledTimes(1);
+
+    window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 65 }));
+    window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 64 }));
+    expect(insertBeforeSpy).toHaveBeenCalledTimes(1);
+
+    window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 67 }));
+    expect(insertBeforeSpy).toHaveBeenCalledTimes(2);
+    expect(list.querySelector('.pinned-note-drop-placeholder').nextSibling)
+      .toBe(third);
+
+    window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 61 }));
+    window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 60 }));
+    expect(insertBeforeSpy).toHaveBeenCalledTimes(2);
+
+    window.dispatchEvent(createPointerEvent('pointermove', { x: 20, y: 53 }));
+    expect(insertBeforeSpy).toHaveBeenCalledTimes(3);
+    expect(list.querySelector('.pinned-note-drop-placeholder').nextSibling)
+      .toBe(second);
+
+    window.dispatchEvent(createPointerEvent('pointerup', { x: 20, y: 53 }));
+    controller.destroy();
+  });
+
   it('does not start dragging from pin and delete controls', () => {
     const list = document.querySelector('#note-list');
     const pinned = noteItem('pinned', true);

@@ -53,7 +53,8 @@ the converted empty heading changes it back to a paragraph.
 | Middle-click a link | Open the link in a new browser tab |
 | Click a rendered image | Emit `image-activate`; SideNote opens a fitted image at the center of the modal |
 | Click the modal image | Keep the current scale and position; clicking no longer toggles zoom |
-| `Ctrl+wheel` or a touchpad pinch in the image modal | A capture-phase non-passive root listener zooms continuously around the pointer position; small high-resolution touchpad deltas are normalized for responsive pinching |
+| `Ctrl+wheel` in the image modal | A capture-phase non-passive root listener zooms continuously around the pointer position |
+| Touchpad pinch in the image modal | Supported in Firefox through synthetic `Ctrl+wheel`; unsupported in Chromium extension Side Panels, which may consume the gesture before it reaches the DOM |
 | Two-finger touchscreen pinch on the modal image | Zoom from the changing distance between the two pointers and pan with their moving centroid |
 | Hold and drag the modal image with a mouse or one finger | Pan the image from its current position |
 | Code language field in a code-block header | Edit the fenced-code language directly |
@@ -146,9 +147,11 @@ from the URL, it remains in the form `[link text](URL)`.
 
 - Clipboard images are saved to SideNote's image store and inserted as
   `![filename](images/...)`.
-- SideNote registers the touchpad wheel bridge when its image-modal module
-  loads, before a modal opens. Browsers can therefore route synthetic
-  `Ctrl+wheel` pinch events to the extension view consistently.
+- SideNote registers the image-modal wheel bridge when its module loads, before
+  a modal opens. It receives explicit `Ctrl+wheel` in Chrome and Firefox and
+  Firefox's synthetic `Ctrl+wheel` touchpad-pinch events. Chromium extension
+  Side Panels may consume physical touchpad pinch before DOM dispatch, so that
+  gesture is intentionally outside SideNote's Chromium support matrix.
 - Closing the image modal with its backdrop or `Escape` uses the same cleanup
   path and discards its zoom, pan, and active-pointer state. Opening an image
   again starts fitted and centered.

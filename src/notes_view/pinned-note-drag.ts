@@ -1,11 +1,13 @@
 const DEFAULT_LONG_PRESS_DELAY_MS = 400;
 const DEFAULT_MOVE_TOLERANCE_PX = 8;
+const DEFAULT_DROP_HYSTERESIS_PX = 6;
 const SUPPRESS_CLICK_DURATION_MS = 600;
 const FLOATING_HORIZONTAL_INSET_PX = 8;
 
 interface PinnedNoteDragOptions {
   longPressDelayMs?: number;
   moveTolerancePx?: number;
+  dropHysteresisPx?: number;
 }
 
 interface DragCandidate {
@@ -24,6 +26,9 @@ interface ActiveDrag {
   noteId: string;
   pointerId: number;
   grabOffsetY: number;
+  dropIndex: number;
+  dropBoundariesY: number[];
+  initialScrollTop: number;
 }
 
 interface PinnedNoteDragController {
@@ -55,24 +60,43 @@ function movePinnedPlaceholderAtPointer(
   list: HTMLElement,
   drag: ActiveDrag,
   clientY: number,
+  dropHysteresisPx: number,
 ): void {
+  const scrollDelta = list.scrollTop - drag.initialScrollTop;
+  let nextDropIndex = drag.dropIndex;
+
+  while (nextDropIndex > 0) {
+    const previousBoundary = drag.dropBoundariesY[nextDropIndex - 1]
+      - scrollDelta;
+    if (clientY >= previousBoundary - dropHysteresisPx) break;
+    nextDropIndex -= 1;
+  }
+
+  while (nextDropIndex < drag.dropBoundariesY.length) {
+    const nextBoundary = drag.dropBoundariesY[nextDropIndex] - scrollDelta;
+    if (clientY <= nextBoundary + dropHysteresisPx) break;
+    nextDropIndex += 1;
+  }
+
+  // Re-inserting the same placeholder on every pointermove restarts its CSS
+  // opening animation in Chromium. Only touch the DOM when the drop slot has
+  // genuinely changed.
+  if (nextDropIndex === drag.dropIndex) return;
+
   const otherPinnedItems = Array.from(
     list.querySelectorAll<HTMLLIElement>('li[data-pinned="true"]'),
   ).filter(candidate => candidate !== drag.item);
-  const insertBefore = otherPinnedItems.find((candidate) => {
-    const bounds = candidate.getBoundingClientRect();
-    return clientY < bounds.top + bounds.height / 2;
-  });
+  const insertBefore = otherPinnedItems[nextDropIndex];
 
   if (insertBefore) {
     list.insertBefore(drag.placeholder, insertBefore);
-    return;
+  } else {
+    const firstUnpinnedItem = list.querySelector<HTMLLIElement>(
+      'li[data-pinned="false"]',
+    );
+    list.insertBefore(drag.placeholder, firstUnpinnedItem);
   }
-
-  const firstUnpinnedItem = list.querySelector<HTMLLIElement>(
-    'li[data-pinned="false"]',
-  );
-  list.insertBefore(drag.placeholder, firstUnpinnedItem);
+  drag.dropIndex = nextDropIndex;
 }
 
 function clearFloatingStyles(item: HTMLLIElement): void {
@@ -94,6 +118,8 @@ function createPinnedNoteDragController(
     ?? DEFAULT_LONG_PRESS_DELAY_MS;
   const moveTolerancePx = options.moveTolerancePx
     ?? DEFAULT_MOVE_TOLERANCE_PX;
+  const dropHysteresisPx = options.dropHysteresisPx
+    ?? DEFAULT_DROP_HYSTERESIS_PX;
   let candidate: DragCandidate | null = null;
   let activeDrag: ActiveDrag | null = null;
   let suppressedClickNoteId: string | null = null;
@@ -132,6 +158,16 @@ function createPinnedNoteDragController(
     }
 
     const bounds = current.item.getBoundingClientRect();
+    const pinnedItems = Array.from(
+      list.querySelectorAll<HTMLLIElement>('li[data-pinned="true"]'),
+    );
+    const dropIndex = pinnedItems.indexOf(current.item);
+    const dropBoundariesY = pinnedItems
+      .filter(item => item !== current.item)
+      .map((item) => {
+        const itemBounds = item.getBoundingClientRect();
+        return itemBounds.top + itemBounds.height / 2;
+      });
     const placeholder = document.createElement('li');
     placeholder.classList.add('pinned-note-drop-placeholder');
     placeholder.setAttribute('aria-hidden', 'true');
@@ -155,6 +191,9 @@ function createPinnedNoteDragController(
         bounds.height,
         Math.max(0, current.startY - bounds.top),
       ),
+      dropIndex,
+      dropBoundariesY,
+      initialScrollTop: list.scrollTop,
     };
     suppressedClickNoteId = current.noteId;
     suppressClickUntil = Number.POSITIVE_INFINITY;
@@ -246,7 +285,12 @@ function createPinnedNoteDragController(
     if (event.cancelable) event.preventDefault();
 
     activeDrag.item.style.top = `${event.clientY - activeDrag.grabOffsetY}px`;
-    movePinnedPlaceholderAtPointer(list, activeDrag, event.clientY);
+    movePinnedPlaceholderAtPointer(
+      list,
+      activeDrag,
+      event.clientY,
+      dropHysteresisPx,
+    );
   };
 
   const handlePointerUp = (event: PointerEvent): void => {

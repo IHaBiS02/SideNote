@@ -390,6 +390,9 @@ Note list and editor functionality:
   card and a rounded animated placeholder moves through the list to create the
   drop gap. The card itself is not reinserted during movement, so DOM relocation
   cannot prematurely end pointer capture when the pointer leaves its old row.
+  Drop slots use row-center snapshots plus a small hysteresis zone, and the
+  placeholder is reinserted only when the slot changes; this prevents repeated
+  CSS gap animations while the pointer rests near a boundary.
   `pointerup` moves the card to the placeholder and reports the final pinned ID
   order; pointer cancellation or window blur restores the original position.
   The generated drop click is suppressed and pin/delete controls are excluded.
@@ -413,7 +416,10 @@ Image modal and management functionality:
 
 - `showImageModal(blobUrl)`: Opens an image fitted and centered in a modal.
   A startup-time, capture-phase, non-passive root wheel listener handles
-  `Ctrl+wheel` and the synthetic wheel events emitted for touchpad pinch.
+  `Ctrl+wheel` in both browser families and Firefox's synthetic wheel events
+  for touchpad pinch. Chromium extension Side Panels may consume physical
+  touchpad pinch before it reaches the DOM, so that gesture is unsupported
+  there.
   Two touchscreen pointers use their changing distance and centroid for direct
   pinch zoom and pan. Mouse or single-touch pointer drag pans, backdrop click
   closes, and every new modal starts from the centered fitted view. A normal
