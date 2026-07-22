@@ -51,7 +51,10 @@ the converted empty heading changes it back to a paragraph.
 | Click a task checkbox | Update both the checkbox state and `[ ]`/`[x]` in Markdown |
 | Double-click a task checkbox | Keep the interaction on the checkbox; do not open full-document source mode |
 | Middle-click a link | Open the link in a new browser tab |
-| Click a rendered image | Emit `image-activate`; SideNote opens the image modal |
+| Click a rendered image | Emit `image-activate`; SideNote opens a fitted image at the center of the modal |
+| Click the modal image | Keep the current scale and position; clicking no longer toggles zoom |
+| `Ctrl+wheel` or a touchpad pinch in the image modal | Zoom continuously around the pointer position; small high-resolution touchpad deltas are normalized for responsive pinching |
+| Hold and drag the modal image | Pan the image from its current position |
 | Code language field in a code-block header | Edit the fenced-code language directly |
 
 Inside bullet and ordered lists, `Enter` creates the next list item while
@@ -142,6 +145,8 @@ from the URL, it remains in the form `[link text](URL)`.
 
 - Clipboard images are saved to SideNote's image store and inserted as
   `![filename](images/...)`.
+- Closing the image modal with its backdrop or `Escape` discards its zoom and
+  pan state. Opening an image again starts fitted and centered.
 - SideNote's image-management view uses `scrollToImage(source)` to open a note
   and bring the matching rendered image into view.
 - Plain text is transformed using SideNote's tilde processing and legacy line

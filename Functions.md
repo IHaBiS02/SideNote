@@ -393,7 +393,10 @@ Recycle bin rendering and management:
 
 Image modal and management functionality:
 
-- `showImageModal(blobUrl)`: Shows an image in a modal dialog
+- `showImageModal(blobUrl)`: Opens an image fitted and centered in a modal.
+  `Ctrl+wheel` and touchpad pinch events zoom around the pointer, pointer drag
+  pans, backdrop click closes, and every new modal starts from the centered
+  fitted view. A normal image click no longer toggles zoom.
 - `renderImagesList()`: Renders the image-management list and uses the
   component's `scrollToImage()` API when navigating to an image occurrence
 

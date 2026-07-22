@@ -15,7 +15,8 @@ A simple notes browser extension that provides a note-taking interface in the br
   highlighting, and aligned multi-line line numbers
 - **Dark/Light Mode**: Toggle between themes for comfortable viewing
 - **Import/Export**: Save and load notes in `.snote` and `.snotes` formats
-- **Image Support**: Paste and embed images directly into notes
+- **Image Support**: Paste and embed images directly into notes; the centered
+  preview modal supports `Ctrl+wheel`/touchpad-pinch zoom and hold-drag panning
 - **Recycle Bin**: Soft delete with 30-day auto-cleanup
 - **Browser Integration**: Works in Chrome **AND** Firefox ~~(Firefox is in development)~~
 - **Keyboard Shortcut**: Quick access with `Shift+Alt+W`; a new-install setup

@@ -106,7 +106,8 @@ npm install
 - **note-renderer.ts**: Note list rendering and note opening
 - **editor-mode.ts**: Switches the shared editor between editable/read-only
   Preview and full-document Markdown source modes
-- **image-modal.ts**: Fullscreen image preview modal with zoom
+- **image-modal.ts**: Centered fullscreen image preview with
+  `Ctrl+wheel`/touchpad-pinch zoom, pointer dragging, and fresh-open reset
 - **image-manager.ts**: Image list UI and management
 - **recycle-bin-renderer.ts**: Deleted items list rendering
 - **index.ts**: Re-exports all view functions
@@ -154,6 +155,7 @@ tests/
     ├── editor-events.test.js
     ├── sidenote-editor-adapter.test.js
     ├── editor-mode.test.js
+    ├── image-modal.test.js
     ├── image-manager.test.js
     ├── import-export.test.js
     ├── import-export-events.test.js

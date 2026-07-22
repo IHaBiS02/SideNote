@@ -73,6 +73,10 @@ The component emits bubbling, composed `input`, `change`, `mode-change`,
 `image-activate` exposes the persisted `source` and resolved `displaySource`
 when a rendered image is clicked.
 
+SideNote uses `displaySource` to open a fitted, centered image modal. Modal image
+clicks do not toggle zoom; `Ctrl+wheel` and touchpad pinch gestures zoom around
+the pointer, while press-drag pans. Closing and reopening resets the view.
+
 Extensions can contribute named commands, shortcuts, and input rules:
 
 ```js

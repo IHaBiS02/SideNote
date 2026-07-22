@@ -72,6 +72,10 @@ Shadow DOM 내부를 외부에 노출하지 않고 화면 안으로 스크롤합
 `event.detail.markdown`에 있습니다. 렌더링된 이미지를 클릭하면 발생하는
 `image-activate`에는 저장된 `source`와 화면 표시용 `displaySource`가 있습니다.
 
+SideNote는 `displaySource`를 사용해 화면에 맞춘 이미지를 모달 중앙에 엽니다.
+모달 이미지 클릭은 배율을 바꾸지 않으며, `Ctrl+휠`과 터치패드 핀치로 포인터
+기준 확대·축소를 하고 누른 채 드래그해 이동합니다. 닫았다 다시 열면 초기화됩니다.
+
 확장은 command, shortcut, input rule을 추가할 수 있습니다.
 
 ```js

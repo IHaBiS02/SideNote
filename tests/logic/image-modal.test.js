@@ -1,0 +1,124 @@
+import { beforeEach, describe, expect, it } from 'vitest';
+
+function createPointerEvent(type, { x, y, pointerId = 1 }) {
+  const event = new MouseEvent(type, {
+    bubbles: true,
+    cancelable: true,
+    button: 0,
+    clientX: x,
+    clientY: y,
+  });
+  Object.defineProperty(event, 'pointerId', { value: pointerId });
+  return event;
+}
+
+function transformScale(image) {
+  return Number(/scale\(([^)]+)\)/.exec(image.style.transform)?.[1]);
+}
+
+describe('image preview modal', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  async function openLoadedModal({ width = 1200, height = 600 } = {}) {
+    const { showImageModal } = await import('../../src/notes_view/image-modal.js');
+    showImageModal('blob:preview');
+
+    const modal = document.querySelector('.image-preview-modal');
+    const image = modal.querySelector('img');
+    Object.defineProperty(image, 'naturalWidth', {
+      configurable: true,
+      value: width,
+    });
+    Object.defineProperty(image, 'naturalHeight', {
+      configurable: true,
+      value: height,
+    });
+    image.dispatchEvent(new Event('load'));
+    return { modal, image };
+  }
+
+  it('opens fitted and centered without changing zoom on image click', async () => {
+    const { modal, image } = await openLoadedModal();
+    const initialTransform = image.style.transform;
+
+    expect(modal.style.justifyContent).toBe('center');
+    expect(modal.style.alignItems).toBe('center');
+    expect(initialTransform).toBe('translate(0px, 0px) scale(1)');
+
+    image.click();
+
+    expect(image.style.transform).toBe(initialTransform);
+    expect(document.body.contains(modal)).toBe(true);
+  });
+
+  it('zooms in and out only for Ctrl+wheel or touchpad pinch wheel events', async () => {
+    const { modal, image } = await openLoadedModal();
+    const initialTransform = image.style.transform;
+    const ordinaryWheel = new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+      deltaY: -100,
+    });
+
+    modal.dispatchEvent(ordinaryWheel);
+    expect(ordinaryWheel.defaultPrevented).toBe(false);
+    expect(image.style.transform).toBe(initialTransform);
+
+    const zoomIn = new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: true,
+      deltaY: -0.1,
+      clientX: 400,
+      clientY: 300,
+    });
+    modal.dispatchEvent(zoomIn);
+    const enlargedScale = transformScale(image);
+
+    expect(zoomIn.defaultPrevented).toBe(true);
+    expect(enlargedScale).toBeGreaterThanOrEqual(1.01);
+    expect(image.style.transform).not.toContain('translate(0px, 0px)');
+
+    const zoomOut = new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: true,
+      deltaY: 100,
+      clientX: 400,
+      clientY: 300,
+    });
+    modal.dispatchEvent(zoomOut);
+
+    expect(zoomOut.defaultPrevented).toBe(true);
+    expect(transformScale(image)).toBeLessThan(enlargedScale);
+  });
+
+  it('pans while held and resets the view when reopened', async () => {
+    const first = await openLoadedModal();
+
+    first.image.dispatchEvent(createPointerEvent('pointerdown', { x: 20, y: 30 }));
+    first.image.dispatchEvent(createPointerEvent('pointermove', { x: 55, y: 80 }));
+    first.image.dispatchEvent(createPointerEvent('pointerup', { x: 55, y: 80 }));
+
+    expect(first.image.style.transform).toBe('translate(35px, 50px) scale(1)');
+    expect(first.image.style.cursor).toBe('grab');
+
+    first.modal.dispatchEvent(new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: true,
+      deltaY: -100,
+      clientX: 400,
+      clientY: 300,
+    }));
+    expect(transformScale(first.image)).toBeGreaterThan(1);
+
+    first.modal.click();
+    expect(document.body.contains(first.modal)).toBe(false);
+
+    const reopened = await openLoadedModal();
+    expect(reopened.image.style.transform).toBe('translate(0px, 0px) scale(1)');
+  });
+});

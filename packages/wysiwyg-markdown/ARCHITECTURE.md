@@ -92,6 +92,9 @@ The element emits composed, bubbling `input`, `change`, `mode-change`,
 `selection-change`, `image-activate`, and `editor-error` events so host
 applications can listen outside the Shadow DOM. `image-activate` carries both
 the persisted Markdown source and resolved display source.
+SideNote consumes that display source in its separate image-modal module, which
+owns fitted centering, pointer-anchored `Ctrl+wheel`/touchpad-pinch zoom,
+pointer-captured panning, backdrop closing, and fresh-open view reset.
 
 ## Markdown and editing behavior
 
