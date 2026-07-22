@@ -143,7 +143,10 @@ click on a rendered link opens its destination in a new browser tab. The
 `--editor-source-line-height` and `--editor-code-line-height` default to `1.2`
 for full-document plain-text editing and fenced code blocks. The
 `--editor-code-content-padding` custom property controls fenced-code inner
-spacing and defaults to `5px`. Markdown table cells use collapsed 1px borders;
+spacing and defaults to `5px`. SideNote reapplies that vertical spacing to both
+numbered-code `pre` columns after its generic `pre` reset, while their nested
+`code` elements keep zero block padding to avoid doubling the inset. Markdown
+table cells use collapsed 1px borders;
 `--editor-table-border-color` defaults to the current text color and can be
 overridden by the host theme. Table columns without Markdown alignment metadata
 center their cell content, while explicit alignment remains encoded as inline

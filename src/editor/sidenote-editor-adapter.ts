@@ -201,6 +201,16 @@ const SIDENOTE_EDITOR_THEME = `
     word-break: inherit;
   }
 
+  .editor-mount .ProseMirror
+    .code-block-content[data-line-numbers] > pre {
+    padding-block: var(--editor-code-content-padding);
+  }
+
+  .editor-mount .ProseMirror
+    .code-block-content[data-line-numbers] > pre > code {
+    padding-block: 0;
+  }
+
   .editor-mount .ProseMirror pre.code-block-body,
   .editor-mount .ProseMirror pre.code-block-body > code {
     line-height: var(--editor-code-line-height);

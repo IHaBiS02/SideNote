@@ -82,7 +82,9 @@ The code body, line-number gutter, and internal spacing use the same
 `--editor-code-header-background` color so only the header is visually
 distinguished from the body. Code content retains 5px of internal spacing via
 `--editor-code-content-padding`; multi-line blocks use that spacing around the
-body and between the line-number gutter and code text.
+body and between the line-number gutter and code text. SideNote reapplies the
+same 5px vertical padding to both the line-number gutter and code-body `pre`
+after its generic `pre` reset, keeping their first and last lines aligned.
 
 ### Editing a Code Block Language
 

@@ -155,7 +155,11 @@ the separate `--editor-code-header-background` variable. The
 `--editor-code-content-padding` variable defaults to `5px` and is applied with
 selectors specific enough to win over the generic Shadow DOM `pre code` rule;
 multi-line blocks reuse it for vertical padding, gutter spacing, and the body
-right edge.
+right edge. Because SideNote's injected theme resets generic `pre` padding after
+the component stylesheet, the adapter repeats the numbered-block `pre` and
+nested `code` block-padding rules with host-level specificity. Both the gutter
+and body therefore receive one shared 5px vertical inset without double
+padding.
 
 The Shadow DOM stylesheet also owns a deterministic semantic typography
 baseline: body and heading line heights default to `1.5`, and heading sizes,
