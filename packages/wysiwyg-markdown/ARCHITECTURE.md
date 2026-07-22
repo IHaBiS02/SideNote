@@ -162,6 +162,9 @@ baseline: body and heading line heights default to `1.5`, and heading sizes,
 weights, margins, paragraph margins, and list margins are explicit. A host can
 override the line heights through `--editor-line-height` and
 `--editor-heading-line-height` without depending on browser UA defaults.
+Native bullet and ordered-list markers are styled inside the Shadow DOM through
+`--editor-list-marker-color`; the default is derived from `currentColor`, while
+hosts such as SideNote provide explicit light- and dark-theme values.
 Full-document source mode and fenced code blocks default to `1.2`, exposed
 separately through `--editor-source-line-height` and
 `--editor-code-line-height` so their compact layout does not affect prose.

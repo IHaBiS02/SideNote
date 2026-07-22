@@ -110,7 +110,10 @@ line height, while full-document source mode and fenced code blocks use
 `1.2`. Hosts can override these independently with `--editor-line-height`,
 `--editor-heading-line-height`, `--editor-source-line-height`, and
 `--editor-code-line-height`. Semantic heading sizes, weights, and margins are
-explicit so hosts do not inherit browser-specific UA typography.
+explicit so hosts do not inherit browser-specific UA typography. Bullet and
+ordered-list markers use `--editor-list-marker-color`; its default derives a
+subdued color from the current text color, and hosts can provide an explicit
+light- or dark-theme value.
 
 See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the current architecture and
 host integration boundaries. Built-in Markdown input rules, shortcuts, mouse

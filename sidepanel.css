@@ -347,6 +347,7 @@ textarea {
   --editor-border-radius: 0;
   --editor-border-color: #ccc;
   --editor-muted-background: #f5f5f5;
+  --editor-list-marker-color: #8a8a8a;
   --editor-code-font-family: monospace;
   --editor-code-content-padding: 5px;
   --editor-code-background: #fafafa;

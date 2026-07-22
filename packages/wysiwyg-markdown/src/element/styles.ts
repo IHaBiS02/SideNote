@@ -8,6 +8,7 @@ export const editorStyles = css`
     --editor-border-radius: 0;
     --editor-border-color: currentColor;
     --editor-muted-background: transparent;
+    --editor-list-marker-color: color-mix(in srgb, currentColor 60%, transparent);
     --editor-code-background: var(--editor-muted-background);
     --editor-accent: currentColor;
     --editor-font-family: inherit;
@@ -128,6 +129,10 @@ export const editorStyles = css`
   .editor-mount .ProseMirror ul,
   .editor-mount .ProseMirror ol {
     margin-block: 1em;
+  }
+
+  .editor-mount .ProseMirror li::marker {
+    color: var(--editor-list-marker-color);
   }
 
   .editor-mount .ProseMirror blockquote {

@@ -52,6 +52,12 @@ describe('wysiwyg-markdown element', () => {
       'padding-inline: 0 var(--editor-code-content-padding)',
     );
     expect(editorStyles.cssText).toContain('--editor-line-height: 1.5');
+    expect(editorStyles.cssText).toContain(
+      '--editor-list-marker-color: color-mix(in srgb, currentColor 60%, transparent)',
+    );
+    expect(editorStyles.cssText).toContain(
+      'color: var(--editor-list-marker-color)',
+    );
     expect(editorStyles.cssText).toContain('--editor-heading-line-height: 1.5');
     expect(editorStyles.cssText).toContain('--editor-source-line-height: 1.2');
     expect(editorStyles.cssText).toContain('--editor-code-line-height: 1.2');

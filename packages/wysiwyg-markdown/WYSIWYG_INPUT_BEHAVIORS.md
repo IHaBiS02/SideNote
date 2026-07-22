@@ -62,6 +62,10 @@ sibling cannot be nested and remains unchanged. `Shift+Enter` also inserts a
 line break inside a code block; other blocks retain their normal ProseMirror
 behavior.
 
+Bullet and ordered-list markers use `--editor-list-marker-color` so they remain
+visually distinct from item text without changing the text color. SideNote
+provides subdued gray marker colors for both light and dark themes.
+
 The code body, line-number gutter, and internal spacing use the same
 `--editor-code-background` color. The header keeps its separate
 `--editor-code-header-background` color so only the header is visually
