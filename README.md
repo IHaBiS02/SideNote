@@ -66,7 +66,7 @@ A simple notes browser extension that provides a note-taking interface in the br
    to Preview. While editing a custom title, Enter or Escape finishes only the
    title edit and keeps the current note open.
 
-Pinned notes remain above regular notes. Hold a pinned note for about 300 ms,
+Pinned notes remain above regular notes. Hold a pinned note for about 150 ms,
 then drag the smaller floating card vertically. An animated rounded gap opens
 at the current drop position, and the drag continues outside the original row.
 Stable row-center boundaries and a 10px hysteresis zone keep the gap from
@@ -75,7 +75,7 @@ A short click still opens the note, and dragging from the pin or delete buttons
 does not start reordering. Cancelling the pointer or leaving the extension
 window restores the original order.
 The hold delay is a global-only setting adjustable from 100 to 2000ms; it
-defaults to 300ms and applies the next time the note list is shown.
+defaults to 150ms and applies the next time the note list is shown.
 
 The image modal supports physical touchpad pinch in Firefox. Chromium extension
 Side Panels can consume that gesture before a DOM wheel event reaches SideNote,
@@ -98,6 +98,10 @@ Licenses show license of libraries used in this project.
 
 Export buttons keep the default `.snote` / `.snotes` behavior on left click. Right-click an export button to choose `.zip` or `.snote` / `.snotes`; right-click the `.zip` option to show original Markdown and two-space line-break Markdown export options above the `.zip` row.
 All-notes `.zip` exports use sanitized note titles as folder names, with suffixes added when titles collide.
+`.snotes` archives include a manifest that preserves displayed note order,
+pinned state, and pinned order. When merging an archive into an existing note
+list, imported pinned positions are rebased after existing pinned notes and
+regular-note timestamps are made unique while retaining the archive order.
 
 ## Development
 

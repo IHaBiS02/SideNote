@@ -40,10 +40,13 @@ note.snote/
 
 ### .snotes (Multiple Notes Export)
 
-A `.snotes` file is a ZIP archive containing multiple notes. Each note is stored in its own directory named by its ID:
+A `.snotes` file is a ZIP archive containing multiple notes. A root manifest
+stores the displayed order and pinned state, while each note remains in its own
+directory named by its ID:
 
 ```
 notes.zip/
+├── manifest.json
 ├── [note-id-1]/
 │   ├── note.md
 │   ├── metadata.json
@@ -57,6 +60,34 @@ notes.zip/
 └── ...
 ```
 
+#### manifest.json Structure
+
+```json
+{
+  "formatVersion": 1,
+  "notes": [
+    {
+      "folder": "note-id-1",
+      "order": 0,
+      "isPinned": true,
+      "pinOrder": 0
+    },
+    {
+      "folder": "note-id-2",
+      "order": 1,
+      "isPinned": false
+    }
+  ]
+}
+```
+
+- `folder` maps the manifest entry to its note directory.
+- `order` records the note's displayed position when exported.
+- `isPinned` restores whether the note belongs to the pinned section.
+- `pinOrder` records the source pinned position for archive inspection. During
+  import, pinned positions are normalized against the destination list rather
+  than copied verbatim.
+
 ## Image Handling
 
 - Images are stored in IndexedDB with unique IDs
@@ -67,6 +98,14 @@ notes.zip/
 ## Import Behavior
 
 - When importing a `.snote` file, a new note is created with the imported content
+- When importing `.snotes`, a version 1 manifest restores the archive's note
+  order and pinned state. Older archives without a manifest remain supported
+  and import as unpinned notes using their modification-time order.
+- Existing notes keep their current order. Imported pinned notes are appended
+  to the pinned section with sequential values after the greatest existing
+  `pinOrder`/legacy `pinnedAt`, preventing order-number collisions.
+- Imported regular notes receive a unique descending `lastModified` range above
+  the existing regular notes so their archive order is preserved without ties.
 - Existing notes are not overwritten
 - Images are imported to IndexedDB with new IDs to avoid conflicts
 - Image references in the Markdown content are automatically updated with the new IDs

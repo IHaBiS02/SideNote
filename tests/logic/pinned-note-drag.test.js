@@ -56,7 +56,7 @@ describe('pinned note long-press dragging', () => {
     vi.useRealTimers();
   });
 
-  it('uses a 300ms long-press delay by default', () => {
+  it('uses a 150ms long-press delay by default', () => {
     const list = document.querySelector('#note-list');
     const pinned = noteItem('pinned', true);
     list.append(pinned);
@@ -64,7 +64,7 @@ describe('pinned note long-press dragging', () => {
     const controller = createPinnedNoteDragController(list, vi.fn());
 
     pinned.dispatchEvent(createPointerEvent('pointerdown', { x: 10, y: 10 }));
-    vi.advanceTimersByTime(299);
+    vi.advanceTimersByTime(149);
     expect(pinned.classList.contains('pinned-note-dragging')).toBe(false);
 
     vi.advanceTimersByTime(1);

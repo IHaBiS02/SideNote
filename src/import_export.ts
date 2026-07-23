@@ -16,12 +16,17 @@ export interface ParsedSnote {
   settings: NoteSettings;
   metadata: Pick<NoteMetadata, 'createdAt' | 'lastModified'>;
   images: ParsedImage[];
+  archiveOrder?: number;
+  isPinned?: boolean;
+  pinOrder?: number;
 }
 
 interface ParsedSnoteOverrides {
   id?: string;
   metadata?: Partial<NoteMetadata>;
   isPinned?: boolean;
+  pinnedAt?: number;
+  pinOrder?: number;
 }
 
 interface ExportOptions {
@@ -34,6 +39,20 @@ interface ArchivedNoteMetadata {
   settings?: NoteSettings;
   metadata?: Partial<NoteMetadata>;
 }
+
+interface SnotesManifestEntry {
+  folder: string;
+  order: number;
+  isPinned: boolean;
+  pinOrder?: number;
+}
+
+interface SnotesManifest {
+  formatVersion: 1;
+  notes: SnotesManifestEntry[];
+}
+
+const SNOTES_FORMAT_VERSION = 1;
 
 /**
  * Parses a .snote zip without saving notes or images.
@@ -89,6 +108,96 @@ async function parseSnote(zip: JSZipType): Promise<ParsedSnote> {
   };
 }
 
+function topLevelNoteFolders(zip: JSZipType): string[] {
+  const folders = new Set<string>();
+  for (const path of Object.keys(zip.files)) {
+    const separatorIndex = path.indexOf('/');
+    if (separatorIndex <= 0) continue;
+    folders.add(path.slice(0, separatorIndex));
+  }
+  return Array.from(folders);
+}
+
+async function readSnotesManifest(
+  zip: JSZipType,
+): Promise<SnotesManifest | null> {
+  const manifestFile = zip.file('manifest.json');
+  if (!manifestFile) return null;
+
+  const parsed = JSON.parse(await manifestFile.async('string')) as Partial<SnotesManifest>;
+  if (
+    parsed.formatVersion !== SNOTES_FORMAT_VERSION
+    || !Array.isArray(parsed.notes)
+  ) {
+    throw new Error('Unsupported or invalid .snotes manifest');
+  }
+
+  const entries = parsed.notes.map((entry, index) => {
+    if (!entry || typeof entry.folder !== 'string' || entry.folder.length === 0) {
+      throw new Error(`Invalid .snotes manifest entry at index ${index}`);
+    }
+
+    return {
+      folder: entry.folder,
+      order: Number.isFinite(entry.order) ? Number(entry.order) : index,
+      isPinned: entry.isPinned === true,
+      ...(Number.isFinite(entry.pinOrder)
+        ? { pinOrder: Number(entry.pinOrder) }
+        : {}),
+    };
+  });
+
+  return {
+    formatVersion: SNOTES_FORMAT_VERSION,
+    notes: entries,
+  };
+}
+
+async function parseSnotesArchive(zip: JSZipType): Promise<ParsedSnote[]> {
+  const manifest = await readSnotesManifest(zip);
+  const availableFolders = topLevelNoteFolders(zip);
+  const seenFolders = new Set<string>();
+  const parsedNotes: ParsedSnote[] = [];
+
+  if (manifest) {
+    const orderedEntries = manifest.notes
+      .map((entry, manifestIndex) => ({ entry, manifestIndex }))
+      .sort((left, right) => (
+        left.entry.order - right.entry.order
+        || left.manifestIndex - right.manifestIndex
+      ));
+
+    for (const { entry } of orderedEntries) {
+      if (seenFolders.has(entry.folder)) continue;
+      const folder = zip.folder(entry.folder);
+      if (!folder) {
+        throw new Error(`Missing note folder from .snotes manifest: ${entry.folder}`);
+      }
+      const parsedNote = await parseSnote(folder);
+      parsedNote.archiveOrder = entry.order;
+      parsedNote.isPinned = entry.isPinned;
+      parsedNote.pinOrder = entry.pinOrder;
+      parsedNotes.push(parsedNote);
+      seenFolders.add(entry.folder);
+    }
+  }
+
+  let nextArchiveOrder = parsedNotes.reduce(
+    (maximum, note) => Math.max(maximum, note.archiveOrder ?? -1),
+    -1,
+  ) + 1;
+  for (const folderName of availableFolders) {
+    if (seenFolders.has(folderName)) continue;
+    const folder = zip.folder(folderName);
+    if (!folder) continue;
+    const parsedNote = await parseSnote(folder);
+    if (manifest) parsedNote.archiveOrder = nextArchiveOrder++;
+    parsedNotes.push(parsedNote);
+  }
+
+  return parsedNotes;
+}
+
 async function saveParsedSnoteImages(parsedNote: ParsedSnote): Promise<void> {
   const imagePromises = (parsedNote.images || []).map(image => saveImage(image.id, image.blob));
   await Promise.all(imagePromises);
@@ -106,14 +215,22 @@ function createNoteFromParsedSnote(
   };
 
   // 새 노트 객체 생성
-  const newNote = {
+  const isPinned = overrides.isPinned ?? false;
+  const newNote: Note = {
     id: overrides.id || crypto.randomUUID(),  // 새 UUID 생성 (중복 방지)
     title: parsedNote.title,
     content: parsedNote.content,
     settings: parsedNote.settings || {},
     metadata,
-    isPinned: overrides.isPinned ?? false  // 가져온 노트는 기본적으로 고정되지 않음
+    isPinned
   };
+
+  if (isPinned) {
+    newNote.pinnedAt = overrides.pinnedAt ?? now;
+    if (overrides.pinOrder !== undefined) {
+      newNote.pinOrder = overrides.pinOrder;
+    }
+  }
 
   return newNote;
 }
@@ -134,15 +251,59 @@ async function processSnote(zip: JSZipType): Promise<Note> {
   return saveParsedSnote(parsedNote);
 }
 
-async function saveImportedNotes(parsedNotes: ParsedSnote[]): Promise<Note[]> {
-  parsedNotes.sort((a, b) => a.metadata.lastModified - b.metadata.lastModified);
-  const now = Date.now();
+function importedAfterPinOrder(note: Note): number {
+  const order = note.pinOrder ?? note.pinnedAt;
+  return Number.isFinite(order) ? Number(order) : -1;
+}
+
+async function saveImportedNotes(
+  parsedNotes: ParsedSnote[],
+  existingNotes: readonly Note[] = [],
+): Promise<Note[]> {
+  const hasArchiveOrder = parsedNotes.some(note => (
+    Number.isFinite(note.archiveOrder)
+  ));
+  parsedNotes.sort((a, b) => {
+    if (hasArchiveOrder) {
+      const leftOrder = Number.isFinite(a.archiveOrder)
+        ? Number(a.archiveOrder)
+        : Number.MAX_SAFE_INTEGER;
+      const rightOrder = Number.isFinite(b.archiveOrder)
+        ? Number(b.archiveOrder)
+        : Number.MAX_SAFE_INTEGER;
+      return leftOrder - rightOrder;
+    }
+    return b.metadata.lastModified - a.metadata.lastModified;
+  });
+
+  const maximumExistingPinOrder = existingNotes
+    .filter(note => note.isPinned)
+    .reduce((maximum, note) => Math.max(
+      maximum,
+      importedAfterPinOrder(note),
+    ), -1);
+  const maximumExistingLastModified = existingNotes.reduce(
+    (maximum, note) => Math.max(maximum, note.metadata.lastModified),
+    0,
+  );
+  const timestampCeiling = Math.max(Date.now(), maximumExistingLastModified)
+    + parsedNotes.length + 1;
+  let nextPinOrder = maximumExistingPinOrder + 1;
+  let pinnedIndex = 0;
   const savedNotes: Note[] = [];
   for (let i = 0; i < parsedNotes.length; i++) {
+    const isPinned = parsedNotes[i].isPinned === true;
     const savedNote = await saveParsedSnote(parsedNotes[i], {
+      isPinned,
+      ...(isPinned
+        ? {
+          pinOrder: nextPinOrder++,
+          pinnedAt: timestampCeiling + pinnedIndex++,
+        }
+        : {}),
       metadata: {
         ...parsedNotes[i].metadata,
-        lastModified: now + i
+        lastModified: timestampCeiling - i,
       }
     });
     savedNotes.push(savedNote);
@@ -229,18 +390,33 @@ async function createAllNotesArchive(
 ): Promise<JSZipType> {
   const zip = new JSZip();
   const usedFolderNames = new Set<string>();
-  for (const note of notes) {
+  const manifest: SnotesManifest = {
+    formatVersion: SNOTES_FORMAT_VERSION,
+    notes: [],
+  };
+  for (let index = 0; index < notes.length; index++) {
+    const note = notes[index];
     const folderName = createNoteFolderName(note, usedFolderNames, options);
     const noteFolder = zip.folder(folderName);
     if (!noteFolder) throw new Error(`Could not create ZIP folder: ${folderName}`);
     await addNoteToZip(noteFolder, note, options);
+    manifest.notes.push({
+      folder: folderName,
+      order: index,
+      isPinned: note.isPinned === true,
+      ...(note.isPinned && Number.isFinite(note.pinOrder)
+        ? { pinOrder: Number(note.pinOrder) }
+        : {}),
+    });
   }
+  zip.file('manifest.json', JSON.stringify(manifest, null, 2));
   return zip;
 }
 
 // Export the function
 export {
   parseSnote,
+  parseSnotesArchive,
   saveParsedSnoteImages,
   createNoteFromParsedSnote,
   saveParsedSnote,

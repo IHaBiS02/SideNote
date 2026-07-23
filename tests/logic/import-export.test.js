@@ -15,6 +15,7 @@ import {
   createSingleNoteArchive,
   getExportContent,
   parseSnote,
+  parseSnotesArchive,
   processSnote,
   saveImportedNotes,
   saveParsedSnoteImages
@@ -225,7 +226,7 @@ describe('import_export', () => {
       };
     }
 
-    it('should call saveNote sequentially for all notes', async () => {
+    it('should save legacy imported notes in display order', async () => {
       const callOrder = [];
       saveNote.mockImplementation(async (note) => {
         callOrder.push(note.title);
@@ -234,27 +235,27 @@ describe('import_export', () => {
       const notes = [makeNote(3000), makeNote(1000), makeNote(2000)];
       await saveImportedNotes(notes);
 
-      expect(callOrder).toEqual(['Note 1000', 'Note 2000', 'Note 3000']);
+      expect(callOrder).toEqual(['Note 3000', 'Note 2000', 'Note 1000']);
     });
 
-    it('should assign increasing lastModified timestamps', async () => {
+    it('should assign decreasing lastModified timestamps in display order', async () => {
       const notes = [makeNote(3000), makeNote(1000), makeNote(2000)];
       const result = await saveImportedNotes(notes);
 
       for (let i = 1; i < result.length; i++) {
-        expect(result[i].metadata.lastModified).toBeGreaterThan(
+        expect(result[i].metadata.lastModified).toBeLessThan(
           result[i - 1].metadata.lastModified
         );
       }
     });
 
-    it('should sort notes by lastModified before processing', async () => {
+    it('should sort legacy notes by newest modification before processing', async () => {
       const notes = [makeNote(3000), makeNote(1000), makeNote(2000)];
       await saveImportedNotes(notes);
 
-      expect(notes[0].title).toBe('Note 1000');
+      expect(notes[0].title).toBe('Note 3000');
       expect(notes[1].title).toBe('Note 2000');
-      expect(notes[2].title).toBe('Note 3000');
+      expect(notes[2].title).toBe('Note 1000');
     });
 
     it('should not call saveNote for empty array', async () => {
@@ -266,6 +267,35 @@ describe('import_export', () => {
       const notes = [makeNote(100), makeNote(200), makeNote(300)];
       await saveImportedNotes(notes);
       expect(saveNote).toHaveBeenCalledTimes(3);
+    });
+
+    it('rebases imported pinned and regular order after existing notes', async () => {
+      const parsedNotes = [
+        { ...makeNote(100), title: 'Pinned A', archiveOrder: 0, isPinned: true, pinOrder: 0 },
+        { ...makeNote(300), title: 'Pinned B', archiveOrder: 1, isPinned: true, pinOrder: 0 },
+        { ...makeNote(200), title: 'Regular A', archiveOrder: 2, isPinned: false },
+        { ...makeNote(400), title: 'Regular B', archiveOrder: 3, isPinned: false },
+      ];
+      const existingNotes = [
+        { id: 'existing-pin', isPinned: true, pinOrder: 7, metadata: { lastModified: 8000 } },
+        { id: 'existing-note', isPinned: false, metadata: { lastModified: 9000 } },
+      ];
+
+      const result = await saveImportedNotes(parsedNotes, existingNotes);
+
+      expect(result.map(note => note.title)).toEqual([
+        'Pinned A',
+        'Pinned B',
+        'Regular A',
+        'Regular B',
+      ]);
+      expect(result.slice(0, 2).map(note => note.pinOrder)).toEqual([8, 9]);
+      expect(result.slice(0, 2).every(note => note.isPinned)).toBe(true);
+      expect(result.slice(2).every(note => !note.isPinned)).toBe(true);
+      expect(result[2].metadata.lastModified).toBeGreaterThan(9000);
+      expect(result[2].metadata.lastModified).toBeGreaterThan(
+        result[3].metadata.lastModified,
+      );
     });
   });
 
@@ -321,6 +351,71 @@ describe('import_export', () => {
       const zip = await createAllNotesArchive([makeExportNote()]);
 
       expect(zip.file('note-1/note.md')).toBeTruthy();
+      expect(zip.file('manifest.json')).toBeTruthy();
+    });
+
+    it('round-trips pinned state and displayed note order through the manifest', async () => {
+      const notes = [
+        {
+          ...makeExportNote(),
+          id: 'pinned-note',
+          title: 'Pinned',
+          content: 'pinned',
+          isPinned: true,
+          pinOrder: 4,
+        },
+        {
+          ...makeExportNote(),
+          id: 'regular-note',
+          title: 'Regular',
+          content: 'regular',
+          isPinned: false,
+        },
+      ];
+
+      const zip = await createAllNotesArchive(notes);
+      const manifest = JSON.parse(
+        await zip.file('manifest.json').async('string'),
+      );
+      const parsedNotes = await parseSnotesArchive(zip);
+
+      expect(manifest).toEqual({
+        formatVersion: 1,
+        notes: [
+          { folder: 'pinned-note', order: 0, isPinned: true, pinOrder: 4 },
+          { folder: 'regular-note', order: 1, isPinned: false },
+        ],
+      });
+      expect(parsedNotes.map(note => ({
+        title: note.title,
+        archiveOrder: note.archiveOrder,
+        isPinned: note.isPinned,
+        pinOrder: note.pinOrder,
+      }))).toEqual([
+        { title: 'Pinned', archiveOrder: 0, isPinned: true, pinOrder: 4 },
+        { title: 'Regular', archiveOrder: 1, isPinned: false, pinOrder: undefined },
+      ]);
+    });
+
+    it('continues to parse legacy all-notes archives without a manifest', async () => {
+      const zip = new JSZip();
+      const folder = zip.folder('legacy-note');
+      await addNoteToZip(folder, {
+        ...makeExportNote(),
+        id: 'legacy-note',
+        title: 'Legacy',
+        content: 'legacy',
+        isPinned: true,
+        pinOrder: 3,
+      });
+
+      const parsedNotes = await parseSnotesArchive(zip);
+
+      expect(parsedNotes).toHaveLength(1);
+      expect(parsedNotes[0].title).toBe('Legacy');
+      expect(parsedNotes[0].archiveOrder).toBeUndefined();
+      expect(parsedNotes[0].isPinned).toBeUndefined();
+      expect(parsedNotes[0].pinOrder).toBeUndefined();
     });
 
     it('should use sanitized note titles for all-notes zip exports when requested', async () => {

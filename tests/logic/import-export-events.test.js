@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
   downloadFile: vi.fn(),
   getTimestamp: vi.fn(() => '2026_01_02_03_04_05'),
   parseSnote: vi.fn(),
+  parseSnotesArchive: vi.fn(),
   saveImportedNotes: vi.fn(),
   saveParsedSnote: vi.fn(),
   saveParsedSnoteImages: vi.fn().mockResolvedValue(),
@@ -30,6 +31,7 @@ vi.mock('../../src/import_export.js', () => ({
   createAllNotesArchive: mocks.createAllNotesArchive,
   createSingleNoteArchive: mocks.createSingleNoteArchive,
   parseSnote: mocks.parseSnote,
+  parseSnotesArchive: mocks.parseSnotesArchive,
   saveImportedNotes: mocks.saveImportedNotes,
   saveParsedSnote: mocks.saveParsedSnote,
   saveParsedSnoteImages: mocks.saveParsedSnoteImages,
@@ -106,6 +108,57 @@ describe('import/export events', () => {
     expect(state.notes[0].title).toBe('Imported');
     expect(state.notes[0].content).toBe('# Imported');
     expect(document.getElementById('markdown-editor').value).toBe('# Imported');
+  });
+
+  it('imports .snotes with existing notes available for order rebasing', async () => {
+    const existingNote = {
+      id: 'existing',
+      title: 'Existing',
+      content: 'existing',
+      settings: {},
+      metadata: { createdAt: 1, lastModified: 2 },
+      isPinned: true,
+      pinOrder: 0,
+    };
+    const parsedNotes = [{
+      title: 'Imported',
+      content: 'imported',
+      settings: {},
+      metadata: { createdAt: 3, lastModified: 4 },
+      images: [],
+      archiveOrder: 0,
+      isPinned: true,
+    }];
+    const importedNote = {
+      id: 'imported',
+      ...parsedNotes[0],
+      pinOrder: 1,
+    };
+    mocks.parseSnotesArchive.mockResolvedValue(parsedNotes);
+    mocks.saveImportedNotes.mockImplementation(async (parsed, existing) => {
+      expect(parsed).toBe(parsedNotes);
+      expect(existing).toEqual([existingNote]);
+      return [importedNote];
+    });
+
+    const state = await import('../../src/state.js');
+    state.setNotes([existingNote]);
+    const { initializeImportExportEvents } = await import('../../src/events/import-export-events.js');
+    initializeImportExportEvents();
+
+    const importInput = document.getElementById('global-import-input');
+    Object.defineProperty(importInput, 'files', {
+      value: [new File(['zip'], 'backup.snotes')],
+      configurable: true,
+    });
+    importInput.dispatchEvent(new Event('change'));
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    expect(mocks.parseSnotesArchive).toHaveBeenCalledTimes(1);
+    expect(mocks.saveImportedNotes).toHaveBeenCalledTimes(1);
+    expect(state.notes.map(note => note.id)).toEqual(['existing', 'imported']);
+    expect(mocks.sortNotes).toHaveBeenCalledTimes(1);
+    expect(mocks.renderNoteList).toHaveBeenCalledTimes(1);
   });
 
   it('keeps the default all-notes export as .snotes on left click', async () => {

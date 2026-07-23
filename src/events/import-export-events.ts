@@ -23,6 +23,7 @@ import {
   createAllNotesArchive,
   createSingleNoteArchive,
   parseSnote,
+  parseSnotesArchive,
   saveImportedNotes,
   saveParsedSnote,
   saveParsedSnoteImages
@@ -34,7 +35,6 @@ import {
   notes,
   activeNoteId
 } from '../state.js';
-import type { ParsedSnote } from '../import_export.js';
 
 interface ExportAllOptions {
   extension?: 'snotes' | 'zip';
@@ -262,24 +262,8 @@ function initializeImportExportEvents(): void {
         notes.push(newNote);
       } else if (file.name.endsWith('.snotes')) {
         // Multiple notes file (.snotes)
-        const parsedNotes: ParsedSnote[] = [];
-        const topLevelFolders = new Set<string>();
-        
-        // Find top-level folders (each folder is one note)
-        for (const path in zip.files) {
-          if (path.endsWith('/') && path.split('/').length === 2) {
-            topLevelFolders.add(path);
-          }
-        }
-
-        for (const noteFolder of topLevelFolders) {
-          const folder = zip.folder(noteFolder);
-          if (!folder) continue;
-          const parsedNote = await parseSnote(folder);
-          parsedNotes.push(parsedNote);
-        }
-
-        const newNotes = await saveImportedNotes(parsedNotes);
+        const parsedNotes = await parseSnotesArchive(zip);
+        const newNotes = await saveImportedNotes(parsedNotes, notes);
         for (const note of newNotes) {
           notes.push(note);
         }
