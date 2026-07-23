@@ -50,7 +50,7 @@ the converted empty heading changes it back to a paragraph.
 | `Enter` or `Escape` in SideNote's custom-title field | Commit the title edit and remain on the current note; `Escape` does not trigger global back navigation |
 | Click a task checkbox | Update both the checkbox state and `[ ]`/`[x]` in Markdown |
 | Double-click a task checkbox | Keep the interaction on the checkbox; do not open full-document source mode |
-| Middle-click a link | Open the link in a new browser tab |
+| Middle-click, Ctrl+click, or Cmd+click a link | Open the link in a new browser tab |
 | Click a rendered image | Emit `image-activate`; SideNote opens a fitted image at the center of the modal |
 | Click the modal image | Keep the current scale and position; clicking no longer toggles zoom |
 | `Ctrl+wheel` in the image modal | A capture-phase non-passive root listener zooms continuously around the pointer position |

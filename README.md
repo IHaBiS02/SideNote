@@ -13,6 +13,8 @@ A simple notes browser extension that provides a note-taking interface in the br
   input-rule extensions
 - **Code Blocks**: Language/copy headers, editable highlight.js syntax
   highlighting, and aligned multi-line line numbers
+- **Link Navigation**: Open rendered links in a new tab with middle-click,
+  `Ctrl+click`, or `Cmd+click`
 - **Dark/Light Mode**: Toggle between themes for comfortable viewing
 - **Pinned Note Ordering**: Hold a pinned note, then drag its lifted card into
   the animated gap between pinned rows; the order is restored on next launch

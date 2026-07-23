@@ -88,6 +88,12 @@ image insertion. `scrollToImage(source)` provides source-based navigation
 without exposing the Shadow DOM. The complete contract is documented in
 `Functions.md` and the package README.
 
+The ProseMirror DOM-event bridge treats a middle-button `auxclick` and a
+primary-button `Ctrl+click`/`Cmd+click` on a rendered anchor as explicit
+new-tab navigation. All three paths share the same safe `window.open` call,
+while an unmodified primary click remains available to document editing and
+image activation.
+
 The element emits composed, bubbling `input`, `change`, `mode-change`,
 `selection-change`, `image-activate`, and `editor-error` events so host
 applications can listen outside the Shadow DOM. `image-activate` carries both

@@ -291,7 +291,8 @@ export class WysiwygMarkdownElement extends LitElement {
           return false;
         },
         auxclick: (_view, event) => this.#handleLinkAuxClick(event),
-        click: (_view, event) => this.#handleImageActivate(event),
+        click: (_view, event) =>
+          this.#handleLinkModifiedClick(event) || this.#handleImageActivate(event),
       },
       nodeViews: {
         code_block: (node, view, getPos) =>
@@ -1319,6 +1320,15 @@ export class WysiwygMarkdownElement extends LitElement {
 
   #handleLinkAuxClick(event: MouseEvent): boolean {
     if (event.button !== 1) return false;
+    return this.#openLinkInNewTab(event);
+  }
+
+  #handleLinkModifiedClick(event: MouseEvent): boolean {
+    if (event.button !== 0 || (!event.ctrlKey && !event.metaKey)) return false;
+    return this.#openLinkInNewTab(event);
+  }
+
+  #openLinkInNewTab(event: MouseEvent): boolean {
     const link = event
       .composedPath()
       .find((target): target is HTMLAnchorElement => target instanceof HTMLAnchorElement);

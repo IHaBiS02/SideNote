@@ -58,7 +58,7 @@ SideNote is a browser extension that provides a note-taking interface within the
     -   `src/index.ts`: Public exports and idempotent registration of `<wysiwyg-markdown>`.
     -   `src/core/markdown.ts`: ProseMirror schema plus Markdown parser and serializer. It covers headings, emphasis, strikethrough, lists/tasks, soft breaks, fenced code, links, and images. Link serialization uses explicit `[text](destination)` syntax, including when the text and destination are identical.
     -   `src/core/commands.ts`: Standard history, block, and inline-format commands.
-    -   `src/element/wysiwyg-markdown.ts`: Form-associated Lit custom element, ProseMirror lifecycle, source modes, node views, events, image hooks, public API, middle-click link navigation, and directly editable code-language controls with selection-safe unfocused labels outside document content.
+    -   `src/element/wysiwyg-markdown.ts`: Form-associated Lit custom element, ProseMirror lifecycle, source modes, node views, events, image hooks, public API, middle-/Ctrl-/Cmd-click link navigation, and directly editable code-language controls with selection-safe unfocused labels outside document content.
     -   `src/element/styles.ts`: Minimal component-owned layout and state CSS. Product styling is supplied by the host through `themeCss`.
     -   `src/extensions/registry.ts`: Extension validation, priority ordering, command merging, shortcuts, and input-rule plugins.
     -   `src/extensions/standard.ts`: Built-in Markdown input rules for headings, code blocks, quotes, lists, task items, and horizontal rules.

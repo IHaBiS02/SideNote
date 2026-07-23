@@ -698,6 +698,39 @@ describe('wysiwyg-markdown element', () => {
     open.mockRestore();
   });
 
+  it('opens a link in a new tab on Ctrl-click or Cmd-click', async () => {
+    const editor = await createEditor('[Example](https://example.com/path)');
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const link = editor.renderRoot.querySelector<HTMLAnchorElement>('a');
+
+    for (const modifier of [{ ctrlKey: true }, { metaKey: true }]) {
+      const event = new MouseEvent('click', {
+        button: 0,
+        ...modifier,
+        bubbles: true,
+        composed: true,
+        cancelable: true,
+      });
+      link?.dispatchEvent(event);
+      expect(event.defaultPrevented).toBe(true);
+    }
+
+    expect(open).toHaveBeenCalledTimes(2);
+    expect(open).toHaveBeenNthCalledWith(
+      1,
+      'https://example.com/path',
+      '_blank',
+      'noopener,noreferrer',
+    );
+    expect(open).toHaveBeenNthCalledWith(
+      2,
+      'https://example.com/path',
+      '_blank',
+      'noopener,noreferrer',
+    );
+    open.mockRestore();
+  });
+
   it('dispatches input events for commands', async () => {
     const editor = await createEditor('paragraph');
     const listener = vi.fn();

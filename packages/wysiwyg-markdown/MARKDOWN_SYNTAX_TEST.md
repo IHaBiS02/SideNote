@@ -53,7 +53,7 @@
 - 자동 링크: <https://example.com/autolink>
 - 붙여넣기 정규화 확인용 URL: https://youtu.be/YcO-MxPf_Vg?si=--UyINcJ33oxOCE-
 
-링크를 마우스 휠로 클릭하면 새 탭에서 열려야 합니다.
+링크를 가운데 버튼으로 클릭하거나 Ctrl+클릭/Cmd+클릭하면 새 탭에서 열려야 합니다.
 
 ---
 

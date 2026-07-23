@@ -73,6 +73,10 @@ The component emits bubbling, composed `input`, `change`, `mode-change`,
 `image-activate` exposes the persisted `source` and resolved `displaySource`
 when a rendered image is clicked.
 
+Rendered links open in a new browser tab on middle-click, `Ctrl+click`, or
+`Cmd+click`. An unmodified primary click remains available to the editable
+document.
+
 SideNote uses `displaySource` to open a fitted, centered image modal. Modal image
 clicks do not toggle zoom. `Ctrl+wheel` and browser-synthesized touchpad pinch
 wheel events zoom around the pointer, direct two-pointer touchscreen pinch
