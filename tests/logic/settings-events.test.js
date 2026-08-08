@@ -52,6 +52,20 @@ describe('settings events', () => {
     vi.clearAllMocks();
   });
 
+  it('provides hover help for every settings checkbox, select, and number input', async () => {
+    await initializeSettings({ isGlobal: true });
+    const controls = document.querySelectorAll(
+      '#settings-container input[type="checkbox"], '
+      + '#settings-container input[type="number"], '
+      + '#settings-container select',
+    );
+
+    expect(controls).toHaveLength(13);
+    controls.forEach((control) => {
+      expect(control.title.trim(), control.id).not.toBe('');
+    });
+  });
+
   it('stores global line spacing values and applies them to each editor surface', async () => {
     const state = await initializeSettings({ isGlobal: true });
     const editor = document.getElementById('markdown-editor');

@@ -54,7 +54,9 @@
     <div id="settings-container">
       <div class="setting">
         <label for="mode-setting">Mode</label>
-        <select id="mode-setting">
+        <select
+          id="mode-setting"
+          title="Choose SideNote's color theme. System follows the browser or operating-system preference; Light and Dark force that theme. This setting applies globally.">
           <option value="system">System</option>
           <option value="light">Light</option>
           <option value="dark">Dark</option>
@@ -62,38 +64,79 @@
       </div>
       <div class="setting">
         <label for="title-setting">Title</label>
-        <select id="title-setting">
+        <select
+          id="title-setting"
+          title="Default derives the note title from its first content line. Custom lets you edit the title separately by double-clicking it. This can be set globally or per note.">
           <option value="default">Default (First line)</option>
           <option value="custom">Custom</option>
         </select>
       </div>
       <div class="setting">
         <label for="font-size-setting">Font Size</label>
-        <input type="number" id="font-size-setting" min="1" value="12">
+        <input
+          type="number"
+          id="font-size-setting"
+          min="1"
+          value="12"
+          title="Set editor text size in pixels. Values must be at least 1 and can be set globally or overridden per note.">
       </div>
       <div class="setting">
         <label for="line-height-setting">WYSIWYG Line Spacing</label>
-        <input type="number" id="line-height-setting" min="1" max="3" step="0.1" value="1.5">
+        <input
+          type="number"
+          id="line-height-setting"
+          min="1"
+          max="3"
+          step="0.1"
+          value="1.5"
+          title="Set WYSIWYG paragraph and heading line spacing from 1.0 to 3.0. The default is 1.5, with global and per-note values supported.">
       </div>
       <div class="setting">
         <label for="source-line-height-setting">Plain Text Line Spacing</label>
-        <input type="number" id="source-line-height-setting" min="1" max="3" step="0.1" value="1.2">
+        <input
+          type="number"
+          id="source-line-height-setting"
+          min="1"
+          max="3"
+          step="0.1"
+          value="1.2"
+          title="Set full-document plain-text Edit mode line spacing from 1.0 to 3.0. The default is 1.2, with global and per-note values supported.">
       </div>
       <div class="setting">
         <label for="code-line-height-setting">Code Block Line Spacing</label>
-        <input type="number" id="code-line-height-setting" min="1" max="3" step="0.1" value="1.2">
+        <input
+          type="number"
+          id="code-line-height-setting"
+          min="1"
+          max="3"
+          step="0.1"
+          value="1.2"
+          title="Set fenced code-block line spacing from 1.0 to 3.0. The default is 1.2, with global and per-note values supported.">
       </div>
       <div class="setting" id="pinned-note-drag-delay-container">
         <label for="pinned-note-drag-delay-setting">Pinned Note Hold Delay (ms)</label>
-        <input type="number" id="pinned-note-drag-delay-setting" min="100" max="2000" step="50" value="150">
+        <input
+          type="number"
+          id="pinned-note-drag-delay-setting"
+          min="100"
+          max="2000"
+          step="50"
+          value="150"
+          title="Set how long a pinned note must be held before dragging starts, from 100 to 2000 milliseconds. The default is 150 ms and this setting applies globally.">
       </div>
       <div class="setting" id="code-block-header-setting">
         <label for="code-block-header-checkbox">Code Block Header</label>
-        <input type="checkbox" id="code-block-header-checkbox">
+        <input
+          type="checkbox"
+          id="code-block-header-checkbox"
+          title="Show the language field and Copy button above fenced code blocks. This can be set globally or overridden per note.">
       </div>
       <div class="setting" id="wysiwyg-preview-setting">
         <label for="wysiwyg-preview-checkbox">Editable WYSIWYG Preview</label>
-        <input type="checkbox" id="wysiwyg-preview-checkbox">
+        <input
+          type="checkbox"
+          id="wysiwyg-preview-checkbox"
+          title="On (default): edit notes directly in rendered WYSIWYG Preview. Off: use the same rendered Preview in read-only mode and press Edit to change Markdown. This setting applies globally.">
       </div>
       <div class="setting" id="prevent-extra-empty-paragraphs-setting">
         <label for="prevent-extra-empty-paragraphs-checkbox">Prevent Extra Empty Paragraphs</label>
@@ -104,17 +147,26 @@
       </div>
       <div class="setting" id="prevent-used-image-deletion-setting">
         <label for="prevent-used-image-deletion-checkbox">Prevent deletion of used images</label>
-        <input type="checkbox" id="prevent-used-image-deletion-checkbox">
+        <input
+          type="checkbox"
+          id="prevent-used-image-deletion-checkbox"
+          title="Prevent an image from being deleted while an active note still references it. This setting applies globally.">
       </div>
       <div class="setting" id="tilde-replacement-setting">
         <label for="show-tilde-replacement-button-checkbox">Tilde Replacement Button</label>
-        <input type="checkbox" id="show-tilde-replacement-button-checkbox">
+        <input
+          type="checkbox"
+          id="show-tilde-replacement-button-checkbox"
+          title="Show the editor toolbar toggle that escapes tilde characters in pasted text to prevent accidental Markdown strikethrough. This setting applies globally.">
       </div>
       <fieldset class="settings-section" id="legacy-settings-section">
         <legend>Legacy</legend>
         <div class="setting" id="legacy-line-break-mode-setting">
           <label for="legacy-line-break-mode-checkbox">Legacy Markdown line breaks</label>
-          <input type="checkbox" id="legacy-line-break-mode-checkbox">
+          <input
+            type="checkbox"
+            id="legacy-line-break-mode-checkbox"
+            title="Enable the legacy pasted-text workflow that can add two trailing spaces for Markdown hard line breaks, and show its Auto Line Break toolbar toggle. Leave off for normal soft-break Preview. This setting applies globally.">
         </div>
       </fieldset>
       <div class="setting">

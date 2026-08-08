@@ -86,7 +86,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   A toolbar with buttons for toggling the view and note-specific import/export/settings. The view button uses `Edit`/`WYSIWYG` when editable WYSIWYG Preview is enabled and `Edit`/`Preview` for the read-only renderer.
 -   **`#settings-view`**: The screen for configuring settings.
     -   Can be accessed globally (from list view) or for a specific note (from editor view).
-    -   Controls for UI Mode (Light/Dark), Title behavior, Font Size, independent WYSIWYG, Plain Text, and Code Block Line Spacing (`1.0`–`3.0`), and the global-only **Prevent Extra Empty Paragraphs** preference. The latter checkbox has a native hover tooltip explaining enabled/disabled behavior and the Markdown round-trip limitation. Font size and all three spacing values support global values plus note-specific overrides.
+    -   Controls for UI Mode (Light/Dark), Title behavior, Font Size, independent WYSIWYG, Plain Text, and Code Block Line Spacing (`1.0`–`3.0`), and the global-only **Prevent Extra Empty Paragraphs** preference. Every settings checkbox, selection field, and number input has a native hover tooltip describing its effect, scope, limits, and defaults where applicable. Font size and all three spacing values support global values plus note-specific overrides.
     -   Checkbox for "Prevent deletion of used images".
     -   Legacy controls for adding two trailing spaces to pasted lines and tilde escaping.
     -   Buttons to navigate to Image Management, Recycle Bin, and Licenses pages.

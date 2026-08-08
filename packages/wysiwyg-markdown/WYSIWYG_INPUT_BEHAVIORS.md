@@ -84,7 +84,8 @@ can be changed with the `preventExtraEmptyParagraphs` property (or the
 global-only **Prevent Extra Empty Paragraphs** setting; turning it off allows
 repeated Enter presses to create additional transient empty paragraphs.
 Hovering the checkbox itself shows the same round-trip behavior in a native
-tooltip.
+tooltip. SideNote provides equivalent control-specific hover help for every
+other settings checkbox, selection field, and number input.
 
 Bullet and ordered-list markers use `--editor-list-marker-color` so they remain
 visually distinct from item text without changing the text color. SideNote

@@ -330,6 +330,8 @@ Settings management (functions exported):
   global or note-specific settings, including effective font size and all three
   line-spacing values. The global form also shows the pinned-note hold delay;
   the note-specific form hides it and the global-only empty-paragraph toggle.
+  Static HTML supplies detailed native hover help for every checkbox, select,
+  and number input in the settings form.
 
 **Note**: Uses `globalSettings` from state.js module
 
