@@ -103,7 +103,8 @@ The global **Prevent Extra Empty Paragraphs** setting is enabled by default. It
 ignores another `Enter` when the caret is already in an empty top-level
 paragraph so source-mode round trips do not remove a temporary blank block.
 Disable it to allow repeated `Enter` presses to create additional empty
-paragraphs using normal ProseMirror behavior.
+paragraphs using normal ProseMirror behavior. Hover over the checkbox itself
+for a tooltip explaining both modes and the source-mode round-trip limitation.
 
 Images button show all images used in the notes, showing that which one is used in which note.
 Recycle bin shows all soft-deleted notes and images, and let user delete all at once.

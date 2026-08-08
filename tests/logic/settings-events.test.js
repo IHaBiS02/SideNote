@@ -140,6 +140,9 @@ describe('settings events', () => {
     const checkbox = document.getElementById('prevent-extra-empty-paragraphs-checkbox');
     const editor = document.getElementById('markdown-editor');
 
+    expect(checkbox.title).toContain('On (default)');
+    expect(checkbox.title).toContain('may disappear after switching to Edit and back');
+
     checkbox.checked = false;
     checkbox.dispatchEvent(new Event('change'));
 
