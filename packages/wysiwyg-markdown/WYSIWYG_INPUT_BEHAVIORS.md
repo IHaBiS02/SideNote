@@ -13,6 +13,11 @@ highlighting remain unchanged, but the direct editing behaviors below are
 disabled. Double-click the document or press Edit to open full-document
 Markdown source editing.
 
+The lower-left mode button says `Edit` while the rendered document is open.
+In full-document source mode, its return label is `WYSIWYG` when editable
+WYSIWYG Preview is enabled and `Preview` when the renderer is configured as
+read-only.
+
 ## Markdown Input Rules
 
 | Input | Result | Stored Markdown example |

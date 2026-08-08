@@ -29,7 +29,7 @@ describe('editor display modes', () => {
 
     mode.togglePreview();
     expect(editor.setMode).toHaveBeenLastCalledWith('source');
-    expect(document.getElementById('toggle-view-button').textContent).toBe('Preview');
+    expect(document.getElementById('toggle-view-button').textContent).toBe('WYSIWYG');
     expect(editor.focus).toHaveBeenCalled();
   });
 
@@ -41,5 +41,9 @@ describe('editor display modes', () => {
     expect(editor.setMode).toHaveBeenLastCalledWith('readonly');
     expect(editor.style.display).toBe('block');
     expect(document.getElementById('toggle-view-button').textContent).toBe('Edit');
+
+    mode.togglePreview();
+    expect(editor.setMode).toHaveBeenLastCalledWith('source');
+    expect(document.getElementById('toggle-view-button').textContent).toBe('Preview');
   });
 });

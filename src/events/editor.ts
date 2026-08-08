@@ -8,6 +8,7 @@ import {
 import { sortNotes } from '../notes.js';
 import {
   openNote,
+  getPreviewModeButtonLabel,
   togglePreview,
   showImageModal,
   renderNoteList
@@ -34,7 +35,9 @@ function initializeEditorEvents(): void {
     if (nextIsPreview === isPreview) return;
 
     setIsPreview(nextIsPreview);
-    toggleViewButton.textContent = nextIsPreview ? 'Edit' : 'Preview';
+    toggleViewButton.textContent = nextIsPreview
+      ? 'Edit'
+      : getPreviewModeButtonLabel();
     pushToHistory({
       view: 'editor',
       params: { noteId: activeNoteId, inEditMode: !nextIsPreview }

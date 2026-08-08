@@ -144,7 +144,9 @@ mapping because NodeView `stopEvent` suppresses ProseMirror handling but does
 not stop native DOM bubbling to the editor mount. SideNote's global
 `wysiwygPreview` preference chooses `wysiwyg` or `readonly` for Preview
 without changing renderers, so both variants retain the same document structure,
-theme, syntax highlighting, and code-block chrome.
+theme, syntax highlighting, and code-block chrome. The SideNote host also uses
+that preference to label the source-mode return button `WYSIWYG` for editable
+Preview or `Preview` for the read-only renderer.
 
 ## Extensions
 

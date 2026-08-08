@@ -8,6 +8,13 @@ import {
   setIsPreview,
 } from '../state.js';
 
+/** Returns the label used to leave source editing for the configured Preview mode. */
+function getPreviewModeButtonLabel(): 'WYSIWYG' | 'Preview' {
+  return normalizeGlobalSettings(globalSettings).wysiwygPreview
+    ? 'WYSIWYG'
+    : 'Preview';
+}
+
 /** Applies the current Preview/Edit state to the shared editor component. */
 function applyEditorDisplayMode(): void {
   markdownEditor.style.display = 'block';
@@ -21,7 +28,7 @@ function applyEditorDisplayMode(): void {
   }
 
   markdownEditor.setMode?.('source');
-  toggleViewButton.textContent = 'Preview';
+  toggleViewButton.textContent = getPreviewModeButtonLabel();
   markdownEditor.focus();
 }
 
@@ -51,4 +58,8 @@ function togglePreview(): void {
   });
 }
 
-export { applyEditorDisplayMode, togglePreview };
+export {
+  applyEditorDisplayMode,
+  getPreviewModeButtonLabel,
+  togglePreview,
+};

@@ -423,7 +423,8 @@ Note list and editor functionality:
 
 Editor display-mode coordination:
 
-- `applyEditorDisplayMode()`: Uses `wysiwyg` or `readonly` for Preview according to `wysiwygPreview`, and `source` for full-document Markdown editing
+- `getPreviewModeButtonLabel()`: Returns `WYSIWYG` for editable Preview or `Preview` for the read-only renderer so the source-mode button names its return target
+- `applyEditorDisplayMode()`: Uses `wysiwyg` or `readonly` for Preview according to `wysiwygPreview`, uses `source` for full-document Markdown editing, and updates the mode button label
 - `togglePreview()`: Toggles between the configured WYSIWYG Preview mode and full-document Markdown source editing
 
 ### src/notes_view/recycle-bin-renderer.ts

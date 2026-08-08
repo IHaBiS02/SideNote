@@ -29,7 +29,7 @@ SideNote is a browser extension that provides a note-taking interface within the
         -   `view-manager.ts`: View switching and navigation management
         -   `note-renderer.ts`: Note list and editor functionality
         -   `pinned-note-drag.ts`: Long-press pointer controller with a fixed floating card, stable hysteresis-based drop slots, animated drop-gap placeholder, cancellation restore, and persisted pinned-note ordering
-        -   `editor-mode.ts`: Editable/read-only Preview and full-document source-mode switching
+        -   `editor-mode.ts`: Editable/read-only Preview and full-document source-mode switching with `Edit`/`WYSIWYG` or `Edit`/`Preview` button labels
         -   `recycle-bin-renderer.ts`: Recycle bin rendering and management
         -   `image-modal.ts`: Centered image preview with `Ctrl+wheel` in Chrome/Firefox, Firefox touchpad-pinch capture, direct two-pointer touchscreen pinch, pointer dragging, shared close cleanup, and fresh-open reset
         -   `image-manager.ts`: Image list, usage, navigation, and deletion management
@@ -83,7 +83,7 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **`#editor-view`**: The screen for writing and viewing a single note.
     -   A header with a "Back" button (`#back-button`) and the note's title (`#editor-title`).
     -   `#markdown-editor`: A `<wysiwyg-markdown>` custom element. New notes and normal note opening start in WYSIWYG Preview mode, editable by default or read-only when configured; double-click or the Edit button opens the full document as plain Markdown source. Its public `value` remains a Markdown string.
-    -   A toolbar with buttons for toggling the view and note-specific import/export/settings.
+    -   A toolbar with buttons for toggling the view and note-specific import/export/settings. The view button uses `Edit`/`WYSIWYG` when editable WYSIWYG Preview is enabled and `Edit`/`Preview` for the read-only renderer.
 -   **`#settings-view`**: The screen for configuring settings.
     -   Can be accessed globally (from list view) or for a specific note (from editor view).
     -   Controls for UI Mode (Light/Dark), Title behavior, Font Size, and independent WYSIWYG, Plain Text, and Code Block Line Spacing (`1.0`–`3.0`). Font size and all three spacing values support global values plus note-specific overrides.
@@ -150,7 +150,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   `keydown`: WYSIWYG `Enter` continues bullet and ordered lists with the next item, `Tab`/`Shift+Tab` changes the current list-item nesting level, and `Shift+Enter` inserts a single inline soft break inside the current list item or block; the full-document source editor retains `Shift+Enter` preview switching.
     -   `image-activate`: Opens the SideNote image modal using the display URL supplied by the component.
     -   Custom title editing: `Enter` or `Escape` commits the title input; `Escape` is consumed before global back navigation so the note stays open.
--   **`applyEditorDisplayMode()` / `togglePreview()`**: Uses the same custom element for editable WYSIWYG and read-only Preview, selected by the global `wysiwygPreview` setting, and switches Edit to full-document Markdown source mode (located in `src/notes_view/editor-mode.ts`).
+-   **`getPreviewModeButtonLabel()` / `applyEditorDisplayMode()` / `togglePreview()`**: Uses the same custom element for editable WYSIWYG and read-only Preview, selected by the global `wysiwygPreview` setting, switches Edit to full-document Markdown source mode, and labels the source-mode return button `WYSIWYG` or `Preview` accordingly (located in `src/notes_view/editor-mode.ts`).
 -   **Image integration**: The component resolves stored images through the adapter, emits `image-activate` for modal opening, and exposes `scrollToImage()` so image management can navigate without reaching into the component Shadow DOM. The host modal initially fits and centers each image. A capture-phase, non-passive `window` listener registered when `image-modal.ts` loads handles `Ctrl+wheel` in both browser families and Firefox's synthetic touchpad-pinch wheel events. Chromium extension Side Panels may consume physical touchpad pinch before it reaches the DOM, so that gesture is not supported there. Direct touchscreen input tracks two Pointer Events to zoom from their distance and pan from their moving centroid; mouse and single-touch dragging remain available. Backdrop and `Escape` close through the same state-clearing function, and reopening starts from the fitted center.
 
 #### Settings & Recycle Bin (`settings.ts`, `src/notes_view/`, `src/events/`)

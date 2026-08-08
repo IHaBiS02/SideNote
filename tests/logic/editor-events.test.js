@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   openNote: vi.fn(),
+  getPreviewModeButtonLabel: vi.fn(() => 'WYSIWYG'),
   togglePreview: vi.fn(),
   showImageModal: vi.fn(),
   renderNoteList: vi.fn(),
@@ -16,6 +17,7 @@ vi.mock('../../src/notes.js', () => ({
 
 vi.mock('../../src/notes_view/index.js', () => ({
   openNote: mocks.openNote,
+  getPreviewModeButtonLabel: mocks.getPreviewModeButtonLabel,
   togglePreview: mocks.togglePreview,
   showImageModal: mocks.showImageModal,
   renderNoteList: mocks.renderNoteList,
@@ -121,6 +123,23 @@ describe('editor events', () => {
       view: 'editor',
       params: { noteId: null, inEditMode: false },
     });
+  });
+
+  it('labels source mode with the configured WYSIWYG return target', async () => {
+    const state = await import('../../src/state.js');
+    state.setIsPreview(true);
+    const { initializeEditorEvents } = await import('../../src/events/editor.js');
+    const editor = document.getElementById('markdown-editor');
+    initializeEditorEvents();
+
+    editor.dispatchEvent(new CustomEvent('mode-change', {
+      bubbles: true,
+      detail: { mode: 'source' },
+    }));
+
+    expect(state.isPreview).toBe(false);
+    expect(mocks.getPreviewModeButtonLabel).toHaveBeenCalledOnce();
+    expect(document.getElementById('toggle-view-button').textContent).toBe('WYSIWYG');
   });
 
   it('opens the image modal from the editor image activation event', async () => {

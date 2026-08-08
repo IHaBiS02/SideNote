@@ -16,6 +16,7 @@ export {
 
 export {
   applyEditorDisplayMode,
+  getPreviewModeButtonLabel,
   togglePreview
 } from './editor-mode.js';
 

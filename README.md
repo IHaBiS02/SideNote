@@ -64,9 +64,11 @@ A simple notes browser extension that provides a note-taking interface in the br
 1. Click the SideNote icon in your browser toolbar or use `Shift+Alt+W`
 2. The side panel will open with the notes interface
 3. Make a new note and write notes
-4. In full Markdown source mode, press Shift+Enter or Ctrl/Cmd+Enter to return
-   to Preview. While editing a custom title, Enter or Escape finishes only the
-   title edit and keeps the current note open.
+4. In full Markdown source mode, use the `WYSIWYG` button when editable
+   Preview is enabled, or the `Preview` button when it is read-only. You can
+   also press Shift+Enter or Ctrl/Cmd+Enter to return. While editing a custom
+   title, Enter or Escape finishes only the title edit and keeps the current
+   note open.
 
 Pinned notes remain above regular notes. Hold a pinned note for about 150 ms,
 then drag the smaller floating card vertically. An animated rounded gap opens

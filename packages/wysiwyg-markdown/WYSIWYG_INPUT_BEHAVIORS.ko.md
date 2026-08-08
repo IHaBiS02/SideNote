@@ -11,6 +11,10 @@ SideNote 설정의 `Editable WYSIWYG Preview`를 끄면 같은 렌더러가
 직접 입력 동작은 비활성화되며, 더블클릭 또는 Edit 버튼으로 전체 Markdown
 source 편집에 들어갈 수 있습니다.
 
+렌더링된 문서를 열었을 때 왼쪽 아래 모드 버튼은 `Edit`로 표시됩니다. 전체
+Markdown source 모드에서는 editable WYSIWYG Preview가 켜져 있으면 돌아갈
+대상을 `WYSIWYG`, 읽기 전용 렌더러를 사용하면 `Preview`로 표시합니다.
+
 ## Markdown 입력 규칙
 
 | 입력 | 결과 | 저장되는 Markdown 예시 |
