@@ -78,7 +78,8 @@ Primary properties:
 
 - `value`, `mode`, `placeholder`, `readonly`, `disabled`, and `name`;
 - `sourceEditScope` (`document` by default, `block` as opt-in);
-- `showCodeBlockHeader` and `showCodeLineNumbers`;
+- `showCodeBlockHeader`, `showCodeLineNumbers`, and
+  `preventExtraEmptyParagraphs`;
 - `themeCss` and `codeHighlighter`;
 - `uploadImage`, `imageResolver`, and `transformPastedText` hooks.
 
@@ -129,11 +130,14 @@ an item below its preceding sibling and Shift+Tab moves a nested item outward.
 `Shift+Enter` inserts a soft break inside the current list item or other normal
 inline content and preserves newline behavior inside code. Pressing `Backspace`
 in an empty heading converts it to a paragraph, removing the corresponding
-Markdown heading marker without opening source mode. The block-editing keymap
-also consumes `Enter` in an empty top-level paragraph before the base keymap can
+Markdown heading marker without opening source mode. When the
+`preventExtraEmptyParagraphs` property is enabled, the block-editing keymap
+consumes `Enter` in an empty top-level paragraph before the base keymap can
 create another empty node. This avoids transient document structure that has no
-distinct CommonMark serialization, while nested empty list items still reach
-the normal list-exit behavior. SideNote uses
+distinct CommonMark serialization. Disabling the property falls through to
+normal ProseMirror paragraph creation, while nested empty list items always
+reach the normal list-exit behavior. SideNote initializes the property from its
+global-only setting and updates it live. SideNote uses
 full-document source mode when the user
 double-clicks Preview or presses Edit. A double-click coordinate is resolved to
 a ProseMirror document position, then mapped into canonical Markdown by
@@ -211,6 +215,7 @@ host variables, so the three surfaces remain independently configurable.
 `src/editor/sidenote-editor-adapter.ts` is the only SideNote-specific bridge.
 It assigns the host theme through `themeCss`, converts highlight.js spans into
 ProseMirror decoration ranges, configures code headers and line numbers,
+initializes `preventExtraEmptyParagraphs` from the saved global setting,
 resolves `images/{id}.png` references to scoped Blob URLs, stores pasted image
 files in IndexedDB, and applies enabled legacy text transformations.
 

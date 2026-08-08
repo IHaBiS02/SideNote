@@ -65,7 +65,9 @@ Host integration hooks:
 - `uploadImage`: pasted image persistence;
 - `imageResolver`: stored Markdown image source resolution;
 - `transformPastedText`: plain-text paste transformation;
-- `showCodeBlockHeader` and `showCodeLineNumbers`: code-block UI controls.
+- `showCodeBlockHeader` and `showCodeLineNumbers`: code-block UI controls;
+- `preventExtraEmptyParagraphs`: consume repeated Enter in an empty top-level
+  paragraph (`true` by default; attribute `prevent-extra-empty-paragraphs`).
 
 The component emits bubbling, composed `input`, `change`, `mode-change`,
 `selection-change`, `image-activate`, and `editor-error` events. `input` and
@@ -117,7 +119,8 @@ When the caret is in an empty heading, `Backspace` converts it to a paragraph
 and removes its `#` heading marker from the Markdown value.
 At the top level, `Enter` in an already empty paragraph is consumed so repeated
 Enter presses do not create transient empty blocks that CommonMark cannot
-serialize or restore.
+serialize or restore. Set `preventExtraEmptyParagraphs` to `false` to retain
+normal ProseMirror repeated-Enter behavior.
 
 A host application can provide trusted CSS through `themeCss`. Editable syntax
 highlighting uses ProseMirror decorations, so it does not rewrite editable DOM.

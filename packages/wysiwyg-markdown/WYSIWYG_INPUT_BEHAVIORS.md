@@ -42,7 +42,7 @@ the converted empty heading changes it back to a paragraph.
 | Action | Result |
 | --- | --- |
 | `Shift+Enter` | Insert a line break inside the current block without creating a new paragraph |
-| `Enter` in an already empty top-level paragraph | Keep the current empty paragraph instead of creating another empty block that Markdown cannot preserve |
+| `Enter` in an already empty top-level paragraph | When `preventExtraEmptyParagraphs` is enabled (default), keep the current empty paragraph instead of creating another block that Markdown cannot preserve; when disabled, use normal ProseMirror paragraph creation |
 | `Enter` in a non-empty bullet-list item | Create the next bullet-list item |
 | `Enter` in a non-empty ordered-list item | Create the next item with the following number |
 | `Enter` in an empty list item | Exit the current list |
@@ -78,7 +78,11 @@ behavior.
 At the top level, the first `Enter` creates a new paragraph. If that paragraph
 is still empty, another `Enter` is consumed without creating an additional
 empty paragraph. CommonMark has no distinct empty-paragraph block, so this
-keeps the WYSIWYG document stable across source-mode round trips.
+keeps the WYSIWYG document stable across source-mode round trips. This default
+can be changed with the `preventExtraEmptyParagraphs` property (or the
+`prevent-extra-empty-paragraphs` attribute). SideNote exposes it as the
+global-only **Prevent Extra Empty Paragraphs** setting; turning it off allows
+repeated Enter presses to create additional transient empty paragraphs.
 
 Bullet and ordered-list markers use `--editor-list-marker-color` so they remain
 visually distinct from item text without changing the text color. SideNote

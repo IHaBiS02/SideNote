@@ -29,6 +29,7 @@ describe('settings model helpers', () => {
     expect(settings.pinnedNoteDragDelayMs).toBe(150);
     expect(settings.mode).toBe('dark');
     expect(settings.wysiwygPreview).toBe(true);
+    expect(settings.preventExtraEmptyParagraphs).toBe(true);
     expect(settings.title).toBe(DEFAULT_SETTINGS.title);
     expect(settings.legacyLineBreakMode).toBe(false);
     expect(settings.autoLineBreak).toBe(false);
@@ -87,6 +88,7 @@ describe('settings model helpers', () => {
       mode: 'light',
       legacyLineBreakMode: true,
       wysiwygPreview: false,
+      preventExtraEmptyParagraphs: false,
     });
 
     const effective = resolveEffectiveSettings({
@@ -94,12 +96,14 @@ describe('settings model helpers', () => {
         mode: 'dark',
         legacyLineBreakMode: false,
         wysiwygPreview: true,
+        preventExtraEmptyParagraphs: true,
       },
     });
 
     expect(effective.mode).toBe('light');
     expect(effective.legacyLineBreakMode).toBe(true);
     expect(effective.wysiwygPreview).toBe(false);
+    expect(effective.preventExtraEmptyParagraphs).toBe(false);
   });
 
   it('disables legacy line-break processors when legacy mode is off', () => {

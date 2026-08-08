@@ -65,6 +65,8 @@ Shadow DOM 내부를 외부에 노출하지 않고 화면 안으로 스크롤합
 - `imageResolver`: 저장된 Markdown 이미지 경로 해석
 - `transformPastedText`: plain text 붙여넣기 변환
 - `showCodeBlockHeader`, `showCodeLineNumbers`: 코드 블럭 UI 설정
+- `preventExtraEmptyParagraphs`: 비어 있는 최상위 문단에서 반복된 `Enter`를
+  소비할지 설정(기본값 `true`, attribute `prevent-extra-empty-paragraphs`)
 
 컴포넌트는 Shadow DOM 밖에서도 받을 수 있는 `input`, `change`,
 `mode-change`, `selection-change`, `image-activate`, `editor-error` 이벤트를
@@ -112,6 +114,8 @@ WYSIWYG 위치로 변환하고 그 커서도 중앙에 배치합니다. 블록 �
 값에서도 해당 `#` 제목 표시가 제거됩니다.
 최상위의 이미 비어 있는 일반 문단에서 `Enter`를 누르면 키 입력만 소비하므로
 CommonMark가 직렬화하거나 복원할 수 없는 일시적인 빈 블록이 추가되지 않습니다.
+ProseMirror의 기본 반복 `Enter` 동작을 유지하려면
+`preventExtraEmptyParagraphs`를 `false`로 설정합니다.
 
 호스트 앱은 `themeCss`로 신뢰할 수 있는 CSS를 전달할 수 있습니다. 편집 가능한
 문법 강조는 ProseMirror decoration을 사용하므로 편집 DOM을 다시 작성하지

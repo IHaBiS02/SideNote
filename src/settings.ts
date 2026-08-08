@@ -15,6 +15,8 @@ import {
   modeSetting,
   codeBlockHeaderCheckbox,
   wysiwygPreviewCheckbox,
+  preventExtraEmptyParagraphsCheckbox,
+  preventExtraEmptyParagraphsContainer,
   preventUsedImageDeletionCheckbox
 } from './dom.js';
 
@@ -41,6 +43,7 @@ const DEFAULT_SETTINGS: Readonly<GlobalSettings> = Object.freeze({
   codeLineHeight: DEFAULT_CODE_LINE_HEIGHT,
   pinnedNoteDragDelayMs: DEFAULT_PINNED_NOTE_DRAG_DELAY_MS,
   wysiwygPreview: true,
+  preventExtraEmptyParagraphs: true,
   legacyLineBreakMode: false,
   autoLineBreak: false,
   showTildeReplacementButton: false,
@@ -251,6 +254,7 @@ function isCodeBlockHeaderEnabled(note?: Note | null): boolean {
 function populateSettingsForm(isGlobal: boolean, note?: Note | null): boolean {
   const effectiveGlobalSettings = normalizeGlobalSettings(globalSettings);
   pinnedNoteDragDelayContainer.hidden = !isGlobal;
+  preventExtraEmptyParagraphsContainer.hidden = !isGlobal;
   if (isGlobal) {
     titleSetting.value = effectiveGlobalSettings.title;
     fontSizeSetting.value = String(effectiveGlobalSettings.fontSize);
@@ -274,6 +278,8 @@ function populateSettingsForm(isGlobal: boolean, note?: Note | null): boolean {
     codeBlockHeaderCheckbox.checked = effectiveNoteSettings.codeBlockHeader !== false;
   }
   wysiwygPreviewCheckbox.checked = effectiveGlobalSettings.wysiwygPreview !== false;
+  preventExtraEmptyParagraphsCheckbox.checked =
+    effectiveGlobalSettings.preventExtraEmptyParagraphs !== false;
   modeSetting.value = effectiveGlobalSettings.mode;
   legacyLineBreakModeCheckbox.checked = effectiveGlobalSettings.legacyLineBreakMode;
   showTildeReplacementButtonCheckbox.checked = effectiveGlobalSettings.showTildeReplacementButton;

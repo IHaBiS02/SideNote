@@ -492,6 +492,7 @@ describe('wysiwyg-markdown element', () => {
 
   it('ignores Enter in an already empty top-level paragraph', async () => {
     const editor = await createEditor('First paragraph');
+    expect(editor.preventExtraEmptyParagraphs).toBe(true);
     const proseMirror = editor.renderRoot.querySelector<HTMLElement>('.ProseMirror');
     selectDocumentEnd(editor);
 
@@ -520,6 +521,28 @@ describe('wysiwyg-markdown element', () => {
     editor.setMode('wysiwyg');
     await editor.updateComplete;
     expect(editor.renderRoot.querySelectorAll('.ProseMirror > p')).toHaveLength(2);
+  });
+
+  it('allows repeated Enter when empty-paragraph prevention is disabled', async () => {
+    const editor = await createEditor('First paragraph');
+    editor.preventExtraEmptyParagraphs = false;
+    await editor.updateComplete;
+    const proseMirror = editor.renderRoot.querySelector<HTMLElement>('.ProseMirror');
+    selectDocumentEnd(editor);
+
+    const pressEnter = () => proseMirror?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'Enter',
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+
+    pressEnter();
+    pressEnter();
+    await editor.updateComplete;
+
+    expect(editor.renderRoot.querySelectorAll('.ProseMirror > p')).toHaveLength(3);
   });
 
   it.each([

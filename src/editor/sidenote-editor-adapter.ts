@@ -1,5 +1,8 @@
 import { getImage, saveImage } from '../database/index.js';
-import { resolveLegacyTextProcessingSettings } from '../settings.js';
+import {
+  normalizeGlobalSettings,
+  resolveLegacyTextProcessingSettings,
+} from '../settings.js';
 import { globalSettings } from '../state.js';
 import { processPastedText } from '../text-processors.js';
 import { markdownEditor } from '../dom.js';
@@ -397,6 +400,8 @@ function initializeWysiwygMarkdownEditor(): boolean {
 
   markdownEditor.sourceEditScope = 'document';
   markdownEditor.showCodeLineNumbers = true;
+  markdownEditor.preventExtraEmptyParagraphs =
+    normalizeGlobalSettings(globalSettings).preventExtraEmptyParagraphs;
   markdownEditor.themeCss = SIDENOTE_EDITOR_THEME;
   markdownEditor.codeHighlighter = highlightCode;
 

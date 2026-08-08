@@ -57,7 +57,7 @@ SideNote is a browser extension that provides a note-taking interface within the
 -   **`packages/wysiwyg-markdown/`**: The reusable Lit/ProseMirror editor npm workspace:
     -   `src/index.ts`: Public exports and idempotent registration of `<wysiwyg-markdown>`.
     -   `src/core/markdown.ts`: ProseMirror schema plus Markdown parser and serializer. It covers headings, emphasis, strikethrough, lists/tasks, soft breaks, fenced code, links, and images. Link serialization uses explicit `[text](destination)` syntax, including when the text and destination are identical.
-    -   `src/core/commands.ts`: Standard history, block, and inline-format commands, including empty-heading reset and repeated-Enter suppression in empty top-level paragraphs.
+    -   `src/core/commands.ts`: Standard history, block, and inline-format commands, including empty-heading reset and the predicate used by configurable repeated-Enter suppression in empty top-level paragraphs.
     -   `src/element/wysiwyg-markdown.ts`: Form-associated Lit custom element, ProseMirror lifecycle, source modes, node views, events, image hooks, public API, middle-/Ctrl-/Cmd-click link navigation, and directly editable code-language controls with selection-safe unfocused labels outside document content.
     -   `src/element/styles.ts`: Minimal component-owned layout and state CSS. Product styling is supplied by the host through `themeCss`.
     -   `src/extensions/registry.ts`: Extension validation, priority ordering, command merging, shortcuts, and input-rule plugins.
@@ -86,7 +86,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   A toolbar with buttons for toggling the view and note-specific import/export/settings. The view button uses `Edit`/`WYSIWYG` when editable WYSIWYG Preview is enabled and `Edit`/`Preview` for the read-only renderer.
 -   **`#settings-view`**: The screen for configuring settings.
     -   Can be accessed globally (from list view) or for a specific note (from editor view).
-    -   Controls for UI Mode (Light/Dark), Title behavior, Font Size, and independent WYSIWYG, Plain Text, and Code Block Line Spacing (`1.0`–`3.0`). Font size and all three spacing values support global values plus note-specific overrides.
+    -   Controls for UI Mode (Light/Dark), Title behavior, Font Size, independent WYSIWYG, Plain Text, and Code Block Line Spacing (`1.0`–`3.0`), and the global-only **Prevent Extra Empty Paragraphs** preference. Font size and all three spacing values support global values plus note-specific overrides.
     -   Checkbox for "Prevent deletion of used images".
     -   Legacy controls for adding two trailing spaces to pasted lines and tilde escaping.
     -   Buttons to navigate to Image Management, Recycle Bin, and Licenses pages.
@@ -102,7 +102,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   `notes`: An array of note objects. Each object contains an `id`, `title`, `content`, `settings`, and `metadata` (timestamps). Pinned notes may include `pinOrder`; older records fall back to `pinnedAt`.
     -   `deletedNotes`: An array of note objects that have been moved to the recycle bin.
     -   `activeNoteId`: Stores the `id` of the note currently being edited.
-    -   `globalSettings`: An object holding all global application settings, including WYSIWYG `lineHeight` (default `1.5`), `sourceLineHeight` and `codeLineHeight` (default `1.2`), `pinnedNoteDragDelayMs` (default `150`, range `100`–`2000`), and `wysiwygPreview` (default `true`) for editable versus read-only Preview.
+    -   `globalSettings`: An object holding all global application settings, including WYSIWYG `lineHeight` (default `1.5`), `sourceLineHeight` and `codeLineHeight` (default `1.2`), `pinnedNoteDragDelayMs` (default `150`, range `100`–`2000`), `wysiwygPreview` (default `true`) for editable versus read-only Preview, and `preventExtraEmptyParagraphs` (default `true`).
     -   `isPreview`: A boolean flag to track if the editor is in "Preview" or "Edit" mode.
     -   Navigation history is managed through the `history.ts` module.
 -   **Data Persistence**:
@@ -147,7 +147,7 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **`markdownEditor` (Event Listeners)** (handled in `src/events/editor.ts`):
     -   `input`: Updates the note content and metadata on every keystroke.
     -   WYSIWYG paste hooks save images to IndexedDB and apply enabled legacy text formatting through `src/editor/sidenote-editor-adapter.ts`.
-    -   `keydown`: WYSIWYG `Enter` continues bullet and ordered lists with the next item, but is consumed in an already empty top-level paragraph to avoid a non-serializable extra block. `Tab`/`Shift+Tab` changes the current list-item nesting level, and `Shift+Enter` inserts a single inline soft break inside the current list item or block; the full-document source editor retains `Shift+Enter` preview switching.
+    -   `keydown`: WYSIWYG `Enter` continues bullet and ordered lists with the next item. With the global `preventExtraEmptyParagraphs` setting enabled (default), it is consumed in an already empty top-level paragraph to avoid a non-serializable extra block; disabling the setting restores normal repeated-Enter behavior. `Tab`/`Shift+Tab` changes the current list-item nesting level, and `Shift+Enter` inserts a single inline soft break inside the current list item or block; the full-document source editor retains `Shift+Enter` preview switching.
     -   `image-activate`: Opens the SideNote image modal using the display URL supplied by the component.
     -   Custom title editing: `Enter` or `Escape` commits the title input; `Escape` is consumed before global back navigation so the note stays open.
 -   **`getPreviewModeButtonLabel()` / `applyEditorDisplayMode()` / `togglePreview()`**: Uses the same custom element for editable WYSIWYG and read-only Preview, selected by the global `wysiwygPreview` setting, switches Edit to full-document Markdown source mode, and labels the source-mode return button `WYSIWYG` or `Preview` accordingly (located in `src/notes_view/editor-mode.ts`).

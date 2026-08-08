@@ -38,7 +38,7 @@ Markdown source 모드에서는 editable WYSIWYG Preview가 켜져 있으면 돌
 | 동작 | 결과 |
 | --- | --- |
 | `Shift+Enter` | 새 문단을 만들지 않고 현재 블록 안에서 한 줄 내림 |
-| 이미 비어 있는 최상위 일반 문단에서 `Enter` | Markdown이 보존할 수 없는 빈 블록을 추가로 만들지 않고 현재 빈 문단 유지 |
+| 이미 비어 있는 최상위 일반 문단에서 `Enter` | `preventExtraEmptyParagraphs`가 켜진 기본 상태에서는 Markdown이 보존할 수 없는 빈 블록을 추가하지 않고 현재 문단 유지. 끄면 ProseMirror의 일반 문단 생성 동작 사용 |
 | 내용이 있는 글머리 기호 목록 항목에서 `Enter` | 다음 글머리 기호 항목 생성 |
 | 내용이 있는 번호 목록 항목에서 `Enter` | 다음 번호의 목록 항목 생성 |
 | 빈 목록 항목에서 `Enter` | 현재 목록 종료 |
@@ -73,7 +73,11 @@ ProseMirror 동작을 유지합니다.
 최상위 일반 문단에서는 첫 번째 `Enter`가 새 문단을 만듭니다. 새 문단이 아직
 비어 있으면 다음 `Enter`는 추가 빈 문단을 만들지 않고 소비됩니다. CommonMark는
 내용 없는 문단을 별도 블록으로 표현할 수 없으므로 source 모드를 왕복해도
-WYSIWYG 문서 구조가 달라지지 않습니다.
+WYSIWYG 문서 구조가 달라지지 않습니다. 이 기본 동작은
+`preventExtraEmptyParagraphs` 속성 또는 `prevent-extra-empty-paragraphs`
+attribute로 바꿀 수 있습니다. SideNote에서는 전역 전용 **Prevent Extra Empty
+Paragraphs** 설정으로 제공하며, 끄면 `Enter`를 반복해 일시적인 빈 문단을 더
+만들 수 있습니다.
 
 글머리 기호와 번호 목록의 마커는 `--editor-list-marker-color`를 사용해 항목의
 본문 글자색을 바꾸지 않으면서 본문과 시각적으로 구분됩니다. SideNote는 라이트와

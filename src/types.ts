@@ -17,6 +17,7 @@ export interface GlobalSettings {
   codeLineHeight: number;
   pinnedNoteDragDelayMs: number;
   wysiwygPreview: boolean;
+  preventExtraEmptyParagraphs: boolean;
   legacyLineBreakMode: boolean;
   autoLineBreak: boolean;
   showTildeReplacementButton: boolean;

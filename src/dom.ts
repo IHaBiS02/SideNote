@@ -35,6 +35,8 @@ const showTildeReplacementButtonCheckbox = document.getElementById('show-tilde-r
 const legacyLineBreakModeCheckbox = document.getElementById('legacy-line-break-mode-checkbox') as HTMLInputElement;
 const codeBlockHeaderCheckbox = document.getElementById('code-block-header-checkbox') as HTMLInputElement;
 const wysiwygPreviewCheckbox = document.getElementById('wysiwyg-preview-checkbox') as HTMLInputElement;
+const preventExtraEmptyParagraphsCheckbox = document.getElementById('prevent-extra-empty-paragraphs-checkbox') as HTMLInputElement;
+const preventExtraEmptyParagraphsContainer = document.getElementById('prevent-extra-empty-paragraphs-setting') as HTMLDivElement;
 // === 가져오기/내보내기 요소 ===
 const globalExportButton = document.getElementById('global-export-button') as HTMLButtonElement;
 const globalImportButton = document.getElementById('global-import-button') as HTMLButtonElement;
@@ -89,6 +91,8 @@ export {
   legacyLineBreakModeCheckbox,
   codeBlockHeaderCheckbox,
   wysiwygPreviewCheckbox,
+  preventExtraEmptyParagraphsCheckbox,
+  preventExtraEmptyParagraphsContainer,
   globalExportButton,
   globalImportButton,
   globalImportInput,

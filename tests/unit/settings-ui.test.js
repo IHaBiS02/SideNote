@@ -18,6 +18,9 @@ function renderSettingsDom() {
     <select id="mode-setting"></select>
     <input type="checkbox" id="code-block-header-checkbox">
     <input type="checkbox" id="wysiwyg-preview-checkbox">
+    <div id="prevent-extra-empty-paragraphs-setting">
+      <input type="checkbox" id="prevent-extra-empty-paragraphs-checkbox">
+    </div>
     <input type="checkbox" id="prevent-used-image-deletion-checkbox">
   `;
 }
@@ -101,6 +104,22 @@ describe('settings UI helpers', () => {
 
     expect(populateSettingsForm(true)).toBe(true);
     expect(document.getElementById('wysiwyg-preview-checkbox').checked).toBe(true);
+  });
+
+  it('enables extra empty paragraph prevention only in global settings by default', async () => {
+    const { populateSettingsForm } = await loadSettingsModule({});
+    const container = document.getElementById('prevent-extra-empty-paragraphs-setting');
+    const checkbox = document.getElementById('prevent-extra-empty-paragraphs-checkbox');
+
+    expect(populateSettingsForm(true)).toBe(true);
+    expect(container.hidden).toBe(false);
+    expect(checkbox.checked).toBe(true);
+
+    expect(populateSettingsForm(false, {
+      id: 'note-1',
+      settings: {},
+    })).toBe(true);
+    expect(container.hidden).toBe(true);
   });
 
   it('shows the pinned-note hold delay only in global settings', async () => {

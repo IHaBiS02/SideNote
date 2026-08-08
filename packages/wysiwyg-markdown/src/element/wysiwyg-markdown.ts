@@ -88,6 +88,11 @@ export class WysiwygMarkdownElement extends LitElement {
       attribute: 'show-code-line-numbers',
       reflect: true,
     },
+    preventExtraEmptyParagraphs: {
+      type: Boolean,
+      attribute: 'prevent-extra-empty-paragraphs',
+      reflect: true,
+    },
     codeHighlighter: { attribute: false },
     themeCss: { attribute: false },
     blockSourceOpen: { state: true },
@@ -105,6 +110,7 @@ export class WysiwygMarkdownElement extends LitElement {
   sourceEditScope: SourceEditScope = 'document';
   showCodeBlockHeader = true;
   showCodeLineNumbers = false;
+  preventExtraEmptyParagraphs = true;
   codeHighlighter?: CodeHighlighter;
   themeCss = '';
   uploadImage?: ImageUploadHandler;
@@ -134,7 +140,10 @@ export class WysiwygMarkdownElement extends LitElement {
   });
   readonly #blockEditingKeymapPlugin = keymap({
     Backspace: clearEmptyHeading,
-    Enter: ignoreEnterInEmptyTopLevelParagraph,
+    Enter: state => (
+      this.preventExtraEmptyParagraphs
+      && ignoreEnterInEmptyTopLevelParagraph(state)
+    ),
   });
   readonly #lineBreakKeymapPlugin = keymap({
     'Shift-Enter': chainCommands(newlineInCode, (state, dispatch) => {

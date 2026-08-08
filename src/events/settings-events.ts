@@ -19,6 +19,7 @@ import {
   legacyLineBreakModeCheckbox,
   codeBlockHeaderCheckbox,
   wysiwygPreviewCheckbox,
+  preventExtraEmptyParagraphsCheckbox,
   preventUsedImageDeletionCheckbox,
   licenseContent,
   editorTitle,
@@ -280,6 +281,16 @@ function initializeSettingsEvents(): void {
   // use the same WYSIWYG renderer so their layout and theme remain identical.
   wysiwygPreviewCheckbox.addEventListener('change', () => {
     globalSettings.wysiwygPreview = wysiwygPreviewCheckbox.checked;
+    saveGlobalSettings();
+  });
+
+  // This keyboard interaction preference is global-only and applies to the
+  // currently open editor immediately.
+  preventExtraEmptyParagraphsCheckbox.addEventListener('change', () => {
+    if (!isGlobalSettings) return;
+    const value = preventExtraEmptyParagraphsCheckbox.checked;
+    globalSettings.preventExtraEmptyParagraphs = value;
+    markdownEditor.preventExtraEmptyParagraphs = value;
     saveGlobalSettings();
   });
 

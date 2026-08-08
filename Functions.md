@@ -64,9 +64,9 @@ and deterministically regenerates the root `LIBRARY_LICENSES.md` file.
   optional dispatch function, and optional view.
 - `clearEmptyHeading(state, dispatch)`: Converts the selected empty heading to
   a paragraph so Backspace removes its Markdown heading marker.
-- `ignoreEnterInEmptyTopLevelParagraph(state)`: Consumes Enter when the caret is
-  already in an empty top-level paragraph, preventing an additional empty node
-  that Markdown could not restore.
+- `ignoreEnterInEmptyTopLevelParagraph(state)`: Reports whether the caret is in
+  an empty top-level paragraph so the element keymap can conditionally consume
+  Enter when the corresponding property is enabled.
 - `standardCommands`: Built-in named commands: `undo`, `redo`, `paragraph`,
   `heading1`, `heading2`, `heading3`, `toggleBold`, `toggleItalic`,
   `toggleCode`, `toggleStrike`, and `blockquote`.
@@ -81,6 +81,9 @@ public properties are:
 - `placeholder`, `readonly`, `disabled`, `name`: Standard input state.
 - `sourceEditScope`: `document` by default; `block` is an explicit opt-in.
 - `showCodeBlockHeader`, `showCodeLineNumbers`: Code-block UI controls.
+- `preventExtraEmptyParagraphs`: When `true` (default), consumes repeated
+  `Enter` in an empty top-level paragraph. Reflected as
+  `prevent-extra-empty-paragraphs`.
 - `themeCss`: Trusted host CSS injected into the component Shadow DOM.
 - `codeHighlighter(code, language)`: Returns token ranges/classes used as
   ProseMirror decorations.
@@ -115,8 +118,10 @@ produces the next bullet or number, Tab nests the current item under a preceding
 sibling, and Shift+Tab moves it outward. `Shift+Enter` inserts a `soft_break`
 inside the current item; an empty list item falls through to the base keymap so
 `Enter` exits the list. Before those handlers, the block-editing keymap consumes
-`Enter` in an already empty top-level paragraph so repeated Enter presses do not
-create a transient block with no distinct CommonMark representation.
+`Enter` in an already empty top-level paragraph when
+`preventExtraEmptyParagraphs` is enabled, so repeated Enter presses do not
+create a transient block with no distinct CommonMark representation. When the
+property is disabled, the keymap falls through to normal ProseMirror behavior.
 
 In document source scope, a WYSIWYG double-click resolves the pointer to a
 ProseMirror position and maps it to the canonical Markdown offset. The source
@@ -188,6 +193,8 @@ the Markdown schema remains fixed for document compatibility.
 - `types.ts`: Defines the shared `Note`, `NoteSettings`, `GlobalSettings`,
   `StoredImage`, and `NavigationHistoryState` contracts. Pinned notes can store
   an optional `pinOrder`; legacy records without it fall back to `pinnedAt`.
+  `GlobalSettings.preventExtraEmptyParagraphs` stores the global-only repeated
+  Enter preference.
 - `globals.d.ts`: Types the packaged `browser`, JSZip, Marked, DOMPurify, and
   highlight.js globals without adding runtime imports to browser modules.
 
@@ -292,7 +299,7 @@ module.
 
 SideNote integration for the reusable WYSIWYG Markdown Web Component:
 
-- `initializeWysiwygMarkdownEditor()`: Installs the 4.1.14-compatible SideNote Preview theme, shared Preview/Edit padding, code line numbers, image hooks, pasted-text processing, and highlight.js decorations on `#markdown-editor`
+- `initializeWysiwygMarkdownEditor()`: Installs the 4.1.14-compatible SideNote Preview theme, shared Preview/Edit padding, code line numbers, the saved empty-paragraph preference, image hooks, pasted-text processing, and highlight.js decorations on `#markdown-editor`
 - `setEditorMode(mode)`: Forwards `wysiwyg`, `source`, or `readonly` mode changes to the custom element when available
 
 Internal image Markdown paths remain `images/{id}.png`; the adapter resolves them to temporary Blob URLs without changing saved note content.
@@ -322,7 +329,7 @@ Settings management (functions exported):
 - `populateSettingsForm(isGlobal, note)`: Populates settings fields for either
   global or note-specific settings, including effective font size and all three
   line-spacing values. The global form also shows the pinned-note hold delay;
-  the note-specific form hides it.
+  the note-specific form hides it and the global-only empty-paragraph toggle.
 
 **Note**: Uses `globalSettings` from state.js module
 
@@ -500,9 +507,9 @@ Settings-related event listeners:
 
 - `initializeSettingsEvents()`: Sets up all settings-related event listeners
 
-Handles: note/global settings (including live line-spacing updates and the
-global-only pinned-note hold delay), licenses, recycle bin, image management,
-confirmation dropdowns
+Handles: note/global settings (including live line-spacing updates, the
+global-only pinned-note hold delay, and live empty-paragraph prevention),
+licenses, recycle bin, image management, confirmation dropdowns
 
 ### src/events/import-export-events.ts
 

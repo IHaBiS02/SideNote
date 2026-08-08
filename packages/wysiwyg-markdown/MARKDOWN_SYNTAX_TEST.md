@@ -211,7 +211,8 @@ console.log('nested fence');
 - [ ] 빈 제목에서 `Backspace`를 눌러 일반 문단으로 돌아가는지 확인
 - [ ] 빈 문단에서 `> `, `- `, `1. `, `` ``` ``, `---` 입력 규칙 확인
 - [ ] 목록에서 `Enter`로 다음 항목 생성, `Shift+Enter`로 항목 내부 줄바꿈 확인
-- [ ] 일반 문단에서 첫 `Enter`로 새 문단을 만든 뒤 다시 `Enter`를 눌러도 빈 문단이 추가되지 않는지 확인
+- [ ] 전역 **Prevent Extra Empty Paragraphs**를 켠 상태에서 일반 문단의 첫 `Enter`로 새 문단을 만든 뒤 다시 `Enter`를 눌러도 빈 문단이 추가되지 않는지 확인
+- [ ] 전역 **Prevent Extra Empty Paragraphs**를 끈 상태에서는 빈 문단에서 `Enter`를 반복할 때 추가 빈 문단이 만들어지는지 확인
 - [ ] 두 번째 이후 목록 항목에서 `Tab`, 중첩 항목에서 `Shift+Tab` 확인
 - [ ] 빈 목록 항목에서 `Enter`를 눌러 목록을 종료하는지 확인
 - [ ] URL을 붙여넣으면 `[URL](URL)` 형태로 저장되는지 확인

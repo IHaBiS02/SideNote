@@ -9,8 +9,9 @@ A simple notes browser extension that provides a note-taking interface in the br
 - **Full Markdown Source Editing**: Double-click Preview or press Edit to edit
   the complete note as plain Markdown text
 - **Soft Line Breaks**: Preview renders normal newlines without requiring trailing spaces
-- **Stable Empty Paragraphs**: Repeated Enter in an empty top-level paragraph
-  does not create a transient block that disappears after source editing
+- **Configurable Empty Paragraphs**: By default, repeated Enter in an empty
+  top-level paragraph does not create a transient block that disappears after
+  source editing; the global setting can restore normal repeated-Enter behavior
 - **Extensible Editing**: Lit/ProseMirror editor with commands, shortcuts, and
   input-rule extensions
 - **Code Blocks**: Language/copy headers, editable highlight.js syntax
@@ -97,6 +98,12 @@ You can paste image on the clipboard directly into notes by Ctrl+V.
 Legacy text-processing options are available in settings for older Markdown workflows that used trailing spaces for line breaks.
 
 In settings, you can choose theme, Mode of Title (Default use first line as title, Custom let user type own title by double-click title in note), text size, whether Preview is directly editable, code block header behavior, image deletion behavior, and legacy Markdown line-break behavior. WYSIWYG text, full-document plain text, and fenced code blocks have independent line-spacing controls from `1.0` to `3.0`, available globally or per note. Their defaults are `1.5`, `1.2`, and `1.2`, respectively. Editable WYSIWYG Preview is enabled by default; disabling it keeps the same rendering and switches Preview to read-only mode.
+
+The global **Prevent Extra Empty Paragraphs** setting is enabled by default. It
+ignores another `Enter` when the caret is already in an empty top-level
+paragraph so source-mode round trips do not remove a temporary blank block.
+Disable it to allow repeated `Enter` presses to create additional empty
+paragraphs using normal ProseMirror behavior.
 
 Images button show all images used in the notes, showing that which one is used in which note.
 Recycle bin shows all soft-deleted notes and images, and let user delete all at once.

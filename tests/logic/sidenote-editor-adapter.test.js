@@ -6,6 +6,10 @@ const mocks = vi.hoisted(() => ({
   getImage: vi.fn(),
   saveImage: vi.fn(),
   processPastedText: vi.fn((text) => `processed:${text}`),
+  normalizeGlobalSettings: vi.fn(settings => ({
+    ...settings,
+    preventExtraEmptyParagraphs: settings.preventExtraEmptyParagraphs ?? true,
+  })),
   resolveLegacyTextProcessingSettings: vi.fn(() => ({ legacyLineBreakMode: false })),
 }));
 
@@ -15,6 +19,7 @@ vi.mock('../../src/database/index.js', () => ({
 }));
 
 vi.mock('../../src/settings.js', () => ({
+  normalizeGlobalSettings: mocks.normalizeGlobalSettings,
   resolveLegacyTextProcessingSettings: mocks.resolveLegacyTextProcessingSettings,
 }));
 
@@ -49,6 +54,7 @@ describe('SideNote WYSIWYG editor adapter', () => {
     expect(adapter.initializeWysiwygMarkdownEditor()).toBe(true);
     expect(editor.sourceEditScope).toBe('document');
     expect(editor.showCodeLineNumbers).toBe(true);
+    expect(editor.preventExtraEmptyParagraphs).toBe(true);
     expect(editor.themeCss).toContain('white-space: pre-wrap');
     expect(editor.themeCss).toContain('.code-block-header');
     expect(editor.themeCss).toContain('var(--editor-code-header-background)');

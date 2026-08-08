@@ -134,4 +134,19 @@ describe('settings events', () => {
     noteInput.dispatchEvent(new Event('input'));
     expect(noteState.globalSettings.pinnedNoteDragDelayMs).toBeUndefined();
   });
+
+  it('stores the global empty-paragraph preference and applies it immediately', async () => {
+    const state = await initializeSettings({ isGlobal: true });
+    const checkbox = document.getElementById('prevent-extra-empty-paragraphs-checkbox');
+    const editor = document.getElementById('markdown-editor');
+
+    checkbox.checked = false;
+    checkbox.dispatchEvent(new Event('change'));
+
+    expect(state.globalSettings.preventExtraEmptyParagraphs).toBe(false);
+    expect(editor.preventExtraEmptyParagraphs).toBe(false);
+    await expect(browser.storage.local.get('globalSettings')).resolves.toEqual({
+      globalSettings: state.globalSettings,
+    });
+  });
 });
