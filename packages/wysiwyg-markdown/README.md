@@ -115,6 +115,9 @@ rapid checkbox clicks do not open source mode.
 
 When the caret is in an empty heading, `Backspace` converts it to a paragraph
 and removes its `#` heading marker from the Markdown value.
+At the top level, `Enter` in an already empty paragraph is consumed so repeated
+Enter presses do not create transient empty blocks that CommonMark cannot
+serialize or restore.
 
 A host application can provide trusted CSS through `themeCss`. Editable syntax
 highlighting uses ProseMirror decorations, so it does not rewrite editable DOM.

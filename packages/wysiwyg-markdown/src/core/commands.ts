@@ -38,6 +38,18 @@ export const clearEmptyHeading: Command = (state, dispatch) => {
   return setBlockType(paragraph)(state, dispatch);
 };
 
+export const ignoreEnterInEmptyTopLevelParagraph: Command = (state) => {
+  const { selection } = state;
+  const { $from } = selection;
+
+  return (
+    selection.empty &&
+    $from.depth === 1 &&
+    $from.parent.type === state.schema.nodes.paragraph &&
+    $from.parent.content.size === 0
+  );
+};
+
 export const standardCommands: Record<string, EditorCommand> = {
   undo: fromProseMirrorCommand(undo),
   redo: fromProseMirrorCommand(redo),

@@ -9,6 +9,8 @@ A simple notes browser extension that provides a note-taking interface in the br
 - **Full Markdown Source Editing**: Double-click Preview or press Edit to edit
   the complete note as plain Markdown text
 - **Soft Line Breaks**: Preview renders normal newlines without requiring trailing spaces
+- **Stable Empty Paragraphs**: Repeated Enter in an empty top-level paragraph
+  does not create a transient block that disappears after source editing
 - **Extensible Editing**: Lit/ProseMirror editor with commands, shortcuts, and
   input-rule extensions
 - **Code Blocks**: Language/copy headers, editable highlight.js syntax

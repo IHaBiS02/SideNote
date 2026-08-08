@@ -490,6 +490,38 @@ describe('wysiwyg-markdown element', () => {
     expect(editor.value).not.toContain('\n\n');
   });
 
+  it('ignores Enter in an already empty top-level paragraph', async () => {
+    const editor = await createEditor('First paragraph');
+    const proseMirror = editor.renderRoot.querySelector<HTMLElement>('.ProseMirror');
+    selectDocumentEnd(editor);
+
+    const pressEnter = () => proseMirror?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'Enter',
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+
+    pressEnter();
+    await editor.updateComplete;
+    expect(editor.renderRoot.querySelectorAll('.ProseMirror > p')).toHaveLength(2);
+
+    pressEnter();
+    await editor.updateComplete;
+    expect(editor.renderRoot.querySelectorAll('.ProseMirror > p')).toHaveLength(2);
+
+    expect(editor.insertText('Second paragraph')).toBe(true);
+    await editor.updateComplete;
+    expect(editor.value).toBe('First paragraph\n\nSecond paragraph');
+
+    editor.setMode('source');
+    await editor.updateComplete;
+    editor.setMode('wysiwyg');
+    await editor.updateComplete;
+    expect(editor.renderRoot.querySelectorAll('.ProseMirror > p')).toHaveLength(2);
+  });
+
   it.each([
     ['bullet', '* Item', 'ul', /\* Next/],
     ['ordered', '1. Item', 'ol', /2\. Next/],

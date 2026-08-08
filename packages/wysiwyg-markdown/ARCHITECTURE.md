@@ -129,7 +129,11 @@ an item below its preceding sibling and Shift+Tab moves a nested item outward.
 `Shift+Enter` inserts a soft break inside the current list item or other normal
 inline content and preserves newline behavior inside code. Pressing `Backspace`
 in an empty heading converts it to a paragraph, removing the corresponding
-Markdown heading marker without opening source mode. SideNote uses
+Markdown heading marker without opening source mode. The block-editing keymap
+also consumes `Enter` in an empty top-level paragraph before the base keymap can
+create another empty node. This avoids transient document structure that has no
+distinct CommonMark serialization, while nested empty list items still reach
+the normal list-exit behavior. SideNote uses
 full-document source mode when the user
 double-clicks Preview or presses Edit. A double-click coordinate is resolved to
 a ProseMirror document position, then mapped into canonical Markdown by

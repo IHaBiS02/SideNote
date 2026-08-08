@@ -57,7 +57,7 @@ SideNote is a browser extension that provides a note-taking interface within the
 -   **`packages/wysiwyg-markdown/`**: The reusable Lit/ProseMirror editor npm workspace:
     -   `src/index.ts`: Public exports and idempotent registration of `<wysiwyg-markdown>`.
     -   `src/core/markdown.ts`: ProseMirror schema plus Markdown parser and serializer. It covers headings, emphasis, strikethrough, lists/tasks, soft breaks, fenced code, links, and images. Link serialization uses explicit `[text](destination)` syntax, including when the text and destination are identical.
-    -   `src/core/commands.ts`: Standard history, block, and inline-format commands.
+    -   `src/core/commands.ts`: Standard history, block, and inline-format commands, including empty-heading reset and repeated-Enter suppression in empty top-level paragraphs.
     -   `src/element/wysiwyg-markdown.ts`: Form-associated Lit custom element, ProseMirror lifecycle, source modes, node views, events, image hooks, public API, middle-/Ctrl-/Cmd-click link navigation, and directly editable code-language controls with selection-safe unfocused labels outside document content.
     -   `src/element/styles.ts`: Minimal component-owned layout and state CSS. Product styling is supplied by the host through `themeCss`.
     -   `src/extensions/registry.ts`: Extension validation, priority ordering, command merging, shortcuts, and input-rule plugins.
@@ -147,7 +147,7 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **`markdownEditor` (Event Listeners)** (handled in `src/events/editor.ts`):
     -   `input`: Updates the note content and metadata on every keystroke.
     -   WYSIWYG paste hooks save images to IndexedDB and apply enabled legacy text formatting through `src/editor/sidenote-editor-adapter.ts`.
-    -   `keydown`: WYSIWYG `Enter` continues bullet and ordered lists with the next item, `Tab`/`Shift+Tab` changes the current list-item nesting level, and `Shift+Enter` inserts a single inline soft break inside the current list item or block; the full-document source editor retains `Shift+Enter` preview switching.
+    -   `keydown`: WYSIWYG `Enter` continues bullet and ordered lists with the next item, but is consumed in an already empty top-level paragraph to avoid a non-serializable extra block. `Tab`/`Shift+Tab` changes the current list-item nesting level, and `Shift+Enter` inserts a single inline soft break inside the current list item or block; the full-document source editor retains `Shift+Enter` preview switching.
     -   `image-activate`: Opens the SideNote image modal using the display URL supplied by the component.
     -   Custom title editing: `Enter` or `Escape` commits the title input; `Escape` is consumed before global back navigation so the note stays open.
 -   **`getPreviewModeButtonLabel()` / `applyEditorDisplayMode()` / `togglePreview()`**: Uses the same custom element for editable WYSIWYG and read-only Preview, selected by the global `wysiwygPreview` setting, switches Edit to full-document Markdown source mode, and labels the source-mode return button `WYSIWYG` or `Preview` accordingly (located in `src/notes_view/editor-mode.ts`).

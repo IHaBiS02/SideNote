@@ -64,6 +64,9 @@ and deterministically regenerates the root `LIBRARY_LICENSES.md` file.
   optional dispatch function, and optional view.
 - `clearEmptyHeading(state, dispatch)`: Converts the selected empty heading to
   a paragraph so Backspace removes its Markdown heading marker.
+- `ignoreEnterInEmptyTopLevelParagraph(state)`: Consumes Enter when the caret is
+  already in an empty top-level paragraph, preventing an additional empty node
+  that Markdown could not restore.
 - `standardCommands`: Built-in named commands: `undo`, `redo`, `paragraph`,
   `heading1`, `heading2`, `heading3`, `toggleBold`, `toggleItalic`,
   `toggleCode`, `toggleStrike`, and `blockquote`.
@@ -111,7 +114,9 @@ The built-in keymaps run `splitListItem()` for `Enter`, `sinkListItem()` for
 produces the next bullet or number, Tab nests the current item under a preceding
 sibling, and Shift+Tab moves it outward. `Shift+Enter` inserts a `soft_break`
 inside the current item; an empty list item falls through to the base keymap so
-`Enter` exits the list.
+`Enter` exits the list. Before those handlers, the block-editing keymap consumes
+`Enter` in an already empty top-level paragraph so repeated Enter presses do not
+create a transient block with no distinct CommonMark representation.
 
 In document source scope, a WYSIWYG double-click resolves the pointer to a
 ProseMirror position and maps it to the canonical Markdown offset. The source

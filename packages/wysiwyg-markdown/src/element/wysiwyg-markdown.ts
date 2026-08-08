@@ -22,6 +22,7 @@ import {
 } from 'prosemirror-view';
 import {
   clearEmptyHeading,
+  ignoreEnterInEmptyTopLevelParagraph,
   standardCommands,
   type EditorCommand,
 } from '../core/commands';
@@ -133,6 +134,7 @@ export class WysiwygMarkdownElement extends LitElement {
   });
   readonly #blockEditingKeymapPlugin = keymap({
     Backspace: clearEmptyHeading,
+    Enter: ignoreEnterInEmptyTopLevelParagraph,
   });
   readonly #lineBreakKeymapPlugin = keymap({
     'Shift-Enter': chainCommands(newlineInCode, (state, dispatch) => {

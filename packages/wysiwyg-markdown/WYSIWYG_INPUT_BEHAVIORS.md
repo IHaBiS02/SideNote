@@ -42,6 +42,7 @@ the converted empty heading changes it back to a paragraph.
 | Action | Result |
 | --- | --- |
 | `Shift+Enter` | Insert a line break inside the current block without creating a new paragraph |
+| `Enter` in an already empty top-level paragraph | Keep the current empty paragraph instead of creating another empty block that Markdown cannot preserve |
 | `Enter` in a non-empty bullet-list item | Create the next bullet-list item |
 | `Enter` in a non-empty ordered-list item | Create the next item with the following number |
 | `Enter` in an empty list item | Exit the current list |
@@ -73,6 +74,11 @@ is available, `Tab` nests the current bullet or numbered item beneath it;
 sibling cannot be nested and remains unchanged. `Shift+Enter` also inserts a
 line break inside a code block; other blocks retain their normal ProseMirror
 behavior.
+
+At the top level, the first `Enter` creates a new paragraph. If that paragraph
+is still empty, another `Enter` is consumed without creating an additional
+empty paragraph. CommonMark has no distinct empty-paragraph block, so this
+keeps the WYSIWYG document stable across source-mode round trips.
 
 Bullet and ordered-list markers use `--editor-list-marker-color` so they remain
 visually distinct from item text without changing the text color. SideNote
