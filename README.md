@@ -106,7 +106,8 @@ Disable it to allow repeated `Enter` presses to create additional empty
 paragraphs using normal ProseMirror behavior. Hover over the checkbox itself
 for a tooltip explaining both modes and the source-mode round-trip limitation.
 All other settings checkboxes, selection fields, and number inputs also provide
-control-specific hover explanations.
+control-specific hover explanations, with each sentence displayed on its own
+line for readability.
 
 Images button show all images used in the notes, showing that which one is used in which note.
 Recycle bin shows all soft-deleted notes and images, and let user delete all at once.

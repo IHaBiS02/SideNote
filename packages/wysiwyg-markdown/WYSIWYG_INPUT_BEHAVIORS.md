@@ -85,7 +85,8 @@ global-only **Prevent Extra Empty Paragraphs** setting; turning it off allows
 repeated Enter presses to create additional transient empty paragraphs.
 Hovering the checkbox itself shows the same round-trip behavior in a native
 tooltip. SideNote provides equivalent control-specific hover help for every
-other settings checkbox, selection field, and number input.
+other settings checkbox, selection field, and number input, with each sentence
+on a separate line.
 
 Bullet and ordered-list markers use `--editor-list-marker-color` so they remain
 visually distinct from item text without changing the text color. SideNote

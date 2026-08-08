@@ -63,6 +63,11 @@ describe('settings events', () => {
     expect(controls).toHaveLength(13);
     controls.forEach((control) => {
       expect(control.title.trim(), control.id).not.toBe('');
+      const tooltipLines = control.title.split('\n');
+      expect(tooltipLines.length, control.id).toBeGreaterThan(1);
+      tooltipLines.forEach((line) => {
+        expect(line.trim(), control.id).toMatch(/[.!?]$/);
+      });
     });
   });
 
