@@ -138,8 +138,15 @@ describe('standalone document export', () => {
     expect(html).toContain('target="_blank"');
     expect(html).toContain('rel="noopener noreferrer"');
     expect(html).toContain('--export-font-size: 14px');
-    expect(html).toContain('type="checkbox"');
-    expect(html).toContain('disabled=""');
+    const checkbox = exportedDocument.querySelector('input[type="checkbox"]');
+    expect(checkbox).not.toBeNull();
+    expect(checkbox.disabled).toBe(false);
+    expect(checkbox.hasAttribute('disabled')).toBe(false);
+    expect(checkbox.checked).toBe(true);
+    checkbox.click();
+    expect(checkbox.checked).toBe(false);
+    expect(html).toContain('--export-checkbox-accent: #007bff');
+    expect(html).toContain('margin: 0 5px 0 0');
     expect(mocks.getImage).toHaveBeenCalledWith('image-1');
     expect(fetch).toHaveBeenCalledWith(
       'https://placehold.co/120x80.png',

@@ -1,6 +1,7 @@
 import { getImage } from './database/index.js';
 import { resolveEffectiveSettings } from './settings.js';
 import { downloadFile, sanitizeFilename } from './utils.js';
+import { createNoteContentStyles } from './editor/note-content-styles.js';
 import type { GlobalSettings, Note } from './types.js';
 
 type DocumentExportSettings = Pick<
@@ -76,6 +77,13 @@ const STANDALONE_NOTE_SCRIPT = `
   })();
 `;
 
+const STANDALONE_NOTE_CONTENT_CSS = createNoteContentStyles({
+  rootSelector: '.sidenote-export .note-content',
+  variableNamespace: 'export',
+  taskItemSelector: 'li.task-list-item',
+  tableAlignmentSource: 'align',
+});
+
 const STANDALONE_NOTE_CSS = `
   html.sidenote-export-document {
     color-scheme: light dark;
@@ -106,20 +114,40 @@ const STANDALONE_NOTE_CSS = `
 
   .sidenote-export {
     --export-background: #ffffff;
-    --export-color: #24292f;
-    --export-muted-color: #57606a;
-    --export-border-color: #d0d7de;
-    --export-code-background: #f5f5f5;
-    --export-code-color: #24292f;
-    --export-code-header-background: #eeeeee;
-    --export-link-color: #0969da;
+    --export-color: #000000;
+    --export-border-color: #cccccc;
+    --export-list-marker-color: #8a8a8a;
+    --export-table-border-color: #000000;
+    --export-table-aligned-cell-padding: 5px;
+    --export-code-background: #fafafa;
+    --export-code-color: #383a42;
+    --export-code-header-background: #f5f5f5;
+    --export-code-header-color: #555555;
+    --export-link-color: #007bff;
+    --export-link-visited-color: #551a8b;
+    --export-link-hover-color: #0056b3;
+    --export-link-active-color: #0056b3;
+    --export-inline-code-background: #f0f0f0;
+    --export-inline-code-border: #cccccc;
+    --export-checkbox-accent: #007bff;
+    --export-hl-comment: #a0a1a7;
+    --export-hl-keyword: #a626a4;
+    --export-hl-name: #e45649;
+    --export-hl-literal: #0184bb;
+    --export-hl-string: #50a14f;
+    --export-hl-number: #986801;
+    --export-hl-title: #4078f2;
+    --export-hl-built-in: #c18401;
+    --export-font-family: Arial, sans-serif;
+    --export-code-font-family: monospace;
+    --export-heading-line-height: var(--export-line-height, 1.5);
     width: 100%;
     max-width: 900px;
     margin: 0 auto;
     padding: 0;
     background: var(--export-background);
     color: var(--export-color);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: var(--export-font-family);
     font-size: var(--export-font-size, 12px);
     line-height: var(--export-line-height, 1.5);
     overflow-wrap: anywhere;
@@ -135,25 +163,57 @@ const STANDALONE_NOTE_CSS = `
 
   .sidenote-export[data-theme="dark"] {
     --export-background: #1e1e1e;
-    --export-color: #d4d4d4;
-    --export-muted-color: #a0a0a0;
-    --export-border-color: #ffffff;
-    --export-code-background: #2a2a2a;
-    --export-code-color: #d4d4d4;
-    --export-code-header-background: #242424;
-    --export-link-color: #58a6ff;
+    --export-color: #e0e0e0;
+    --export-border-color: #444444;
+    --export-list-marker-color: #a8a8a8;
+    --export-table-border-color: #ffffff;
+    --export-code-background: #2d2d2d;
+    --export-code-color: #abb2bf;
+    --export-code-header-background: #252525;
+    --export-code-header-color: #cccccc;
+    --export-link-color: #82aaff;
+    --export-link-visited-color: #c792ea;
+    --export-link-hover-color: #add8e6;
+    --export-link-active-color: #ffffff;
+    --export-inline-code-background: #333333;
+    --export-inline-code-border: #555555;
+    --export-checkbox-accent: #82aaff;
+    --export-hl-comment: #5c6370;
+    --export-hl-keyword: #c678dd;
+    --export-hl-name: #e06c75;
+    --export-hl-literal: #56b6c2;
+    --export-hl-string: #98c379;
+    --export-hl-number: #d19a66;
+    --export-hl-title: #61aeee;
+    --export-hl-built-in: #e6c07b;
   }
 
   @media (prefers-color-scheme: dark) {
     .sidenote-export[data-theme="system"] {
       --export-background: #1e1e1e;
-      --export-color: #d4d4d4;
-      --export-muted-color: #a0a0a0;
-      --export-border-color: #ffffff;
-      --export-code-background: #2a2a2a;
-      --export-code-color: #d4d4d4;
-      --export-code-header-background: #242424;
-      --export-link-color: #58a6ff;
+      --export-color: #e0e0e0;
+      --export-border-color: #444444;
+      --export-list-marker-color: #a8a8a8;
+      --export-table-border-color: #ffffff;
+      --export-code-background: #2d2d2d;
+      --export-code-color: #abb2bf;
+      --export-code-header-background: #252525;
+      --export-code-header-color: #cccccc;
+      --export-link-color: #82aaff;
+      --export-link-visited-color: #c792ea;
+      --export-link-hover-color: #add8e6;
+      --export-link-active-color: #ffffff;
+      --export-inline-code-background: #333333;
+      --export-inline-code-border: #555555;
+      --export-checkbox-accent: #82aaff;
+      --export-hl-comment: #5c6370;
+      --export-hl-keyword: #c678dd;
+      --export-hl-name: #e06c75;
+      --export-hl-literal: #56b6c2;
+      --export-hl-string: #98c379;
+      --export-hl-number: #d19a66;
+      --export-hl-title: #61aeee;
+      --export-hl-built-in: #e6c07b;
     }
   }
 
@@ -166,91 +226,10 @@ const STANDALONE_NOTE_CSS = `
     line-height: var(--export-line-height, 1.5);
   }
 
-  .sidenote-export .note-content > :first-child {
-    margin-top: 0;
-  }
-
-  .sidenote-export .note-content > :last-child {
-    margin-bottom: 0;
-  }
-
-  .sidenote-export h1,
-  .sidenote-export h2,
-  .sidenote-export h3,
-  .sidenote-export h4,
-  .sidenote-export h5,
-  .sidenote-export h6 {
-    margin: 1em 0 0.5em;
-    font-weight: 700;
-    line-height: var(--export-line-height, 1.5);
-  }
-
-  .sidenote-export h1 { font-size: 2em; }
-  .sidenote-export h2 { font-size: 1.5em; }
-  .sidenote-export h3 { font-size: 1.25em; }
-  .sidenote-export h4 { font-size: 1em; }
-  .sidenote-export h5 { font-size: 0.875em; }
-  .sidenote-export h6 { font-size: 0.85em; color: var(--export-muted-color); }
-
-  .sidenote-export p,
-  .sidenote-export ul,
-  .sidenote-export ol,
-  .sidenote-export blockquote,
-  .sidenote-export table,
-  .sidenote-export .code-block {
-    margin: 0 0 1em;
-  }
-
-  .sidenote-export ul,
-  .sidenote-export ol {
-    padding-left: 2em;
-  }
-
-  .sidenote-export li + li {
-    margin-top: 0.25em;
-  }
-
-  .sidenote-export .task-list-item {
-    list-style: none;
-  }
-
-  .sidenote-export input[type="checkbox"] {
-    margin: 0 0.45em 0 -1.5em;
-    vertical-align: middle;
-  }
-
-  .sidenote-export blockquote {
-    padding-left: 1em;
-    border-left: 4px solid var(--export-border-color);
-    color: var(--export-muted-color);
-  }
-
-  .sidenote-export a {
-    color: var(--export-link-color);
-    text-decoration: none;
-  }
-
-  .sidenote-export a:hover {
-    text-decoration: underline;
-  }
-
-  .sidenote-export hr {
-    height: 1px;
-    margin: 1.5em 0;
-    border: 0;
-    background: var(--export-border-color);
-  }
-
-  .sidenote-export :not(pre) > code {
-    border: 1px solid var(--export-border-color);
-    border-radius: 4px;
-    padding: 0.15em 0.35em;
-    background: var(--export-code-background);
-    color: var(--export-code-color);
-    font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
-  }
+  ${STANDALONE_NOTE_CONTENT_CSS}
 
   .sidenote-export .code-block {
+    margin: 1em 0;
     break-inside: avoid;
     border: 1px solid var(--export-border-color);
     background: var(--export-code-background);
@@ -261,11 +240,11 @@ const STANDALONE_NOTE_CSS = `
     align-items: center;
     justify-content: space-between;
     min-height: 26px;
-    padding: 4px 7px;
+    padding: 3px 5px;
     border-bottom: 1px solid var(--export-border-color);
     background: var(--export-code-header-background);
-    color: var(--export-muted-color);
-    font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    color: var(--export-code-header-color);
+    font-family: var(--export-code-font-family);
     font-size: 0.9em;
   }
 
@@ -277,10 +256,14 @@ const STANDALONE_NOTE_CSS = `
   }
 
   .sidenote-export .copy-code-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     flex: 0 0 auto;
     min-width: 26px;
     height: 22px;
     border: 1px solid transparent;
+    border-radius: 6px;
     padding: 0 4px;
     background: transparent;
     color: inherit;
@@ -297,15 +280,15 @@ const STANDALONE_NOTE_CSS = `
 
   .sidenote-export pre {
     margin: 0 0 1em;
-    padding: 7px;
+    padding: 5px;
     break-inside: avoid;
     background: var(--export-code-background);
     color: var(--export-code-color);
-    font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    font-family: var(--export-code-font-family);
     line-height: var(--export-code-line-height, 1.2);
     white-space: pre-wrap;
     overflow-wrap: anywhere;
-    word-break: break-word;
+    word-break: break-all;
   }
 
   .sidenote-export .code-block pre {
@@ -313,69 +296,9 @@ const STANDALONE_NOTE_CSS = `
     border: 0;
   }
 
-  .sidenote-export table {
-    width: 100%;
-    border-collapse: collapse;
-    break-inside: avoid;
-  }
-
-  .sidenote-export th,
-  .sidenote-export td {
-    border: 1px solid var(--export-border-color);
-    padding: 5px;
-    text-align: center;
-  }
-
-  .sidenote-export th {
-    font-weight: 700;
-  }
-
-  .sidenote-export th[align="left"],
-  .sidenote-export td[align="left"] { text-align: left; }
-  .sidenote-export th[align="right"],
-  .sidenote-export td[align="right"] { text-align: right; }
-
+  .sidenote-export table,
   .sidenote-export img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    margin: 1em auto;
     break-inside: avoid;
-  }
-
-  .sidenote-export .hljs-comment,
-  .sidenote-export .hljs-quote { color: #6a737d; font-style: italic; }
-  .sidenote-export .hljs-keyword,
-  .sidenote-export .hljs-selector-tag { color: #d73a49; }
-  .sidenote-export .hljs-string,
-  .sidenote-export .hljs-regexp { color: #032f62; }
-  .sidenote-export .hljs-number,
-  .sidenote-export .hljs-literal { color: #005cc5; }
-  .sidenote-export .hljs-title,
-  .sidenote-export .hljs-section { color: #6f42c1; }
-
-  .sidenote-export[data-theme="dark"] .hljs-comment,
-  .sidenote-export[data-theme="dark"] .hljs-quote { color: #6a9955; }
-  .sidenote-export[data-theme="dark"] .hljs-keyword,
-  .sidenote-export[data-theme="dark"] .hljs-selector-tag { color: #c586c0; }
-  .sidenote-export[data-theme="dark"] .hljs-string,
-  .sidenote-export[data-theme="dark"] .hljs-regexp { color: #ce9178; }
-  .sidenote-export[data-theme="dark"] .hljs-number,
-  .sidenote-export[data-theme="dark"] .hljs-literal { color: #b5cea8; }
-  .sidenote-export[data-theme="dark"] .hljs-title,
-  .sidenote-export[data-theme="dark"] .hljs-section { color: #dcdcaa; }
-
-  @media (prefers-color-scheme: dark) {
-    .sidenote-export[data-theme="system"] .hljs-comment,
-    .sidenote-export[data-theme="system"] .hljs-quote { color: #6a9955; }
-    .sidenote-export[data-theme="system"] .hljs-keyword,
-    .sidenote-export[data-theme="system"] .hljs-selector-tag { color: #c586c0; }
-    .sidenote-export[data-theme="system"] .hljs-string,
-    .sidenote-export[data-theme="system"] .hljs-regexp { color: #ce9178; }
-    .sidenote-export[data-theme="system"] .hljs-number,
-    .sidenote-export[data-theme="system"] .hljs-literal { color: #b5cea8; }
-    .sidenote-export[data-theme="system"] .hljs-title,
-    .sidenote-export[data-theme="system"] .hljs-section { color: #dcdcaa; }
   }
 
   @page {
@@ -563,7 +486,12 @@ async function createExportArticle(
   content.className = 'note-content';
   content.innerHTML = sanitizedHtml;
   content.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')
-    .forEach(checkbox => { checkbox.disabled = true; });
+    .forEach((checkbox) => {
+      // Marked emits disabled task inputs. Standalone HTML may keep them
+      // interactive because its state is intentionally local to the file.
+      checkbox.disabled = false;
+      checkbox.removeAttribute('disabled');
+    });
   content.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((link) => {
     link.target = '_blank';
     link.rel = 'noopener noreferrer';

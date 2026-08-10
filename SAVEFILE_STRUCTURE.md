@@ -5,8 +5,12 @@ This document describes the file structure for SideNote's import/export function
 Standalone `.html` and `.pdf` exports are presentation formats, not SideNote
 backup/import formats. HTML export creates one self-contained file, embeds
 SideNote-stored and reachable external images as Base64 data URLs, and includes
-a local code-block copy handler. It fails when an external image cannot be
-downloaded instead of retaining an online image URL. PDF export directly creates
+a local code-block copy handler. Its note body shares SideNote Preview's
+semantic typography, list, link, table, checkbox, and syntax-highlight styles.
+HTML task checkboxes can be toggled locally, but their state is not saved back
+to SideNote or into the HTML file; reopening restores the exported state. It
+fails when an external image cannot be downloaded instead of retaining an
+online image URL. PDF export directly creates
 a local PDF from the same sanitized document without opening the print dialog;
 its rendered note content is rasterized rather than selectable text. Use
 `.snote` or `.snotes` when the note must be imported back into SideNote.

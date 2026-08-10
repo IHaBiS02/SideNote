@@ -75,6 +75,8 @@ describe('SideNote WYSIWYG editor adapter', () => {
     expect(editor.themeCss).toContain('line-height: var(--editor-source-line-height)');
     expect(editor.themeCss).toContain('word-break: keep-all');
     expect(editor.themeCss).toContain('background: var(--editor-inline-code-background)');
+    expect(editor.themeCss).toContain('accent-color: var(--editor-checkbox-accent)');
+    expect(editor.themeCss).toContain('margin: 0 5px 0 0');
     expect(editor.themeCss).toContain('border-collapse: collapse');
     expect(editor.themeCss).toContain(
       'border: 1px solid var(--editor-table-border-color)'

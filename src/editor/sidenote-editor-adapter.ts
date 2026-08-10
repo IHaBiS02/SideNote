@@ -6,6 +6,7 @@ import {
 import { globalSettings } from '../state.js';
 import { processPastedText } from '../text-processors.js';
 import { markdownEditor } from '../dom.js';
+import { createNoteContentStyles } from './note-content-styles.js';
 import type {
   CodeHighlightToken,
   EditorMode,
@@ -77,78 +78,16 @@ const SIDENOTE_EDITOR_THEME = `
   .editor-mount .ProseMirror {
     min-height: 100%;
     padding: var(--editor-padding);
-    font-family: var(--editor-font-family);
-    line-height: var(--editor-line-height);
-    overflow-wrap: anywhere;
-    word-break: break-word;
   }
 
-  .editor-mount .ProseMirror p {
-    line-height: var(--editor-line-height);
-  }
-
-  .editor-mount .ProseMirror a {
-    color: var(--editor-link-color);
-    text-decoration: none;
-  }
-
-  .editor-mount .ProseMirror a:visited {
-    color: var(--editor-link-visited-color);
-  }
-
-  .editor-mount .ProseMirror a:hover {
-    color: var(--editor-link-hover-color);
-    text-decoration: underline;
-  }
-
-  .editor-mount .ProseMirror a:active {
-    color: var(--editor-link-active-color);
-  }
-
-  .editor-mount .ProseMirror blockquote {
-    margin-left: 0;
-    padding-left: 10px;
-    border-left: 4px solid var(--editor-border-color);
-  }
-
-  .editor-mount .ProseMirror :not(pre) > code {
-    border: 1px solid var(--editor-inline-code-border);
-    border-radius: 4px;
-    padding: 2px 4px;
-    background: var(--editor-inline-code-background);
-  }
-
-  .editor-mount .ProseMirror ul,
-  .editor-mount .ProseMirror ol {
-    padding-left: 15px;
-  }
-
-  .editor-mount .ProseMirror li[data-task] {
-    display: list-item;
-    list-style: none;
-  }
-
-  .editor-mount .ProseMirror li[data-task] > input {
-    display: inline-block;
-    width: auto;
-    height: auto;
-    margin: 0 5px 0 0;
-    accent-color: var(--editor-checkbox-accent);
-    vertical-align: middle;
-  }
-
-  .editor-mount .ProseMirror .task-content {
-    display: inline;
-  }
-
-  .editor-mount .ProseMirror .task-content > p {
-    display: inline;
-  }
-
-  .editor-mount .ProseMirror li[data-checked="true"] .task-content {
-    opacity: 1;
-    text-decoration: none;
-  }
+  ${createNoteContentStyles({
+    rootSelector: '.editor-mount .ProseMirror',
+    variableNamespace: 'editor',
+    taskItemSelector: 'li[data-task]',
+    taskContentSelector: '.task-content',
+    checkedTaskSelector: 'li[data-checked="true"]',
+    tableAlignmentSource: 'style',
+  })}
 
   .editor-mount .ProseMirror pre {
     max-width: 100%;
@@ -263,99 +202,8 @@ const SIDENOTE_EDITOR_THEME = `
     color: var(--editor-code-color);
   }
 
-  .hljs-comment,
-  .hljs-quote {
-    color: var(--editor-hl-comment);
-    font-style: italic;
-  }
-
-  .hljs-doctag,
-  .hljs-keyword,
-  .hljs-formula {
-    color: var(--editor-hl-keyword);
-  }
-
-  .hljs-section,
-  .hljs-name,
-  .hljs-selector-tag,
-  .hljs-deletion,
-  .hljs-subst {
-    color: var(--editor-hl-name);
-  }
-
-  .hljs-literal {
-    color: var(--editor-hl-literal);
-  }
-
-  .hljs-string,
-  .hljs-regexp,
-  .hljs-addition,
-  .hljs-attribute,
-  .hljs-meta .hljs-string {
-    color: var(--editor-hl-string);
-  }
-
-  .hljs-attr,
-  .hljs-variable,
-  .hljs-template-variable,
-  .hljs-type,
-  .hljs-selector-class,
-  .hljs-selector-attr,
-  .hljs-selector-pseudo,
-  .hljs-number {
-    color: var(--editor-hl-number);
-  }
-
-  .hljs-symbol,
-  .hljs-bullet,
-  .hljs-link,
-  .hljs-meta,
-  .hljs-selector-id,
-  .hljs-title {
-    color: var(--editor-hl-title);
-  }
-
-  .hljs-built_in,
-  .hljs-title.class_,
-  .hljs-class .hljs-title {
-    color: var(--editor-hl-built-in);
-  }
-
-  .hljs-emphasis {
-    font-style: italic;
-  }
-
-  .hljs-strong {
-    font-weight: bold;
-  }
-
-  .hljs-link {
-    text-decoration: underline;
-  }
-
-  .editor-mount .ProseMirror code,
   .source-editor {
     font-family: var(--editor-code-font-family);
-  }
-
-  .editor-mount .ProseMirror table {
-    width: auto;
-    margin: 0;
-    border-collapse: collapse;
-    border-spacing: 0;
-    table-layout: auto;
-  }
-
-  .editor-mount .ProseMirror th,
-  .editor-mount .ProseMirror td {
-    min-width: 0;
-    border: 1px solid var(--editor-table-border-color);
-    padding: 1px;
-    overflow-wrap: anywhere;
-  }
-
-  .editor-mount .ProseMirror th {
-    background: transparent;
   }
 
   .source-editor {

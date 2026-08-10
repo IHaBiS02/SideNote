@@ -83,6 +83,9 @@ npm install
 - **src/editor/sidenote-editor-adapter.ts**: Connects SideNote storage,
   settings, paste processing, theme CSS, and highlight.js token ranges to the
   reusable editor Web Component
+- **src/editor/note-content-styles.ts**: Generates the shared semantic Markdown
+  body CSS used by WYSIWYG Preview and standalone HTML/PDF exports while
+  adapting their different task-list and table-alignment DOM selectors
 - **packages/wysiwyg-markdown/**: Lit/ProseMirror Web Component source, demo,
   tests, and build configuration managed as an npm workspace
 - **build.js**: Packages the compiled editor and extension files, including the
@@ -132,12 +135,17 @@ npm install
   line-number gutter. Code-copy controls show a one-second success check before
   restoring their icon and expose idle/success/error state accessibly
 - **Host Styling**: SideNote injects its 4.1.14-compatible theme through
-  `themeCss` because document CSS does not cross the editor Shadow DOM
+  `themeCss` because document CSS does not cross the editor Shadow DOM. Its
+  semantic body rules come from the same scoped CSS generator used by
+  standalone document exports
 - **Image Handling**: Images pasted/imported are stored as blobs in IndexedDB; blob URLs are tracked and revoked on re-render to prevent memory leaks
 - **HTML/PDF Export**: The current-note export menu can create a self-contained
   HTML document with SideNote-managed and reachable external images embedded as
-  Base64 data URLs plus local fenced-code copy buttons. Inaccessible external
-  images fail export rather than remaining online dependencies. html2pdf.js
+  Base64 data URLs plus local fenced-code copy buttons. The note body shares
+  Preview typography, lists, links, tables, syntax colors, and checkbox styling;
+  exported HTML task checkboxes remain interactive but do not persist changes
+  back to SideNote. Inaccessible external images fail export rather than
+  remaining online dependencies. html2pdf.js
   directly downloads a non-interactive rasterized PDF without the print dialog
   or a remote conversion service
 - **Pinned Note Ordering**: Pinned rows use delayed Pointer Events, a floating

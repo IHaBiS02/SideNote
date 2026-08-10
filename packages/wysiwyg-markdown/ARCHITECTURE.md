@@ -219,6 +219,13 @@ initializes `preventExtraEmptyParagraphs` from the saved global setting,
 resolves `images/{id}.png` references to scoped Blob URLs, stores pasted image
 files in IndexedDB, and applies enabled legacy text transformations.
 
+The host composes the semantic part of that injected theme with
+`src/editor/note-content-styles.ts`. The same generator targets the sanitized
+Marked tree used for SideNote's standalone HTML/PDF exports, adapting task-list
+and table-alignment selectors while keeping typography, links, inline code,
+checkboxes, tables, images, and syntax token colors aligned. Component-owned
+editing chrome and export-owned page layout remain outside that shared layer.
+
 The adapter intentionally does not modify the editor's default CSS source.
 SideNote controls fonts, colors, product-specific borders, and light/dark
 themes through the injected trusted CSS string and shared CSS variables. The

@@ -121,6 +121,10 @@ and reachable external images as Base64 data URLs for offline viewing. If an
 external image cannot be downloaded because of network or cross-origin rules,
 the export fails instead of leaving an online dependency in the file. Fenced
 code headers retain the SideNote copy button through a small embedded handler.
+The exported note body shares Preview typography, lists, links, tables,
+checkboxes, and syntax colors. Checklist boxes remain clickable in the saved
+HTML; those temporary changes are not written back to SideNote or the file, so
+reopening it restores the exported check state.
 PDF export renders the same sanitized document locally without opening the
 browser print dialog or sending the note to a server; interactive copy buttons
 are omitted. PDF pages preserve browser-rendered fonts and formatting, but
