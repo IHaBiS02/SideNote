@@ -13,7 +13,7 @@ interface HighlightJsGlobal {
 }
 
 interface MarkedGlobal {
-  parse(markdown: string): string;
+  parse(markdown: string, options?: Record<string, unknown>): string;
 }
 
 declare global {
@@ -26,6 +26,7 @@ declare global {
   const DOMPurify: {
     sanitize(dirty: string, config?: Record<string, unknown>): string;
   };
+  const html2pdf: typeof import('html2pdf.js').default;
   var hljs: HighlightJsGlobal;
 }
 

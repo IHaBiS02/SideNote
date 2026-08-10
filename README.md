@@ -21,7 +21,8 @@ A simple notes browser extension that provides a note-taking interface in the br
 - **Dark/Light Mode**: Toggle between themes for comfortable viewing
 - **Pinned Note Ordering**: Hold a pinned note, then drag its lifted card into
   the animated gap between pinned rows; the order is restored on next launch
-- **Import/Export**: Save and load notes in `.snote` and `.snotes` formats
+- **Import/Export**: Save and load notes in `.snote` and `.snotes` formats, or
+  export the current note as a standalone HTML file or a directly generated PDF
 - **Image Support**: Paste and embed images directly into notes; the centered
   preview modal supports `Ctrl+wheel`, Firefox touchpad-pinch zoom, direct
   two-finger touchscreen pinch, and mouse or single-finger drag panning
@@ -114,11 +115,28 @@ Recycle bin shows all soft-deleted notes and images, and let user delete all at 
 Licenses show license of libraries used in this project.
 
 Export buttons keep the default `.snote` / `.snotes` behavior on left click. Right-click an export button to choose `.zip` or `.snote` / `.snotes`; right-click the `.zip` option to show original Markdown and two-space line-break Markdown export options above the `.zip` row.
+The current-note export button also offers **Save as PDF** and **Save as HTML**.
+HTML export creates one script-free document and embeds images stored by
+SideNote as data URLs. PDF export renders that same sanitized document locally
+into a PDF download without opening the browser print dialog or sending the
+note to a server. PDF pages preserve browser-rendered fonts and formatting, but
+their note content is rasterized rather than selectable text.
 All-notes `.zip` exports use sanitized note titles as folder names, with suffixes added when titles collide.
 `.snotes` archives include a manifest that preserves displayed note order,
 pinned state, and pinned order. When merging an archive into an existing note
 list, imported pinned positions are rebased after existing pinned notes and
 regular-note timestamps are made unique while retaining the archive order.
+
+### HTML/PDF export dependency licenses
+
+Direct PDF export uses `html2pdf.js` 0.14.0, `html2canvas` 1.4.1, and
+`jsPDF` 4.2.1, all under the MIT License. The remaining newly installed
+transitive packages are also MIT-licensed. Document export reuses Marked (MIT),
+highlight.js (BSD-3-Clause), and DOMPurify (dual Apache-2.0/MPL-2.0; SideNote
+distributes it under the Apache-2.0 option). These terms are compatible with
+SideNote's MIT license when their notices are retained. Complete notices are
+generated in `LIBRARY_LICENSES.md`, and the html2pdf distribution notice is
+packaged beside its browser bundle.
 
 ## Development
 

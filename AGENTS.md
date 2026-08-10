@@ -73,6 +73,8 @@ npm install
 - **src/text-processors.ts**: Plain-text paste processing (tilde escaping and
   optional legacy two-space line breaks)
 - **src/import_export.ts**: .snote/.snotes file processing
+- **src/document-export.ts**: Standalone current-note HTML export with embedded
+  SideNote images and direct rasterized PDF generation
 - **src/shortcut-setup.ts**: Opens the browser's extension shortcut settings
   from the first-install setup popup
 - **sidenote-controls.css**: Shared settings-style button appearance for the
@@ -82,8 +84,8 @@ npm install
   reusable editor Web Component
 - **packages/wysiwyg-markdown/**: Lit/ProseMirror Web Component source, demo,
   tests, and build configuration managed as an npm workspace
-- **build.js**: Packages the compiled editor and extension files for Chrome and
-  Firefox
+- **build.js**: Packages the compiled editor and extension files, including the
+  html2pdf browser bundle and its distribution notice, for Chrome and Firefox
 - **tsconfig.extension.json**: Compiles readable extension ES modules to
   `build/extension-runtime/` before packaging
 
@@ -121,14 +123,19 @@ npm install
 - **Preview/Source Modes**: Preview uses the same WYSIWYG renderer in editable
   or read-only mode according to settings; double-click or Edit opens the
   complete document in plain Markdown source mode
-- **License Rendering**: Marked and DOMPurify are limited to rendering the
-  bundled third-party license document; note Preview has one renderer
+- **Detached Document Rendering**: Marked and DOMPurify render the bundled
+  license document and sanitized standalone exports; note Preview continues to
+  use only the ProseMirror renderer
 - **Syntax Highlighting**: The SideNote adapter converts highlight.js output
   into editable ProseMirror decorations; multi-line code uses a non-editable
   line-number gutter
 - **Host Styling**: SideNote injects its 4.1.14-compatible theme through
   `themeCss` because document CSS does not cross the editor Shadow DOM
 - **Image Handling**: Images pasted/imported are stored as blobs in IndexedDB; blob URLs are tracked and revoked on re-render to prevent memory leaks
+- **HTML/PDF Export**: The current-note export menu can create a script-free
+  standalone HTML document with SideNote-managed images embedded as data URLs,
+  or use html2pdf.js to directly download a rasterized PDF without the print
+  dialog or a remote service
 - **Pinned Note Ordering**: Pinned rows use delayed Pointer Events, a floating
   drag card, and an animated placeholder gap; completed drops persist
   normalized `pinOrder` values to IndexedDB while cancellation restores order
@@ -163,6 +170,7 @@ tests/
     ├── editor-mode.test.js
     ├── image-modal.test.js
     ├── image-manager.test.js
+    ├── document-export.test.js
     ├── import-export.test.js
     ├── import-export-events.test.js
     ├── main.test.js

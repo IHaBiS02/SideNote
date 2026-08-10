@@ -50,6 +50,8 @@ for (const artifact of runtimeArtifacts) {
 const vendorFiles = {
     'reset-css/reset.css': 'reset.css',
     'dompurify/dist/purify.min.js': 'dompurify.min.js',
+    'html2pdf.js/dist/html2pdf.bundle.min.js': 'html2pdf.bundle.min.js',
+    'html2pdf.js/dist/html2pdf.bundle.min.js.LICENSE.txt': 'html2pdf.bundle.min.js.LICENSE.txt',
     'marked/marked.min.js': 'marked.min.js',
     '@highlightjs/cdn-assets/highlight.min.js': 'highlight.min.js',
     'jszip/dist/jszip.min.js': 'jszip.min.js',

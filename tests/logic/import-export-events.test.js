@@ -13,6 +13,8 @@ const mocks = vi.hoisted(() => ({
   saveImportedNotes: vi.fn(),
   saveParsedSnote: vi.fn(),
   saveParsedSnoteImages: vi.fn().mockResolvedValue(),
+  downloadStandaloneNoteHtml: vi.fn().mockResolvedValue(),
+  downloadStandaloneNotePdf: vi.fn().mockResolvedValue(),
 }));
 
 vi.mock('../../src/database/index.js', () => ({
@@ -35,6 +37,11 @@ vi.mock('../../src/import_export.js', () => ({
   saveImportedNotes: mocks.saveImportedNotes,
   saveParsedSnote: mocks.saveParsedSnote,
   saveParsedSnoteImages: mocks.saveParsedSnoteImages,
+}));
+
+vi.mock('../../src/document-export.js', () => ({
+  downloadStandaloneNoteHtml: mocks.downloadStandaloneNoteHtml,
+  downloadStandaloneNotePdf: mocks.downloadStandaloneNotePdf,
 }));
 
 vi.mock('../../src/utils.js', async (importOriginal) => {
@@ -231,6 +238,49 @@ describe('import/export events', () => {
       blob,
       'notes_2026_01_02_03_04_05.zip'
     );
+  });
+
+  it('adds direct PDF and standalone HTML actions to the note save menu', async () => {
+    const note = {
+      id: 'note-1',
+      title: 'Note',
+      content: '# Note',
+      settings: {},
+      metadata: { createdAt: 1, lastModified: 2 },
+      isPinned: false,
+    };
+    const state = await import('../../src/state.js');
+    state.setNotes([note]);
+    state.setActiveNoteId(note.id);
+
+    const { initializeImportExportEvents } = await import('../../src/events/import-export-events.js');
+    initializeImportExportEvents();
+    const exportButton = document.getElementById('export-note-button');
+
+    exportButton.dispatchEvent(new MouseEvent('contextmenu', {
+      bubbles: true,
+      cancelable: true,
+    }));
+    let menuItems = document.querySelectorAll('.export-options-dropdown > div');
+    expect(Array.from(menuItems, item => item.textContent)).toEqual([
+      'Export as .zip',
+      'Export as .snote',
+      'Save as PDF',
+      'Save as HTML',
+    ]);
+
+    menuItems[2].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(mocks.downloadStandaloneNotePdf).toHaveBeenCalledWith(note);
+
+    exportButton.dispatchEvent(new MouseEvent('contextmenu', {
+      bubbles: true,
+      cancelable: true,
+    }));
+    menuItems = document.querySelectorAll('.export-options-dropdown > div');
+    menuItems[3].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(mocks.downloadStandaloneNoteHtml).toHaveBeenCalledWith(note);
   });
 
   it('exports all notes as zip with two-space line breaks from options inserted above the zip item', async () => {

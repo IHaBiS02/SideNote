@@ -2,6 +2,13 @@
 
 This document describes the file structure for SideNote's import/export functionality.
 
+Standalone `.html` and `.pdf` exports are presentation formats, not SideNote
+backup/import formats. HTML export creates one script-free file and embeds
+images stored by SideNote as data URLs. PDF export directly creates a local PDF
+from the same sanitized document without opening the print dialog; its rendered
+note content is rasterized rather than selectable text. Use `.snote` or
+`.snotes` when the note must be imported back into SideNote.
+
 ## File Types
 
 ### .snote (Single Note Export)

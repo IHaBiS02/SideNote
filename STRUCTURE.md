@@ -44,6 +44,7 @@ SideNote is a browser extension that provides a note-taking interface within the
     -   `history.ts`: Manages the view navigation history stack, allowing for "back" functionality.
     -   `settings.ts`: Manages global and note-specific settings, including default setting normalization and effective setting resolution.
     -   `import_export.ts`: Contains the logic for parsing `.snote` files, saving parsed imports, and packaging `.snote`/`.snotes` zip archives.
+    -   `document-export.ts`: Renders a sanitized, styled note document, embeds SideNote-managed images as data URLs for standalone HTML, and generates a directly downloadable rasterized PDF from the same DOM without invoking the print dialog.
     -   `utils.ts`: Utility functions for timestamps, filename sanitization, file downloads, scoped blob URL tracking, and image ID extraction.
     -   `text-processors.ts`: Legacy text processing utilities for markdown editing, including tilde escaping, auto line breaks, Enter key handling, and whitespace cleanup.
 -   **`sidepanel.css`**: The primary stylesheet for the extension's UI. It is
@@ -165,7 +166,8 @@ The UI is a single-page application with several distinct "views" that are shown
 
 #### Import & Export (`import_export.ts`, `src/events/`)
 
--   **Export Buttons**: Left-click packages one or all notes into a `.snote` or `.snotes` zip file. Right-click opens an export format dropdown with `.zip` above `.snote`/`.snotes`. Right-clicking the `.zip` option inserts original Markdown and Markdown with two-space line breaks options above the `.zip` row. All-notes `.zip` exports use sanitized note titles as folder names, while `.snotes` keeps note IDs for compatibility. Shared helpers in `src/import_export.ts` write note content (`note.md`), metadata (`metadata.json`), associated images, and an all-notes root manifest that maps folders to displayed order, pinned state, and pinned order.
+-   **Export Buttons**: Left-click packages one or all notes into a `.snote` or `.snotes` zip file. Right-click opens an export format dropdown with `.zip` above `.snote`/`.snotes`. Right-clicking the `.zip` option inserts original Markdown and Markdown with two-space line breaks options above the `.zip` row. The current-note menu additionally offers **Save as PDF** and **Save as HTML**. All-notes `.zip` exports use sanitized note titles as folder names, while `.snotes` keeps note IDs for compatibility. Shared helpers in `src/import_export.ts` write note content (`note.md`), metadata (`metadata.json`), associated images, and an all-notes root manifest that maps folders to displayed order, pinned state, and pinned order.
+-   **Standalone documents**: `src/document-export.ts` parses Markdown with Marked, sanitizes the result with DOMPurify, and highlights fenced code with highlight.js. SideNote-managed IndexedDB images are converted to data URLs, producing one script-free HTML file. The same detached DOM is passed to html2pdf.js to download an A4 PDF directly, without a print dialog or network service. Its browser-rendered content is rasterized and therefore is not selectable PDF text.
 -   **Import Buttons**: Unzip a `.snote` or `.snotes` file and parse metadata/content/images without saving first. Manifest-based `.snotes` imports preserve their internal display order and pinned state. Imported pinned positions are normalized after the existing pinned range to prevent `pinOrder` collisions; imported regular timestamps are assigned a unique descending range above existing regular notes. Legacy `.snotes` files without a manifest remain supported.
 
 ## 5. Packaged Runtime Assets (`build/<browser>/vendor/`)
@@ -174,9 +176,11 @@ The UI is a single-page application with several distinct "views" that are shown
 package. Most are third-party libraries from `node_modules`; the editor bundle
 is first-party generated code and is listed separately.
 
--   **`marked.min.js`**: Renders the bundled generated license Markdown in the license view.
--   **`dompurify.min.js`**: Sanitizes the HTML generated for the license view.
--   **`highlight.min.js`**: A syntax highlighter that can parse and style code blocks in many different languages.
+-   **`marked.min.js`**: Renders the bundled generated license Markdown and parses Markdown for standalone note export.
+-   **`dompurify.min.js`**: Sanitizes the license view and standalone exported note documents.
+-   **`highlight.min.js`**: Highlights editable Preview code and standalone exported code blocks.
+-   **`html2pdf.bundle.min.js`**: Bundled html2pdf.js, html2canvas, jsPDF, and DOMPurify runtime used for direct local PDF generation.
+-   **`html2pdf.bundle.min.js.LICENSE.txt`**: Upstream distribution notices kept beside the minified PDF bundle.
 -   **`jszip.min.js`**: A library for creating, reading, and editing `.zip` files, used for the import/export functionality.
 -   **`browser-polyfill.min.js`**: WebExtension browser API Polyfill for cross-browser compatibility.
 -   **`reset.css`**: Removes browser UA styling differences before SideNote's explicit baseline is applied.

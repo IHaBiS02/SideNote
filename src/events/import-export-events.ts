@@ -29,6 +29,10 @@ import {
   saveParsedSnoteImages
 } from '../import_export.js';
 import { createDropdown } from '../ui-helpers.js';
+import {
+  downloadStandaloneNoteHtml,
+  downloadStandaloneNotePdf,
+} from '../document-export.js';
 
 // Import state from state module
 import {
@@ -54,6 +58,10 @@ interface ExportDropdownOptions {
   archiveExtension: 'snote' | 'snotes';
   zipExport: ZipExportAction;
   archiveExport: ExportAction;
+  additionalActions?: Array<{
+    label: string;
+    action: ExportAction;
+  }>;
 }
 
 // === Import/Export Event Listeners ===
@@ -85,6 +93,30 @@ async function exportCurrentNote({
   const zip = await createSingleNoteArchive(note, { addTwoSpaceLineBreaks });
   const blob = await zip.generateAsync({ type: 'blob' });
   downloadFile(blob, `${sanitizedTitle}.${extension}`);
+}
+
+async function exportCurrentNoteAsHtml(): Promise<void> {
+  const note = notes.find(n => n.id === activeNoteId);
+  if (!note) return;
+
+  try {
+    await downloadStandaloneNoteHtml(note);
+  } catch (error) {
+    console.error('Failed to export note as HTML:', error);
+    alert('Failed to save this note as HTML. A referenced image may be missing.');
+  }
+}
+
+async function exportCurrentNoteAsPdf(): Promise<void> {
+  const note = notes.find(n => n.id === activeNoteId);
+  if (!note) return;
+
+  try {
+    await downloadStandaloneNotePdf(note);
+  } catch (error) {
+    console.error('Failed to export note as PDF:', error);
+    alert('Failed to save this note as PDF. A referenced image may be missing.');
+  }
 }
 
 function positionDropdownNearButton(
@@ -172,7 +204,12 @@ function showZipLineBreakOptions(
 
 function showExportOptionsDropdown(
   button: HTMLButtonElement,
-  { archiveExtension, zipExport, archiveExport }: ExportDropdownOptions,
+  {
+    archiveExtension,
+    zipExport,
+    archiveExport,
+    additionalActions = [],
+  }: ExportDropdownOptions,
 ): void {
   const dropdown = createDropdown({
     className: 'export-options-dropdown',
@@ -186,6 +223,9 @@ function showExportOptionsDropdown(
       });
 
       addDropdownItem(dropdownElement, `Export as .${archiveExtension}`, archiveExport);
+      additionalActions.forEach(({ label, action }) => {
+        addDropdownItem(dropdownElement, label, action);
+      });
     },
     excludeFromClose: ['.export-options-dropdown']
   });
@@ -227,7 +267,11 @@ function initializeImportExportEvents(): void {
         extension: 'zip',
         addTwoSpaceLineBreaks
       }),
-      archiveExport: () => exportCurrentNote()
+      archiveExport: () => exportCurrentNote(),
+      additionalActions: [
+        { label: 'Save as PDF', action: exportCurrentNoteAsPdf },
+        { label: 'Save as HTML', action: exportCurrentNoteAsHtml },
+      ],
     });
   });
 
@@ -314,5 +358,7 @@ function initializeImportExportEvents(): void {
 export {
   exportAllNotes,
   exportCurrentNote,
+  exportCurrentNoteAsHtml,
+  exportCurrentNoteAsPdf,
   initializeImportExportEvents
 };

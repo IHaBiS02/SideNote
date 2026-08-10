@@ -395,6 +395,23 @@ File processing (functions exported):
   for all notes and writes a root manifest containing folder mappings, display
   order, pinned state, and pinned order
 
+## src/document-export.ts
+
+Standalone current-note export (functions exported):
+
+- `createStandaloneNoteHtml(note)`: Parses and sanitizes Markdown, applies
+  export-specific styling and code highlighting, embeds SideNote-managed images
+  from IndexedDB as data URLs, and returns a complete script-free HTML string
+- `createStandaloneNotePdf(note)`: Builds the same sanitized document in a
+  detached DOM, passes it to html2pdf.js, and returns a PDF `Blob` without
+  opening the print dialog; the resulting page content is rasterized
+- `downloadStandaloneNoteHtml(note)`: Downloads the generated HTML using a
+  sanitized note-title filename
+- `downloadStandaloneNotePdf(note)`: Downloads the directly generated PDF
+  using a sanitized note-title filename
+- `STANDALONE_NOTE_CSS`: Scoped light/dark document styling shared by both
+  standalone formats
+
 ## src/notes_view/
 
 UI rendering and view management is now modularized into separate files for better organization:
@@ -520,9 +537,13 @@ Import/export functionality:
 
 - `initializeImportExportEvents()`: Sets up all import/export event listeners
 
-Handles: note/global export, file import, .snote/.snotes processing
+Handles: note/global archive export, current-note standalone HTML/direct PDF
+export, file import, and `.snote`/`.snotes` processing
 
-Right-clicking an export button opens a format dropdown. The `.zip` option can be right-clicked again to show original Markdown and Markdown with two-space line break options above the `.zip` row.
+Right-clicking an export button opens a format dropdown. The current-note menu
+also includes **Save as PDF** and **Save as HTML**. The `.zip` option can be
+right-clicked again to show original Markdown and Markdown with two-space line
+break options above the `.zip` row.
 
 ### src/events/global-events.ts
 
