@@ -233,6 +233,13 @@ export const editorStyles = css`
     white-space: nowrap;
   }
 
+  .copy-code-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+  }
+
   .code-block-language-control {
     position: relative;
     flex: 1 1 auto;

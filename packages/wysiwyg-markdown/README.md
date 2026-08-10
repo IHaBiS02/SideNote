@@ -124,6 +124,8 @@ normal ProseMirror repeated-Enter behavior.
 
 A host application can provide trusted CSS through `themeCss`. Editable syntax
 highlighting uses ProseMirror decorations, so it does not rewrite editable DOM.
+The fenced-code copy control shows `✓` for one second after a successful copy,
+then restores its copy icon; failures briefly show `!`.
 Fenced code content uses `--editor-code-content-padding` (`5px` by default) for
 its inner spacing. Numbered blocks apply the same vertical value to the gutter
 and code body so their lines remain aligned. The component defines `1.5` as the

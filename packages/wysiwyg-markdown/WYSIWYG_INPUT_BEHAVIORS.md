@@ -64,6 +64,7 @@ the converted empty heading changes it back to a paragraph.
 | Two-finger touchscreen pinch on the modal image | Zoom from the changing distance between the two pointers and pan with their moving centroid |
 | Hold and drag the modal image with a mouse or one finger | Pan the image from its current position |
 | Code language field in a code-block header | Edit the fenced-code language directly |
+| Code-block copy button | Copy only the raw code, show `✓` for one second, and then restore the copy icon; show `!` briefly if copying fails |
 
 Inside bullet and ordered lists, `Enter` creates the next list item while
 `Shift+Enter` inserts a line break inside the current item. Ordered-list

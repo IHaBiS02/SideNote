@@ -119,7 +119,8 @@ ProseMirror의 기본 반복 `Enter` 동작을 유지하려면
 
 호스트 앱은 `themeCss`로 신뢰할 수 있는 CSS를 전달할 수 있습니다. 편집 가능한
 문법 강조는 ProseMirror decoration을 사용하므로 편집 DOM을 다시 작성하지
-않습니다. fenced code 내용의 내부 여백은 `--editor-code-content-padding`
+않습니다. fenced code 복사 버튼은 복사 성공 후 1초 동안 `✓`를 표시한 뒤 복사
+아이콘으로 돌아가며, 실패하면 `!`를 잠시 표시합니다. fenced code 내용의 내부 여백은 `--editor-code-content-padding`
 (기본값 `5px`)으로 설정할 수 있습니다. 줄 번호가 있는 블록은 번호 영역과 코드
 본문에 같은 상하 여백을 적용해 각 줄을 정렬합니다. 컴포넌트의 본문 및 제목
 줄 높이 기본값은 `1.5`이며, 전체 문서 plain-text 모드와 fenced code block의 줄 높이는

@@ -333,7 +333,30 @@ describe('wysiwyg-markdown element', () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(writeText).toHaveBeenCalledWith('first line\nsecond line');
-    expect(copyButton?.textContent).toBe('✓');
+    const feedbackButton = editor.renderRoot.querySelector<HTMLButtonElement>(
+      '.copy-code-button',
+    );
+    expect(feedbackButton?.textContent).toBe('✓');
+    expect(feedbackButton?.dataset.copyState).toBe('success');
+    expect(feedbackButton?.getAttribute('aria-label')).toBe('Code copied');
+
+    await new Promise((resolve) => setTimeout(resolve, 1050));
+    const currentCopyButton = editor.renderRoot.querySelector<HTMLButtonElement>(
+      '.copy-code-button',
+    );
+    expect(currentCopyButton?.textContent).toBe('📄');
+    expect(currentCopyButton?.dataset.copyState).toBe('idle');
+    expect(currentCopyButton?.getAttribute('aria-label')).toBe('Copy code');
+
+    writeText.mockRejectedValueOnce(new Error('Clipboard denied'));
+    currentCopyButton?.click();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const failedCopyButton = editor.renderRoot.querySelector<HTMLButtonElement>(
+      '.copy-code-button',
+    );
+    expect(failedCopyButton?.textContent).toBe('!');
+    expect(failedCopyButton?.dataset.copyState).toBe('error');
+    expect(failedCopyButton?.getAttribute('aria-label')).toBe('Copy failed');
   });
 
   it('edits the fenced code language from the non-content code header', async () => {

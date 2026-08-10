@@ -232,6 +232,11 @@ UI. The optional header shows language and copy controls. Multi-line blocks get
 a generated line-number gutter; single-line blocks omit the gutter. Syntax
 highlighting uses decorations instead of replacing editable DOM, so copy,
 selection, undo, and serialization continue to operate on plain code text.
+The component keeps explicit idle/success/error copy state keyed by document
+position, outside individual node-view DOM instances. Successful copies display
+`✓` for one second before restoring the copy icon, failures briefly display
+`!`, and replacement node views recover the active feedback instead of clearing
+it early.
 
 ## Build and packaging
 

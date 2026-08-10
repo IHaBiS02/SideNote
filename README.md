@@ -14,8 +14,8 @@ A simple notes browser extension that provides a note-taking interface in the br
   source editing; the global setting can restore normal repeated-Enter behavior
 - **Extensible Editing**: Lit/ProseMirror editor with commands, shortcuts, and
   input-rule extensions
-- **Code Blocks**: Language/copy headers, editable highlight.js syntax
-  highlighting, and aligned multi-line line numbers
+- **Code Blocks**: Language/copy headers with brief success feedback, editable
+  highlight.js syntax highlighting, and aligned multi-line line numbers
 - **Link Navigation**: Open rendered links in a new tab with middle-click,
   `Ctrl+click`, or `Cmd+click`
 - **Dark/Light Mode**: Toggle between themes for comfortable viewing

@@ -171,7 +171,9 @@ keeping its language input directly editable in WYSIWYG mode. Committing the
 input updates the code block `params` attribute; source, readonly, and disabled
 modes lock the control. An unselectable display label sits behind the stable
 input while it is unfocused, hiding browser selection paint from ranges that
-cross the non-content header.
+cross the non-content header. The copy control reports success with `✓` for one
+second before restoring its icon, reports failure with `!`, and exposes the same
+state through its accessible label.
 
 ### src/extensions
 

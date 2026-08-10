@@ -66,6 +66,7 @@ export type CodeHighlighter = (
   code: string,
   language: string,
 ) => readonly CodeHighlightToken[];
+type CodeCopyFeedbackState = 'idle' | 'success' | 'error';
 
 export class WysiwygMarkdownElement extends LitElement {
   static formAssociated = true;
@@ -167,6 +168,12 @@ export class WysiwygMarkdownElement extends LitElement {
   #sourceReturnMode: Exclude<EditorMode, 'source'> = 'wysiwyg';
   #pendingSourceOffset?: number;
   #pendingWysiwygPosition?: number;
+  readonly #codeCopyFeedback = new Map<
+    number,
+    Exclude<CodeCopyFeedbackState, 'idle'>
+  >();
+  readonly #codeCopyFeedbackTimers = new Map<number, ReturnType<typeof setTimeout>>();
+  readonly #codeCopyFeedbackRenderers = new Set<() => void>();
 
   constructor() {
     super();
@@ -392,6 +399,7 @@ export class WysiwygMarkdownElement extends LitElement {
   disconnectedCallback(): void {
     this.#view?.destroy();
     this.#view = undefined;
+    this.#clearCodeCopyFeedback();
     super.disconnectedCallback();
   }
 
@@ -807,6 +815,8 @@ export class WysiwygMarkdownElement extends LitElement {
     copyButton.className = 'copy-code-button';
     copyButton.setAttribute('part', 'copy-code-button');
     copyButton.setAttribute('aria-label', 'Copy code');
+    copyButton.setAttribute('aria-live', 'polite');
+    copyButton.setAttribute('aria-atomic', 'true');
     copyButton.title = 'Copy code';
     copyButton.textContent = '📄';
 
@@ -830,7 +840,27 @@ export class WysiwygMarkdownElement extends LitElement {
     container.append(header, body);
 
     let node = initialNode;
-    let feedbackTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const renderCopyFeedback = (): void => {
+      const position = getPos();
+      const copyFeedbackState = typeof position === 'number'
+        ? this.#codeCopyFeedback.get(position) ?? 'idle'
+        : 'idle';
+      copyButton.dataset.copyState = copyFeedbackState;
+      if (copyFeedbackState === 'success') {
+        copyButton.textContent = '✓';
+        copyButton.setAttribute('aria-label', 'Code copied');
+        copyButton.title = 'Code copied';
+      } else if (copyFeedbackState === 'error') {
+        copyButton.textContent = '!';
+        copyButton.setAttribute('aria-label', 'Copy failed');
+        copyButton.title = 'Copy failed';
+      } else {
+        copyButton.textContent = '📄';
+        copyButton.setAttribute('aria-label', 'Copy code');
+        copyButton.title = 'Copy code';
+      }
+    };
 
     const updatePresentation = (): void => {
       const info = String(node.attrs.params ?? '').trim();
@@ -846,6 +876,7 @@ export class WysiwygMarkdownElement extends LitElement {
       lineNumbers.hidden = !showLineNumbers;
       body.dataset.lineCount = String(lines.length);
       body.toggleAttribute('data-line-numbers', showLineNumbers);
+      renderCopyFeedback();
     };
 
     const commitLanguageEdit = (): void => {
@@ -892,27 +923,26 @@ export class WysiwygMarkdownElement extends LitElement {
       event.stopPropagation();
     };
 
-    const showFeedback = (text: string): void => {
-      if (feedbackTimer) clearTimeout(feedbackTimer);
-      copyButton.textContent = text;
-      feedbackTimer = setTimeout(() => {
-        copyButton.textContent = '📄';
-        feedbackTimer = undefined;
-      }, 1000);
+    const showFeedback = (state: 'success' | 'error'): void => {
+      const position = getPos();
+      if (typeof position === 'number') {
+        this.#showCodeCopyFeedback(position, state);
+      }
     };
 
     const handleCopy = async (): Promise<void> => {
       try {
         await this.#copyTextToClipboard(node.textContent);
-        showFeedback('✓');
+        showFeedback('success');
       } catch {
-        showFeedback('!');
+        showFeedback('error');
       }
     };
     languageEditor.addEventListener('input', handleLanguageEditorInput);
     languageEditor.addEventListener('keydown', handleLanguageEditorKeyDown);
     languageEditor.addEventListener('blur', commitLanguageEdit);
     copyButton.addEventListener('click', handleCopy);
+    this.#codeCopyFeedbackRenderers.add(renderCopyFeedback);
     updatePresentation();
 
     return {
@@ -928,13 +958,41 @@ export class WysiwygMarkdownElement extends LitElement {
         header.contains(event.target as globalThis.Node) ||
         lineNumbers.contains(event.target as globalThis.Node),
       destroy: () => {
-        if (feedbackTimer) clearTimeout(feedbackTimer);
+        this.#codeCopyFeedbackRenderers.delete(renderCopyFeedback);
         languageEditor.removeEventListener('input', handleLanguageEditorInput);
         languageEditor.removeEventListener('keydown', handleLanguageEditorKeyDown);
         languageEditor.removeEventListener('blur', commitLanguageEdit);
         copyButton.removeEventListener('click', handleCopy);
       },
     };
+  }
+
+  #showCodeCopyFeedback(
+    position: number,
+    state: Exclude<CodeCopyFeedbackState, 'idle'>,
+  ): void {
+    const previousTimer = this.#codeCopyFeedbackTimers.get(position);
+    if (previousTimer) clearTimeout(previousTimer);
+
+    this.#codeCopyFeedback.set(position, state);
+    this.#renderCodeCopyFeedback();
+    const timer = setTimeout(() => {
+      this.#codeCopyFeedback.delete(position);
+      this.#codeCopyFeedbackTimers.delete(position);
+      this.#renderCodeCopyFeedback();
+    }, 1000);
+    this.#codeCopyFeedbackTimers.set(position, timer);
+  }
+
+  #renderCodeCopyFeedback(): void {
+    this.#codeCopyFeedbackRenderers.forEach(render => render());
+  }
+
+  #clearCodeCopyFeedback(): void {
+    this.#codeCopyFeedbackTimers.forEach(timer => clearTimeout(timer));
+    this.#codeCopyFeedbackTimers.clear();
+    this.#codeCopyFeedback.clear();
+    this.#codeCopyFeedbackRenderers.clear();
   }
 
   async #copyTextToClipboard(text: string): Promise<void> {

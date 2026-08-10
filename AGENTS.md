@@ -129,7 +129,8 @@ npm install
   use only the ProseMirror renderer
 - **Syntax Highlighting**: The SideNote adapter converts highlight.js output
   into editable ProseMirror decorations; multi-line code uses a non-editable
-  line-number gutter
+  line-number gutter. Code-copy controls show a one-second success check before
+  restoring their icon and expose idle/success/error state accessibly
 - **Host Styling**: SideNote injects its 4.1.14-compatible theme through
   `themeCss` because document CSS does not cross the editor Shadow DOM
 - **Image Handling**: Images pasted/imported are stored as blobs in IndexedDB; blob URLs are tracked and revoked on re-render to prevent memory leaks
