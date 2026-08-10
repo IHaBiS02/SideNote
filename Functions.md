@@ -400,8 +400,10 @@ File processing (functions exported):
 Standalone current-note export (functions exported):
 
 - `createStandaloneNoteHtml(note)`: Parses and sanitizes Markdown, applies
-  export-specific styling and code highlighting, embeds SideNote-managed images
-  from IndexedDB as data URLs, and returns a complete script-free HTML string
+  export-specific styling and code highlighting, embeds SideNote-managed and
+  reachable external images as Base64 data URLs, adds working code-copy buttons,
+  and returns one self-contained HTML string. Inaccessible external images fail
+  the export rather than remaining as online dependencies
 - `createStandaloneNotePdf(note)`: Builds the same sanitized document in a
   detached DOM, passes it to html2pdf.js, and returns a PDF `Blob` without
   opening the print dialog; the resulting page content is rasterized
@@ -411,6 +413,8 @@ Standalone current-note export (functions exported):
   using a sanitized note-title filename
 - `STANDALONE_NOTE_CSS`: Scoped light/dark document styling shared by both
   standalone formats
+- `STANDALONE_NOTE_SCRIPT`: Fixed inline handler for HTML code-block copy buttons,
+  with Clipboard API and local fallback support
 
 ## src/notes_view/
 

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import createDOMPurify from 'dompurify';
 import { marked as markedParser } from 'marked';
 
@@ -31,6 +31,7 @@ vi.mock('../../src/utils.js', async (importOriginal) => {
 });
 
 import {
+  STANDALONE_NOTE_SCRIPT,
   createStandaloneNoteHtml,
   createStandaloneNotePdf,
   downloadStandaloneNoteHtml,
@@ -54,6 +55,8 @@ function makeNote(overrides = {}) {
       '```',
       '',
       '![Stored image](images/image-1.png)',
+      '',
+      '![External image](https://placehold.co/120x80.png)',
       '',
       '[Example](https://example.com)',
       '',
@@ -98,9 +101,20 @@ describe('standalone document export', () => {
     mocks.getImage.mockResolvedValue(
       new Blob(['stored-image'], { type: 'image/png' }),
     );
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      blob: vi.fn().mockResolvedValue(
+        new Blob(['external-image'], { type: 'image/png' }),
+      ),
+    }));
   });
 
-  it('creates a sanitized single HTML file with stored images embedded', async () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('creates a sanitized single HTML file with all images embedded', async () => {
     const html = await createStandaloneNoteHtml(makeNote());
 
     expect(html).toContain('<!doctype html>');
@@ -108,9 +122,18 @@ describe('standalone document export', () => {
     expect(html).toContain('<title>Export &lt;Note&gt;</title>');
     expect(html).toContain('data:image/png;base64,');
     expect(html).not.toContain('images/image-1.png');
-    expect(html).not.toContain('<script>');
+    expect(html).not.toContain('placehold.co');
+    const exportedDocument = new DOMParser().parseFromString(html, 'text/html');
+    expect(Array.from(exportedDocument.images, image => image.src).every(
+      source => source.startsWith('data:image/png;base64,'),
+    )).toBe(true);
+    expect(html).not.toContain('alert("unsafe")');
     expect(html).toContain('first line<br>second line');
-    expect(html).toContain('class="code-block-header">javascript</div>');
+    expect(html).toContain('class="code-block-language">javascript</span>');
+    expect(html).toContain('class="copy-code-button"');
+    expect(html).toContain('aria-label="Copy code"');
+    expect(html).toContain("navigator.clipboard?.writeText");
+    expect(html.match(/<script>/g)).toHaveLength(1);
     expect(html).toContain('class="hljs-keyword">const</span>');
     expect(html).toContain('target="_blank"');
     expect(html).toContain('rel="noopener noreferrer"');
@@ -118,6 +141,10 @@ describe('standalone document export', () => {
     expect(html).toContain('type="checkbox"');
     expect(html).toContain('disabled=""');
     expect(mocks.getImage).toHaveBeenCalledWith('image-1');
+    expect(fetch).toHaveBeenCalledWith(
+      'https://placehold.co/120x80.png',
+      { cache: 'force-cache', credentials: 'omit' },
+    );
   });
 
   it('fails rather than creating a non-standalone file when a stored image is missing', async () => {
@@ -125,6 +152,14 @@ describe('standalone document export', () => {
 
     await expect(createStandaloneNoteHtml(makeNote())).rejects.toThrow(
       'Could not embed missing image: images/image-1.png',
+    );
+  });
+
+  it('fails rather than leaving an external image URL in an offline export', async () => {
+    fetch.mockRejectedValue(new TypeError('CORS blocked'));
+
+    await expect(createStandaloneNoteHtml(makeNote())).rejects.toThrow(
+      'Could not download image for offline export: https://placehold.co/120x80.png',
     );
   });
 
@@ -155,6 +190,7 @@ describe('standalone document export', () => {
     }));
     const renderedArticle = worker.from.mock.calls[0][0];
     expect(renderedArticle.querySelector('img').src).toMatch(/^data:image\/png;base64,/);
+    expect(renderedArticle.querySelector('.copy-code-button')).toBeNull();
     expect(worker.toPdf).toHaveBeenCalledTimes(1);
     expect(worker.outputPdf).toHaveBeenCalledWith('blob');
     expect(printSpy).not.toHaveBeenCalled();
@@ -163,5 +199,29 @@ describe('standalone document export', () => {
 
     await downloadStandaloneNotePdf(makeNote({ title: 'PDF Note' }));
     expect(mocks.downloadFile).toHaveBeenLastCalledWith(pdfBlob, 'PDF Note.pdf');
+  });
+
+  it('copies fenced code from the self-contained HTML handler', async () => {
+    const html = await createStandaloneNoteHtml(makeNote());
+    const exportedDocument = new DOMParser().parseFromString(html, 'text/html');
+    document.body.innerHTML = exportedDocument.body.innerHTML;
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    });
+    Object.defineProperty(window, 'isSecureContext', {
+      configurable: true,
+      value: true,
+    });
+    window.eval(STANDALONE_NOTE_SCRIPT);
+
+    const button = document.querySelector('.copy-code-button');
+    const code = document.querySelector('.code-block pre > code');
+    button.click();
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    expect(writeText).toHaveBeenCalledWith(code.textContent);
+    expect(button.textContent).toBe('✓');
   });
 });

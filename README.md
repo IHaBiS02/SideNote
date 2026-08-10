@@ -116,10 +116,14 @@ Licenses show license of libraries used in this project.
 
 Export buttons keep the default `.snote` / `.snotes` behavior on left click. Right-click an export button to choose `.zip` or `.snote` / `.snotes`; right-click the `.zip` option to show original Markdown and two-space line-break Markdown export options above the `.zip` row.
 The current-note export button also offers **Save as PDF** and **Save as HTML**.
-HTML export creates one script-free document and embeds images stored by
-SideNote as data URLs. PDF export renders that same sanitized document locally
-into a PDF download without opening the browser print dialog or sending the
-note to a server. PDF pages preserve browser-rendered fonts and formatting, but
+HTML export creates one self-contained document and embeds both SideNote-stored
+and reachable external images as Base64 data URLs for offline viewing. If an
+external image cannot be downloaded because of network or cross-origin rules,
+the export fails instead of leaving an online dependency in the file. Fenced
+code headers retain the SideNote copy button through a small embedded handler.
+PDF export renders the same sanitized document locally without opening the
+browser print dialog or sending the note to a server; interactive copy buttons
+are omitted. PDF pages preserve browser-rendered fonts and formatting, but
 their note content is rasterized rather than selectable text.
 All-notes `.zip` exports use sanitized note titles as folder names, with suffixes added when titles collide.
 `.snotes` archives include a manifest that preserves displayed note order,

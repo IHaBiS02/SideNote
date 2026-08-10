@@ -73,8 +73,9 @@ npm install
 - **src/text-processors.ts**: Plain-text paste processing (tilde escaping and
   optional legacy two-space line breaks)
 - **src/import_export.ts**: .snote/.snotes file processing
-- **src/document-export.ts**: Standalone current-note HTML export with embedded
-  SideNote images and direct rasterized PDF generation
+- **src/document-export.ts**: Self-contained current-note HTML export with
+  embedded local/external images and code-copy controls, plus direct rasterized
+  PDF generation
 - **src/shortcut-setup.ts**: Opens the browser's extension shortcut settings
   from the first-install setup popup
 - **sidenote-controls.css**: Shared settings-style button appearance for the
@@ -132,10 +133,12 @@ npm install
 - **Host Styling**: SideNote injects its 4.1.14-compatible theme through
   `themeCss` because document CSS does not cross the editor Shadow DOM
 - **Image Handling**: Images pasted/imported are stored as blobs in IndexedDB; blob URLs are tracked and revoked on re-render to prevent memory leaks
-- **HTML/PDF Export**: The current-note export menu can create a script-free
-  standalone HTML document with SideNote-managed images embedded as data URLs,
-  or use html2pdf.js to directly download a rasterized PDF without the print
-  dialog or a remote service
+- **HTML/PDF Export**: The current-note export menu can create a self-contained
+  HTML document with SideNote-managed and reachable external images embedded as
+  Base64 data URLs plus local fenced-code copy buttons. Inaccessible external
+  images fail export rather than remaining online dependencies. html2pdf.js
+  directly downloads a non-interactive rasterized PDF without the print dialog
+  or a remote conversion service
 - **Pinned Note Ordering**: Pinned rows use delayed Pointer Events, a floating
   drag card, and an animated placeholder gap; completed drops persist
   normalized `pinOrder` values to IndexedDB while cancellation restores order

@@ -19,6 +19,63 @@ type Html2PdfOptions = Parameters<Html2PdfWorker['set']>[0] & {
 const INTERNAL_IMAGE_PATTERN = /^images\/([^/?#]+)\.png(?:[?#].*)?$/;
 const LANGUAGE_CLASS_PATTERN = /(?:^|\s)language-([^\s]+)/;
 
+const STANDALONE_NOTE_SCRIPT = `
+  (() => {
+    const feedbackTimers = new WeakMap();
+
+    const copyText = async (text) => {
+      if (navigator.clipboard?.writeText && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return;
+        } catch {
+          // Local files may expose the API while denying clipboard permission.
+        }
+      }
+
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.readOnly = true;
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-10000px';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        if (!document.execCommand('copy')) {
+          throw new Error('The browser rejected the copy command.');
+        }
+      } finally {
+        textarea.remove();
+      }
+    };
+
+    const showFeedback = (button, text) => {
+      const previousTimer = feedbackTimers.get(button);
+      if (previousTimer) clearTimeout(previousTimer);
+      button.textContent = text;
+      feedbackTimers.set(button, setTimeout(() => {
+        button.textContent = '📄';
+        feedbackTimers.delete(button);
+      }, 1000));
+    };
+
+    document.addEventListener('click', async (event) => {
+      if (!(event.target instanceof Element)) return;
+      const button = event.target.closest('.copy-code-button');
+      if (!button) return;
+
+      const code = button.closest('.code-block')?.querySelector('pre > code');
+      if (!code) return;
+      try {
+        await copyText(code.textContent || '');
+        showFeedback(button, '✓');
+      } catch {
+        showFeedback(button, '!');
+      }
+    });
+  })();
+`;
+
 const STANDALONE_NOTE_CSS = `
   html.sidenote-export-document {
     color-scheme: light dark;
@@ -200,12 +257,42 @@ const STANDALONE_NOTE_CSS = `
   }
 
   .sidenote-export .code-block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 26px;
     padding: 4px 7px;
     border-bottom: 1px solid var(--export-border-color);
     background: var(--export-code-header-background);
     color: var(--export-muted-color);
     font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
     font-size: 0.9em;
+  }
+
+  .sidenote-export .code-block-language {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sidenote-export .copy-code-button {
+    flex: 0 0 auto;
+    min-width: 26px;
+    height: 22px;
+    border: 1px solid transparent;
+    padding: 0 4px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .sidenote-export .copy-code-button:hover,
+  .sidenote-export .copy-code-button:focus-visible {
+    background: color-mix(in srgb, var(--export-color) 12%, transparent);
   }
 
   .sidenote-export pre {
@@ -309,6 +396,10 @@ const STANDALONE_NOTE_CSS = `
     .sidenote-export {
       max-width: none;
     }
+
+    .sidenote-export .copy-code-button {
+      display: none;
+    }
   }
 `;
 
@@ -355,7 +446,11 @@ function highlightCodeBlocks(root: ParentNode): void {
   });
 }
 
-function decorateCodeBlocks(root: ParentNode, showHeader: boolean): void {
+function decorateCodeBlocks(
+  root: ParentNode,
+  showHeader: boolean,
+  includeCopyButtons: boolean,
+): void {
   root.querySelectorAll<HTMLPreElement>('pre').forEach((pre) => {
     const code = pre.querySelector<HTMLElement>(':scope > code');
     const language = LANGUAGE_CLASS_PATTERN.exec(code?.className || '')?.[1] || 'text';
@@ -366,24 +461,76 @@ function decorateCodeBlocks(root: ParentNode, showHeader: boolean): void {
     if (showHeader) {
       const header = document.createElement('div');
       header.className = 'code-block-header';
-      header.textContent = language;
+      const languageLabel = document.createElement('span');
+      languageLabel.className = 'code-block-language';
+      languageLabel.textContent = language;
+      header.appendChild(languageLabel);
+
+      if (includeCopyButtons) {
+        const copyButton = document.createElement('button');
+        copyButton.type = 'button';
+        copyButton.className = 'copy-code-button';
+        copyButton.setAttribute('aria-label', 'Copy code');
+        copyButton.title = 'Copy code';
+        copyButton.textContent = '📄';
+        header.appendChild(copyButton);
+      }
       container.appendChild(header);
     }
     container.appendChild(pre);
   });
 }
 
-async function embedStoredImages(root: ParentNode): Promise<void> {
-  const images = Array.from(root.querySelectorAll<HTMLImageElement>('img'));
-  await Promise.all(images.map(async (image) => {
-    const source = image.getAttribute('src') || '';
-    const match = INTERNAL_IMAGE_PATTERN.exec(source);
-    if (!match) return;
-
-    const blob = await getImage(match[1]);
+async function loadImageBlob(source: string): Promise<Blob | null> {
+  const internalMatch = INTERNAL_IMAGE_PATTERN.exec(source);
+  if (internalMatch) {
+    const blob = await getImage(internalMatch[1]);
     if (!blob) {
       throw new Error(`Could not embed missing image: ${source}`);
     }
+    return blob;
+  }
+
+  if (source.startsWith('data:')) return null;
+
+  let url: URL;
+  try {
+    url = new URL(source);
+  } catch {
+    throw new Error(`Could not embed unsupported image URL: ${source}`);
+  }
+  if (!['http:', 'https:', 'blob:'].includes(url.protocol)) {
+    throw new Error(`Could not embed unsupported image URL: ${source}`);
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(url.href, {
+      cache: 'force-cache',
+      credentials: 'omit',
+    });
+  } catch {
+    throw new Error(`Could not download image for offline export: ${source}`);
+  }
+  if (!response.ok) {
+    throw new Error(
+      `Could not download image for offline export (${response.status}): ${source}`,
+    );
+  }
+
+  const blob = await response.blob();
+  if (blob.type && !blob.type.startsWith('image/')) {
+    throw new Error(`Export image has an unsupported content type: ${source}`);
+  }
+  return blob;
+}
+
+async function embedImages(root: ParentNode): Promise<void> {
+  const images = Array.from(root.querySelectorAll<HTMLImageElement>('img'));
+  await Promise.all(images.map(async (image) => {
+    const source = image.getAttribute('src') || '';
+    const blob = await loadImageBlob(source);
+    if (!blob) return;
     image.src = await blobToDataUrl(blob);
   }));
 }
@@ -391,6 +538,7 @@ async function embedStoredImages(root: ParentNode): Promise<void> {
 async function createExportArticle(
   note: Note,
   settings: DocumentExportSettings,
+  includeCopyButtons: boolean,
 ): Promise<HTMLElement> {
   const dirtyHtml = marked.parse(note.content, { gfm: true, breaks: true });
   const sanitizedHtml = DOMPurify.sanitize(dirtyHtml, {
@@ -422,8 +570,12 @@ async function createExportArticle(
   });
 
   highlightCodeBlocks(content);
-  decorateCodeBlocks(content, settings.codeBlockHeader !== false);
-  await embedStoredImages(content);
+  decorateCodeBlocks(
+    content,
+    settings.codeBlockHeader !== false,
+    includeCopyButtons,
+  );
+  await embedImages(content);
   article.appendChild(content);
   return article;
 }
@@ -435,8 +587,11 @@ function exportFilename(note: Note, extension: 'html' | 'pdf'): string {
 
 async function createStandaloneNoteHtml(note: Note): Promise<string> {
   const settings = resolveEffectiveSettings(note);
-  const article = await createExportArticle(note, settings);
+  const article = await createExportArticle(note, settings, true);
   const title = escapeHtml(note.title || 'Untitled Note');
+  const copyScript = article.querySelector('.copy-code-button')
+    ? `\n<script>${STANDALONE_NOTE_SCRIPT}<\/script>`
+    : '';
 
   return `<!doctype html>
 <html class="sidenote-export-document" lang="und" data-theme="${settings.mode}">
@@ -449,6 +604,7 @@ async function createStandaloneNoteHtml(note: Note): Promise<string> {
 </head>
 <body class="sidenote-export-document" data-theme="${settings.mode}">
 ${article.outerHTML}
+${copyScript}
 </body>
 </html>`;
 }
@@ -473,7 +629,7 @@ async function createStandaloneNotePdf(note: Note): Promise<Blob> {
   }
 
   const settings = resolveEffectiveSettings(note);
-  const article = await createExportArticle(note, settings);
+  const article = await createExportArticle(note, settings, false);
   article.classList.add('pdf-render-root');
   article.style.width = '190mm';
   article.style.maxWidth = '190mm';
@@ -531,6 +687,7 @@ async function downloadStandaloneNotePdf(note: Note): Promise<void> {
 
 export {
   STANDALONE_NOTE_CSS,
+  STANDALONE_NOTE_SCRIPT,
   createStandaloneNoteHtml,
   createStandaloneNotePdf,
   downloadStandaloneNoteHtml,
