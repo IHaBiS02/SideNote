@@ -20,13 +20,13 @@ declare global {
   function importScripts(...urls: string[]): void;
 
   var __SIDENOTE_DISABLE_AUTO_BOOTSTRAP__: boolean | undefined;
-  const JSZip: typeof JSZipClass;
+  var JSZip: typeof JSZipClass;
   const browser: WebExtensionBrowser;
-  const marked: MarkedGlobal;
-  const DOMPurify: {
+  var marked: MarkedGlobal;
+  var DOMPurify: {
     sanitize(dirty: string, config?: Record<string, unknown>): string;
   };
-  const html2pdf: typeof import('html2pdf.js').default;
+  var html2pdf: typeof import('html2pdf.js').default;
   var hljs: HighlightJsGlobal;
 }
 

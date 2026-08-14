@@ -2,6 +2,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   saveNote: vi.fn().mockResolvedValue(),
+  getAllNotes: vi.fn().mockResolvedValue([]),
+  getNote: vi.fn().mockResolvedValue(undefined),
   sortNotes: vi.fn(),
   renderNoteList: vi.fn(),
   createAllNotesArchive: vi.fn(),
@@ -19,6 +21,8 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('../../src/database/index.js', () => ({
   saveNote: mocks.saveNote,
+  getAllNotes: mocks.getAllNotes,
+  getNote: mocks.getNote,
 }));
 
 vi.mock('../../src/notes.js', () => ({
@@ -57,6 +61,14 @@ describe('import/export events', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
+    mocks.getAllNotes.mockImplementation(async () => {
+      const state = await import('../../src/state.js');
+      return state.notes.filter(note => typeof note.content === 'string');
+    });
+    mocks.getNote.mockImplementation(async (id) => {
+      const storedNotes = await mocks.getAllNotes();
+      return storedNotes.find(note => note.id === id);
+    });
     document.body.innerHTML = `
       <button id="global-export-button"></button>
       <button id="global-import-button"></button>

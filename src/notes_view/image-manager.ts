@@ -5,7 +5,11 @@ import {
 } from '../dom.js';
 
 // Import required functions from other modules
-import { getAllImageObjectsFromDB, deleteImage } from '../database/index.js';
+import {
+  getAllImageObjectsFromDB,
+  getAllNotes,
+  deleteImage,
+} from '../database/index.js';
 import { createBlobUrlTracker, extractImageIds } from '../utils.js';
 import { normalizeGlobalSettings } from '../settings.js';
 
@@ -32,8 +36,12 @@ async function renderImagesList(): Promise<void> {
   imageList.innerHTML = '';
   try {
     const imageObjects = await getAllImageObjectsFromDB();
+    const activeNoteIds = new Set(notes.map(note => note.id));
+    const storedNotes = (await getAllNotes()).filter(
+      note => activeNoteIds.has(note.id) && !note.metadata.deletedAt,
+    );
     const imageUsageMap = new Map<string, Note[]>();
-    for (const note of notes) {
+    for (const note of storedNotes) {
       for (const imageId of extractImageIds(note.content || '')) {
         if (!imageUsageMap.has(imageId)) {
           imageUsageMap.set(imageId, []);
@@ -139,8 +147,8 @@ async function renderImagesList(): Promise<void> {
             notesUsingImage.forEach(note => {
               const noteItem = document.createElement('div');
               noteItem.textContent = note.title;
-              noteItem.onclick = () => {
-                openNote(note.id, false);
+              noteItem.onclick = async () => {
+                if (!await openNote(note.id, false)) return;
                 void markdownEditor.updateComplete.then(() => {
                   markdownEditor.scrollToImage(`images/${imageId}.png`);
                 });

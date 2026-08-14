@@ -6,7 +6,9 @@ export { initDB, closeDB } from './init.js';
 // Notes operations
 export {
   saveNote,
+  getNote,
   getAllNotes,
+  getAllNoteSummaries,
   deleteNoteDB,
   restoreNoteDB,
   deleteNotePermanentlyDB

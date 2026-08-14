@@ -1,5 +1,10 @@
+import { createNoteSummary } from '../note-summary.js';
+import type { Note } from '../types.js';
+
 // 전역 데이터베이스 인스턴스
 let db: IDBDatabase | undefined;
+
+type SideNoteStoreName = 'notes' | 'noteSummaries' | 'images';
 
 /**
  * Initializes the IndexedDB database.
@@ -7,8 +12,8 @@ let db: IDBDatabase | undefined;
  */
 function initDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    // IndexedDB 열기 요청 (버전 2)
-    const request = indexedDB.open('SimpleNotesDB', 2);
+    // Version 3 separates list metadata from full Markdown note records.
+    const request = indexedDB.open('SimpleNotesDB', 3);
 
     // 데이터베이스 버전 업그레이드 시 실행 (첫 실행 또는 버전 변경 시)
     request.onupgradeneeded = () => {
@@ -20,6 +25,22 @@ function initDB(): Promise<IDBDatabase> {
       // notes 객체 저장소가 없으면 생성
       if (!database.objectStoreNames.contains('notes')) {
         database.createObjectStore('notes', { keyPath: 'id' });
+      }
+      if (!database.objectStoreNames.contains('noteSummaries')) {
+        const summaries = database.createObjectStore('noteSummaries', {
+          keyPath: 'id',
+        });
+        const notesStore = request.transaction?.objectStore('notes');
+        if (notesStore) {
+          const cursorRequest = notesStore.openCursor();
+          cursorRequest.onsuccess = () => {
+            const cursor = cursorRequest.result;
+            if (!cursor) return;
+            const note = cursor.value as Note;
+            summaries.put(createNoteSummary(note));
+            cursor.continue();
+          };
+        }
       }
     };
 
@@ -64,7 +85,7 @@ function closeDB(): void {
  * @returns {Promise<*>} A promise that resolves with the request result.
  */
 function dbTransaction<T>(
-  storeName: 'notes' | 'images',
+  storeName: SideNoteStoreName,
   mode: IDBTransactionMode,
   operation: (store: IDBObjectStore) => IDBRequest<T>,
 ): Promise<T> {

@@ -21,6 +21,7 @@ import {
   notes,
   activeNoteId,
   isPreview,
+  getLoadedNote,
   setIsPreview
 } from '../state.js';
 import type { WysiwygMarkdownImageActivateDetail } from '../../packages/wysiwyg-markdown/src/index.js';
@@ -64,12 +65,12 @@ function initializeEditorEvents(): void {
     const inEditMode = false;
     const noteId = newNote.id;
     pushToHistory({ view: 'editor', params: { noteId, inEditMode } });
-    openNote(noteId, inEditMode, false);
+    await openNote(noteId, inEditMode, false);
   });
 
   // Markdown editor input event (auto-save)
   markdownEditor.addEventListener('input', async () => {
-    const note = notes.find(n => n.id === activeNoteId);
+    const note = getLoadedNote();
     if (note) {
       note.content = markdownEditor.value;
       note.metadata.lastModified = Date.now();
@@ -114,7 +115,7 @@ function initializeEditorEvents(): void {
 
   // Double-click on title to edit
   editorTitle.addEventListener('dblclick', () => {
-    const note = notes.find(n => n.id === activeNoteId);
+    const note = getLoadedNote();
     if (note) {
       note.settings = note.settings || {};
       let titleSource = resolveEffectiveSettings(note).title;

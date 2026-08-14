@@ -1,6 +1,7 @@
 // Import required functions from database
 import {
   saveNote,
+  getNote,
   deleteNoteDB,
   restoreNoteDB,
   deleteNotePermanentlyDB,
@@ -10,9 +11,10 @@ import {
 
 // Import state from state module
 import { notes, deletedNotes, setDeletedNotes } from './state.js';
-import type { Note } from './types.js';
+import { isLoadedNote } from './note-summary.js';
+import type { NoteListEntry } from './types.js';
 
-function pinnedOrderValue(note: Note): number {
+function pinnedOrderValue(note: NoteListEntry): number {
   return note.pinOrder ?? note.pinnedAt ?? 0;
 }
 
@@ -37,7 +39,7 @@ function sortNotes(): void {
  * Deletes a note.
  * @param {string} noteId The ID of the note to delete.
  */
-async function deleteNote(noteId: string): Promise<Note | null> {
+async function deleteNote(noteId: string): Promise<NoteListEntry | null> {
   const noteIndex = notes.findIndex(n => n.id === noteId);
   if (noteIndex > -1) {
     const [deletedNote] = notes.splice(noteIndex, 1);
@@ -53,7 +55,7 @@ async function deleteNote(noteId: string): Promise<Note | null> {
  * Toggles the pin status of a note.
  * @param {string} noteId The ID of the note to toggle.
  */
-async function togglePin(noteId: string): Promise<Note | null> {
+async function togglePin(noteId: string): Promise<NoteListEntry | null> {
     const note = notes.find(n => n.id === noteId);
     if (note) {
         if (!note.isPinned) {
@@ -75,7 +77,20 @@ async function togglePin(noteId: string): Promise<Note | null> {
             delete note.pinOrder;
         }
         sortNotes();
-        await saveNote(note);
+        const storedNote = isLoadedNote(note) ? note : await getNote(note.id);
+        if (!storedNote) return null;
+        storedNote.isPinned = note.isPinned;
+        if (note.pinnedAt === undefined) {
+          delete storedNote.pinnedAt;
+        } else {
+          storedNote.pinnedAt = note.pinnedAt;
+        }
+        if (note.pinOrder === undefined) {
+          delete storedNote.pinOrder;
+        } else {
+          storedNote.pinOrder = note.pinOrder;
+        }
+        await saveNote(storedNote);
         return note;
     }
     return null;
@@ -103,7 +118,7 @@ async function reorderPinnedNotes(
   if (!orderChanged) return false;
 
   const orderedPinnedNotes = orderedNoteIds.map(
-    noteId => pinnedById.get(noteId) as Note,
+    noteId => pinnedById.get(noteId) as NoteListEntry,
   );
   orderedPinnedNotes.forEach((note, index) => {
     note.pinOrder = index;
@@ -111,7 +126,12 @@ async function reorderPinnedNotes(
 
   const unpinnedNotes = notes.filter(note => !note.isPinned);
   notes.splice(0, notes.length, ...orderedPinnedNotes, ...unpinnedNotes);
-  await Promise.all(orderedPinnedNotes.map(note => saveNote(note)));
+  await Promise.all(orderedPinnedNotes.map(async (note) => {
+    const storedNote = isLoadedNote(note) ? note : await getNote(note.id);
+    if (!storedNote) return;
+    storedNote.pinOrder = note.pinOrder;
+    await saveNote(storedNote);
+  }));
   return true;
 }
 
@@ -119,7 +139,7 @@ async function reorderPinnedNotes(
  * Restores a deleted note.
  * @param {string} noteId The ID of the note to restore.
  */
-async function restoreNote(noteId: string): Promise<Note | null> {
+async function restoreNote(noteId: string): Promise<NoteListEntry | null> {
   const noteIndex = deletedNotes.findIndex(n => n.id === noteId);
   if (noteIndex > -1) {
     const [restoredNote] = deletedNotes.splice(noteIndex, 1);

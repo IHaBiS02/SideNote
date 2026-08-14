@@ -20,7 +20,7 @@ import {
   openNote,
   renderNoteList
 } from '../notes_view/index.js';
-import { saveNote } from '../database/index.js';
+import { getNote, saveNote } from '../database/index.js';
 import { populateSettingsForm } from '../settings.js';
 import { createDropdown } from '../ui-helpers.js';
 
@@ -29,7 +29,9 @@ import {
   notes,
   isGlobalSettings,
   originalNoteContent,
-  setIsGlobalSettings
+  setIsGlobalSettings,
+  getLoadedNote,
+  hydrateNote,
 } from '../state.js';
 
 import {
@@ -48,7 +50,7 @@ import type { NavigationHistoryState } from '../types.js';
 async function saveCurrentEditorIfChanged(): Promise<void> {
     const currentState = getCurrentHistoryState();
     if (currentState && currentState.view === 'editor') {
-        const note = notes.find(n => n.id === currentState.params?.noteId);
+        const note = getLoadedNote(currentState.params?.noteId ?? null);
         if (note && markdownEditor.value !== originalNoteContent) {
             note.content = markdownEditor.value;
             note.metadata.lastModified = Date.now();
@@ -77,14 +79,21 @@ async function navigateToState(
                 showListView(false);
                 return;
             }
-            openNote(state.params.noteId, state.params.inEditMode ?? false, false);
+            await openNote(
+              state.params.noteId,
+              state.params.inEditMode ?? false,
+              false,
+            );
             break;
         case 'settings':
             setIsGlobalSettings(state.params?.isGlobal ?? false);
             if (isGlobalSettings) {
                 populateSettingsForm(true);
             } else {
-                const note = notes.find(n => n.id === state.params?.noteId);
+                const noteId = state.params?.noteId ?? null;
+                const note = getLoadedNote(noteId)
+                  || (noteId ? await getNote(noteId) : undefined);
+                if (note) hydrateNote(note);
                 if (!note || !populateSettingsForm(false, note)) {
                     showListView(false);
                     return;
@@ -112,7 +121,7 @@ async function goBack(): Promise<void> {
 
     const previousState = moveBack();
     if (previousState) {
-        navigateToState(previousState);
+        await navigateToState(previousState);
 
         const existingDropdown = document.querySelector('.history-dropdown');
         if (existingDropdown) {
@@ -169,7 +178,7 @@ function populateHistoryDropdown(dropdown: Element): void {
             await saveCurrentEditorIfChanged();
 
             goToHistoryState(originalIndex);
-            navigateToState(targetState);
+            await navigateToState(targetState);
             dropdown.remove();
         });
         dropdown.appendChild(item);

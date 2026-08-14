@@ -6,8 +6,8 @@ const mocks = vi.hoisted(() => {
     calls,
     initDB: vi.fn(async () => calls.push('initDB')),
     saveNote: vi.fn(async () => calls.push('saveNote')),
-    getAllNotes: vi.fn(async () => {
-      calls.push('getAllNotes');
+    getAllNoteSummaries: vi.fn(async () => {
+      calls.push('getAllNoteSummaries');
       return [];
     }),
     getAllImageObjectsFromDB: vi.fn(async () => {
@@ -46,7 +46,7 @@ const mocks = vi.hoisted(() => {
 vi.mock('../../src/database/index.js', () => ({
   initDB: mocks.initDB,
   saveNote: mocks.saveNote,
-  getAllNotes: mocks.getAllNotes,
+  getAllNoteSummaries: mocks.getAllNoteSummaries,
   getAllImageObjectsFromDB: mocks.getAllImageObjectsFromDB,
   deleteNotePermanentlyDB: mocks.deleteNotePermanentlyDB,
   deleteImagePermanently: mocks.deleteImagePermanently,
@@ -74,14 +74,24 @@ vi.mock('../../src/events/index.js', () => ({
 }));
 
 describe('main bootstrap', () => {
+  let scheduledMaintenance;
+
   beforeEach(() => {
+    vi.useFakeTimers();
     vi.resetModules();
     vi.clearAllMocks();
     mocks.calls.length = 0;
+    scheduledMaintenance = undefined;
+    vi.stubGlobal('requestAnimationFrame', vi.fn((callback) => {
+      scheduledMaintenance = callback;
+      return 1;
+    }));
     globalThis.__SIDENOTE_DISABLE_AUTO_BOOTSTRAP__ = true;
   });
 
   afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
     delete globalThis.__SIDENOTE_DISABLE_AUTO_BOOTSTRAP__;
   });
 
@@ -92,9 +102,8 @@ describe('main bootstrap', () => {
 
     expect(mocks.calls).toEqual([
       'initDB',
-      'getAllNotes',
+      'getAllNoteSummaries',
       'sortNotes',
-      'getAllImageObjectsFromDB',
       'applyMode',
       'applyFontSize',
       'applyLineHeightSettings',
@@ -103,6 +112,12 @@ describe('main bootstrap', () => {
       'showListView',
       'initializeAllEvents',
     ]);
+    expect(mocks.getAllImageObjectsFromDB).not.toHaveBeenCalled();
+
+    scheduledMaintenance();
+    await vi.runAllTimersAsync();
+
+    expect(mocks.getAllImageObjectsFromDB).toHaveBeenCalledTimes(1);
   });
 
   it('migrates legacy notes from browser storage before loading IndexedDB notes', async () => {
@@ -117,6 +132,6 @@ describe('main bootstrap', () => {
 
     expect(mocks.saveNote).toHaveBeenCalledTimes(2);
     expect(globalThis.browser.storage.local.remove).toHaveBeenCalledWith(['notes', 'deletedNotes']);
-    expect(mocks.getAllNotes).toHaveBeenCalled();
+    expect(mocks.getAllNoteSummaries).toHaveBeenCalled();
   });
 });

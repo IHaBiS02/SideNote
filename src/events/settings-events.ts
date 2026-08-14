@@ -55,13 +55,13 @@ import {
 } from '../settings.js';
 import { saveNote } from '../database/index.js';
 import { createDropdown } from '../ui-helpers.js';
+import { ensureMarkdownRenderersLoaded } from '../vendor-loader.js';
 
 // Import state from state module
 import {
-  notes,
   globalSettings,
   isGlobalSettings,
-  activeNoteId,
+  getLoadedNote,
   setIsGlobalSettings
 } from '../state.js';
 import type { ThemeMode } from '../types.js';
@@ -91,7 +91,7 @@ function registerLineHeightSetting(
       return;
     }
 
-    const note = notes.find(n => n.id === activeNoteId);
+    const note = getLoadedNote();
     if (note) {
       note.settings = note.settings || {};
       note.settings[settingKey] = value;
@@ -109,7 +109,7 @@ function initializeSettingsEvents(): void {
   // Open note settings
   settingsButton.addEventListener('click', () => {
     setIsGlobalSettings(false);
-    const note = notes.find(n => n.id === activeNoteId);
+    const note = getLoadedNote();
     populateSettingsForm(false, note);
     showSettingsView();
   });
@@ -123,6 +123,7 @@ function initializeSettingsEvents(): void {
 
   // Licenses button
   licensesButton.addEventListener('click', async () => {
+    await ensureMarkdownRenderersLoaded();
     const response = await fetch('LIBRARY_LICENSES.md');
     if (!response.ok) {
       throw new Error(`Failed to load LIBRARY_LICENSES.md: ${response.status}`);
@@ -192,7 +193,7 @@ function initializeSettingsEvents(): void {
       globalSettings.title = value;
       saveGlobalSettings();
     } else {
-      const note = notes.find(n => n.id === activeNoteId);
+      const note = getLoadedNote();
       if (note) {
         note.settings = note.settings || {};
         note.settings.title = value;
@@ -219,7 +220,7 @@ function initializeSettingsEvents(): void {
       globalSettings.fontSize = value;
       saveGlobalSettings();
     } else {
-      const note = notes.find(n => n.id === activeNoteId);
+      const note = getLoadedNote();
       if (note) {
         note.settings = note.settings || {};
         note.settings.fontSize = value;
@@ -265,7 +266,7 @@ function initializeSettingsEvents(): void {
       globalSettings.codeBlockHeader = value;
       saveGlobalSettings();
     } else {
-      const note = notes.find(n => n.id === activeNoteId);
+      const note = getLoadedNote();
       if (note) {
         note.settings = note.settings || {};
         note.settings.codeBlockHeader = value;

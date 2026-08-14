@@ -1,13 +1,14 @@
 // Import database helpers
-import { dbTransaction } from './init.js';
-import type { Note } from '../types.js';
+import { dbTransaction, getDB } from './init.js';
+import { createNoteSummary } from '../note-summary.js';
+import type { Note, NoteSummary } from '../types.js';
 
 /**
  * Retrieves a note object from the database by its ID.
  * @param {string} id The ID of the note to retrieve.
  * @returns {Promise<object>} A promise that resolves with the note object.
  */
-function _getNoteObject(id: string): Promise<Note | undefined> {
+function getNote(id: string): Promise<Note | undefined> {
     return dbTransaction('notes', 'readonly', (store) => store.get(id) as IDBRequest<Note | undefined>);
 }
 
@@ -17,7 +18,25 @@ function _getNoteObject(id: string): Promise<Note | undefined> {
  * @returns {Promise<void>} A promise that resolves when the note is saved.
  */
 function saveNote(note: Note): Promise<IDBValidKey> {
-    return dbTransaction('notes', 'readwrite', (store) => store.put(note));
+    return new Promise((resolve, reject) => {
+        const database = getDB();
+        if (!database) {
+            reject(new Error('DB not initialized'));
+            return;
+        }
+
+        const transaction = database.transaction(
+            ['notes', 'noteSummaries'],
+            'readwrite',
+        );
+        const request = transaction.objectStore('notes').put(note);
+        transaction.objectStore('noteSummaries').put(createNoteSummary(note));
+        let savedKey: IDBValidKey = note.id;
+        request.onsuccess = () => { savedKey = request.result; };
+        transaction.oncomplete = () => resolve(savedKey);
+        transaction.onerror = () => reject(transaction.error);
+        transaction.onabort = () => reject(transaction.error);
+    });
 }
 
 /**
@@ -28,16 +47,24 @@ function getAllNotes(): Promise<Note[]> {
     return dbTransaction('notes', 'readonly', (store) => store.getAll() as IDBRequest<Note[]>);
 }
 
+function getAllNoteSummaries(): Promise<NoteSummary[]> {
+    return dbTransaction(
+        'noteSummaries',
+        'readonly',
+        (store) => store.getAll() as IDBRequest<NoteSummary[]>,
+    );
+}
+
 /**
  * Marks a note as deleted in the database.
  * @param {string} id The ID of the note to delete.
  * @returns {Promise<void>} A promise that resolves when the note is marked as deleted.
  */
 async function deleteNoteDB(id: string): Promise<void> {
-    const noteObject = await _getNoteObject(id);
+    const noteObject = await getNote(id);
     if (noteObject) {
         noteObject.metadata.deletedAt = Date.now();
-        await dbTransaction('notes', 'readwrite', (store) => store.put(noteObject));
+        await saveNote(noteObject);
     }
 }
 
@@ -47,10 +74,10 @@ async function deleteNoteDB(id: string): Promise<void> {
  * @returns {Promise<void>} A promise that resolves when the note is restored.
  */
 async function restoreNoteDB(id: string): Promise<void> {
-    const noteObject = await _getNoteObject(id);
+    const noteObject = await getNote(id);
     if (noteObject) {
         delete noteObject.metadata.deletedAt;
-        await dbTransaction('notes', 'readwrite', (store) => store.put(noteObject));
+        await saveNote(noteObject);
     }
 }
 
@@ -59,14 +86,32 @@ async function restoreNoteDB(id: string): Promise<void> {
  * @param {string} id The ID of the note to delete permanently.
  * @returns {Promise<void>} A promise that resolves when the note is deleted.
  */
-function deleteNotePermanentlyDB(id: string): Promise<undefined> {
-    return dbTransaction('notes', 'readwrite', (store) => store.delete(id));
+function deleteNotePermanentlyDB(id: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const database = getDB();
+        if (!database) {
+            reject(new Error('DB not initialized'));
+            return;
+        }
+
+        const transaction = database.transaction(
+            ['notes', 'noteSummaries'],
+            'readwrite',
+        );
+        transaction.objectStore('notes').delete(id);
+        transaction.objectStore('noteSummaries').delete(id);
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error);
+        transaction.onabort = () => reject(transaction.error);
+    });
 }
 
 // Export functions
 export {
     saveNote,
+    getNote,
     getAllNotes,
+    getAllNoteSummaries,
     deleteNoteDB,
     restoreNoteDB,
     deleteNotePermanentlyDB

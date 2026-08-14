@@ -2,12 +2,14 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 const dbMocks = vi.hoisted(() => ({
   getAllImageObjectsFromDB: vi.fn(),
+  getAllNotes: vi.fn(),
   deleteImage: vi.fn().mockResolvedValue(),
-  openNote: vi.fn(),
+  openNote: vi.fn().mockResolvedValue(true),
 }));
 
 vi.mock('../../src/database/index.js', () => ({
   getAllImageObjectsFromDB: dbMocks.getAllImageObjectsFromDB,
+  getAllNotes: dbMocks.getAllNotes,
   deleteImage: dbMocks.deleteImage,
 }));
 
@@ -23,6 +25,7 @@ describe('image manager usage detection', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
+    dbMocks.openNote.mockResolvedValue(true);
     document.body.innerHTML = `
       <ul id="image-list"></ul>
       <div id="markdown-editor"></div>
@@ -35,10 +38,17 @@ describe('image manager usage detection', () => {
   });
 
   async function renderImages({ notes, images }) {
+    const storedNotes = notes.map(note => ({
+      settings: {},
+      isPinned: false,
+      metadata: { createdAt: 1, lastModified: 2 },
+      ...note,
+    }));
     dbMocks.getAllImageObjectsFromDB.mockResolvedValue(images);
+    dbMocks.getAllNotes.mockResolvedValue(storedNotes);
 
     const state = await import('../../src/state.js');
-    state.setNotes(notes);
+    state.setNotes(storedNotes);
     state.setGlobalSettings({ preventUsedImageDeletion: true });
 
     const { renderImagesList } = await import('../../src/notes_view/image-manager.js');
@@ -75,7 +85,7 @@ describe('image manager usage detection', () => {
 
     imageList.querySelector('.usage-icon').click();
     imageList.querySelector('.notes-dropdown div').click();
-    await Promise.resolve();
+    await new Promise(resolve => setTimeout(resolve, 0));
 
     expect(dbMocks.openNote).toHaveBeenCalledWith('note-1', false);
     expect(document.getElementById('markdown-editor').scrollToImage).toHaveBeenCalledWith(

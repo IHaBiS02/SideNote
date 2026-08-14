@@ -44,6 +44,19 @@ export interface Note {
   pinOrder?: number;
 }
 
+/** Lightweight list/recycle-bin record that intentionally excludes Markdown. */
+export interface NoteSummary {
+  id: string;
+  title: string;
+  metadata: NoteMetadata;
+  isPinned: boolean;
+  pinnedAt?: number;
+  pinOrder?: number;
+}
+
+/** A summary is hydrated to a full note only after its content is requested. */
+export type NoteListEntry = NoteSummary | Note;
+
 export interface StoredImage {
   id: string;
   blob: Blob;

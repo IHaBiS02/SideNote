@@ -3,6 +3,10 @@ import { resolveEffectiveSettings } from './settings.js';
 import { downloadFile, sanitizeFilename } from './utils.js';
 import { createNoteContentStyles } from './editor/note-content-styles.js';
 import type { GlobalSettings, Note } from './types.js';
+import {
+  ensureHtml2PdfLoaded,
+  ensureMarkdownRenderersLoaded,
+} from './vendor-loader.js';
 
 type DocumentExportSettings = Pick<
   GlobalSettings,
@@ -514,6 +518,7 @@ function exportFilename(note: Note, extension: 'html' | 'pdf'): string {
 }
 
 async function createStandaloneNoteHtml(note: Note): Promise<string> {
+  await ensureMarkdownRenderersLoaded();
   const settings = resolveEffectiveSettings(note);
   const article = await createExportArticle(note, settings, true);
   const title = escapeHtml(note.title || 'Untitled Note');
@@ -552,6 +557,10 @@ function usesDarkExportTheme(settings: DocumentExportSettings): boolean {
 }
 
 async function createStandaloneNotePdf(note: Note): Promise<Blob> {
+  await Promise.all([
+    ensureMarkdownRenderersLoaded(),
+    ensureHtml2PdfLoaded(),
+  ]);
   if (typeof html2pdf !== 'function') {
     throw new Error('PDF export library is unavailable');
   }

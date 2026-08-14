@@ -1,6 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { initDB, closeDB } from '../../src/database/init.js';
-import { saveNote, getAllNotes, deleteNoteDB, restoreNoteDB, deleteNotePermanentlyDB } from '../../src/database/notes.js';
+import {
+  saveNote,
+  getNote,
+  getAllNotes,
+  getAllNoteSummaries,
+  deleteNoteDB,
+  restoreNoteDB,
+  deleteNotePermanentlyDB,
+} from '../../src/database/notes.js';
 import { createSampleNote } from '../fixtures/notes.js';
 
 describe('database/notes', () => {
@@ -22,6 +30,14 @@ describe('database/notes', () => {
       expect(allNotes).toHaveLength(1);
       expect(allNotes[0].id).toBe('note-save-1');
       expect(allNotes[0].title).toBe(note.title);
+      await expect(getNote(note.id)).resolves.toEqual(note);
+      const summaries = await getAllNoteSummaries();
+      expect(summaries).toEqual([expect.objectContaining({
+        id: note.id,
+        title: note.title,
+      })]);
+      expect(summaries[0]).not.toHaveProperty('content');
+      expect(summaries[0]).not.toHaveProperty('settings');
     });
 
     it('should update an existing note', async () => {
@@ -32,6 +48,9 @@ describe('database/notes', () => {
       const allNotes = await getAllNotes();
       expect(allNotes).toHaveLength(1);
       expect(allNotes[0].title).toBe('Updated Title');
+      await expect(getAllNoteSummaries()).resolves.toEqual([
+        expect.objectContaining({ title: 'Updated Title' }),
+      ]);
     });
   });
 
@@ -57,6 +76,8 @@ describe('database/notes', () => {
       const allNotes = await getAllNotes();
       expect(allNotes[0].metadata.deletedAt).toBeDefined();
       expect(typeof allNotes[0].metadata.deletedAt).toBe('number');
+      const summaries = await getAllNoteSummaries();
+      expect(typeof summaries[0].metadata.deletedAt).toBe('number');
     });
 
     it('should not error when deleting non-existent note', async () => {
@@ -76,6 +97,8 @@ describe('database/notes', () => {
       await restoreNoteDB('note-restore-1');
       allNotes = await getAllNotes();
       expect(allNotes[0].metadata.deletedAt).toBeUndefined();
+      const summaries = await getAllNoteSummaries();
+      expect(summaries[0].metadata.deletedAt).toBeUndefined();
     });
 
     it('should not error when restoring non-existent note', async () => {
@@ -90,6 +113,7 @@ describe('database/notes', () => {
       await deleteNotePermanentlyDB('note-perm-1');
       const allNotes = await getAllNotes();
       expect(allNotes).toHaveLength(0);
+      await expect(getAllNoteSummaries()).resolves.toHaveLength(0);
     });
   });
 });

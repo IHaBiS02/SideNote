@@ -3,6 +3,14 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 // Mock database and view modules before importing notes.js
 vi.mock('../../src/database/index.js', () => ({
   saveNote: vi.fn().mockResolvedValue(),
+  getNote: vi.fn(async (id) => ({
+    id,
+    title: '',
+    content: '',
+    settings: {},
+    isPinned: false,
+    metadata: { createdAt: 0, lastModified: 0 },
+  })),
   deleteNoteDB: vi.fn().mockResolvedValue(),
   restoreNoteDB: vi.fn().mockResolvedValue(),
   deleteNotePermanentlyDB: vi.fn().mockResolvedValue(),

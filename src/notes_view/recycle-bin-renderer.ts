@@ -21,9 +21,9 @@ import { createBlobUrlTracker } from '../utils.js';
 
 // Import image modal function
 import { showImageModal } from './image-manager.js';
-import type { Note, StoredImage } from '../types.js';
+import type { NoteListEntry, StoredImage } from '../types.js';
 
-type DeletedNoteItem = Note & {
+type DeletedNoteItem = NoteListEntry & {
   type: 'note';
   deletedAt: number;
 };

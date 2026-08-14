@@ -1,5 +1,12 @@
 // Import all required modules  
-import { initDB, saveNote, getAllNotes, getAllImageObjectsFromDB, deleteNotePermanentlyDB, deleteImagePermanently } from './database/index.js';
+import {
+  initDB,
+  saveNote,
+  getAllNoteSummaries,
+  getAllImageObjectsFromDB,
+  deleteNotePermanentlyDB,
+  deleteImagePermanently,
+} from './database/index.js';
 import { THIRTY_DAYS_MS } from './constants.js';
 import { sortNotes } from './notes.js';
 import { applyFontSize, applyLineHeightSettings, applyMode, normalizeGlobalSettings, updateLegacyLineBreakControls, updateTildeReplacementButton } from './settings.js';
@@ -14,9 +21,32 @@ import type { GlobalSettings, Note } from './types.js';
 async function bootstrap(): Promise<void> {
   await initDB();
   await loadAndMigrateData();
-  await cleanupDeletedImages();
   initializeInitialView();
   initializeAllEvents();
+  scheduleStartupMaintenance();
+}
+
+async function runStartupMaintenance(): Promise<void> {
+  await Promise.all([
+    cleanupDeletedNotes(),
+    cleanupDeletedImages(),
+  ]);
+}
+
+function scheduleStartupMaintenance(): void {
+  const runAfterPaint = (): void => {
+    setTimeout(() => {
+      void runStartupMaintenance().catch((error) => {
+        console.error('Failed to complete startup maintenance:', error);
+      });
+    }, 0);
+  };
+
+  if (typeof requestAnimationFrame === 'function') {
+    requestAnimationFrame(runAfterPaint);
+  } else {
+    setTimeout(runAfterPaint, 0);
+  }
 }
 
 function initializeInitialView(): void {
@@ -58,14 +88,13 @@ async function loadAndMigrateData(): Promise<void> {
     }
   }
 
-  // IndexedDB에서 모든 노트 로드
-  const allNotesFromDB = await getAllNotes();
+  // Load only list metadata. Full Markdown is fetched when a note is opened.
+  const allNotesFromDB = await getAllNoteSummaries();
   // 활성 노트와 삭제된 노트 분리
   setNotes(allNotesFromDB.filter(note => !note.metadata.deletedAt));
   setDeletedNotes(allNotesFromDB.filter(note => note.metadata.deletedAt));
 
   sortNotes();              // 노트 정렬
-  await cleanupDeletedNotes();    // 30일 이상 된 삭제 노트 정리
 }
 
 /**
@@ -114,5 +143,7 @@ export {
   loadAndMigrateData,
   cleanupDeletedImages,
   cleanupDeletedNotes,
+  runStartupMaintenance,
+  scheduleStartupMaintenance,
   initializeInitialView
 };

@@ -13,7 +13,7 @@ import {
 // Import functions from other modules
 import { sortNotes } from '../notes.js';
 import { renderNoteList } from '../notes_view/index.js';
-import { saveNote } from '../database/index.js';
+import { getAllNotes, getNote, saveNote } from '../database/index.js';
 import { 
   getTimestamp, 
   sanitizeFilename, 
@@ -37,8 +37,12 @@ import {
 // Import state from state module
 import {
   notes,
-  activeNoteId
+  activeNoteId,
+  getLoadedNote,
+  hydrateNote,
 } from '../state.js';
+import type { Note } from '../types.js';
+import { ensureJsZipLoaded } from '../vendor-loader.js';
 
 interface ExportAllOptions {
   extension?: 'snotes' | 'zip';
@@ -64,6 +68,26 @@ interface ExportDropdownOptions {
   }>;
 }
 
+async function loadActiveNotesInListOrder(): Promise<Note[]> {
+  const storedNotes = await getAllNotes();
+  const activeById = new Map(
+    storedNotes
+      .filter(note => !note.metadata.deletedAt)
+      .map(note => [note.id, note]),
+  );
+  return notes
+    .map(note => activeById.get(note.id))
+    .filter((note): note is Note => Boolean(note));
+}
+
+async function loadCurrentNote(): Promise<Note | null> {
+  const loadedNote = getLoadedNote();
+  if (loadedNote) return loadedNote;
+  if (!activeNoteId) return null;
+  const note = await getNote(activeNoteId);
+  return note ? hydrateNote(note) : null;
+}
+
 // === Import/Export Event Listeners ===
 
 async function exportAllNotes({
@@ -71,8 +95,10 @@ async function exportAllNotes({
   addTwoSpaceLineBreaks = false,
   useTitleFolderNames = false
 }: ExportAllOptions = {}): Promise<void> {
+  await ensureJsZipLoaded();
   const timestamp = getTimestamp();
-  const zip = await createAllNotesArchive(notes, {
+  const activeNotes = await loadActiveNotesInListOrder();
+  const zip = await createAllNotesArchive(activeNotes, {
     addTwoSpaceLineBreaks,
     useTitleFolderNames
   });
@@ -84,7 +110,8 @@ async function exportCurrentNote({
   extension = 'snote',
   addTwoSpaceLineBreaks = false,
 }: ExportNoteOptions = {}): Promise<void> {
-  const note = notes.find(n => n.id === activeNoteId);
+  await ensureJsZipLoaded();
+  const note = await loadCurrentNote();
   if (!note) {
     return;
   }
@@ -96,7 +123,7 @@ async function exportCurrentNote({
 }
 
 async function exportCurrentNoteAsHtml(): Promise<void> {
-  const note = notes.find(n => n.id === activeNoteId);
+  const note = await loadCurrentNote();
   if (!note) return;
 
   try {
@@ -108,7 +135,7 @@ async function exportCurrentNoteAsHtml(): Promise<void> {
 }
 
 async function exportCurrentNoteAsPdf(): Promise<void> {
-  const note = notes.find(n => n.id === activeNoteId);
+  const note = await loadCurrentNote();
   if (!note) return;
 
   try {
@@ -331,9 +358,11 @@ function initializeImportExportEvents(): void {
     }
     
     try {
+      await ensureJsZipLoaded();
+      await ensureJsZipLoaded();
       const zip = await JSZip.loadAsync(file);
       const importedNote = await parseSnote(zip);
-      const note = notes.find(n => n.id === activeNoteId);
+      const note = getLoadedNote();
       if (note) {
         await saveParsedSnoteImages(importedNote);
         note.title = importedNote.title;

@@ -3,7 +3,12 @@ import { getImage, saveImage, saveNote } from './database/index.js';
 import { extractImageIds, sanitizeFilename } from './utils.js';
 import { addAutoLineBreaks } from './text-processors.js';
 import type JSZipType from 'jszip';
-import type { Note, NoteMetadata, NoteSettings } from './types.js';
+import type {
+  Note,
+  NoteListEntry,
+  NoteMetadata,
+  NoteSettings,
+} from './types.js';
 
 interface ParsedImage {
   id: string;
@@ -251,14 +256,14 @@ async function processSnote(zip: JSZipType): Promise<Note> {
   return saveParsedSnote(parsedNote);
 }
 
-function importedAfterPinOrder(note: Note): number {
+function importedAfterPinOrder(note: NoteListEntry): number {
   const order = note.pinOrder ?? note.pinnedAt;
   return Number.isFinite(order) ? Number(order) : -1;
 }
 
 async function saveImportedNotes(
   parsedNotes: ParsedSnote[],
-  existingNotes: readonly Note[] = [],
+  existingNotes: readonly NoteListEntry[] = [],
 ): Promise<Note[]> {
   const hasArchiveOrder = parsedNotes.some(note => (
     Number.isFinite(note.archiveOrder)

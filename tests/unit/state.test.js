@@ -3,7 +3,8 @@ import {
   notes, deletedNotes, globalSettings, isGlobalSettings,
   activeNoteId, originalNoteContent, isPreview,
   setNotes, setDeletedNotes, setGlobalSettings, setIsGlobalSettings,
-  setActiveNoteId, setOriginalNoteContent, setIsPreview
+  setActiveNoteId, setOriginalNoteContent, setIsPreview,
+  hydrateNote, getLoadedNote,
 } from '../../src/state.js';
 
 describe('state', () => {
@@ -26,6 +27,26 @@ describe('state', () => {
       const newNotes = [{ id: '1', title: 'Test' }];
       setNotes(newNotes);
       expect(notes).toEqual(newNotes);
+    });
+
+    it('replaces a summary with its loaded Markdown record', () => {
+      setNotes([{
+        id: '1',
+        title: 'Summary',
+        isPinned: false,
+        metadata: { createdAt: 1, lastModified: 2 },
+      }]);
+      const fullNote = {
+        ...notes[0],
+        content: '# Loaded',
+        settings: {},
+      };
+
+      hydrateNote(fullNote);
+      setActiveNoteId('1');
+
+      expect(notes[0]).toBe(fullNote);
+      expect(getLoadedNote()).toBe(fullNote);
     });
   });
 

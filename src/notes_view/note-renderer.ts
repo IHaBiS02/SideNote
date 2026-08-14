@@ -6,7 +6,10 @@ import {
 } from '../dom.js';
 
 // Import required functions from other modules
-import { 
+import {
+  getNote,
+} from '../database/index.js';
+import {
   togglePin, 
   deleteNote,
   reorderPinnedNotes,
@@ -36,9 +39,12 @@ import {
   globalSettings,
   activeNoteId, 
   setActiveNoteId,
+  hydrateNote,
   setOriginalNoteContent,
   setIsPreview
 } from '../state.js';
+import { isLoadedNote } from '../note-summary.js';
+import type { NoteListEntry } from '../types.js';
 
 // Import view manager functions
 import { showEditorView } from './view-manager.js';
@@ -50,51 +56,69 @@ import { applyEditorDisplayMode } from './editor-mode.js';
 // === 노트 목록 렌더링 ===
 
 let pinnedNoteDragController: PinnedNoteDragController | null = null;
+let noteListClickInitialized = false;
+
+function createNoteListItem(note: NoteListEntry): HTMLLIElement {
+  const li = document.createElement('li');
+  li.dataset.noteId = note.id;
+  li.dataset.pinned = note.isPinned ? 'true' : 'false';
+  if (note.isPinned) li.title = 'Hold and drag to reorder pinned notes';
+
+  const titleSpan = document.createElement('span');
+  titleSpan.textContent = note.title;
+
+  const buttonContainer = document.createElement('div');
+  buttonContainer.classList.add('button-container');
+
+  const pinSpan = document.createElement('span');
+  pinSpan.textContent = note.isPinned ? '📌' : '📎';
+  pinSpan.title = note.isPinned ? 'Unpin Note' : 'Pin Note';
+  pinSpan.classList.add('pin-note-icon');
+
+  const deleteSpan = document.createElement('span');
+  deleteSpan.textContent = '🗑️';
+  deleteSpan.title = 'Delete Note';
+  deleteSpan.classList.add('delete-note-icon');
+
+  li.appendChild(titleSpan);
+  buttonContainer.appendChild(pinSpan);
+  buttonContainer.appendChild(deleteSpan);
+  li.appendChild(buttonContainer);
+  return li;
+}
+
+function initializeNoteListClickDelegation(): void {
+  if (noteListClickInitialized) return;
+  noteListClickInitialized = true;
+  noteList.addEventListener('click', async (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const row = target.closest<HTMLElement>('li[data-note-id]');
+    const noteId = row?.dataset.noteId;
+    if (!row || !noteId) return;
+
+    if (target.closest('.pin-note-icon')) {
+      await togglePin(noteId);
+      renderNoteList();
+      return;
+    }
+    if (target.closest('.delete-note-icon')) {
+      await deleteNote(noteId);
+      renderNoteList();
+      return;
+    }
+    await openNote(noteId);
+  });
+}
 
 function renderNoteList(): void {
+  initializeNoteListClickDelegation();
   pinnedNoteDragController?.destroy();
   pinnedNoteDragController = null;
-  noteList.innerHTML = '';
   if (!Array.isArray(notes)) return;
-  notes.forEach(note => {
-    const li = document.createElement('li');
-    li.dataset.noteId = note.id;
-    li.dataset.pinned = note.isPinned ? 'true' : 'false';
-    if (note.isPinned) li.title = 'Hold and drag to reorder pinned notes';
-    li.addEventListener('click', () => openNote(note.id));
-
-    const titleSpan = document.createElement('span');
-    titleSpan.textContent = note.title;
-
-    const buttonContainer = document.createElement('div');
-    buttonContainer.classList.add('button-container');
-
-    const pinSpan = document.createElement('span');
-    pinSpan.textContent = note.isPinned ? '📌' : '📎';
-    pinSpan.title = note.isPinned ? 'Unpin Note' : 'Pin Note';
-    pinSpan.classList.add('pin-note-icon');
-    pinSpan.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        await togglePin(note.id);
-        renderNoteList();
-    });
-
-    const deleteSpan = document.createElement('span');
-    deleteSpan.textContent = '🗑️';
-    deleteSpan.title = 'Delete Note';
-    deleteSpan.classList.add('delete-note-icon');
-    deleteSpan.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      await deleteNote(note.id);
-      renderNoteList();
-    });
-
-    li.appendChild(titleSpan);
-    buttonContainer.appendChild(pinSpan);
-    buttonContainer.appendChild(deleteSpan);
-    li.appendChild(buttonContainer);
-    noteList.appendChild(li);
-  });
+  const fragment = document.createDocumentFragment();
+  notes.forEach(note => fragment.appendChild(createNoteListItem(note)));
+  noteList.replaceChildren(fragment);
 
   pinnedNoteDragController = createPinnedNoteDragController(
     noteList,
@@ -116,13 +140,15 @@ function renderNoteList(): void {
  */
 // === 노트 열기 및 편집 ===
 
-function openNote(
+async function openNote(
   noteId: string,
   inEditMode = false,
   addToHistory = true,
-): void {
-  const note = notes.find(n => n.id === noteId);
+): Promise<boolean> {
+  const entry = notes.find(n => n.id === noteId);
+  const note = isLoadedNote(entry) ? entry : await getNote(noteId);
   if (note) {
+    hydrateNote(note);
     setActiveNoteId(noteId);
     setOriginalNoteContent(note.content); // 원본 내용 저장 (변경 감지용)
     editorTitle.textContent = note.title;
@@ -141,7 +167,9 @@ function openNote(
     if (addToHistory) {
         pushToHistory({ view: 'editor', params: { noteId, inEditMode } });
     }
+    return true;
   }
+  return false;
 }
 
 // Export functions
