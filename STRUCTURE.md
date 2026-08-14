@@ -13,12 +13,14 @@ SideNote is a browser extension that provides a note-taking interface within the
 -   **`shortcut-setup.html` / `shortcut-setup.css`**: Small first-install window that explains an unassigned activation shortcut and links to the browser's shortcut settings.
 -   **`sidenote-controls.css`**: Shared settings-style button skin used by both the main settings view and the shortcut setup window, including matching light/dark hover colors and control geometry.
 -   **`src/`**: This directory contains the TypeScript extension runtime, organized as readable ES modules. `tsc` preserves this module layout when emitting JavaScript for browser packages.
-    -   `main.ts`: The main entry point. It runs a deterministic `bootstrap()` sequence that initializes the database, loads settings and notes, handles the one-time migration of notes from `chrome.storage` to `IndexedDB`, cleans expired recycle-bin items, renders the initial view, and calls `initializeAllEvents()` to set up all event listeners.
-    -   `types.ts`: Shared note, settings, stored-image, and navigation types.
+    -   `main.ts`: The main entry point. It initializes the database, loads settings and lightweight note summaries, renders and binds the list, then schedules expired note/image cleanup after the browser has had a chance to paint.
+    -   `types.ts`: Shared full-note, lightweight note-summary, settings, stored-image, and navigation types.
+    -   `note-summary.ts`: Creates summary records and distinguishes summaries from hydrated notes.
+    -   `vendor-loader.ts`: Deduplicated on-demand script loader for JSZip, Marked, DOMPurify, and html2pdf.
     -   `globals.d.ts`: Declarations for packaged browser/vendor globals.
     -   `database/`: Directory containing modularized IndexedDB operations:
-        -   `init.ts`: Database initialization and shared instance management
-        -   `notes.ts`: Note-related database operations and CRUD functions
+        -   `init.ts`: Database initialization, version-3 summary-store migration, and shared instance management
+        -   `notes.ts`: Atomic full-note/summary persistence and note CRUD functions
         -   `images.ts`: Image-related database operations and blob management
         -   `index.ts`: Unified entry point for backward compatibility
     -   `editor/`:
@@ -28,7 +30,7 @@ SideNote is a browser extension that provides a note-taking interface within the
     -   `notes.ts`: Contains the core logic for managing notes (sorting, deleting, pinning, persistent pinned-note ordering, restoring, etc.).
     -   `notes_view/`: Directory containing modularized UI rendering and view management:
         -   `view-manager.ts`: View switching and navigation management
-        -   `note-renderer.ts`: Note list and editor functionality
+        -   `note-renderer.ts`: Fragment-based list rendering, delegated list actions, and on-demand note hydration
         -   `pinned-note-drag.ts`: Long-press pointer controller with a fixed floating card, stable hysteresis-based drop slots, animated drop-gap placeholder, cancellation restore, and persisted pinned-note ordering
         -   `editor-mode.ts`: Editable/read-only Preview and full-document source-mode switching with `Edit`/`WYSIWYG` or `Edit`/`Preview` button labels
         -   `recycle-bin-renderer.ts`: Recycle bin rendering and management
@@ -45,7 +47,7 @@ SideNote is a browser extension that provides a note-taking interface within the
     -   `history.ts`: Manages the view navigation history stack, allowing for "back" functionality.
     -   `settings.ts`: Manages global and note-specific settings, including default setting normalization and effective setting resolution.
     -   `import_export.ts`: Contains the logic for parsing `.snote` files, saving parsed imports, and packaging `.snote`/`.snotes` zip archives.
-    -   `document-export.ts`: Renders a sanitized note document using the shared Preview body-style generator, embeds SideNote-managed and reachable external images as Base64 data URLs, keeps HTML task checkboxes locally interactive, adds self-contained code-copy controls, and generates a directly downloadable rasterized PDF from the same DOM without invoking the print dialog.
+    -   `document-export.ts`: Loads its export renderers on demand, renders a sanitized note document using the shared Preview body-style generator, embeds SideNote-managed and reachable external images as Base64 data URLs, keeps HTML task checkboxes locally interactive, adds self-contained code-copy controls, and generates a directly downloadable rasterized PDF from the same DOM without invoking the print dialog.
     -   `utils.ts`: Utility functions for timestamps, filename sanitization, file downloads, scoped blob URL tracking, and image ID extraction.
     -   `text-processors.ts`: Legacy text processing utilities for markdown editing, including tilde escaping, auto line breaks, Enter key handling, and whitespace cleanup.
 -   **`sidepanel.css`**: The primary stylesheet for the extension's UI. It is
@@ -101,25 +103,25 @@ The UI is a single-page application with several distinct "views" that are shown
 ### Core Concepts & State Management
 
 -   **State Variables**:
-    -   `notes`: An array of note objects. Each object contains an `id`, `title`, `content`, `settings`, and `metadata` (timestamps). Pinned notes may include `pinOrder`; older records fall back to `pinnedAt`.
-    -   `deletedNotes`: An array of note objects that have been moved to the recycle bin.
+    -   `notes`: An array of lightweight `NoteSummary` records at startup. An entry is replaced in place by its full `Note` after the note is opened or another body-dependent operation loads it. Pinned notes may include `pinOrder`; older records fall back to `pinnedAt`.
+    -   `deletedNotes`: The same summary-or-hydrated representation for notes in the recycle bin.
     -   `activeNoteId`: Stores the `id` of the note currently being edited.
     -   `globalSettings`: An object holding all global application settings, including WYSIWYG `lineHeight` (default `1.5`), `sourceLineHeight` and `codeLineHeight` (default `1.2`), `pinnedNoteDragDelayMs` (default `150`, range `100`–`2000`), `wysiwygPreview` (default `true`) for editable versus read-only Preview, and `preventExtraEmptyParagraphs` (default `true`).
     -   `isPreview`: A boolean flag to track if the editor is in "Preview" or "Edit" mode.
     -   Navigation history is managed through the `history.ts` module.
 -   **Data Persistence**:
-    -   Notes and images are stored in `IndexedDB`.
+    -   Full notes live in IndexedDB `notes`, list/recycle metadata lives in the derived `noteSummaries` store, and images live in `images`. Saving, deleting, restoring, or permanently removing a note updates both note stores atomically.
     -   `chrome.storage.local` stores `globalSettings` and is also used for the one-time migration of old note data.
-    -   Startup runs through `bootstrap()` so storage load, migration, cleanup, rendering, and event binding happen in a predictable order.
+    -   Startup runs through `bootstrap()` so storage load and migration complete before the list renders. Cleanup is deliberately scheduled after the initial paint and does not delay opening the list.
 
 ### Function Breakdown
 
 #### Initialization & Data Management (`main.ts`, `src/database/`)
 
--   **`bootstrap()`**: Runs the startup sequence in order: IndexedDB initialization, settings/note load and migration, recycle-bin cleanup, initial UI render, and event binding.
--   **`initDB()`**: Initializes the IndexedDB database and creates the `images` and `notes` object stores (located in `src/database/init.ts`).
--   **`loadAndMigrateData()`**: On startup, this function loads all data from `IndexedDB`. It also handles the one-time migration of notes from `chrome.storage.local` to `IndexedDB`.
--   **`saveNote()` / `getAllNotes()` / `deleteNoteDB()` / etc.**: A set of async functions in `src/database/notes.ts` to perform CRUD operations on note data in IndexedDB.
+-   **`bootstrap()`**: Runs IndexedDB initialization, settings/summary load and migration, initial list rendering, and event binding; `scheduleStartupMaintenance()` then defers expired note/image cleanup until after a paint opportunity.
+-   **`initDB()`**: Initializes IndexedDB version 3 with `notes`, `noteSummaries`, and `images`; upgrading from version 2 backfills summaries from existing full notes (located in `src/database/init.ts`).
+-   **`loadAndMigrateData()`**: Migrates legacy `chrome.storage.local` notes when necessary, then reads only `noteSummaries` for the initial active/recycle lists.
+-   **`saveNote()` / `getNote()` / `getAllNoteSummaries()` / `getAllNotes()` / etc.**: Note persistence functions. Normal list startup uses summaries; body-dependent features explicitly fetch full notes.
 -   **`saveImage()` / `getImage()` / `deleteImage()` / etc.**: A set of async functions in `src/database/images.ts` to perform CRUD operations on image data in IndexedDB.
 -   **`sortNotes()`**: Keeps pinned notes first using persisted `pinOrder` (or legacy `pinnedAt`) and sorts regular notes by `lastModified`.
 -   **`cleanupDeletedNotes()` / `cleanupDeletedImages()`**: Automatically and permanently deletes items from the recycle bin that are older than 30 days.
@@ -136,7 +138,7 @@ The UI is a single-page application with several distinct "views" that are shown
 
 #### Note List (`src/notes_view/`, `src/events/`)
 
--   **`renderNoteList()`**: Populates the `#note-list` with items from the `notes` array (located in `src/notes_view/note-renderer.ts`).
+-   **`renderNoteList()`**: Builds every row in one `DocumentFragment`, replaces the list children once, and uses one delegated list click handler for open/pin/delete actions (located in `src/notes_view/note-renderer.ts`).
 -   **Pinned-note drag ordering**: Holding a pinned row for the global `pinnedNoteDragDelayMs` duration (150ms by default) activates `pinned-note-drag.ts`. The global settings view allows 100–2000ms; note-specific settings do not expose or override it. The grabbed row becomes a slightly inset, rounded fixed card that follows the pointer, while a separate animated placeholder moves through the pinned section and opens the current drop gap. Keeping the captured row at one DOM position until `pointerup` prevents Chromium from ending the drag when reordering or leaving the original row. Drop slots are calculated from stable row-center snapshots with a 10px hysteresis zone, and the placeholder DOM node moves only when the selected slot changes, preventing its opening animation from repeatedly restarting at a boundary. A completed drop replaces the placeholder and `reorderPinnedNotes()` saves normalized positions to IndexedDB; pointer cancellation or window blur restores the original position. Short taps and movements made before activation preserve normal click and scroll behavior.
 -   **`newNoteButton` (Event Listener)**: Creates a new, empty note object and opens it (handled in `src/events/editor.ts`).
 -   **`deleteNote(noteId)`**: Moves a note to the recycle bin by adding a `deletedAt` timestamp.
@@ -145,7 +147,7 @@ The UI is a single-page application with several distinct "views" that are shown
 
 #### Editor (`src/notes_view/`, `src/events/`)
 
--   **`openNote(noteId, inEditMode, addToHistory)`**: Sets the `activeNoteId` and populates the editor with the note's content. It now also records the action in the navigation history (located in `src/notes_view/note-renderer.ts`).
+-   **`openNote(noteId, inEditMode, addToHistory)`**: Asynchronously fetches the full note when the list entry is still a summary, hydrates it in place, populates the editor, and records the action in navigation history (located in `src/notes_view/note-renderer.ts`).
 -   **`markdownEditor` (Event Listeners)** (handled in `src/events/editor.ts`):
     -   `input`: Updates the note content and metadata on every keystroke.
     -   WYSIWYG paste hooks save images to IndexedDB and apply enabled legacy text formatting through `src/editor/sidenote-editor-adapter.ts`.
@@ -160,22 +162,26 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **Settings Listeners**: Update `globalSettings` or note-specific settings (handled in `src/events/settings-events.ts`).
 -   **Line-height applicators**: `applyLineHeight()`, `applySourceLineHeight()`, and `applyCodeLineHeight()` update the WYSIWYG, plain-text source, and fenced-code CSS variables independently. `applyLineHeightSettings()` applies the effective trio when a note opens or SideNote starts.
 -   **`applyMode(mode)`**: Toggles the `dark-mode` class on the `<body>`.
--   **`renderDeletedItemsList()`**: Fetches all deleted notes and images from `IndexedDB`. It combines them into a single array, sorts them by deletion date, and renders them in the `#deleted-items-list`. Each item has controls to be restored or permanently deleted (located in `src/notes_view/recycle-bin-renderer.ts`).
--   **`renderImagesList()`**: Renders the list of images in the image management view, showing usage information and delete controls (located in `src/notes_view/image-manager.ts`). Usage detection is based on exact Markdown image references extracted from note content.
+-   **`renderDeletedItemsList()`**: Combines the in-memory deleted-note summaries with deleted images loaded when the recycle-bin view is opened, sorts them by deletion date, and renders restore/permanent-delete controls (located in `src/notes_view/recycle-bin-renderer.ts`).
+-   **`renderImagesList()`**: Loads full active note bodies only when image management is opened, then renders image usage and delete controls. Usage detection is based on exact Markdown image references extracted from note content (located in `src/notes_view/image-manager.ts`).
 -   **`restoreNote(noteId)` / `restoreImage(id)`**: Moves an item from the recycle bin back to the active state.
 -   **`deleteNotePermanently(noteId)` / `deleteImagePermanently(id)`**: Removes an item permanently from storage.
 
 #### Import & Export (`import_export.ts`, `src/events/`)
 
 -   **Export Buttons**: Left-click packages one or all notes into a `.snote` or `.snotes` zip file. Right-click opens an export format dropdown with `.zip` above `.snote`/`.snotes`. Right-clicking the `.zip` option inserts original Markdown and Markdown with two-space line breaks options above the `.zip` row. The current-note menu additionally offers **Save as PDF** and **Save as HTML**. All-notes `.zip` exports use sanitized note titles as folder names, while `.snotes` keeps note IDs for compatibility. Shared helpers in `src/import_export.ts` write note content (`note.md`), metadata (`metadata.json`), associated images, and an all-notes root manifest that maps folders to displayed order, pinned state, and pinned order.
--   **Standalone documents**: `src/document-export.ts` parses Markdown with Marked, sanitizes the result with DOMPurify, and highlights fenced code with highlight.js. `src/editor/note-content-styles.ts` supplies the same semantic body typography, list/link/table rules, checkbox geometry and accent, and syntax colors used by Preview, with selectors adapted for Marked output. Marked's default `disabled` attribute is removed from task checkboxes, so a saved HTML file can toggle them locally without modifying SideNote storage; reopening the file restores its exported state. SideNote-managed IndexedDB images and reachable HTTP(S)/Blob images are converted to Base64 data URLs; inaccessible external images stop the export so the result never silently depends on an online image. The single HTML file includes a fixed local handler for SideNote-style fenced-code copy buttons. The same detached DOM, without interactive buttons, is passed to html2pdf.js to download an A4 PDF directly without a print dialog or remote conversion service. Its browser-rendered content is rasterized and therefore is not selectable PDF text.
+-   **Standalone documents**: `src/document-export.ts` requests Marked and DOMPurify only when HTML/PDF export starts, and requests html2pdf only for PDF. It sanitizes and highlights the document, shares Preview body styles, embeds images as Base64, preserves local HTML checkbox/copy interactions, and produces a rasterized A4 PDF without a print dialog or remote service.
+-   **Archive import/export**: `src/events/import-export-events.ts` requests JSZip only when an import or archive export action actually runs. Exporting all notes is another explicit body-dependent operation and reads the full active-note records in displayed summary order.
 -   **Import Buttons**: Unzip a `.snote` or `.snotes` file and parse metadata/content/images without saving first. Manifest-based `.snotes` imports preserve their internal display order and pinned state. Imported pinned positions are normalized after the existing pinned range to prevent `pinOrder` collisions; imported regular timestamps are assigned a unique descending range above existing regular notes. Legacy `.snotes` files without a manifest remain supported.
 
 ## 5. Packaged Runtime Assets (`build/<browser>/vendor/`)
 
 `build.js` copies the exact locked browser assets below into each extension
 package. Most are third-party libraries from `node_modules`; the editor bundle
-is first-party generated code and is listed separately.
+is first-party generated code and is listed separately. JSZip, Marked,
+DOMPurify, and html2pdf remain packaged locally for offline operation but are
+injected by `src/vendor-loader.ts` only when their feature is invoked;
+highlight.js remains an initial editor dependency.
 
 -   **`marked.min.js`**: Renders the bundled generated license Markdown and parses Markdown for standalone note export.
 -   **`dompurify.min.js`**: Sanitizes the license view and standalone exported note documents.

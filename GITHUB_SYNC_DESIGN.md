@@ -147,6 +147,7 @@ LightningFS
 
 ```text
 IndexedDB notes/images
+  (`noteSummaries`는 로컬에서 재생성하는 목록 인덱스이므로 sync 대상에서 제외)
   -> LightningFS working tree 생성/갱신
   -> git add/commit/fetch/merge/push
   -> remote 변경사항을 다시 IndexedDB에 반영
@@ -189,6 +190,7 @@ My Note (Conflict from Firefox)
 1. GitHub sync용 파일 트리 변환 함수 작성
    - IndexedDB note/image/globalSettings -> sync tree
    - sync tree -> IndexedDB note/image/globalSettings
+   - `noteSummaries`는 동기화하지 않고 full note 저장 시 다시 생성
 2. shared `images/` 구조로 image deduplication 적용
 3. LightningFS에 working tree 생성
 4. isomorphic-git으로 commit 생성

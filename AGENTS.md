@@ -54,26 +54,29 @@ npm install
 
 ### Data Storage
 - **IndexedDB**: Primary storage for notes and images
-  - `notes` object store: Note content, metadata, settings
+  - `notes` object store: Full Markdown note content, metadata, settings
+  - `noteSummaries` object store: Derived title/ID/pin/recycle metadata used for startup lists; version 3 backfills existing notes
   - `images` object store: Embedded images as blobs
 - **chrome.storage.local**: Global settings only (migrated from for notes)
 
 ### Core Modules
-- **src/main.ts**: Entry point and application initialization (TypeScript ES module)
+- **src/main.ts**: Entry point; renders the summary-based list before scheduling recycle-bin/image cleanup after the first paint opportunity
+- **src/note-summary.ts**: Creates lightweight summary records and identifies hydrated full notes
+- **src/vendor-loader.ts**: Loads JSZip, Marked, DOMPurify, and html2pdf only when their features are used
 - **src/types.ts**: Shared note, settings, image, and navigation types
 - **src/globals.d.ts**: Types for packaged browser globals and reviewer-safe vendor scripts
-- **src/state.ts**: Centralized state management for shared variables
+- **src/state.ts**: Centralized state management; list entries begin as summaries and are hydrated in place when opened
 - **src/constants.ts**: Shared constants (`THIRTY_DAYS_MS`, etc.)
 - **src/dom.ts**: Typed DOM element references and selections
 - **src/utils.ts**: Utility functions (timestamps, file handling, blob URL tracking)
 - **src/ui-helpers.ts**: Shared UI utilities (`createDropdown`)
 - **src/settings.ts**: Global settings management, theme, and `populateSettingsForm`
-- **src/notes.ts**: Note data operations (CRUD, sorting, pin/unpin, persistent pinned ordering)
+- **src/notes.ts**: Note data operations (CRUD, sorting, pin/unpin, persistent pinned ordering) across summary/full state entries
 - **src/history.ts**: Navigation history management
 - **src/text-processors.ts**: Plain-text paste processing (tilde escaping and
   optional legacy two-space line breaks)
 - **src/import_export.ts**: .snote/.snotes file processing
-- **src/document-export.ts**: Self-contained current-note HTML export with
+- **src/document-export.ts**: On-demand self-contained current-note HTML export with
   embedded local/external images and code-copy controls, plus direct rasterized
   PDF generation
 - **src/shortcut-setup.ts**: Opens the browser's extension shortcut settings
@@ -94,8 +97,8 @@ npm install
   `build/extension-runtime/` before packaging
 
 ### Database Module (`src/database/`)
-- **init.ts**: IndexedDB initialization, typed `dbTransaction()` helper, `closeDB()`
-- **notes.ts**: Note CRUD operations using `dbTransaction`
+- **init.ts**: IndexedDB v3 initialization/summary backfill, typed `dbTransaction()` helper, `closeDB()`
+- **notes.ts**: Atomic full-note/summary persistence plus note CRUD operations
 - **images.ts**: Image CRUD operations using `dbTransaction`
 - **index.ts**: Re-exports all database functions
 
@@ -109,7 +112,7 @@ npm install
 
 ### Notes View Module (`src/notes_view/`)
 - **view-manager.ts**: View visibility management (list, editor, settings, etc.)
-- **note-renderer.ts**: Note list rendering and note opening
+- **note-renderer.ts**: DocumentFragment list rendering, delegated list actions, and full-note hydration on open
 - **pinned-note-drag.ts**: Long-press pointer reordering with a floating pinned
   row, animated drop-gap placeholder, window-level movement, and cancel restore
 - **editor-mode.ts**: Switches the shared editor between editable/read-only
@@ -152,6 +155,11 @@ npm install
   drag card, and an animated placeholder gap; completed drops persist
   normalized `pinOrder` values to IndexedDB while cancellation restores order
 - **Recycle Bin**: Soft delete with 30-day auto-cleanup (`THIRTY_DAYS_MS`)
+- **Startup Loading**: Startup reads only `noteSummaries`, batches list DOM work,
+  then defers note/image cleanup; full bodies are loaded on note open or another
+  explicit body-dependent feature
+- **Lazy Vendors**: JSZip, Marked, DOMPurify, and html2pdf are packaged locally
+  but injected only for archive, license, HTML, or PDF operations
 - **Shortcut Setup**: `background.ts` checks the activation command only on a
   fresh install and opens `shortcut-setup.html` when the browser reports no
   assigned shortcut
@@ -170,7 +178,8 @@ tests/
 │   ├── state.test.js
 │   ├── settings.test.js
 │   ├── settings-ui.test.js
-│   └── utils.test.js
+│   ├── utils.test.js
+│   └── vendor-loader.test.js
 ├── database/             # IndexedDB layer tests
 │   ├── init.test.js
 │   ├── notes.test.js
@@ -187,6 +196,7 @@ tests/
     ├── import-export-events.test.js
     ├── main.test.js
     ├── notes.test.js
+    ├── note-renderer.test.js
     ├── pinned-note-drag.test.js
     └── shortcut-setup.test.js
 ```

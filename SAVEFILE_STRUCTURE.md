@@ -125,7 +125,9 @@ notes.zip/
 
 ## Note Storage in IndexedDB
 
-Notes and images are stored in separate object stores:
+The runtime database uses three object stores. Export archives continue to use
+full note records; the summary store is a derived startup index and is not part
+of `.snote` or `.snotes` files.
 
 - **notes** object store: Contains note objects with the following structure:
   ```javascript
@@ -154,6 +156,28 @@ Notes and images are stored in separate object stores:
 
   `pinOrder` stores the user-arranged position within the pinned section.
   Existing records without it remain compatible and are ordered by `pinnedAt`.
+
+- **noteSummaries** object store: Contains only list and recycle-bin metadata:
+  ```javascript
+  {
+    id: "unique-id",
+    title: "Note Title",
+    metadata: {
+      createdAt: timestamp,
+      lastModified: timestamp,
+      deletedAt?: timestamp
+    },
+    isPinned: boolean,
+    pinnedAt?: timestamp,
+    pinOrder?: number
+  }
+  ```
+
+  Markdown `content` and per-note `settings` are intentionally excluded so
+  startup can list many notes without reading every body. Saving, deleting,
+  restoring, or permanently deleting a note updates `notes` and
+  `noteSummaries` together. IndexedDB version 3 backfills this store for
+  existing installations.
 
 - **images** object store: Contains image objects with the following structure:
   ```javascript

@@ -27,6 +27,9 @@ A simple notes browser extension that provides a note-taking interface in the br
   preview modal supports `Ctrl+wheel`, Firefox touchpad-pinch zoom, direct
   two-finger touchscreen pinch, and mouse or single-finger drag panning
 - **Recycle Bin**: Soft delete with 30-day auto-cleanup
+- **Fast Large-List Startup**: The list reads lightweight note summaries and
+  renders them in one batch; Markdown bodies, cleanup work, and feature-specific
+  libraries are deferred until they are needed
 - **Browser Integration**: Works in Chrome **AND** Firefox ~~(Firefox is in development)~~
 - **Keyboard Shortcut**: Quick access with `Shift+Alt+W`; a new-install setup
   popup appears when the browser leaves the command unassigned
@@ -134,6 +137,10 @@ All-notes `.zip` exports use sanitized note titles as folder names, with suffixe
 pinned state, and pinned order. When merging an archive into an existing note
 list, imported pinned positions are rebased after existing pinned notes and
 regular-note timestamps are made unique while retaining the archive order.
+
+SideNote keeps JSZip, Marked, DOMPurify, and html2pdf packaged inside the
+extension for offline use, but loads them into the side panel only when archive
+import/export, license rendering, HTML export, or PDF export needs them.
 
 ### HTML/PDF export dependency licenses
 

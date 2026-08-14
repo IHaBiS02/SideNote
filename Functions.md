@@ -192,13 +192,22 @@ the Markdown schema remains fixed for document compatibility.
 
 ## src/types.ts and src/globals.d.ts
 
-- `types.ts`: Defines the shared `Note`, `NoteSettings`, `GlobalSettings`,
-  `StoredImage`, and `NavigationHistoryState` contracts. Pinned notes can store
-  an optional `pinOrder`; legacy records without it fall back to `pinnedAt`.
+- `types.ts`: Defines the shared full `Note`, lightweight `NoteSummary`,
+  `NoteListEntry` union, settings, stored-image, and navigation contracts.
+  Pinned notes can store an optional `pinOrder`; legacy records without it fall
+  back to `pinnedAt`.
   `GlobalSettings.preventExtraEmptyParagraphs` stores the global-only repeated
   Enter preference.
-- `globals.d.ts`: Types the packaged `browser`, JSZip, Marked, DOMPurify, and
-  highlight.js globals without adding runtime imports to browser modules.
+- `globals.d.ts`: Types the packaged `browser`, JSZip, Marked, DOMPurify,
+  html2pdf, and highlight.js globals. Export-only globals may be absent until
+  `vendor-loader.ts` resolves them.
+
+## src/note-summary.ts
+
+- `createNoteSummary(note)`: Copies list/recycle metadata from a full note and
+  intentionally omits Markdown content and note settings.
+- `isLoadedNote(entry)`: Narrows a `NoteListEntry` by checking for the full
+  Markdown `content` field.
 
 ## src/state.ts
 
@@ -213,6 +222,10 @@ Central state management for shared variables:
   - `setActiveNoteId(id)`: Sets the currently active note ID
   - `setOriginalNoteContent(content)`: Sets original note content for change detection
   - `setIsPreview(value)`: Sets preview mode state
+- `hydrateNote(note)`: Replaces the matching active/deleted summary in place
+  with a full note after a body-dependent read.
+- `getLoadedNote(id?)`: Returns a full note only when the requested state entry
+  is already hydrated.
 
 ## src/constants.ts
 
@@ -229,21 +242,24 @@ IndexedDB operations are now modularized into separate files for better organiza
 
 Database initialization and shared instance management:
 
-- `initDB()`: Initializes the IndexedDB database and creates object stores
+- `initDB()`: Opens IndexedDB version 3, creates `notes`, `noteSummaries`, and
+  `images`, and backfills summaries while upgrading an existing version-2 DB
 - `getDB()`: Gets the shared database instance for other modules
 
 ### src/database/notes.ts
 
 Note-related database operations:
 
-- `saveNote(note)`: Saves a note object to the database
+- `saveNote(note)`: Atomically saves the full note and its derived summary
+- `getNote(id)`: Retrieves one full Markdown note by ID
 - `getAllNotes()`: Retrieves all note objects from the database
+- `getAllNoteSummaries()`: Retrieves the lightweight startup/list records
 - `deleteNoteDB(id)`: Marks a note as deleted in the database
 - `restoreNoteDB(id)`: Restores a deleted note in the database
 - `deleteNotePermanentlyDB(id)`: Permanently deletes a note from the database
 
-**Internal functions** (not exported):
-- `_getNoteObject(id)`: Retrieves a note object from the database by its ID
+Soft delete, restore, and permanent delete keep `notes` and `noteSummaries`
+synchronized in one database operation.
 
 ### src/database/images.ts
 
@@ -265,6 +281,16 @@ Unified entry point for backward compatibility:
 
 - Re-exports all functions from the sub-modules for seamless integration
 - Maintains backward compatibility with existing imports
+
+## src/vendor-loader.ts
+
+- `loadVendorScript(name, source, isReady)`: Injects one asynchronous local
+  script, deduplicates concurrent requests, validates its global API, and lets a
+  failed request be retried.
+- `ensureJsZipLoaded()`: Loads JSZip for archive import/export.
+- `ensureMarkdownRenderersLoaded()`: Loads Marked and DOMPurify for licenses or
+  standalone documents.
+- `ensureHtml2PdfLoaded()`: Loads the PDF bundle only for direct PDF export.
 
 ## src/dom.ts
 
@@ -417,10 +443,11 @@ Standalone current-note export (functions exported):
   leaves task checkboxes locally interactive, and returns one self-contained
   HTML string. Checkbox changes are not written to SideNote or the file, and
   inaccessible external images fail the export rather than remaining as online
-  dependencies
+  dependencies. Marked and DOMPurify are loaded on first use.
 - `createStandaloneNotePdf(note)`: Builds the same sanitized document in a
   detached DOM, passes it to html2pdf.js, and returns a PDF `Blob` without
-  opening the print dialog; the resulting page content is rasterized
+  opening the print dialog; the resulting page content is rasterized. The
+  html2pdf bundle is loaded only when this function is first used.
 - `downloadStandaloneNoteHtml(note)`: Downloads the generated HTML using a
   sanitized note-title filename
 - `downloadStandaloneNotePdf(note)`: Downloads the directly generated PDF
@@ -450,9 +477,12 @@ View switching and navigation management:
 
 Note list and editor functionality:
 
-- `renderNoteList()`: Renders the list of notes in the main view and attaches
-  long-press dragging to pinned entries
-- `openNote(noteId, inEditMode, addToHistory)`: Opens a note in the editor
+- `renderNoteList()`: Builds all rows in a `DocumentFragment`, replaces the DOM
+  once, retains one delegated click listener for open/pin/delete, and attaches
+  long-press dragging to pinned entries.
+- `openNote(noteId, inEditMode, addToHistory)`: Returns a promise, loads the
+  full note by ID when state still contains a summary, hydrates state, and opens
+  it in the editor.
 
 ### src/notes_view/pinned-note-drag.ts
 
@@ -557,7 +587,9 @@ Import/export functionality:
 - `initializeImportExportEvents()`: Sets up all import/export event listeners
 
 Handles: note/global archive export, current-note standalone HTML/direct PDF
-export, file import, and `.snote`/`.snotes` processing
+export, file import, and `.snote`/`.snotes` processing. It loads JSZip only for
+archive actions, fetches a full current note only when needed, and loads all
+full active notes only for all-note export.
 
 Right-clicking an export button opens a format dropdown. The current-note menu
 also includes **Save as PDF** and **Save as HTML**. The `.zip` option can be
@@ -585,9 +617,14 @@ Unified entry point for all event modules:
 
 Application entry point and initialization:
 
-- `bootstrap()`: Runs deterministic startup: DB init, data load/migration, cleanup, initial UI render, and event binding
+- `bootstrap()`: Initializes the DB, loads settings and note summaries, renders
+  and binds the initial list, then schedules maintenance without awaiting it.
 - `initializeInitialView()`: Applies loaded settings and shows the initial list view
-- `loadAndMigrateData()`: Loads data from storage and migrates to IndexedDB if necessary
+- `loadAndMigrateData()`: Migrates legacy notes when necessary and loads only
+  `noteSummaries` into active/deleted list state.
+- `scheduleStartupMaintenance()`: Waits for a paint opportunity and queues
+  recycle-bin cleanup on a later task.
+- `runStartupMaintenance()`: Runs expired note and image cleanup in parallel.
 - `cleanupDeletedImages()`: Deletes images in recycle bin for more than 30 days
 - `cleanupDeletedNotes()`: Deletes notes in recycle bin for more than 30 days
 
