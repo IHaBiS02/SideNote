@@ -56,7 +56,7 @@ npm install
 - **IndexedDB**: Primary storage for notes and images
   - `notes` object store: Full Markdown note content, metadata, settings
   - `noteSummaries` object store: Derived title/ID/pin/recycle metadata used for startup lists; version 3 backfills existing notes
-  - `images` object store: Embedded images as blobs
+  - `images` object store: Embedded image blobs with a version-4 `deletedAt` index for key-only cleanup scans
 - **chrome.storage.local**: Global settings only (migrated from for notes)
 
 ### Core Modules
@@ -97,9 +97,9 @@ npm install
   `build/extension-runtime/` before packaging
 
 ### Database Module (`src/database/`)
-- **init.ts**: IndexedDB v3 initialization/summary backfill, typed `dbTransaction()` helper, `closeDB()`
+- **init.ts**: IndexedDB v4 initialization, summary backfill, image-deletion index creation, typed `dbTransaction()` helper, `closeDB()`
 - **notes.ts**: Atomic full-note/summary persistence plus note CRUD operations
-- **images.ts**: Image CRUD operations using `dbTransaction`
+- **images.ts**: Image CRUD operations plus `deletedAt` index key scans that avoid cloning Blob values
 - **index.ts**: Re-exports all database functions
 
 ### Events Module (`src/events/`)
@@ -141,7 +141,7 @@ npm install
   `themeCss` because document CSS does not cross the editor Shadow DOM. Its
   semantic body rules come from the same scoped CSS generator used by
   standalone document exports
-- **Image Handling**: Images pasted/imported are stored as blobs in IndexedDB; blob URLs are tracked and revoked on re-render to prevent memory leaks
+- **Image Handling**: Images pasted/imported are stored as blobs in IndexedDB; blob URLs are tracked and revoked on re-render to prevent memory leaks. Expired-image and empty-recycle-bin scans use the `deletedAt` index to retrieve only image IDs.
 - **HTML/PDF Export**: The current-note export menu can create a self-contained
   HTML document with SideNote-managed and reachable external images embedded as
   Base64 data URLs plus local fenced-code copy buttons. The note body shares
@@ -156,8 +156,9 @@ npm install
   normalized `pinOrder` values to IndexedDB while cancellation restores order
 - **Recycle Bin**: Soft delete with 30-day auto-cleanup (`THIRTY_DAYS_MS`)
 - **Startup Loading**: Startup reads only `noteSummaries`, batches list DOM work,
-  then defers note/image cleanup; full bodies are loaded on note open or another
-  explicit body-dependent feature
+  then defers note/image cleanup; full note bodies are loaded on note open or
+  another explicit body-dependent feature, and image cleanup reads indexed IDs
+  without loading image Blob values
 - **Lazy Vendors**: JSZip, Marked, DOMPurify, and html2pdf are packaged locally
   but injected only for archive, license, HTML, or PDF operations
 - **Shortcut Setup**: `background.ts` checks the activation command only on a

@@ -5,7 +5,7 @@ import {
   deleteNoteDB,
   restoreNoteDB,
   deleteNotePermanentlyDB,
-  getAllImageObjectsFromDB,
+  getDeletedImageIdsFromDB,
   deleteImagePermanently
 } from './database/index.js';
 
@@ -177,15 +177,14 @@ async function emptyRecycleBin(): Promise<{
     setDeletedNotes([]);
 
     // 모든 삭제된 이미지 영구 삭제
-    const imageObjects = await getAllImageObjectsFromDB();
-    const deletedImages = imageObjects.filter(img => img.deletedAt);
-    for (const image of deletedImages) {
-        await deleteImagePermanently(image.id);
+    const deletedImageIds = await getDeletedImageIdsFromDB();
+    for (const imageId of deletedImageIds) {
+        await deleteImagePermanently(imageId);
     }
 
     return {
         deletedNotesCount,
-        deletedImagesCount: deletedImages.length
+        deletedImagesCount: deletedImageIds.length
     };
 }
 

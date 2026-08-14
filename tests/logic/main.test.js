@@ -10,8 +10,8 @@ const mocks = vi.hoisted(() => {
       calls.push('getAllNoteSummaries');
       return [];
     }),
-    getAllImageObjectsFromDB: vi.fn(async () => {
-      calls.push('getAllImageObjectsFromDB');
+    getDeletedImageIdsFromDB: vi.fn(async () => {
+      calls.push('getDeletedImageIdsFromDB');
       return [];
     }),
     deleteNotePermanentlyDB: vi.fn(async () => calls.push('deleteNotePermanentlyDB')),
@@ -47,7 +47,7 @@ vi.mock('../../src/database/index.js', () => ({
   initDB: mocks.initDB,
   saveNote: mocks.saveNote,
   getAllNoteSummaries: mocks.getAllNoteSummaries,
-  getAllImageObjectsFromDB: mocks.getAllImageObjectsFromDB,
+  getDeletedImageIdsFromDB: mocks.getDeletedImageIdsFromDB,
   deleteNotePermanentlyDB: mocks.deleteNotePermanentlyDB,
   deleteImagePermanently: mocks.deleteImagePermanently,
 }));
@@ -96,6 +96,8 @@ describe('main bootstrap', () => {
   });
 
   it('initializes storage and data before rendering and binding events', async () => {
+    vi.setSystemTime(new Date('2026-08-14T00:00:00Z'));
+    mocks.getDeletedImageIdsFromDB.mockResolvedValueOnce(['expired-image']);
     const { bootstrap } = await import('../../src/main.js');
 
     await bootstrap();
@@ -112,12 +114,15 @@ describe('main bootstrap', () => {
       'showListView',
       'initializeAllEvents',
     ]);
-    expect(mocks.getAllImageObjectsFromDB).not.toHaveBeenCalled();
+    expect(mocks.getDeletedImageIdsFromDB).not.toHaveBeenCalled();
 
     scheduledMaintenance();
     await vi.runAllTimersAsync();
 
-    expect(mocks.getAllImageObjectsFromDB).toHaveBeenCalledTimes(1);
+    expect(mocks.getDeletedImageIdsFromDB).toHaveBeenCalledWith(
+      Date.now() - (30 * 24 * 60 * 60 * 1000),
+    );
+    expect(mocks.deleteImagePermanently).toHaveBeenCalledWith('expired-image');
   });
 
   it('migrates legacy notes from browser storage before loading IndexedDB notes', async () => {

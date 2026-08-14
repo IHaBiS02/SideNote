@@ -1,5 +1,5 @@
 // Import database helpers
-import { dbTransaction } from './init.js';
+import { dbTransaction, getDB } from './init.js';
 import type { StoredImage } from '../types.js';
 
 /**
@@ -79,6 +79,40 @@ function getAllImageObjectsFromDB(): Promise<StoredImage[]> {
   return dbTransaction('images', 'readonly', (store) => store.getAll() as IDBRequest<StoredImage[]>);
 }
 
+/**
+ * Retrieves deleted image IDs through the deletedAt index without cloning Blob values.
+ * @param {number} deletedBefore Optional exclusive deletion timestamp cutoff.
+ */
+function getDeletedImageIdsFromDB(deletedBefore?: number): Promise<string[]> {
+  return new Promise((resolve, reject) => {
+    const database = getDB();
+    if (!database) {
+      reject(new Error('DB not initialized'));
+      return;
+    }
+
+    const transaction = database.transaction('images', 'readonly');
+    const index = transaction.objectStore('images').index('deletedAt');
+    const request = deletedBefore === undefined
+      ? index.openKeyCursor()
+      : index.openKeyCursor(IDBKeyRange.upperBound(deletedBefore, true));
+    const imageIds: string[] = [];
+
+    request.onsuccess = () => {
+      const cursor = request.result;
+      if (!cursor) return;
+      if (typeof cursor.primaryKey === 'string') {
+        imageIds.push(cursor.primaryKey);
+      }
+      cursor.continue();
+    };
+    request.onerror = () => reject(request.error);
+    transaction.oncomplete = () => resolve(imageIds);
+    transaction.onerror = () => reject(transaction.error);
+    transaction.onabort = () => reject(transaction.error);
+  });
+}
+
 // Export functions
 export {
   saveImage,
@@ -86,5 +120,6 @@ export {
   deleteImage,
   restoreImage,
   deleteImagePermanently,
-  getAllImageObjectsFromDB
+  getAllImageObjectsFromDB,
+  getDeletedImageIdsFromDB,
 };

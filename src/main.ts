@@ -3,7 +3,7 @@ import {
   initDB,
   saveNote,
   getAllNoteSummaries,
-  getAllImageObjectsFromDB,
+  getDeletedImageIdsFromDB,
   deleteNotePermanentlyDB,
   deleteImagePermanently,
 } from './database/index.js';
@@ -104,12 +104,10 @@ async function loadAndMigrateData(): Promise<void> {
 
 async function cleanupDeletedImages(): Promise<void> {
     const thirtyDaysAgo = Date.now() - THIRTY_DAYS_MS; // 30일 전 타임스탬프
-    const imageObjects = await getAllImageObjectsFromDB();
-    // 30일 이상 오래된 삭제 이미지 찾기
-    const imagesToDelete = imageObjects.filter(img => img.deletedAt && img.deletedAt < thirtyDaysAgo);
+    const imageIdsToDelete = await getDeletedImageIdsFromDB(thirtyDaysAgo);
     // 영구 삭제
-    for (const image of imagesToDelete) {
-        await deleteImagePermanently(image.id);
+    for (const imageId of imageIdsToDelete) {
+        await deleteImagePermanently(imageId);
     }
 }
 

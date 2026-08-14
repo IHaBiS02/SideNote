@@ -110,7 +110,7 @@ The UI is a single-page application with several distinct "views" that are shown
     -   `isPreview`: A boolean flag to track if the editor is in "Preview" or "Edit" mode.
     -   Navigation history is managed through the `history.ts` module.
 -   **Data Persistence**:
-    -   Full notes live in IndexedDB `notes`, list/recycle metadata lives in the derived `noteSummaries` store, and images live in `images`. Saving, deleting, restoring, or permanently removing a note updates both note stores atomically.
+    -   Full notes live in IndexedDB `notes`, list/recycle metadata lives in the derived `noteSummaries` store, and images live in `images`. The image store has a non-unique `deletedAt` index so maintenance can enumerate deleted image IDs without cloning Blob values. Saving, deleting, restoring, or permanently removing a note updates both note stores atomically.
     -   `chrome.storage.local` stores `globalSettings` and is also used for the one-time migration of old note data.
     -   Startup runs through `bootstrap()` so storage load and migration complete before the list renders. Cleanup is deliberately scheduled after the initial paint and does not delay opening the list.
 
@@ -119,12 +119,12 @@ The UI is a single-page application with several distinct "views" that are shown
 #### Initialization & Data Management (`main.ts`, `src/database/`)
 
 -   **`bootstrap()`**: Runs IndexedDB initialization, settings/summary load and migration, initial list rendering, and event binding; `scheduleStartupMaintenance()` then defers expired note/image cleanup until after a paint opportunity.
--   **`initDB()`**: Initializes IndexedDB version 3 with `notes`, `noteSummaries`, and `images`; upgrading from version 2 backfills summaries from existing full notes (located in `src/database/init.ts`).
+-   **`initDB()`**: Initializes IndexedDB version 4 with `notes`, `noteSummaries`, and `images`; upgrading from version 2 backfills summaries from existing full notes, and upgrading from version 3 adds the image `deletedAt` index (located in `src/database/init.ts`).
 -   **`loadAndMigrateData()`**: Migrates legacy `chrome.storage.local` notes when necessary, then reads only `noteSummaries` for the initial active/recycle lists.
 -   **`saveNote()` / `getNote()` / `getAllNoteSummaries()` / `getAllNotes()` / etc.**: Note persistence functions. Normal list startup uses summaries; body-dependent features explicitly fetch full notes.
--   **`saveImage()` / `getImage()` / `deleteImage()` / etc.**: A set of async functions in `src/database/images.ts` to perform CRUD operations on image data in IndexedDB.
+-   **`saveImage()` / `getImage()` / `deleteImage()` / etc.**: Async image CRUD operations in `src/database/images.ts`; `getDeletedImageIdsFromDB()` uses an index key cursor for cleanup paths that do not need image data.
 -   **`sortNotes()`**: Keeps pinned notes first using persisted `pinOrder` (or legacy `pinnedAt`) and sorts regular notes by `lastModified`.
--   **`cleanupDeletedNotes()` / `cleanupDeletedImages()`**: Automatically and permanently deletes items from the recycle bin that are older than 30 days.
+-   **`cleanupDeletedNotes()` / `cleanupDeletedImages()`**: Automatically and permanently deletes items from the recycle bin that are older than 30 days. Image cleanup queries only indexed primary keys and does not read stored Blob values.
     -   Note operations mutate state and persist through the database layer. UI refreshes are handled by the event or view caller rather than by `src/notes.ts`.
 
 #### View Management (`src/notes_view/`, `history.ts`, `src/events/`)
@@ -143,7 +143,7 @@ The UI is a single-page application with several distinct "views" that are shown
 -   **`newNoteButton` (Event Listener)**: Creates a new, empty note object and opens it (handled in `src/events/editor.ts`).
 -   **`deleteNote(noteId)`**: Moves a note to the recycle bin by adding a `deletedAt` timestamp.
 -   **`togglePin(noteId)`**: Toggles the pin status of a note.
--   **`emptyRecycleBin()`**: Empties the recycle bin after two-step confirmation (handled in `src/events/settings-events.ts`).
+-   **`emptyRecycleBin()`**: Empties the recycle bin after two-step confirmation (handled in `src/events/settings-events.ts`); deleted image IDs come from the key-only `deletedAt` index scan.
 
 #### Editor (`src/notes_view/`, `src/events/`)
 

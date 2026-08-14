@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { initDB, closeDB } from '../../src/database/init.js';
 import {
   saveImage,
@@ -6,7 +6,8 @@ import {
   deleteImage,
   restoreImage,
   deleteImagePermanently,
-  getAllImageObjectsFromDB
+  getAllImageObjectsFromDB,
+  getDeletedImageIdsFromDB,
 } from '../../src/database/images.js';
 
 describe('database/images', () => {
@@ -18,6 +19,10 @@ describe('database/images', () => {
       req.onerror = () => reject(req.error);
     });
     await initDB();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   describe('saveImage / getImage', () => {
@@ -101,6 +106,33 @@ describe('database/images', () => {
     it('should return empty array when no images exist', async () => {
       const allImages = await getAllImageObjectsFromDB();
       expect(allImages).toEqual([]);
+    });
+  });
+
+  describe('getDeletedImageIdsFromDB', () => {
+    it('returns only deleted image keys older than an exclusive cutoff', async () => {
+      const blob = new Blob(['test'], { type: 'image/png' });
+      const now = vi.spyOn(Date, 'now');
+      await saveImage('active', blob);
+      await saveImage('old', blob);
+      now.mockReturnValue(100);
+      await deleteImage('old');
+      await saveImage('recent', blob);
+      now.mockReturnValue(200);
+      await deleteImage('recent');
+
+      await expect(getDeletedImageIdsFromDB(150)).resolves.toEqual(['old']);
+    });
+
+    it('uses a key cursor instead of reading image Blob values', async () => {
+      const blob = new Blob(['test'], { type: 'image/png' });
+      await saveImage('deleted', blob);
+      await deleteImage('deleted');
+      const getAllSpy = vi.spyOn(IDBObjectStore.prototype, 'getAll');
+
+      await expect(getDeletedImageIdsFromDB()).resolves.toEqual(['deleted']);
+
+      expect(getAllSpy).not.toHaveBeenCalled();
     });
   });
 });

@@ -21,5 +21,6 @@ export {
   deleteImage,
   restoreImage,
   deleteImagePermanently,
-  getAllImageObjectsFromDB
+  getAllImageObjectsFromDB,
+  getDeletedImageIdsFromDB,
 } from './images.js';

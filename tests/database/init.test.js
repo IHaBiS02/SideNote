@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { initDB, getDB, closeDB } from '../../src/database/init.js';
 import { getAllNoteSummaries } from '../../src/database/notes.js';
+import { getDeletedImageIdsFromDB } from '../../src/database/images.js';
 import { createSampleNote } from '../fixtures/notes.js';
 
 describe('database/init', () => {
@@ -20,11 +21,13 @@ describe('database/init', () => {
       expect(db.name).toBe('SimpleNotesDB');
     });
 
-    it('should create note, summary, and image object stores', async () => {
+    it('should create note, summary, and image object stores with the deletion index', async () => {
       const db = await initDB();
       expect(db.objectStoreNames.contains('notes')).toBe(true);
       expect(db.objectStoreNames.contains('noteSummaries')).toBe(true);
       expect(db.objectStoreNames.contains('images')).toBe(true);
+      const transaction = db.transaction('images', 'readonly');
+      expect(transaction.objectStore('images').indexNames.contains('deletedAt')).toBe(true);
     });
 
     it('backfills summaries when upgrading an existing version 2 database', async () => {
@@ -53,6 +56,36 @@ describe('database/init', () => {
         expect.objectContaining({ id: 'legacy-note', title: note.title }),
       ]);
       expect(summaries[0]).not.toHaveProperty('content');
+    });
+
+    it('adds the deletion index when upgrading an existing version 3 database', async () => {
+      const legacyDB = await new Promise((resolve, reject) => {
+        const request = indexedDB.open('SimpleNotesDB', 3);
+        request.onupgradeneeded = () => {
+          request.result.createObjectStore('notes', { keyPath: 'id' });
+          request.result.createObjectStore('noteSummaries', { keyPath: 'id' });
+          request.result.createObjectStore('images', { keyPath: 'id' });
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+      await new Promise((resolve, reject) => {
+        const transaction = legacyDB.transaction('images', 'readwrite');
+        transaction.objectStore('images').put({
+          id: 'legacy-deleted-image',
+          blob: new Blob(['legacy'], { type: 'image/png' }),
+          deletedAt: 100,
+        });
+        transaction.oncomplete = resolve;
+        transaction.onerror = () => reject(transaction.error);
+      });
+      legacyDB.close();
+
+      const db = await initDB();
+
+      const transaction = db.transaction('images', 'readonly');
+      expect(transaction.objectStore('images').indexNames.contains('deletedAt')).toBe(true);
+      await expect(getDeletedImageIdsFromDB()).resolves.toEqual(['legacy-deleted-image']);
     });
   });
 

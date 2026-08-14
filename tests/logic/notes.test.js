@@ -15,12 +15,12 @@ vi.mock('../../src/database/index.js', () => ({
   restoreNoteDB: vi.fn().mockResolvedValue(),
   deleteNotePermanentlyDB: vi.fn().mockResolvedValue(),
   deleteImagePermanently: vi.fn().mockResolvedValue(),
-  getAllImageObjectsFromDB: vi.fn().mockResolvedValue([]),
+  getDeletedImageIdsFromDB: vi.fn().mockResolvedValue([]),
 }));
 
 import { sortNotes, deleteNote, togglePin, reorderPinnedNotes, restoreNote, deleteNotePermanently, emptyRecycleBin } from '../../src/notes.js';
 import { setNotes, setDeletedNotes, notes, deletedNotes } from '../../src/state.js';
-import { saveNote, deleteNoteDB, restoreNoteDB, deleteNotePermanentlyDB, getAllImageObjectsFromDB, deleteImagePermanently } from '../../src/database/index.js';
+import { saveNote, deleteNoteDB, restoreNoteDB, deleteNotePermanentlyDB, getDeletedImageIdsFromDB, deleteImagePermanently } from '../../src/database/index.js';
 
 describe('notes business logic', () => {
   beforeEach(() => {
@@ -175,14 +175,12 @@ describe('notes business logic', () => {
         { id: 'n1', metadata: { deletedAt: 100 } },
         { id: 'n2', metadata: { deletedAt: 200 } },
       ]);
-      getAllImageObjectsFromDB.mockResolvedValue([
-        { id: 'img1', deletedAt: 100 },
-        { id: 'img2', deletedAt: null },
-      ]);
+      getDeletedImageIdsFromDB.mockResolvedValue(['img1']);
 
       await emptyRecycleBin();
       expect(deletedNotes).toHaveLength(0);
       expect(deleteNotePermanentlyDB).toHaveBeenCalledTimes(2);
+      expect(getDeletedImageIdsFromDB).toHaveBeenCalledTimes(1);
       expect(deleteImagePermanently).toHaveBeenCalledWith('img1');
       expect(deleteImagePermanently).not.toHaveBeenCalledWith('img2');
     });

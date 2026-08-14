@@ -12,15 +12,18 @@ type SideNoteStoreName = 'notes' | 'noteSummaries' | 'images';
  */
 function initDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    // Version 3 separates list metadata from full Markdown note records.
-    const request = indexedDB.open('SimpleNotesDB', 3);
+    // Version 4 indexes image deletion timestamps without reading Blob values.
+    const request = indexedDB.open('SimpleNotesDB', 4);
 
     // 데이터베이스 버전 업그레이드 시 실행 (첫 실행 또는 버전 변경 시)
     request.onupgradeneeded = () => {
       const database = request.result;
       // images 객체 저장소가 없으면 생성
-      if (!database.objectStoreNames.contains('images')) {
-        database.createObjectStore('images', { keyPath: 'id' });
+      const imagesStore = database.objectStoreNames.contains('images')
+        ? request.transaction?.objectStore('images')
+        : database.createObjectStore('images', { keyPath: 'id' });
+      if (imagesStore && !imagesStore.indexNames.contains('deletedAt')) {
+        imagesStore.createIndex('deletedAt', 'deletedAt', { unique: false });
       }
       // notes 객체 저장소가 없으면 생성
       if (!database.objectStoreNames.contains('notes')) {

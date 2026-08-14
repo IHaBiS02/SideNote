@@ -29,7 +29,8 @@ A simple notes browser extension that provides a note-taking interface in the br
 - **Recycle Bin**: Soft delete with 30-day auto-cleanup
 - **Fast Large-List Startup**: The list reads lightweight note summaries and
   renders them in one batch; Markdown bodies, cleanup work, and feature-specific
-  libraries are deferred until they are needed
+  libraries are deferred until they are needed. Deferred image cleanup scans
+  indexed deletion keys without loading stored image Blob values
 - **Browser Integration**: Works in Chrome **AND** Firefox ~~(Firefox is in development)~~
 - **Keyboard Shortcut**: Quick access with `Shift+Alt+W`; a new-install setup
   popup appears when the browser leaves the command unassigned

@@ -242,8 +242,9 @@ IndexedDB operations are now modularized into separate files for better organiza
 
 Database initialization and shared instance management:
 
-- `initDB()`: Opens IndexedDB version 3, creates `notes`, `noteSummaries`, and
-  `images`, and backfills summaries while upgrading an existing version-2 DB
+- `initDB()`: Opens IndexedDB version 4, creates `notes`, `noteSummaries`, and
+  `images`, backfills summaries while upgrading an existing version-2 DB, and
+  adds the image `deletedAt` index when upgrading from version 3
 - `getDB()`: Gets the shared database instance for other modules
 
 ### src/database/notes.ts
@@ -271,6 +272,9 @@ Image-related database operations:
 - `restoreImage(id)`: Restores a deleted image in the database
 - `deleteImagePermanently(id)`: Permanently deletes an image from the database
 - `getAllImageObjectsFromDB()`: Retrieves all image objects from the database
+- `getDeletedImageIdsFromDB(deletedBefore?)`: Uses the image `deletedAt` index
+  and `openKeyCursor()` to retrieve deleted image primary keys without reading
+  or cloning stored Blob values; an optional timestamp is an exclusive cutoff
 
 **Internal functions** (not exported):
 - `_getImageObject(id)`: Retrieves an image object from the database by its ID
@@ -387,7 +391,8 @@ Note operations (functions exported):
   normalizes `pinOrder`, updates in-memory order, and persists every pinned note
 - `restoreNote(noteId)`: Restores a deleted note from recycle bin
 - `deleteNotePermanently(noteId)`: Permanently deletes a note
-- `emptyRecycleBin()`: Empties the recycle bin (permanent deletion of all items)
+- `emptyRecycleBin()`: Empties the recycle bin (permanent deletion of all
+  items); images are selected through the key-only deletion index
 
 **Note**: These functions mutate in-memory state and persist through the database layer, but they no longer call view renderers directly. Event or view callers are responsible for refreshing affected UI.
 
@@ -626,6 +631,7 @@ Application entry point and initialization:
   recycle-bin cleanup on a later task.
 - `runStartupMaintenance()`: Runs expired note and image cleanup in parallel.
 - `cleanupDeletedImages()`: Deletes images in recycle bin for more than 30 days
+  using indexed image IDs without loading their Blob values
 - `cleanupDeletedNotes()`: Deletes notes in recycle bin for more than 30 days
 
 **Note**: Main entry point now exports startup helpers for tests and only auto-runs `bootstrap()` when auto bootstrap is not disabled.

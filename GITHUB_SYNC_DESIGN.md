@@ -9,6 +9,7 @@ SideNote의 실제 앱 데이터는 브라우저 IndexedDB에 저장된다.
 ```text
 SimpleNotesDB
   notes
+  noteSummaries
   images
 ```
 
@@ -38,6 +39,11 @@ SimpleNotesDB
   deletedAt: null
 }
 ```
+
+IndexedDB version 4부터 `images.deletedAt` 비고유 인덱스를 사용한다. 시작
+정리와 휴지통 비우기는 이 인덱스의 primary key만 읽으므로 이미지 Blob을
+불러오지 않는다. 이 인덱스와 `noteSummaries`는 로컬에서 재생성 가능한
+파생 데이터이므로 GitHub 동기화 payload에는 포함하지 않는다.
 
 노트 본문은 이미지 파일 자체를 포함하지 않고, `imageId`를 가진 Markdown 링크만 가진다.
 

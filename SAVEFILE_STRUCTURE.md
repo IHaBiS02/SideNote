@@ -187,3 +187,10 @@ of `.snote` or `.snotes` files.
     deletedAt: timestamp | null
   }
   ```
+
+  IndexedDB version 4 adds a non-unique `deletedAt` index. Startup expiration
+  cleanup and empty-recycle-bin operations use an index key cursor to retrieve
+  only image IDs, so large Blob values are not read or cloned. Active images
+  with `deletedAt: null` are absent from the index. The index is local derived
+  database metadata and does not change `.snote`, `.snotes`, HTML, PDF, or ZIP
+  export formats.
