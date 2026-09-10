@@ -2,6 +2,9 @@
 
 # WYSIWYG Input Behaviors
 
+Task checkboxes follow the text font size and align with the center of the first
+text line using the configured line height, including wrapped and nested tasks.
+
 [한국어](./WYSIWYG_INPUT_BEHAVIORS.ko.md)
 
 This document describes the built-in Markdown input rules, keyboard behavior,

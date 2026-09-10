@@ -7,7 +7,7 @@ function createNoteContentStyles({ rootSelector: root, variableNamespace: namesp
     const variable = (name) => `var(--${namespace}-${name})`;
     const taskItem = `${root} ${taskItemSelector}`;
     const taskContent = taskContentSelector
-        ? `${taskItem} ${taskContentSelector}`
+        ? `${taskItem} > ${taskContentSelector}`
         : null;
     const checkedTaskContent = checkedTaskSelector && taskContentSelector
         ? `${root} ${checkedTaskSelector} ${taskContentSelector}`
@@ -105,25 +105,37 @@ function createNoteContentStyles({ rootSelector: root, variableNamespace: namesp
   }
 
   ${taskItem} {
-    display: list-item;
+    display: ${taskContent ? 'flex' : 'list-item'};
+    ${taskContent ? 'align-items: flex-start; gap: 5px;' : ''}
     list-style: none;
   }
 
   ${taskItem} > input[type="checkbox"] {
     display: inline-block;
-    width: auto;
-    height: auto;
-    margin: 0 5px 0 0;
+    width: ${taskContent ? '1em' : 'auto'};
+    height: ${taskContent ? '1em' : 'auto'};
+    ${taskContent ? 'font: inherit; flex: 0 0 auto;' : ''}
+    margin: ${taskContent ? `calc((${variable('line-height')} - 1) * 0.5em) 0 0` : '0 5px 0 0'};
     accent-color: ${variable('checkbox-accent')};
     vertical-align: middle;
   }
 
   ${taskContent ? `${taskContent} {
-    display: inline;
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   ${taskContent} > p {
-    display: inline;
+    display: block;
+  }
+
+  ${taskContent} > :first-child {
+    margin-top: 0;
+  }
+
+  ${taskContent} > :last-child {
+    margin-bottom: 0;
   }` : ''}
 
   ${checkedTaskContent ? `${checkedTaskContent} {

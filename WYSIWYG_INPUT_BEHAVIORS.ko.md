@@ -2,6 +2,9 @@
 
 # WYSIWYG 입력 동작
 
+체크박스 크기는 본문 글자 크기를 따르며, 설정된 줄간격을 기준으로 첫 번째
+텍스트 줄의 중앙에 맞춥니다. 자동 줄바꿈과 중첩 작업 항목에도 적용됩니다.
+
 [English](./WYSIWYG_INPUT_BEHAVIORS.md)
 
 이 문서는 SideNote의 Preview(WYSIWYG) 모드에서 기본으로 사용할 수 있는
