@@ -1,0 +1,12 @@
+{
+  "name": "sidenote-pages",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test:run": "node --test tests/*.test.mjs",
+    "dev": "node scripts/serve.mjs",
+    "samples": "node scripts/create-samples.mjs"
+  },
+  "devDependencies": { "jsdom": "28.1.0" }
+}

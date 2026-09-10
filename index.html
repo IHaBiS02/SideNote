@@ -1,82 +1,29 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>SideNote - Simple Notes in your Browser</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Read notes published with SideNote.">
+  <title>SideNote · Notes</title>
+  <link rel="stylesheet" href="vendor/reset.css">
   <link rel="stylesheet" href="style.css">
+  <script defer src="vendor/jszip.min.js"></script>
+  <script defer src="vendor/marked.min.js"></script>
+  <script defer src="vendor/purify.min.js"></script>
+  <script defer src="vendor/highlight.min.js"></script>
+  <script type="module" src="script.js"></script>
 </head>
 <body>
-  <div class="browser-top-bar"></div>
-  <div class="main-container">
-    <div id="side-note-layout">
-        <div class="header">
-            <h1 id="notes-list-title">Notes</h1>
-            <button class="add-note-button">+</button>
-        </div>
-        <ul class="notes-list">
-            <li class="note-item active" data-content="intro">
-                <span>Introduction</span>
-                <div class="note-actions">
-                    <button class="pin-button" title="Pin">📌</button>
-                    <button class="delete-button" title="Delete">🗑️</button>
-                </div>
-            </li>
-            <li class="note-item" data-content="how-to-use">
-                <span>How to use</span>
-                <div class="note-actions">
-                    <button class="pin-button" title="Pin">📌</button>
-                    <button class="delete-button" title="Delete">🗑️</button>
-                </div>
-            </li>
-            <li class="note-item" data-content="contacts">
-                <span>Contacts</span>
-                <div class="note-actions">
-                    <button class="pin-button" title="Pin">📌</button>
-                    <button class="delete-button" title="Delete">🗑️</button>
-                </div>
-            </li>
-        </ul>
-        <div class="toolbar">
-            <button id="settings-button" title="Settings">⚙️</button>
-        </div>
-    </div>
-    <div id="main-content-area">
-        <div id="intro" class="content-section">
-            <div>
-                <h2>A simple note-taking extension for your browser's side panel.</h2>
-                <p>SideNote allows you to quickly jot down notes, ideas, and to-do lists without leaving your current tab. It's perfect for students, researchers, and anyone who needs a simple way to stay organized.</p>
-                <h3>Features:</h3>
-                <ul>
-                    <li>📝 Create and manage multiple notes</li>
-                    <li>🌗 Light and dark mode</li>
-                    <li>💾 Export and import your notes</li>
-                    <li>⌨️ Markdown support</li>
-                </ul>
-                <a href="https://chromewebstore.google.com/detail/sidenote/jdgobmepjpcgfcjmocndbbhhigogafak" target="_blank">Get Extension</a>
-            </div>
-        </div>
-        <div id="how-to-use" class="content-section" style="display: none;">
-            <h2>How to use</h2>
-            <p>Instructions on how to use the SideNote extension will go here.</p>
-        </div>
-        <div id="contacts" class="content-section" style="display: none;">
-            <h2>Contacts</h2>
-            <p>Contacts posts and updates will go here.</p>
-        </div>
-        <div id="settings" class="content-section" style="display: none;">
-            <h2>Settings</h2>
-            <div class="setting-option">
-              <label for="theme-select">Theme</label>
-              <select id="theme-select">
-                <option value="system">System</option>
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-              </select>
-            </div>
-        </div>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
+  <a class="skip-link" href="#content">Skip to note</a>
+  <aside aria-label="Published notes">
+    <header class="header"><h1>Notes</h1><a class="brand" href="https://github.com/IHaBiS02/SideNote">SideNote ↗</a></header>
+    <nav aria-label="Note selection"><ul id="note-list"></ul></nav>
+    <footer><label for="theme">Theme</label><select id="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select><a href="LIBRARY_LICENSES.md">Licenses</a></footer>
+  </aside>
+  <main>
+    <header class="header"><h2 id="note-title">SideNote</h2><a id="download" hidden>Download .snote ↓</a></header>
+    <div id="reader"><p id="status" role="status">Loading notes…</p><article id="content" tabindex="-1" aria-labelledby="note-title"></article></div>
+  </main>
+  <noscript>This site needs JavaScript to open .snote archives.</noscript>
 </body>
 </html>

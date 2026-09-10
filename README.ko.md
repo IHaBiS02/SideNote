@@ -1,0 +1,40 @@
+# SideNote 노트 사이트
+
+왼쪽 목록에서 노트를 선택하면 SideNote에서 내보낸 `.snote` 파일을 읽어
+제목·본문·첨부 이미지를 보여주는 GitHub Pages 사이트입니다.
+
+## 내 노트 올리기
+
+1. SideNote에서 `.snote`로 내보냅니다.
+2. `notes/my-note.snote`처럼 `notes` 폴더에 넣습니다.
+3. `notes/index.json`에 아래 항목을 추가합니다.
+
+```json
+{ "id": "my-note", "title": "내 노트", "file": "notes/my-note.snote" }
+```
+
+목록은 JSON 배열 순서대로 표시됩니다. `id`는 영문 소문자·숫자·하이픈을
+사용하고 중복되지 않게 정합니다. 파일명은 영문·숫자·하이픈·밑줄을 사용합니다.
+`title`은 목록용 제목이며 본문을 열면 `.snote` 내부 제목을 표시합니다.
+`pinned: true`를 넣으면 고정 표시가 붙습니다. 수정할 때는 `.snote`를 교체합니다.
+공개한 파일은 누구나 내려받을 수 있습니다. 확장프로그램의 개인 노트 저장소와는 연결되지 않습니다.
+
+## 실행과 배포
+
+이 브랜치 폴더에서 `npm run dev` 후 `http://127.0.0.1:4173`을 엽니다.
+`npm run test:run`은 게시 파일을 검증하고 `npm run build`는 `dist`에 사이트를 복사합니다.
+Node.js 24를 사용하며 `npm ci`로 테스트용 jsdom을 설치합니다.
+실제 사이트의 실행 라이브러리는 `vendor`에 포함되어 있습니다.
+빌드는 기존 생성물인 `dist` 폴더를 교체합니다.
+
+GitHub Settings → Pages에서 **Deploy from a branch / gh-pages / 루트**를
+선택하면 브랜치에 push할 때 배포됩니다. 확장프로그램 버전이나 태그는 변경하지 않습니다.
+링크는 `#my-note` 형식으로 공유할 수 있습니다. 모바일에서는 목록이 본문 위에 배치됩니다.
+
+글꼴 크기·줄간격·코드 블록 헤더 설정을 반영하고 라이트/다크/시스템 테마를
+지원합니다. 첨부 이미지는 압축파일에서 읽고, 외부 URL 이미지는 인터넷이 필요합니다.
+편집기 자체가 아닌 Marked 기반 읽기 화면이며 체크박스는 읽기 전용입니다.
+예시를 직접 바꾼 뒤에는 `npm run samples`를 실행하지 마세요. 예시 파일을 덮어씁니다.
+
+구조·유지보수 설명은 [README.md](README.md), 라이선스는
+[LIBRARY_LICENSES.md](LIBRARY_LICENSES.md)에 있습니다.

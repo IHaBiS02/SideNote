@@ -1,0 +1,4 @@
+[
+  { "id": "welcome", "title": "Welcome to SideNote", "file": "notes/welcome.snote", "pinned": true },
+  { "id": "publishing", "title": "Publish your own notes", "file": "notes/publishing.snote" }
+]
