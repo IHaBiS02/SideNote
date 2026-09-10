@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
-const JSZip = require('../vendor/jszip.min.js');
+const JSZip = require('../app/vendor/jszip.min.js');
 const notes = JSON.parse(await readFile(new URL('../notes/index.json', import.meta.url), 'utf8'));
 test('published notes have unique routes and valid SideNote archives', async () => {
   const ids = new Set();

@@ -1,6 +1,4 @@
-> GitHub Pages demo: edit directly or double-click for full Markdown. Switch with Edit/WYSIWYG, Ctrl/Cmd+Enter, or Shift+Enter/Escape in source mode. Edits and pasted images survive note navigation but reset on refresh. Downloads contain the published original.
-
-The sidebar switches between list and note views. Selecting a note opens synchronized sidebar and expanded editors; Back returns to the list. Portrait or narrow screens show only the sidebar. Hold pinned notes for 150ms to reorder them; reload resets the order.
+> This site runs the original SideNote app, including settings, navigation, editing and exports. Notes, images and settings use memory storage and reset on reload. A website cannot register browser-wide extension shortcuts.
 
 # WYSIWYG Input Behaviors
 

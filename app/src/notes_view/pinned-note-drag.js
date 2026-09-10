@@ -1,4 +1,4 @@
-import { DEFAULT_PINNED_NOTE_DRAG_DELAY_MS } from './constants.js';
+import { DEFAULT_PINNED_NOTE_DRAG_DELAY_MS } from '../constants.js';
 const DEFAULT_MOVE_TOLERANCE_PX = 8;
 const DEFAULT_DROP_HYSTERESIS_PX = 10;
 const SUPPRESS_CLICK_DURATION_MS = 600;

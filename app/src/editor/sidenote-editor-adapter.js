@@ -1,4 +1,10 @@
+import { getImage, saveImage } from '../database/index.js';
+import { normalizeGlobalSettings, resolveLegacyTextProcessingSettings, } from '../settings.js';
+import { globalSettings } from '../state.js';
+import { processPastedText } from '../text-processors.js';
+import { markdownEditor } from '../dom.js';
 import { createNoteContentStyles } from './note-content-styles.js';
+const INTERNAL_IMAGE_PATTERN = /^images\/([^/]+)\.png$/;
 function highlightCode(code, requestedLanguage) {
     if (!globalThis.hljs?.highlight
         || !globalThis.hljs?.highlightAuto
@@ -218,4 +224,35 @@ const SIDENOTE_EDITOR_THEME = `
     background: var(--editor-scrollbar-thumb-hover);
   }
 `;
-export { highlightCode, SIDENOTE_EDITOR_THEME };
+function initializeWysiwygMarkdownEditor() {
+    if (!markdownEditor || typeof markdownEditor.setMode !== 'function') {
+        return false;
+    }
+    markdownEditor.sourceEditScope = 'document';
+    markdownEditor.showCodeLineNumbers = true;
+    markdownEditor.preventExtraEmptyParagraphs =
+        normalizeGlobalSettings(globalSettings).preventExtraEmptyParagraphs;
+    markdownEditor.themeCss = SIDENOTE_EDITOR_THEME;
+    markdownEditor.codeHighlighter = highlightCode;
+    markdownEditor.uploadImage = async (file) => {
+        const imageId = crypto.randomUUID();
+        await saveImage(imageId, file);
+        return `images/${imageId}.png`;
+    };
+    markdownEditor.imageResolver = async (source) => {
+        const match = INTERNAL_IMAGE_PATTERN.exec(source);
+        if (!match) {
+            return source;
+        }
+        const image = await getImage(match[1]);
+        return image ? URL.createObjectURL(image) : null;
+    };
+    markdownEditor.transformPastedText = (text) => processPastedText(text, resolveLegacyTextProcessingSettings(globalSettings));
+    return true;
+}
+function setEditorMode(mode) {
+    if (typeof markdownEditor?.setMode === 'function') {
+        markdownEditor.setMode(mode);
+    }
+}
+export { initializeWysiwygMarkdownEditor, setEditorMode };

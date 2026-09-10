@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Notes</title>
+  <link rel="stylesheet" href="vendor/reset.css">
+  <link rel="stylesheet" href="sidenote-controls.css">
+  <link rel="stylesheet" href="sidepanel.css">
+  <link rel="stylesheet" href="dark_mode.css">
+</head>
+<body>
+  <div id="list-view">
+    <div class="header">
+      <h1 id="notes-list-title">Notes</h1>
+      <button id="new-note-button">+</button>
+    </div>
+    <ul id="note-list"></ul>
+    <div class="toolbar">
+      <button id="global-import-button" title="Import Notes">📂</button>
+      <button id="global-export-button" title="Export Notes">💾</button>
+      <input type="file" id="global-import-input" style="display: none;" accept=".snotes,.snote" />
+      <button id="global-settings-button" title="Settings">⚙️</button>
+    </div>
+  </div>
+
+  <div id="editor-view" style="display: none;">
+    <div class="header">
+      <button id="back-button"><</button>
+      <h1 id="editor-title"></h1>
+    </div>
+    <div id="editor-container">
+      <wysiwyg-markdown id="markdown-editor" aria-label="Markdown editor"></wysiwyg-markdown>
+    </div>
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <button id="toggle-view-button">Preview</button>
+        <button id="auto-line-break-button" title="Auto Line Break" hidden>↩</button>
+        <button id="tilde-replacement-button" title="Tilde Replacement" hidden>~</button>
+      </div>
+      <div class="toolbar-right">
+        <button id="import-note-button" title="Import Single Note">📂</button>
+        <button id="export-note-button" title="Export Single Note">💾</button>
+        <input type="file" id="import-note-input" style="display: none;" accept=".snote" />
+        <button id="settings-button" title="Settings">⚙️</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="settings-view" style="display: none;">
+    <div class="header">
+      <button id="settings-back-button"><</button>
+      <h1 id="settings-title">Settings</h1>
+    </div>
+    <div id="settings-container">
+      <div class="setting">
+        <label for="mode-setting">Mode</label>
+        <select
+          id="mode-setting"
+          title="Choose SideNote's color theme.&#10;System follows the browser or operating-system preference; Light and Dark force that theme.&#10;This setting applies globally.">
+          <option value="system">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+      <div class="setting">
+        <label for="title-setting">Title</label>
+        <select
+          id="title-setting"
+          title="Default derives the note title from its first content line.&#10;Custom lets you edit the title separately by double-clicking it.&#10;This can be set globally or per note.">
+          <option value="default">Default (First line)</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+      <div class="setting">
+        <label for="font-size-setting">Font Size</label>
+        <input
+          type="number"
+          id="font-size-setting"
+          min="1"
+          value="12"
+          title="Set editor text size in pixels.&#10;Values must be at least 1 and can be set globally or overridden per note.">
+      </div>
+      <div class="setting">
+        <label for="line-height-setting">WYSIWYG Line Spacing</label>
+        <input
+          type="number"
+          id="line-height-setting"
+          min="1"
+          max="3"
+          step="0.1"
+          value="1.5"
+          title="Set WYSIWYG paragraph and heading line spacing from 1.0 to 3.0.&#10;The default is 1.5, with global and per-note values supported.">
+      </div>
+      <div class="setting">
+        <label for="source-line-height-setting">Plain Text Line Spacing</label>
+        <input
+          type="number"
+          id="source-line-height-setting"
+          min="1"
+          max="3"
+          step="0.1"
+          value="1.2"
+          title="Set full-document plain-text Edit mode line spacing from 1.0 to 3.0.&#10;The default is 1.2, with global and per-note values supported.">
+      </div>
+      <div class="setting">
+        <label for="code-line-height-setting">Code Block Line Spacing</label>
+        <input
+          type="number"
+          id="code-line-height-setting"
+          min="1"
+          max="3"
+          step="0.1"
+          value="1.2"
+          title="Set fenced code-block line spacing from 1.0 to 3.0.&#10;The default is 1.2, with global and per-note values supported.">
+      </div>
+      <div class="setting" id="pinned-note-drag-delay-container">
+        <label for="pinned-note-drag-delay-setting">Pinned Note Hold Delay (ms)</label>
+        <input
+          type="number"
+          id="pinned-note-drag-delay-setting"
+          min="100"
+          max="2000"
+          step="50"
+          value="150"
+          title="Set how long a pinned note must be held before dragging starts, from 100 to 2000 milliseconds.&#10;The default is 150 ms and this setting applies globally.">
+      </div>
+      <div class="setting" id="code-block-header-setting">
+        <label for="code-block-header-checkbox">Code Block Header</label>
+        <input
+          type="checkbox"
+          id="code-block-header-checkbox"
+          title="Show the language field and Copy button above fenced code blocks.&#10;This can be set globally or overridden per note.">
+      </div>
+      <div class="setting" id="wysiwyg-preview-setting">
+        <label for="wysiwyg-preview-checkbox">Editable WYSIWYG Preview</label>
+        <input
+          type="checkbox"
+          id="wysiwyg-preview-checkbox"
+          title="On (default): edit notes directly in rendered WYSIWYG Preview.&#10;Off: use the same rendered Preview in read-only mode and press Edit to change Markdown.&#10;This setting applies globally.">
+      </div>
+      <div class="setting" id="prevent-extra-empty-paragraphs-setting">
+        <label for="prevent-extra-empty-paragraphs-checkbox">Prevent Extra Empty Paragraphs</label>
+        <input
+          type="checkbox"
+          id="prevent-extra-empty-paragraphs-checkbox"
+          title="On (default): pressing Enter in an already empty WYSIWYG paragraph does nothing, preventing blank paragraphs that Markdown cannot preserve.&#10;Off: repeated Enter creates additional empty paragraphs, which may disappear after switching to Edit and back.">
+      </div>
+      <div class="setting" id="prevent-used-image-deletion-setting">
+        <label for="prevent-used-image-deletion-checkbox">Prevent deletion of used images</label>
+        <input
+          type="checkbox"
+          id="prevent-used-image-deletion-checkbox"
+          title="Prevent an image from being deleted while an active note still references it.&#10;This setting applies globally.">
+      </div>
+      <div class="setting" id="tilde-replacement-setting">
+        <label for="show-tilde-replacement-button-checkbox">Tilde Replacement Button</label>
+        <input
+          type="checkbox"
+          id="show-tilde-replacement-button-checkbox"
+          title="Show the editor toolbar toggle that escapes tilde characters in pasted text to prevent accidental Markdown strikethrough.&#10;This setting applies globally.">
+      </div>
+      <fieldset class="settings-section" id="legacy-settings-section">
+        <legend>Legacy</legend>
+        <div class="setting" id="legacy-line-break-mode-setting">
+          <label for="legacy-line-break-mode-checkbox">Legacy Markdown line breaks</label>
+          <input
+            type="checkbox"
+            id="legacy-line-break-mode-checkbox"
+            title="Enable the legacy pasted-text workflow that can add two trailing spaces for Markdown hard line breaks, and show its Auto Line Break toolbar toggle.&#10;Leave off for normal soft-break Preview.&#10;This setting applies globally.">
+        </div>
+      </fieldset>
+      <div class="setting">
+        <button id="image-management-button" class="sidenote-settings-button" title="Images 🖼️">Images 🖼️</button>
+      </div>
+      <div class="setting">
+        <button id="recycle-bin-button" class="sidenote-settings-button" title="Recycle Bin 🗑️">Recycle Bin 🗑️</button>
+      </div>
+      <div class="setting">
+        <button id="licenses-button" class="sidenote-settings-button" title="Licenses 📝">Licenses 📝</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="license-view" style="display: none;">
+    <div class="header">
+      <button id="license-back-button"><</button>
+      <h1 id="license-title">Licenses</h1>
+    </div>
+    <div id="license-content"></div>
+  </div>
+
+  <div id="recycle-bin-view" style="display: none;">
+    <div class="header">
+      <button id="recycle-bin-back-button"><</button>
+      <h1 id="recycle-bin-title">Recycle Bin</h1>
+    </div>
+    <ul id="deleted-items-list"></ul>
+    <div class="toolbar">
+        <button id="empty-recycle-bin-button" title="Empty Recycle Bin">🔥</button>
+    </div>
+  </div>
+
+  <div id="image-management-view" style="display: none;">
+    <div class="header">
+      <button id="image-management-back-button"><</button>
+      <h1 id="image-management-title">Image Management</h1>
+    </div>
+    <ul id="image-list"></ul>
+  </div>
+
+  <script src="../web-platform.js"></script>
+  <script src="vendor/highlight.min.js"></script>
+  <script type="module" src="vendor/wysiwyg-markdown.js"></script>
+  <script type="module" src="../app-bootstrap.js"></script>
+</body>
+</html>

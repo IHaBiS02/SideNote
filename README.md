@@ -1,50 +1,52 @@
-# SideNote published notes
+# SideNote web demo
 
-The left sidebar switches between list and note views. Initially the right pane
-is empty; selecting a note opens matching editors on both sides. Edits synchronize
-in both directions; mode and scroll are independent. Back returns to the list and
-clears the expanded view. Direct hash links still open their note. At widths up
-to 760px or in portrait orientation, only the full-height sidebar is shown.
-Hold a pinned row for 150ms to reorder it with SideNote's original drag controller.
-New pins append to the pinned group; drag order and edits reset on refresh.
-The source sync command also refreshes the drag controller and expanded-editor CSS.
+[한국어](README.ko.md)
 
-A GitHub Pages site using SideNote's real Lit/ProseMirror editor. Published
-content lives in .snote archives. Visitors can edit in WYSIWYG, double-click
-to edit the whole Markdown document, then return with Edit/WYSIWYG,
-Ctrl/Cmd+Enter, or Shift+Enter/Escape in source mode.
+This site runs the **complete original SideNote side-panel app**, not a separately
+implemented reader. Its HTML, styles, settings, events, note management, editor,
+image viewer/manager, recycle bin and import/export code are copied unchanged.
+Only the HTML's platform and bootstrap script URLs are substituted.
 
-Edits and pasted images survive note navigation only in memory. Refresh restores
-published content. The disk/download control downloads the original .snote,
-not the visitor's draft. Nothing is written to extension storage or a server.
-Checkboxes, headings, lists, code language editing and code copying use the
-same editor as SideNote. See [input behaviors](WYSIWYG_INPUT_BEHAVIORS.md)
-or [Korean reference](WYSIWYG_INPUT_BEHAVIORS.ko.md).
+The left panel starts with the note list. Selecting a note shows the same content
+in a second, wider instance of the app. Edits and settings synchronize; editor
+mode and scroll remain independent. Returning to the list clears the wide pane.
+At widths up to 760px or in portrait orientation, only the sidebar is visible.
 
-The list reuses SideNote's source CSS, icon spacing, 51px header and 41px footer.
-The gear opens theme settings. Pins are clickable and sort pinned notes first,
-preserving manifest order for unpinned notes. Pin changes reset on refresh.
-Add/import/delete are unavailable on this published demo. The browser-owned
-panel frame is not part of the website. Small screens show only the sidebar.
+Settings, Escape navigation, title editing, pinning, long-press reorder, creation,
+deletion, restore, image management, WYSIWYG/source editing and all original
+export menus use the original handlers. Downloads export the current visitor's
+content, including edits, rather than always returning the published archive.
 
-## Publishing notes
+## Web platform boundary
 
-Export a .snote from SideNote into notes/my-note.snote and add an entry to
-notes/index.json:
+The two same-origin frames share a fresh **in-memory IndexedDB factory** and an
+in-memory `browser.storage.local` adapter. All notes, images, ordering and settings
+reset when the top-level page reloads. No extension data, browser IndexedDB database
+or server is modified. Export anything you want to keep before reloading.
+
+An ordinary website cannot install a browser side panel, register the browser-wide
+activation shortcut or run the extension's install/service-worker lifecycle.
+Those browser-owned features are not simulated. Clipboard, downloads and external
+images remain subject to normal website permissions, CORS and browser support.
+
+## Publish notes
+
+Export `.snote` files from SideNote into `notes/`, then add entries to `notes/index.json`:
 
 ```json
-{ "id": "my-note", "title": "My note", "file": "notes/my-note.snote", "pinned": false }
+{ "id": "my-note", "file": "notes/my-note.snote", "pinned": false }
 ```
 
-Use unique lowercase IDs with hyphens. File names accept ASCII letters, numbers,
-hyphens and underscores. Array order controls order within each pin group.
-List titles come from this manifest; reader titles come from archive metadata.
-Replace a .snote to update it. Delete its entry and file to unpublish it.
-Published archives, including their attached images, are public.
+Use unique lowercase IDs with digits/hyphens. Filenames accept ASCII letters,
+digits, underscores and hyphens. Titles and note settings come from the archive;
+an old manifest `title` field is optional and ignored. Manifest order seeds initial
+pin order and modification timestamps; afterward SideNote's original sorting applies.
+Archives and attached images are public. Publishing does not expose private extension
+data. All published archives are imported once before displaying the initial list.
 
-## Development
+## Develop and deploy
 
-Use Node.js 24. Runtime dependencies are vendored; jsdom is a development dependency.
+Use Node.js 24 on Windows. From this gh-pages checkout:
 
 ```powershell
 npm ci
@@ -53,14 +55,13 @@ npm run test:run
 npm run build
 ```
 
-Open http://127.0.0.1:4173. The build replaces only the generated dist folder.
-GitHub Pages can serve the branch root directly: Settings → Pages → Deploy
-from a branch → gh-pages → / (root). Commit and push gh-pages to publish;
-extension version tags are unrelated.
+Open http://127.0.0.1:4173. Tests execute the actual app modules in jsdom, with the
+same memory adapter used by the website. VM module support is enabled by the test
+command. Build replaces only generated `dist/`. GitHub Pages can serve `gh-pages`
+at `/ (root)` directly. Commit and push this branch to publish; extension release
+tags are unrelated.
 
-## Sync from SideNote
-
-From this gh-pages checkout, run:
+## Sync the entire app
 
 ```powershell
 npm run sync:sidenote -- C:\Users\justp\Documents\SideNote
@@ -68,29 +69,29 @@ npm run test:run
 npm run build
 ```
 
-The argument must be an extension source checkout with its dependencies installed
-(npm ci). The command builds its editor, copies the bundle/source map and original
-CSS, extracts the pure theme and highlighter declarations using the TypeScript AST,
-and copies the shared Markdown styles, runtime libraries, license notices and
-both input-behavior references. It records the source version/commit in
-vendor/sidenote-source.json. It does not modify your published .snote files.
-If upstream declaration names change, extraction fails and requires review.
-Changes in browser-dependent adapter behavior still require host integration work.
+The source checkout must have dependencies installed (`npm ci`). Sync builds the
+editor and extension, replaces generated `app/` with `build/chrome/`, substitutes
+two bootstrap script URLs, and bundles the memory database adapter. No source
+functions are extracted or rewritten. All original CSS and runtime/vendor files,
+including PDF/HTML export dependencies, are copied. Licenses and both WYSIWYG
+behavior references are refreshed. `vendor/sidenote-source.json` records the exact
+source version/commit. Published `.snote` files are not changed.
 
-Review and commit the generated files after tests. This is explicit command-based
-sync, not an automatic push on every main commit. No sync/build is needed merely
-to replace a published .snote file.
+This is explicit command-based synchronization, not an automatic push after each
+main commit. Review changes to the entry points, exported state APIs or extension
+API use when updating upstream. Test and commit generated assets together.
 
 ## Files
 
-- script.js: archive loading, navigation, theme and temporary pins/drafts.
-- editor-session.js: real editor host, in-memory pasted images, mode switching.
-- vendor/: generated editor, extracted theme and original SideNote CSS.
-- notes/: publication manifest and .snote archives.
-- scripts/: server, build, source sync and sample generation.
-- tests/: archive validation and real-bundle DOM integration tests.
+- `app/`: complete generated original extension distribution; do not edit manually.
+- `web-platform.js`: memory storage/IndexedDB compatibility, disables auto bootstrap.
+- `app-bootstrap.js`: imports published archives, starts original app, mirrors state.
+- `script.js`, `index.html`, `style.css`: platform owner and responsive iframe layout.
+- `vendor/`: bundled memory database and source revision record.
+- `notes/`: published archives and manifest.
+- `scripts/`: source sync, static server/build and sample generation.
+- `tests/`: actual-runtime integration and archive validation.
 
-External image URLs need network access; attached images are resolved from ZIP
-entries. Each editor image node owns and revokes its Blob URL.
-npm run samples overwrites only the two sample archives: do not run it after
-replacing those files with your own content. Old site artifacts remain in Git history.
+See [input behaviors](WYSIWYG_INPUT_BEHAVIORS.md) and [licenses](LIBRARY_LICENSES.md).
+`npm run samples` overwrites the two sample archives; do not run it over your own
+replacement files. Removed simplified-reader code remains recoverable in Git history.
