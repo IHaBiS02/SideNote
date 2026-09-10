@@ -48,6 +48,9 @@ editor.addEventListener('input', (event) => {
 
 ## Public API
 
+Task checkboxes inherit the document font size. Their top spacing follows the
+configured line height to center them on the first line of wrapped or nested tasks.
+
 The Markdown string is available through `value`, `getMarkdown()`, and
 `setMarkdown()`. Modes are changed with `setMode('wysiwyg' | 'source' |
 'readonly')`.

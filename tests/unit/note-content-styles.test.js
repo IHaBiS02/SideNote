@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createNoteContentStyles } from '../../src/editor/note-content-styles.js';
 
 describe('shared note content styles', () => {
-  it('emits the same semantic checkbox geometry for Preview and HTML export', () => {
+  it('aligns Preview checkboxes to the first line and preserves inline export layout', () => {
     const previewCss = createNoteContentStyles({
       rootSelector: '.editor-mount .ProseMirror',
       variableNamespace: 'editor',
@@ -20,13 +20,19 @@ describe('shared note content styles', () => {
 
     for (const css of [previewCss, exportCss]) {
       expect(css).toContain('display: inline-block');
-      expect(css).toContain('width: auto');
-      expect(css).toContain('height: auto');
-      expect(css).toContain('margin: 0 5px 0 0');
       expect(css).toContain('vertical-align: middle');
       expect(css).toContain('margin-block: 0.67em');
       expect(css).toContain('border-collapse: collapse');
     }
+
+    expect(previewCss).toContain('align-items: flex-start; gap: 5px');
+    expect(previewCss).toContain('font: inherit; flex: 0 0 auto');
+    expect(previewCss).toContain('width: 1em');
+    expect(previewCss).toContain('height: 1em');
+    expect(previewCss).toContain('margin: calc((var(--editor-line-height) - 1) * 0.5em) 0 0');
+    expect(exportCss).toContain('width: auto');
+    expect(exportCss).toContain('height: auto');
+    expect(exportCss).toContain('margin: 0 5px 0 0');
 
     expect(previewCss).toContain('accent-color: var(--editor-checkbox-accent)');
     expect(exportCss).toContain('accent-color: var(--export-checkbox-accent)');
@@ -49,7 +55,7 @@ describe('shared note content styles', () => {
     });
 
     expect(previewCss).toContain("th[style*='text-align: left']");
-    expect(previewCss).toContain('.preview li[data-task] .task-content');
+    expect(previewCss).toContain('.preview li[data-task] > .task-content');
     expect(exportCss).toContain('th[align="left"]');
     expect(exportCss).toContain('.export li.task-list-item');
     expect(exportCss).not.toContain('.task-content');

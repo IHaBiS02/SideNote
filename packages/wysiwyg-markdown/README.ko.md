@@ -1,5 +1,8 @@
 # WYSIWYG Markdown
 
+작업 체크박스는 본문 글자 크기를 상속하고 설정된 줄간격으로 위쪽 여백을
+계산합니다. 여러 줄·중첩 항목에서도 첫 줄 텍스트의 중앙에 정렬합니다.
+
 [English](./README.md) | 한국어
 
 SideNote가 내부에서 사용하는 WYSIWYG Markdown 에디터입니다. Lit과

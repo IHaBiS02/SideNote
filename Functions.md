@@ -338,6 +338,11 @@ Internal image Markdown paths remain `images/{id}.png`; the adapter resolves the
 
 ## src/editor/note-content-styles.ts
 
+The shared editor body styles lay out task checkboxes and content in a flex row.
+Checkbox size inherits the body font; top spacing is half the difference between
+the first line height and checkbox height. Wrapped and nested tasks stay aligned
+to their first line. Standalone exports retain their inline checkbox structure.
+
 - `createNoteContentStyles(options)`: Generates scoped semantic Markdown body
   CSS for both the ProseMirror Preview tree and Marked export tree. The options
   select the root, CSS-variable namespace, task-list selectors, and table

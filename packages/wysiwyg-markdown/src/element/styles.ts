@@ -301,7 +301,8 @@ export const editorStyles = css`
     flex: 0 0 auto;
     width: 1em;
     height: 1em;
-    margin: 0.38em 0 0;
+    font: inherit;
+    margin: calc((var(--editor-line-height) - 1) * 0.5em) 0 0;
     accent-color: var(--editor-accent);
   }
 
