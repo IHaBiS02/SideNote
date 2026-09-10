@@ -11,6 +11,8 @@ The left panel starts with the note list. Selecting a note shows the same conten
 in a second, wider instance of the app. Edits and settings synchronize; editor
 mode and scroll remain independent. Returning to the list clears the wide pane.
 At widths up to 760px or in portrait orientation, only the sidebar is visible.
+The empty wide pane and frame backgrounds follow the app's Light/Dark/System
+setting. System theme changes are reflected even before a note is selected.
 
 Settings, Escape navigation, title editing, pinning, long-press reorder, creation,
 deletion, restore, image management, WYSIWYG/source editing and all original

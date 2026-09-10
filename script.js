@@ -2,6 +2,14 @@
 const peers = new Map();
 const expanded = document.getElementById('expanded');
 let latest;
+const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
+function updateShellTheme() {
+  const mode = latest?.globalSettings?.mode || 'system';
+  document.documentElement.dataset.theme = mode === 'dark'
+    || (mode === 'system' && systemTheme.matches) ? 'dark' : 'light';
+}
+systemTheme.addEventListener('change', updateShellTheme);
+updateShellTheme();
 window.sideNoteWeb = {
   indexedDB: new SideNoteMemoryDB.IDBFactory(),
   IDBKeyRange: SideNoteMemoryDB.IDBKeyRange,
@@ -12,6 +20,7 @@ window.sideNoteWeb = {
   },
   publish(role, snapshot) {
     latest = snapshot;
+    updateShellTheme();
     expanded.hidden = !snapshot.note;
     if (snapshot.note && !expanded.getAttribute('src')) expanded.src = 'app/sidepanel.html?expanded';
     for (const [target, receive] of peers) if (target !== role) receive(snapshot);
