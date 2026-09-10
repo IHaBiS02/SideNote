@@ -11,8 +11,6 @@
   <link rel="stylesheet" href="vendor/dark_mode.css">
   <link rel="stylesheet" href="style.css">
   <script defer src="vendor/jszip.min.js"></script>
-  <script defer src="vendor/marked.min.js"></script>
-  <script defer src="vendor/purify.min.js"></script>
   <script defer src="vendor/highlight.min.js"></script>
   <script type="module" src="script.js"></script>
 </head>
@@ -32,8 +30,9 @@
     </section>
   </aside>
   <main>
-    <header class="header"><h2 id="note-title">SideNote</h2><a id="download" hidden>Download .snote ↓</a></header>
+    <header class="header"><h2 id="note-title">SideNote</h2><a id="download" hidden>Download original .snote ↓</a></header>
     <div id="reader"><p id="status" role="status">Loading notes…</p><article id="content" tabindex="-1" aria-labelledby="note-title"></article></div>
+    <div class="demo-toolbar"><button id="toggle-view-button">Edit</button><span>Try editing · Double-click for Markdown · Refresh to reset</span></div>
   </main>
   <noscript>This site needs JavaScript to open .snote archives.</noscript>
 </body>

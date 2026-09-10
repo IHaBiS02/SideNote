@@ -1,7 +1,12 @@
 # Library licenses
 
 SideNote website code is MIT licensed; see [LICENSE](LICENSE).
-Unmodified runtime distributions are copied from SideNote 4.5.1's installed libraries.
+Runtime distributions are copied from the SideNote checkout recorded in
+vendor/sidenote-source.json. The actual editor bundles Lit, ProseMirror,
+Markdown-it and their dependencies. Their full upstream notices are included in
+[SideNote runtime licenses](licenses/sidenote-runtime.md) and refreshed by
+npm run sync:sidenote. The site's source remains MIT; each dependency retains
+its own license. Marked/DOMPurify notices below are retained from the former reader.
 
 | Library | License used | Full notice |
 | --- | --- | --- |

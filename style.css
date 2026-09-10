@@ -21,6 +21,11 @@ button { cursor: pointer; }
 button:hover { background: var(--selected); }
 :focus-visible { outline: 2px solid var(--link); outline-offset: -2px; }
 #reader { padding: 22px 26px 48px; }
+#reader { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+#reader #status { padding: 10px; }
+#reader #content { flex: 1; min-height: 0; overflow: hidden; }
+.demo-toolbar { flex: 0 0 41px; display: flex; align-items: center; gap: 12px; padding: 5px; border-top: 1px solid var(--border); }
+.demo-toolbar span { color: var(--muted); font-size: 11px; }
 #status { color: var(--muted); }
 #download { flex-shrink: 0; }
 #content { font-size: var(--note-font-size, 14px); line-height: var(--note-line-height, 1.5); overflow-wrap: anywhere; }
@@ -91,6 +96,6 @@ noscript { display: none; }
 @media (max-width: 640px) {
   body { grid-template-columns: 1fr; grid-template-rows: minmax(140px, 32dvh) minmax(0, 1fr); }
   aside { border-right: 0; border-bottom: 1px solid var(--border); }
-  #reader { padding: 16px 14px 32px; }
+  #reader { padding: 0; }
   .header { gap: 8px; }
 }

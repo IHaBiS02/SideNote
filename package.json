@@ -1,8 +1,9 @@
 {
   "name": "sidenote-pages",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
+    "sync:sidenote": "node scripts/sync-sidenote.mjs",
     "build": "node scripts/build.mjs",
     "test:run": "node --test tests/*.test.mjs",
     "dev": "node scripts/serve.mjs",

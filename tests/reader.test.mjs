@@ -16,7 +16,7 @@ async function waitFor(predicate) {
 }
 
 async function reader(t, { hash = '', archive, fetchOverride } = {}) {
-  const dom = new JSDOM(await read('index.html'), { url: `https://example.org/SideNote/${hash}`, runScripts: 'outside-only' });
+  const dom = new JSDOM(await read('index.html'), { url: `https://example.org/SideNote/${hash}`, runScripts: 'outside-only', pretendToBeVisual: true });
   t.after(() => dom.window.close());
   const w = dom.window;
   const revoked = [];
@@ -27,7 +27,15 @@ async function reader(t, { hash = '', archive, fetchOverride } = {}) {
   w.URL.revokeObjectURL = url => revoked.push(url);
   Object.defineProperty(w.navigator, 'clipboard', { value: { writeText: async text => copied.push(text) } });
   w.JSZip = JSZip;
-  for (const vendor of ['purify', 'marked', 'highlight']) w.eval((await read(`vendor/${vendor}.min.js`)).toString());
+  w.document.execCommand = () => false;
+  w.Range.prototype.getClientRects = () => [];
+  w.Range.prototype.getBoundingClientRect = () => ({ left: 0, right: 0, top: 0, bottom: 0 });
+  w.eval((await read('vendor/highlight.min.js')).toString());
+  const stripExports = text => text.replace(/export\s*\{[^}]+\};/g, '');
+  w.eval('(() => {' + stripExports((await read('vendor/wysiwyg-markdown.js')).toString()) + '\n})()');
+  w.eval(stripExports((await read('vendor/note-content-styles.js')).toString()) + '\nwindow.createNoteContentStyles = createNoteContentStyles;');
+  w.eval(stripExports((await read('vendor/sidenote-editor-theme.js')).toString().replace(/^import .*;$/gm, '')) + '\nwindow.SIDENOTE_EDITOR_THEME = SIDENOTE_EDITOR_THEME; window.highlightCode = highlightCode;');
+  w.eval((await read('editor-session.js')).toString().replace(/^import .*;$/gm, '').replace('export function', 'function') + '\nwindow.mountEditor = mountEditor;');
   w.fetch = async path => {
     if (fetchOverride) {
       const override = await fetchOverride(path);
@@ -36,7 +44,7 @@ async function reader(t, { hash = '', archive, fetchOverride } = {}) {
     const bytes = archive && path.endsWith('.snote') ? archive : await read(path);
     return { ok: true, json: async () => JSON.parse(bytes), arrayBuffer: async () => bytes };
   };
-  w.eval((await read('script.js')).toString());
+  w.eval((await read('script.js')).toString().replace(/^import .*;$/gm, ''));
   return { w, created, revoked, copied };
 }
 
@@ -53,11 +61,11 @@ test('opens .snote with images, settings, highlighting, copy and theme; frees im
   doc.querySelector('#close-settings').click();
   assert.equal(doc.querySelector('#site-settings').hidden, true);
   assert.equal(doc.querySelector('#note-title').textContent, 'Publish your own notes');
-  assert.equal(doc.querySelector('#content img').getAttribute('src'), 'blob:note-1');
+  await waitFor(() => doc.querySelector('#markdown-editor').shadowRoot?.querySelector('img')?.getAttribute('src') === 'blob:note-1');
   assert.ok(created[0].size > 0);
-  assert.ok(doc.querySelector('code .hljs-attr'));
-  assert.equal(doc.querySelector('#content').style.getPropertyValue('--note-code-line-height'), '1.2');
-  doc.querySelector('.code-header button').click();
+  assert.ok(doc.querySelector('#markdown-editor').shadowRoot.querySelector('.hljs-attr'));
+  assert.equal(doc.querySelector('#markdown-editor').style.getPropertyValue('--editor-code-line-height'), '1.2');
+  doc.querySelector('#markdown-editor').shadowRoot.querySelector('.copy-code-button').click();
   await waitFor(() => copied.length === 1);
   assert.match(copied[0], /my-note/);
   const theme = doc.querySelector('#theme');
@@ -76,13 +84,49 @@ test('sanitizes archive HTML and reports malformed archives and unknown routes',
   const { w } = await reader(t, { archive: await zip.generateAsync({ type: 'nodebuffer' }) });
   await waitFor(() => w.document.querySelector('#status').hidden);
   assert.equal(w.pwned, undefined);
-  assert.equal(w.document.querySelector('#content script, #content [onerror], #content a[href]'), null);
+  assert.equal(w.document.querySelector('#markdown-editor').shadowRoot.querySelector('script, [onerror], a[href^="javascript:"]'), null);
   w.location.hash = '#unknown';
   await waitFor(() => w.document.querySelector('#note-title').textContent === 'Note not found');
   assert.equal(w.document.querySelector('#download').hidden, true);
   const broken = new JSZip(); broken.file('note.md', 'No metadata');
   const other = await reader(t, { archive: await broken.generateAsync({ type: 'nodebuffer' }) });
   await waitFor(() => other.w.document.querySelector('#status').textContent.includes('missing'));
+});
+
+test('real editor supports WYSIWYG, double-click source editing, session drafts and fresh-load reset', async t => {
+  const { w } = await reader(t);
+  const doc = w.document;
+  await waitFor(() => doc.querySelector('#status').hidden);
+  const editor = doc.querySelector('#markdown-editor');
+  await editor.updateComplete;
+  assert.equal(editor.mode, 'wysiwyg');
+  assert.equal(editor.insertText('Visitor edit '), true);
+  assert.match(editor.value, /Visitor edit/);
+  editor.shadowRoot.querySelector('#editor-mount').dispatchEvent(new w.MouseEvent('dblclick', { bubbles: true }));
+  await editor.updateComplete;
+  assert.equal(editor.mode, 'source');
+  const textarea = editor.shadowRoot.querySelector('#document-source');
+  textarea.value = '# Changed in plain text\n\nHello';
+  textarea.dispatchEvent(new w.Event('input', { bubbles: true }));
+  doc.querySelector('#toggle-view-button').click();
+  await editor.updateComplete;
+  assert.equal(editor.mode, 'wysiwyg');
+  assert.match(editor.value, /Changed in plain text/);
+  assert.equal(editor.shadowRoot.querySelector('.ProseMirror h1').textContent, 'Changed in plain text');
+  const pasted = await editor.uploadImage(new w.Blob(['image'], { type: 'image/png' }));
+  editor.insertMarkdown(`\n\n![Pasted](${pasted})`);
+  w.location.hash = '#publishing';
+  await waitFor(() => doc.querySelector('#status').hidden && doc.querySelector('#note-title').textContent === 'Publish your own notes');
+  w.location.hash = '#welcome';
+  await waitFor(() => doc.querySelector('#status').hidden && doc.querySelector('#note-title').textContent === 'Welcome to SideNote');
+  const returned = doc.querySelector('#markdown-editor');
+  await returned.updateComplete;
+  assert.match(returned.value, /Changed in plain text/);
+  assert.ok(await returned.imageResolver(pasted));
+  assert.equal(w.localStorage.length, 0);
+  const fresh = await reader(t);
+  await waitFor(() => fresh.w.document.querySelector('#status').hidden);
+  assert.doesNotMatch(fresh.w.document.querySelector('#markdown-editor').value, /Changed in plain text/);
 });
 
 test('pins sort first, toggles preserve the reader, and a fresh load restores publisher defaults', async t => {
