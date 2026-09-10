@@ -1,10 +1,14 @@
 # SideNote published notes
 
-A static GitHub Pages site on `gh-pages`. Its left-hand list follows SideNote's
-Arial typography, row spacing, borders and footer layout. Selecting a note
+A static GitHub Pages site on `gh-pages`. Its left-hand list reuses SideNote 4.5.1's
+original CSS, pin/paperclip/trash icons, 51px header, 41px bottom toolbar and row padding. Selecting a note
 loads its `.snote` archive and displays the title, Markdown and attached images.
 On small screens the list is above the reader. Light, dark and system themes
 are available, and note links use hashes so refresh and back/forward work on Pages.
+Open the gear button for theme settings. The disk button downloads the selected
+note. Add/import/delete controls are inactive because publication is managed in
+the repository. Pin icons indicate publisher metadata. Browser-owned panel chrome
+(the browser's outer title bar and rounded frame) is not part of the website.
 
 ## Publish a note
 
@@ -59,8 +63,10 @@ Do not run it after replacing those examples with your own files.
 The archive format is SideNote's `metadata.json`, `note.md`, and optional `images/`.
 Font size, paragraph/code line heights and code-header visibility are respected.
 Rendering uses SideNote's existing Marked/DOMPurify approach; this website is a
-reader, not the Lit/ProseMirror editor. Its CSS is a maintained adaptation, not a
-live import from `main`. Update it explicitly when matching future extension styles.
+reader, not the Lit/ProseMirror editor. `vendor/sidepanel.css`, `vendor/dark_mode.css`
+and `vendor/sidenote-controls.css` are unchanged copies from `main` at 4.5.1.
+`style.css` adapts their positioning for the two-pane website and styles the Markdown
+reader. Refresh these copies explicitly when matching future extension styles.
 Code blocks wrap and include a copy button. Task checkboxes are read-only.
 External image URLs still need network access; archive images are self-contained.
 

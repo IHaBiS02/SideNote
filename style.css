@@ -60,6 +60,31 @@ button:hover { background: var(--selected); }
 .skip-link { position: fixed; top: -60px; padding: 10px; background: var(--bg); z-index: 2; }
 .skip-link:focus { top: 0; }
 [hidden] { display: none !important; }
+/* Source styles above are copied unchanged from SideNote 4.5.1.
+   Adapt only positioning for two panes; preserve the extension's list metrics. */
+body { grid-template-columns: 360px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); overflow: hidden; }
+noscript { display: none; }
+:root { --text: #000; }
+:root[data-theme="dark"] { --text: #e0e0e0; --border: #333; --row-border: #333; }
+#list-view { position: relative; height: 100%; background: var(--bg); }
+#list-view .header { box-sizing: content-box; height: 30px; min-height: 30px; flex: 0 0 30px; padding: 10px; gap: 0; }
+#list-view #notes-list-title { font-size: 18px; line-height: 1.5; }
+#list-view nav { position: absolute; inset: 51px 0 41px; overflow: auto; }
+#list-view #note-list { position: static; overflow: visible; }
+#list-view #note-list li { padding: 10px; border-bottom: 1px solid var(--row-border); display: flex; justify-content: space-between; align-items: center; }
+#list-view .note-link { display: block; flex: 1; min-width: 0; padding: 0; border: 0; color: var(--text); background: transparent; box-shadow: none; font: 12px/1.5 Arial, sans-serif; }
+#list-view .button-container { display: flex; flex: 0 0 auto; align-items: center; }
+#list-view .pin-note-icon, #list-view .delete-note-icon { padding: 5px; font: 12px/1.5 Arial, sans-serif; cursor: default; }
+#list-view .pin-note-icon:hover, #list-view .delete-note-icon:hover { background: transparent; }
+#list-view button { background: none; border: 1px solid transparent; padding: 5px 10px; border-radius: 3px; font: 13.3333px/1.5 Arial, sans-serif; color: var(--text); }
+#list-view button:hover:enabled { background: var(--hover); }
+#list-view button:disabled { opacity: 1; cursor: default; }
+#list-view .toolbar { box-sizing: border-box; position: absolute; bottom: 0; width: 100%; height: 41px; padding: 5px; background: var(--bg); border-top: 1px solid var(--border); justify-content: flex-end; }
+#site-settings { position: absolute; inset: 0; z-index: 6; background: var(--bg); }
+#site-settings .header { justify-content: flex-start; gap: 20px; }
+.settings-body { padding: 15px; }
+.settings-body label { margin-right: 10px; }
+.settings-body p { margin-top: 15px; }
 @media (max-width: 640px) {
   body { grid-template-columns: 1fr; grid-template-rows: minmax(140px, 32dvh) minmax(0, 1fr); }
   aside { border-right: 0; border-bottom: 1px solid var(--border); }

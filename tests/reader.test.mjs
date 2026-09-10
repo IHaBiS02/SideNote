@@ -46,6 +46,12 @@ test('opens .snote with images, settings, highlighting, copy and theme; frees im
   await waitFor(() => doc.querySelector('#status').hidden);
   assert.equal(doc.querySelectorAll('.note-link').length, 2);
   assert.equal(doc.querySelector('[aria-current]').dataset.id, 'publishing');
+  assert.equal(doc.querySelectorAll('.pin-note-icon').length, 2);
+  assert.equal(doc.querySelectorAll('.delete-note-icon').length, 2);
+  doc.querySelector('#global-settings-button').click();
+  assert.equal(doc.querySelector('#site-settings').hidden, false);
+  doc.querySelector('#close-settings').click();
+  assert.equal(doc.querySelector('#site-settings').hidden, true);
   assert.equal(doc.querySelector('#note-title').textContent, 'Publish your own notes');
   assert.equal(doc.querySelector('#content img').getAttribute('src'), 'blob:note-1');
   assert.ok(created[0].size > 0);

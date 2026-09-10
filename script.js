@@ -12,7 +12,20 @@ let imageUrls = [];
 function applyTheme() {
   document.documentElement.dataset.theme = theme.value === 'system'
     ? (systemTheme.matches ? 'dark' : 'light') : theme.value;
+  document.body.classList.toggle('dark-mode', document.documentElement.dataset.theme === 'dark');
 }
+const settingsPanel = document.querySelector('#site-settings');
+document.querySelector('#global-settings-button').addEventListener('click', () => {
+  settingsPanel.hidden = false;
+  theme.focus();
+});
+document.querySelector('#close-settings').addEventListener('click', () => {
+  settingsPanel.hidden = true;
+  document.querySelector('#global-settings-button').focus();
+});
+document.querySelector('#save-note').addEventListener('click', () => {
+  if (!download.hidden) download.click();
+});
 try {
   const saved = localStorage.getItem('sidenote-site-theme');
   if (['system', 'light', 'dark'].includes(saved)) theme.value = saved;
@@ -154,10 +167,19 @@ async function start() {
       link.href = `#${encodeURIComponent(note.id)}`;
       link.dataset.id = note.id;
       link.textContent = note.title;
-      if (note.pinned) {
-        const pin = document.createElement('span'); pin.className = 'pin'; pin.textContent = 'Pinned'; link.append(pin);
-      }
-      item.append(link); list.append(item);
+      const actions = document.createElement('div');
+      actions.className = 'button-container';
+      const pin = document.createElement('span');
+      pin.className = 'pin-note-icon';
+      pin.textContent = note.pinned ? '📌' : '📎';
+      pin.title = note.pinned ? 'Pinned by the publisher' : 'Not pinned';
+      const remove = document.createElement('span');
+      remove.className = 'delete-note-icon';
+      remove.textContent = '🗑️';
+      remove.title = 'Published notes are managed in the repository';
+      actions.setAttribute('aria-disabled', 'true');
+      actions.append(pin, remove);
+      item.append(link, actions); list.append(item);
     }
     window.addEventListener('hashchange', openNote);
     await openNote();

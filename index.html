@@ -6,6 +6,9 @@
   <meta name="description" content="Read notes published with SideNote.">
   <title>SideNote · Notes</title>
   <link rel="stylesheet" href="vendor/reset.css">
+  <link rel="stylesheet" href="vendor/sidenote-controls.css">
+  <link rel="stylesheet" href="vendor/sidepanel.css">
+  <link rel="stylesheet" href="vendor/dark_mode.css">
   <link rel="stylesheet" href="style.css">
   <script defer src="vendor/jszip.min.js"></script>
   <script defer src="vendor/marked.min.js"></script>
@@ -15,10 +18,18 @@
 </head>
 <body>
   <a class="skip-link" href="#content">Skip to note</a>
-  <aside aria-label="Published notes">
-    <header class="header"><h1>Notes</h1><a class="brand" href="https://github.com/IHaBiS02/SideNote">SideNote ↗</a></header>
+  <aside id="list-view" aria-label="Published notes">
+    <header class="header"><h1 id="notes-list-title">Notes</h1><button disabled title="Create notes in the SideNote extension">+</button></header>
     <nav aria-label="Note selection"><ul id="note-list"></ul></nav>
-    <footer><label for="theme">Theme</label><select id="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select><a href="LIBRARY_LICENSES.md">Licenses</a></footer>
+    <div class="toolbar">
+      <button disabled title="Publish .snote files through the repository" aria-label="Import notes unavailable on this published site">📂</button>
+      <button id="save-note" title="Download selected note" aria-label="Download selected note">💾</button>
+      <button id="global-settings-button" title="Settings" aria-label="Settings">⚙️</button>
+    </div>
+    <section id="site-settings" hidden aria-label="Settings">
+      <div class="header"><button id="close-settings" aria-label="Back to notes">&lt;</button><h2>Settings</h2></div>
+      <div class="settings-body"><label for="theme">Mode</label><select id="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select><p><a href="LIBRARY_LICENSES.md">Licenses</a></p></div>
+    </section>
   </aside>
   <main>
     <header class="header"><h2 id="note-title">SideNote</h2><a id="download" hidden>Download .snote ↓</a></header>
