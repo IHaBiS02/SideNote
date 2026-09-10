@@ -7,7 +7,9 @@ On small screens the list is above the reader. Light, dark and system themes
 are available, and note links use hashes so refresh and back/forward work on Pages.
 Open the gear button for theme settings. The disk button downloads the selected
 note. Add/import/delete controls are inactive because publication is managed in
-the repository. Pin icons indicate publisher metadata. Browser-owned panel chrome
+the repository. Visitors can toggle pins by mouse or keyboard. Pinned notes sort
+first; both groups retain manifest order. Changes are memory-only and reset to
+publisher defaults on refresh. Pinning keeps the current note open. Browser-owned panel chrome
 (the browser's outer title bar and rounded frame) is not part of the website.
 
 ## Publish a note
@@ -21,8 +23,8 @@ the repository. Pin icons indicate publisher metadata. Browser-owned panel chrom
 ```
 
 Use unique lowercase IDs with hyphens. File names may contain ASCII letters,
-numbers, hyphens and underscores. The array controls the display order;
-`pinned` adds a label. The list title comes from this manifest to avoid downloading
+numbers, hyphens and underscores. The array controls order within each pin group;
+`pinned: true` places a note in the upper group. The list title comes from this manifest to avoid downloading
 every archive at startup; the reader title comes from `metadata.json`.
 To update a note, replace its `.snote` file. To remove one, delete its entry and file.
 Only published files are read; this site has no access to extension storage.

@@ -79,6 +79,9 @@ noscript { display: none; }
 #list-view button { background: none; border: 1px solid transparent; padding: 5px 10px; border-radius: 3px; font: 13.3333px/1.5 Arial, sans-serif; color: var(--text); }
 #list-view button:hover:enabled { background: var(--hover); }
 #list-view button:disabled { opacity: 1; cursor: default; }
+#list-view button.pin-note-icon { padding: 5px; border: 0; border-radius: 0; font: 12px/1.5 Arial, sans-serif; cursor: pointer; }
+#list-view button.pin-note-icon:hover { background-color: #ddd; border-radius: 50%; }
+.dark-mode #list-view button.pin-note-icon:hover { background-color: #444; }
 #list-view .toolbar { box-sizing: border-box; position: absolute; bottom: 0; width: 100%; height: 41px; padding: 5px; background: var(--bg); border-top: 1px solid var(--border); justify-content: flex-end; }
 #site-settings { position: absolute; inset: 0; z-index: 6; background: var(--bg); }
 #site-settings .header { justify-content: flex-start; gap: 20px; }

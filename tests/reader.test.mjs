@@ -85,6 +85,35 @@ test('sanitizes archive HTML and reports malformed archives and unknown routes',
   await waitFor(() => other.w.document.querySelector('#status').textContent.includes('missing'));
 });
 
+test('pins sort first, toggles preserve the reader, and a fresh load restores publisher defaults', async t => {
+  // Put the pinned entry last to verify actual sorting rather than fixture order.
+  const manifest = JSON.parse(await read('notes/index.json')).reverse();
+  const options = { fetchOverride: async path => path === 'notes/index.json'
+    ? { ok: true, json: async () => structuredClone(manifest) } : undefined };
+  const { w } = await reader(t, options);
+  const doc = w.document;
+  await waitFor(() => doc.querySelector('#status').hidden);
+  const order = () => [...doc.querySelectorAll('.note-link')].map(link => link.dataset.id);
+  const pin = id => doc.querySelector(`li[data-note-id="${id}"] .pin-note-icon`);
+  assert.deepEqual(order(), ['welcome', 'publishing']);
+  const body = doc.querySelector('#content').firstChild;
+  pin('publishing').click();
+  assert.deepEqual(order(), ['publishing', 'welcome']);
+  assert.equal(pin('publishing').getAttribute('aria-pressed'), 'true');
+  assert.equal(doc.activeElement, pin('publishing'));
+  assert.equal(doc.querySelector('#content').firstChild, body);
+  assert.equal(doc.querySelector('[aria-current]').dataset.id, 'welcome');
+  pin('welcome').click();
+  assert.equal(pin('welcome').getAttribute('aria-pressed'), 'false');
+  assert.deepEqual(order(), ['publishing', 'welcome']);
+  assert.equal(w.localStorage.length, 0);
+  assert.equal(w.sessionStorage.length, 0);
+  const fresh = await reader(t, options);
+  await waitFor(() => fresh.w.document.querySelector('#status').hidden);
+  assert.deepEqual([...fresh.w.document.querySelectorAll('.note-link')].map(link => link.dataset.id), ['welcome', 'publishing']);
+  assert.equal(fresh.w.document.querySelector('li[data-note-id="publishing"] .pin-note-icon').getAttribute('aria-pressed'), 'false');
+});
+
 test('a late response cannot replace a more recently selected note', async t => {
   let release;
   const delayed = new Promise(resolve => { release = resolve; });

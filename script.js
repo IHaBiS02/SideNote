@@ -9,6 +9,23 @@ let notes = [];
 let revision = 0;
 let imageUrls = [];
 
+// Stable sorting keeps manifest order within each group; pins are memory-only.
+function orderedNotes() {
+  return [...notes].sort((a, b) => Number(b.pinned === true) - Number(a.pinned === true));
+}
+
+function sortNoteList() {
+  const rows = new Map([...list.children].map(row => [row.dataset.noteId, row]));
+  for (const note of orderedNotes()) list.append(rows.get(note.id));
+}
+
+function updatePin(button, note) {
+  button.textContent = note.pinned ? '📌' : '📎';
+  button.title = note.pinned ? 'Unpin Note' : 'Pin Note';
+  button.setAttribute('aria-label', `${button.title}: ${note.title}`);
+  button.setAttribute('aria-pressed', String(note.pinned));
+}
+
 function applyTheme() {
   document.documentElement.dataset.theme = theme.value === 'system'
     ? (systemTheme.matches ? 'dark' : 'light') : theme.value;
@@ -55,7 +72,7 @@ async function openNote() {
   status.hidden = false;
   let id;
   try { id = decodeURIComponent(location.hash.slice(1)); } catch { id = null; }
-  const note = id === '' ? notes[0] : notes.find(entry => entry.id === id);
+  const note = id === '' ? orderedNotes()[0] : notes.find(entry => entry.id === id);
   for (const link of list.querySelectorAll('a')) {
     if (link.dataset.id === note?.id) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
@@ -161,7 +178,9 @@ async function start() {
       ids.add(note.id); return true;
     })) throw new Error('Invalid note list.');
     for (const note of notes) {
+      note.pinned = note.pinned === true;
       const item = document.createElement('li');
+      item.dataset.noteId = note.id;
       const link = document.createElement('a');
       link.className = 'note-link';
       link.href = `#${encodeURIComponent(note.id)}`;
@@ -169,18 +188,25 @@ async function start() {
       link.textContent = note.title;
       const actions = document.createElement('div');
       actions.className = 'button-container';
-      const pin = document.createElement('span');
+      const pin = document.createElement('button');
+      pin.type = 'button';
       pin.className = 'pin-note-icon';
-      pin.textContent = note.pinned ? '📌' : '📎';
-      pin.title = note.pinned ? 'Pinned by the publisher' : 'Not pinned';
+      updatePin(pin, note);
+      pin.addEventListener('click', () => {
+        note.pinned = !note.pinned;
+        updatePin(pin, note);
+        sortNoteList();
+        pin.focus({ preventScroll: true });
+      });
       const remove = document.createElement('span');
       remove.className = 'delete-note-icon';
       remove.textContent = '🗑️';
       remove.title = 'Published notes are managed in the repository';
-      actions.setAttribute('aria-disabled', 'true');
+      remove.setAttribute('aria-disabled', 'true');
       actions.append(pin, remove);
       item.append(link, actions); list.append(item);
     }
+    sortNoteList();
     window.addEventListener('hashchange', openNote);
     await openNote();
   } catch (error) { status.textContent = error.message; }
