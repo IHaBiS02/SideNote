@@ -1,5 +1,5 @@
 import MarkdownIt from 'markdown-it';
-import { Schema, type MarkSpec, type Node as ProseMirrorNode } from 'prosemirror-model';
+import { Fragment, Schema, Slice, type MarkSpec, type Node as ProseMirrorNode } from 'prosemirror-model';
 import {
   defaultMarkdownParser,
   defaultMarkdownSerializer,
@@ -110,8 +110,36 @@ function alignmentFromStyle(style: string | null): { align: string | null } {
 
 const tokenizer = new MarkdownIt('default', {
   html: false,
-  linkify: true,
+  linkify: false,
 });
+
+/** Link only pasted HTTP(S) text, never documents loaded from Markdown source. */
+export function linkifyPastedSlice(slice: Slice): Slice {
+  function transform(fragment: Fragment): Fragment {
+    const children: ProseMirrorNode[] = [];
+    fragment.forEach(node => {
+      if (node.type.spec.code || node.marks.some(mark => mark.type.spec.code || mark.type.name === 'link')) {
+        children.push(node);
+      } else if (node.isText) {
+        const text = node.text!;
+        let offset = 0;
+        for (const match of tokenizer.linkify.match(text) ?? []) {
+          if (!/^https?:\/\//i.test(match.raw)) continue;
+          if (match.index > offset) children.push(node.cut(offset, match.index));
+          children.push(node.cut(match.index, match.lastIndex).mark(
+            markdownSchema.marks.link.create({ href: match.url }).addToSet(node.marks),
+          ));
+          offset = match.lastIndex;
+        }
+        if (offset < text.length) children.push(node.cut(offset));
+      } else {
+        children.push(node.copy(transform(node.content)));
+      }
+    });
+    return Fragment.fromArray(children);
+  }
+  return new Slice(transform(slice.content), slice.openStart, slice.openEnd);
+}
 
 tokenizer.core.ruler.after('inline', 'sidenote-task-list', (state) => {
   for (let index = 0; index < state.tokens.length; index += 1) {

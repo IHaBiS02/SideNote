@@ -28,6 +28,7 @@ import {
 } from '../core/commands';
 import {
   markdownSchema,
+  linkifyPastedSlice,
   parseMarkdown,
   serializeMarkdown,
 } from '../core/markdown';
@@ -302,6 +303,12 @@ export class WysiwygMarkdownElement extends LitElement {
       editable: () => this.#isEditable(),
       dispatchTransaction: (transaction) => this.#dispatchTransaction(transaction),
       transformPastedText: (text) => this.transformPastedText?.(text) ?? text,
+      transformPasted: (slice, view) => {
+        const { selection, storedMarks } = view.state;
+        if (selection.$from.parent.type.spec.code
+          || (storedMarks ?? selection.$from.marks()).some(mark => mark.type.spec.code)) return slice;
+        return linkifyPastedSlice(slice);
+      },
       handlePaste: (view, event) => this.#handleImagePaste(view, event),
       handleDOMEvents: {
         blur: () => {

@@ -1,5 +1,11 @@
 # WYSIWYG Markdown editor architecture
 
+URL linkification is paste-only: the element's `transformPasted` hook calls
+`linkifyPastedSlice()` on clipboard content, preserving existing marks and slice
+boundaries and skipping code/links. Markdown parsing disables bare-URL linkification,
+so manual source edits and mode changes do not restore deliberately removed links.
+Explicit `[text](URL)` and `<URL>` syntax continue to parse as links.
+
 This document describes the editor as it exists in the SideNote repository.
 The editor is reusable first-party code, but it is developed and released as an
 internal npm workspace rather than as a separate repository.

@@ -62,7 +62,7 @@ describe('Markdown conversion', () => {
   it('serializes automatic links with explicit Markdown link syntax', () => {
     const url = 'https://youtu.be/YcO-MxPf_Vg?si=--UyINcJ33oxOCE-';
 
-    expect(serializeMarkdown(parseMarkdown(url))).toBe(`[${url}](${url})`);
+    expect(serializeMarkdown(parseMarkdown(url))).toBe(url);
     expect(serializeMarkdown(parseMarkdown(`<${url}>`))).toBe(`[${url}](${url})`);
     expect(
       serializeMarkdown(parseMarkdown('[Example 방문하기](https://example.com)')),

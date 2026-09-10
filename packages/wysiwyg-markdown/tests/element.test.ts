@@ -29,6 +29,46 @@ function selectDocumentEnd(editor: WysiwygMarkdownElement): void {
 }
 
 describe('wysiwyg-markdown element', () => {
+  it('links pasted URLs but preserves URLs made plain in source across mode switches', async () => {
+    const editor = await createEditor();
+    editor.use({ name: 'test-paste-links', commands: {
+      pasteLinks: ({ view }) => view!.pasteText('Visit https://example.com/ and https://example.org/path?q=1.', new Event('paste') as ClipboardEvent),
+    } });
+    editor.execute('pasteLinks');
+    expect(editor.value).toBe('Visit [https://example.com/](https://example.com/) and [https://example.org/path?q=1](https://example.org/path?q=1).');
+    editor.setMode('source');
+    await editor.updateComplete;
+    const source = editor.renderRoot.querySelector<HTMLTextAreaElement>('textarea')!;
+    source.value = 'Visit https://example.com/';
+    source.dispatchEvent(new Event('input', { bubbles: true }));
+    editor.setMode('wysiwyg');
+    await editor.updateComplete;
+    expect(editor.renderRoot.querySelector('a')).toBeNull();
+    editor.setMode('source');
+    editor.setMode('wysiwyg');
+    await editor.updateComplete;
+    expect(editor.value).toBe('Visit https://example.com/');
+    expect(editor.renderRoot.querySelector('a')).toBeNull();
+  });
+
+  it('does not link pasted code and retains existing rich-text links', async () => {
+    const editor = await createEditor('```text\ncode\n```');
+    selectDocumentEnd(editor);
+    editor.use({ name: 'test-paste-code', commands: {
+      pasteCode: ({ view }) => view!.pasteText('https://example.com/', new Event('paste') as ClipboardEvent),
+    } });
+    editor.execute('pasteCode');
+    expect(editor.value).not.toContain('[https:');
+    const rich = await createEditor();
+    rich.use({ name: 'test-paste-html', commands: {
+      pasteRich: ({ view }) => view!.pasteHTML('<p><a href="https://example.com/">Example</a> <code>https://code.example/</code> https://other.example/</p>', new Event('paste') as ClipboardEvent),
+    } });
+    rich.execute('pasteRich');
+    expect(rich.value).toContain('[Example](https://example.com/)');
+    expect(rich.value).toContain('`https://code.example/`');
+    expect(rich.value).toContain('[https://other.example/](https://other.example/)');
+  });
+
   it('uses one background variable across every fenced code body layer', () => {
     expect(editorStyles.cssText).toContain(
       '--editor-code-background: var(--editor-muted-background)',

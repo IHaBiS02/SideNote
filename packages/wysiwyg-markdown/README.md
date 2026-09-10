@@ -2,6 +2,10 @@
 
 English | [한국어](./README.ko.md)
 
+WYSIWYG paste links HTTP(S) URLs in text automatically. Code and existing links
+are preserved. Bare URLs typed or edited in source stay plain across mode changes;
+loading Markdown does not automatically linkify them.
+
 The internal WYSIWYG Markdown editor used by SideNote. It is an extensible Web
 Component built with Lit and ProseMirror and is maintained in the SideNote npm
 workspace.

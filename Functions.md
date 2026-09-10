@@ -49,6 +49,10 @@ and deterministically regenerates the root `LIBRARY_LICENSES.md` file.
 
 ### src/core/markdown.ts
 
+- `linkifyPastedSlice(slice)`: Marks pasted HTTP(S) URLs as links without changing
+  surrounding formatting, existing links, code, or slice boundaries. Called only
+  by WYSIWYG paste; `parseMarkdown()` leaves bare URLs as plain text.
+
 - `markdownSchema`: ProseMirror schema used by every editor instance. It
   extends CommonMark with task-list state, strikethrough, soft breaks, fenced
   code language metadata, and image metadata.
