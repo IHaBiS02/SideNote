@@ -1,5 +1,14 @@
 # SideNote published notes
 
+The left sidebar switches between list and note views. Initially the right pane
+is empty; selecting a note opens matching editors on both sides. Edits synchronize
+in both directions; mode and scroll are independent. Back returns to the list and
+clears the expanded view. Direct hash links still open their note. At widths up
+to 760px or in portrait orientation, only the full-height sidebar is shown.
+Hold a pinned row for 150ms to reorder it with SideNote's original drag controller.
+New pins append to the pinned group; drag order and edits reset on refresh.
+The source sync command also refreshes the drag controller and expanded-editor CSS.
+
 A GitHub Pages site using SideNote's real Lit/ProseMirror editor. Published
 content lives in .snote archives. Visitors can edit in WYSIWYG, double-click
 to edit the whole Markdown document, then return with Edit/WYSIWYG,
@@ -14,9 +23,9 @@ or [Korean reference](WYSIWYG_INPUT_BEHAVIORS.ko.md).
 
 The list reuses SideNote's source CSS, icon spacing, 51px header and 41px footer.
 The gear opens theme settings. Pins are clickable and sort pinned notes first,
-preserving manifest order within each group. Pin changes reset on refresh.
+preserving manifest order for unpinned notes. Pin changes reset on refresh.
 Add/import/delete are unavailable on this published demo. The browser-owned
-panel frame is not part of the website. Small screens put the list above the editor.
+panel frame is not part of the website. Small screens show only the sidebar.
 
 ## Publishing notes
 

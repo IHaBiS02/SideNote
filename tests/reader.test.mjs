@@ -15,7 +15,7 @@ async function waitFor(predicate) {
   throw new Error('Reader did not reach the expected state');
 }
 
-async function reader(t, { hash = '', archive, fetchOverride } = {}) {
+async function reader(t, { hash = '#welcome', archive, fetchOverride } = {}) {
   const dom = new JSDOM(await read('index.html'), { url: `https://example.org/SideNote/${hash}`, runScripts: 'outside-only', pretendToBeVisual: true });
   t.after(() => dom.window.close());
   const w = dom.window;
@@ -32,6 +32,7 @@ async function reader(t, { hash = '', archive, fetchOverride } = {}) {
   w.Range.prototype.getBoundingClientRect = () => ({ left: 0, right: 0, top: 0, bottom: 0 });
   w.eval((await read('vendor/highlight.min.js')).toString());
   const stripExports = text => text.replace(/export\s*\{[^}]+\};/g, '');
+  w.eval((await read('vendor/constants.js')).toString().replaceAll('export ', '') + '\n' + stripExports((await read('vendor/pinned-note-drag.js')).toString().replace(/^import .*;$/gm, '')) + '\nwindow.createPinnedNoteDragController = createPinnedNoteDragController;');
   w.eval('(() => {' + stripExports((await read('vendor/wysiwyg-markdown.js')).toString()) + '\n})()');
   w.eval(stripExports((await read('vendor/note-content-styles.js')).toString()) + '\nwindow.createNoteContentStyles = createNoteContentStyles;');
   w.eval(stripExports((await read('vendor/sidenote-editor-theme.js')).toString().replace(/^import .*;$/gm, '')) + '\nwindow.SIDENOTE_EDITOR_THEME = SIDENOTE_EDITOR_THEME; window.highlightCode = highlightCode;');
@@ -74,7 +75,7 @@ test('opens .snote with images, settings, highlighting, copy and theme; frees im
   assert.equal(w.localStorage.getItem('sidenote-site-theme'), 'dark');
   w.location.hash = '#welcome';
   await waitFor(() => doc.querySelector('#note-title').textContent === 'Welcome to SideNote' && doc.querySelector('#status').hidden);
-  assert.deepEqual(revoked, ['blob:note-1']);
+  assert.ok(revoked.includes('blob:note-1'));
 });
 
 test('sanitizes archive HTML and reports malformed archives and unknown routes', async t => {
@@ -86,7 +87,7 @@ test('sanitizes archive HTML and reports malformed archives and unknown routes',
   assert.equal(w.pwned, undefined);
   assert.equal(w.document.querySelector('#markdown-editor').shadowRoot.querySelector('script, [onerror], a[href^="javascript:"]'), null);
   w.location.hash = '#unknown';
-  await waitFor(() => w.document.querySelector('#note-title').textContent === 'Note not found');
+  await waitFor(() => w.document.querySelector('#list-status').textContent.includes('Note not found'));
   assert.equal(w.document.querySelector('#download').hidden, true);
   const broken = new JSZip(); broken.file('note.md', 'No metadata');
   const other = await reader(t, { archive: await broken.generateAsync({ type: 'nodebuffer' }) });
@@ -142,7 +143,7 @@ test('pins sort first, toggles preserve the reader, and a fresh load restores pu
   assert.deepEqual(order(), ['welcome', 'publishing']);
   const body = doc.querySelector('#content').firstChild;
   pin('publishing').click();
-  assert.deepEqual(order(), ['publishing', 'welcome']);
+  assert.deepEqual(order(), ['welcome', 'publishing']);
   assert.equal(pin('publishing').getAttribute('aria-pressed'), 'true');
   assert.equal(doc.activeElement, pin('publishing'));
   assert.equal(doc.querySelector('#content').firstChild, body);
@@ -169,4 +170,50 @@ test('a late response cannot replace a more recently selected note', async t => 
   release({ ok: true, arrayBuffer: async () => bytes });
   await new Promise(resolve => setTimeout(resolve, 50));
   assert.equal(w.document.querySelector('#note-title').textContent, 'Publish your own notes');
+});
+
+test('starts with a blank expanded pane and synchronizes both editors after selection', async t => {
+  const { w } = await reader(t, { hash: '' });
+  const doc = w.document;
+  await waitFor(() => doc.querySelectorAll('.note-link').length === 2);
+  assert.equal(doc.querySelector('#expanded-note').hidden, true);
+  assert.equal(doc.querySelector('#sidebar-note').hidden, true);
+  assert.equal(doc.querySelector('#markdown-editor'), null);
+  doc.querySelector('.note-link').click();
+  await waitFor(() => doc.querySelector('#markdown-editor') && doc.querySelector('#expanded-editor'));
+  const left = doc.querySelector('#markdown-editor');
+  const right = doc.querySelector('#expanded-editor');
+  await Promise.all([left.updateComplete, right.updateComplete]);
+  assert.equal(doc.querySelector('#list-view').hidden, true);
+  left.insertText('Left edit ');
+  await right.updateComplete;
+  assert.equal(left.value, right.value);
+  right.insertText('Right edit');
+  await left.updateComplete;
+  assert.equal(left.value, right.value);
+  assert.match(left.value, /Right edit/);
+  doc.querySelector('#back-to-list').click();
+  await waitFor(() => !doc.querySelector('#list-view').hidden);
+  assert.equal(doc.querySelector('#expanded-note').hidden, true);
+});
+
+test('uses the source long-press controller to reorder pinned rows without opening them', async t => {
+  const { w } = await reader(t, { hash: '' });
+  const doc = w.document;
+  await waitFor(() => doc.querySelectorAll('.note-link').length === 2);
+  doc.querySelector('li[data-note-id="publishing"] .pin-note-icon').click();
+  const rows = [...doc.querySelectorAll('#note-list > li')];
+  rows.forEach((row, index) => { row.getBoundingClientRect = () => ({ top: index * 50, bottom: index * 50 + 50, left: 0, right: 360, width: 360, height: 50 }); });
+  function pointer(target, type, y) {
+    const event = new w.MouseEvent(type, { bubbles: true, cancelable: true, clientX: 20, clientY: y, buttons: type === 'pointerup' ? 0 : 1 });
+    Object.defineProperties(event, { pointerId: { value: 1 }, isPrimary: { value: true } });
+    target.dispatchEvent(event);
+  }
+  pointer(rows[1], 'pointerdown', 70);
+  await waitFor(() => rows[1].classList.contains('pinned-note-dragging'));
+  pointer(w, 'pointermove', 0);
+  pointer(w, 'pointerup', 0);
+  assert.deepEqual([...doc.querySelectorAll('.note-link')].map(link => link.dataset.id), ['publishing', 'welcome']);
+  assert.equal(doc.querySelector('#expanded-note').hidden, true);
+  assert.equal(w.localStorage.length, 0);
 });

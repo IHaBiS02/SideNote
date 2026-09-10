@@ -1,9 +1,9 @@
 import './vendor/wysiwyg-markdown.js';
 import { highlightCode, SIDENOTE_EDITOR_THEME } from './vendor/sidenote-editor-theme.js';
 
-export function mountEditor(container, zip, settings, draft) {
+export function mountEditor(container, zip, settings, draft, options = {}) {
   const editor = document.createElement('wysiwyg-markdown');
-  editor.id = 'markdown-editor';
+  editor.id = options.id || 'markdown-editor';
   editor.setAttribute('aria-label', 'Try editing this note');
   editor.sourceEditScope = 'document';
   editor.themeCss = SIDENOTE_EDITOR_THEME;
@@ -35,9 +35,12 @@ export function mountEditor(container, zip, settings, draft) {
   };
   editor.value = draft.markdown;
   editor.addEventListener('input', event => {
-    if (alive && typeof event.detail?.markdown === 'string') draft.markdown = event.detail.markdown;
+    if (alive && typeof event.detail?.markdown === 'string') {
+      draft.markdown = event.detail.markdown;
+      options.onInput?.(draft.markdown);
+    }
   });
-  const toggle = document.querySelector('#toggle-view-button');
+  const toggle = document.querySelector(options.toggle || '#toggle-view-button');
   const updateMode = () => { toggle.textContent = editor.mode === 'source' ? 'WYSIWYG' : 'Edit'; };
   editor.addEventListener('mode-change', updateMode);
   toggle.onclick = () => { editor.setMode(editor.mode === 'source' ? 'wysiwyg' : 'source'); };
@@ -49,7 +52,6 @@ export function mountEditor(container, zip, settings, draft) {
   container.replaceChildren(editor);
   updateMode();
   return () => {
-    draft.markdown = editor.value;
     alive = false;
     editor.remove();
     toggle.onclick = null;

@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="vendor/sidenote-controls.css">
   <link rel="stylesheet" href="vendor/sidepanel.css">
   <link rel="stylesheet" href="vendor/dark_mode.css">
+  <link rel="stylesheet" href="vendor/expanded-editor.css">
   <link rel="stylesheet" href="style.css">
   <script defer src="vendor/jszip.min.js"></script>
   <script defer src="vendor/highlight.min.js"></script>
@@ -16,7 +17,8 @@
 </head>
 <body>
   <a class="skip-link" href="#content">Skip to note</a>
-  <aside id="list-view" aria-label="Published notes">
+  <aside id="sidebar" aria-label="SideNote">
+   <section id="list-view" aria-label="Published notes">
     <header class="header"><h1 id="notes-list-title">Notes</h1><button disabled title="Create notes in the SideNote extension">+</button></header>
     <nav aria-label="Note selection"><ul id="note-list"></ul></nav>
     <div class="toolbar">
@@ -28,11 +30,20 @@
       <div class="header"><button id="close-settings" aria-label="Back to notes">&lt;</button><h2>Settings</h2></div>
       <div class="settings-body"><label for="theme">Mode</label><select id="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select><p><a href="LIBRARY_LICENSES.md">Licenses</a></p></div>
     </section>
-  </aside>
-  <main>
-    <header class="header"><h2 id="note-title">SideNote</h2><a id="download" hidden>Download original .snote ↓</a></header>
+   </section>
+   <section id="sidebar-note" hidden>
+    <header class="header"><button id="back-to-list" aria-label="Back to notes">&lt;</button><h2 id="note-title"></h2></header>
     <div id="reader"><p id="status" role="status">Loading notes…</p><article id="content" tabindex="-1" aria-labelledby="note-title"></article></div>
-    <div class="demo-toolbar"><button id="toggle-view-button">Edit</button><span>Try editing · Double-click for Markdown · Refresh to reset</span></div>
+    <div class="demo-toolbar"><button id="toggle-view-button">Edit</button><div class="toolbar-right"><button disabled title="Import through the repository">📂</button><button id="sidebar-download" aria-label="Download original note">💾</button><button id="note-settings" aria-label="Settings">⚙️</button></div></div>
+   </section>
+   <p id="list-status" role="status"></p>
+  </aside>
+  <main id="expanded-pane" aria-label="Expanded note">
+   <section id="expanded-note" hidden>
+    <header class="header"><h2 id="expanded-title"></h2><a id="download" hidden>Download original .snote ↓</a></header>
+    <article id="expanded-content"></article>
+    <div class="demo-toolbar"><button id="expanded-toggle">Edit</button><span>Try editing · Refresh to reset</span></div>
+   </section>
   </main>
   <noscript>This site needs JavaScript to open .snote archives.</noscript>
 </body>

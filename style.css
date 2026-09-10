@@ -99,3 +99,25 @@ noscript { display: none; }
   #reader { padding: 0; }
   .header { gap: 8px; }
 }
+
+/* The sidebar is a complete list/editor viewport; the right pane is optional. */
+#sidebar { position: relative; overflow: hidden; }
+#sidebar-note, #expanded-note { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+#expanded-content { flex: 1; min-height: 0; overflow: hidden; }
+#sidebar-note .header { flex-shrink: 0; }
+#sidebar-note #note-title { flex: 1; text-align: center; font-size: 18px; }
+#sidebar-note .demo-toolbar { justify-content: space-between; }
+#sidebar-note .demo-toolbar button { background: none; border: 1px solid transparent; padding: 5px 10px; }
+#sidebar-note .demo-toolbar button:hover:enabled { background: var(--hover); }
+#sidebar-note #note-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#list-status { position: absolute; bottom: 48px; padding: 10px; pointer-events: none; }
+#list-view nav { overflow: hidden; }
+#list-view #note-list { position: absolute; inset: 0; overflow-y: auto; }
+#list-view #note-list li[data-pinned="true"] .note-link { cursor: grab; }
+#list-view #note-list li.pinned-note-drop-placeholder { display: block; padding: 0; border: 1px dashed var(--border); }
+#list-view #note-list li.pinned-note-dragging { position: fixed; background: var(--bg); }
+@media (max-width: 760px), (orientation: portrait) {
+  body { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+  #expanded-pane { display: none; }
+  #sidebar { border: 0; }
+}

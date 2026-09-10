@@ -1,4 +1,5 @@
 import { mountEditor } from './editor-session.js';
+import { createPinnedNoteDragController } from './vendor/pinned-note-drag.js';
 const list = document.querySelector('#note-list');
 const content = document.querySelector('#content');
 const title = document.querySelector('#note-title');
@@ -10,15 +11,32 @@ let notes = [];
 let revision = 0;
 let disposeEditor = null;
 const drafts = new Map();
+let pinOrder = [];
+let dragController;
+const sidebarNote = document.querySelector('#sidebar-note');
+const expandedNote = document.querySelector('#expanded-note');
+const listView = document.querySelector('#list-view');
+let settingsReturnToNote = false;
+document.querySelector('#note-settings').onclick = () => {
+  settingsReturnToNote = true;
+  listView.hidden = false;
+  sidebarNote.hidden = true;
+  document.querySelector('#global-settings-button').click();
+};
+document.querySelector('#back-to-list').onclick = () => { location.hash = ''; };
+document.querySelector('#sidebar-download').onclick = () => { if (!download.hidden) download.click(); };
 
 // Stable sorting keeps manifest order within each group; pins are memory-only.
 function orderedNotes() {
-  return [...notes].sort((a, b) => Number(b.pinned === true) - Number(a.pinned === true));
+  return [...notes].sort((a, b) => Number(b.pinned === true) - Number(a.pinned === true)
+    || (a.pinned && b.pinned ? pinOrder.indexOf(a.id) - pinOrder.indexOf(b.id) : 0));
 }
 
 function sortNoteList() {
+  dragController?.destroy();
   const rows = new Map([...list.children].map(row => [row.dataset.noteId, row]));
   for (const note of orderedNotes()) list.append(rows.get(note.id));
+  dragController = createPinnedNoteDragController(list, ids => { pinOrder = ids; }, { longPressDelayMs: 150 });
 }
 
 function updatePin(button, note) {
@@ -40,6 +58,13 @@ document.querySelector('#global-settings-button').addEventListener('click', () =
 });
 document.querySelector('#close-settings').addEventListener('click', () => {
   settingsPanel.hidden = true;
+  if (settingsReturnToNote) {
+    settingsReturnToNote = false;
+    listView.hidden = true;
+    sidebarNote.hidden = false;
+    document.querySelector('#note-settings').focus();
+    return;
+  }
   document.querySelector('#global-settings-button').focus();
 });
 document.querySelector('#save-note').addEventListener('click', () => {
@@ -57,6 +82,8 @@ systemTheme.addEventListener('change', applyTheme);
 applyTheme();
 
 async function openNote() {
+  settingsReturnToNote = false;
+  settingsPanel.hidden = true;
   const current = ++revision;
   disposeEditor?.();
   disposeEditor = null;
@@ -65,18 +92,23 @@ async function openNote() {
   status.hidden = false;
   let id;
   try { id = decodeURIComponent(location.hash.slice(1)); } catch { id = null; }
-  const note = id === '' ? orderedNotes()[0] : notes.find(entry => entry.id === id);
+  const note = notes.find(entry => entry.id === id);
+  sidebarNote.hidden = !note;
+  expandedNote.hidden = !note;
+  listView.hidden = Boolean(note);
+  document.querySelector('#list-status').textContent = '';
   for (const link of list.querySelectorAll('a')) {
     if (link.dataset.id === note?.id) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
   }
   if (!note) {
-    title.textContent = 'Note not found';
-    document.title = 'Note not found · SideNote';
-    status.textContent = 'Choose a note from the list.';
+    document.title = 'SideNote · Notes';
+    status.hidden = true;
+    if (id) document.querySelector('#list-status').textContent = 'Note not found. Choose a note from the list.';
     return;
   }
   title.textContent = note.title;
+  document.querySelector('#expanded-title').textContent = note.title;
   document.title = `${note.title} · SideNote`;
   status.textContent = 'Opening note…';
   try {
@@ -94,7 +126,22 @@ async function openNote() {
     title.textContent = typeof metadata.title === 'string' && metadata.title ? metadata.title : note.title;
     document.title = `${title.textContent} · SideNote`;
     if (!drafts.has(note.id)) drafts.set(note.id, { markdown, images: new Map() });
-    disposeEditor = mountEditor(content, zip, metadata.settings || {}, drafts.get(note.id));
+    document.querySelector('#expanded-title').textContent = title.textContent;
+    const draft = drafts.get(note.id);
+    let syncing = false;
+    const syncTo = (selector, value) => {
+      const target = document.querySelector(selector);
+      if (syncing || !target || target.value === value) return;
+      syncing = true;
+      try { target.value = value; } finally { syncing = false; }
+    };
+    const left = mountEditor(content, zip, metadata.settings || {}, draft, {
+      onInput: value => syncTo('#expanded-editor', value),
+    });
+    const right = mountEditor(document.querySelector('#expanded-content'), zip, metadata.settings || {}, draft, {
+      id: 'expanded-editor', toggle: '#expanded-toggle', onInput: value => syncTo('#markdown-editor', value),
+    });
+    disposeEditor = () => { left(); right(); };
     document.querySelector('#reader').scrollTop = 0;
     status.hidden = true;
     download.href = note.file;
@@ -124,6 +171,8 @@ async function start() {
       note.pinned = note.pinned === true;
       const item = document.createElement('li');
       item.dataset.noteId = note.id;
+      item.dataset.pinned = String(note.pinned);
+      if (note.pinned) pinOrder.push(note.id);
       const link = document.createElement('a');
       link.className = 'note-link';
       link.href = `#${encodeURIComponent(note.id)}`;
@@ -137,6 +186,9 @@ async function start() {
       updatePin(pin, note);
       pin.addEventListener('click', () => {
         note.pinned = !note.pinned;
+        item.dataset.pinned = String(note.pinned);
+        pinOrder = pinOrder.filter(id => id !== note.id);
+        if (note.pinned) pinOrder.push(note.id);
         updatePin(pin, note);
         sortNoteList();
         pin.focus({ preventScroll: true });
@@ -152,6 +204,6 @@ async function start() {
     sortNoteList();
     window.addEventListener('hashchange', openNote);
     await openNote();
-  } catch (error) { status.textContent = error.message; }
+  } catch (error) { document.querySelector('#list-status').textContent = error.message; }
 }
 start();
