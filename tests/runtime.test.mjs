@@ -14,6 +14,7 @@ globalThis.FileReader = class {
 };
 const root = new URL('../', import.meta.url);
 const read = async path => (await readFile(new URL(path, root))).toString();
+const publishedNoteCount = JSON.parse(await read('notes/index.json')).length;
 async function waitFor(predicate) {
   for (let i = 0; i < 400; i++) {
     if (predicate()) return;
@@ -68,7 +69,7 @@ async function app(t, platform, expanded = false) {
 test('original app loads all settings, creates notes, and keeps original Escape navigation', async t => {
   const { w, state } = await app(t);
   const doc = w.document;
-  assert.equal(state.notes.length, 2);
+  assert.equal(state.notes.length, publishedNoteCount);
   assert.equal(state.activeNoteId, null);
   doc.getElementById('global-settings-button').click();
   assert.equal(doc.getElementById('settings-view').style.display, 'block');
@@ -77,7 +78,7 @@ test('original app loads all settings, creates notes, and keeps original Escape 
   await waitFor(() => doc.getElementById('list-view').style.display === 'block');
   doc.getElementById('new-note-button').click();
   await waitFor(() => state.activeNoteId);
-  assert.equal(state.notes.length, 3);
+  assert.equal(state.notes.length, publishedNoteCount + 1);
   const title = doc.getElementById('editor-title');
   title.dispatchEvent(new w.MouseEvent('dblclick', { bubbles: true }));
   title.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
@@ -103,7 +104,7 @@ test('original editor edits synchronize in both directions; reload resets all da
   await waitFor(() => leftEditor.value === 'Edited on right');
   await left.w.browser.storage.local.set({ globalSettings: { mode: 'dark' } });
   const fresh = await app(t);
-  assert.equal(fresh.state.notes.length, 2);
+  assert.equal(fresh.state.notes.length, publishedNoteCount);
   assert.equal(fresh.state.activeNoteId, null);
   assert.deepEqual(fresh.platform.storage, {});
   assert.notEqual(fresh.platform.indexedDB, left.platform.indexedDB);
@@ -128,7 +129,7 @@ test('original pin, recycle, settings persistence and archive export operate on 
   await waitFor(() => doc.querySelector('[data-note-id="publishing"]').dataset.pinned === 'true');
   doc.querySelector('[data-note-id="welcome"] .delete-note-icon').click();
   await waitFor(() => state.deletedNotes.length === 1 && !doc.querySelector('[data-note-id="welcome"]'));
-  assert.equal(state.notes.length, 1);
+  assert.equal(state.notes.length, publishedNoteCount - 1);
   doc.getElementById('global-settings-button').click();
   const mode = doc.getElementById('mode-setting');
   mode.value = 'dark';

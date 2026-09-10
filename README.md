@@ -33,6 +33,9 @@ images remain subject to normal website permissions, CORS and browser support.
 
 ## Publish notes
 
+The published list includes `notes/markdown-syntax-test.snote`, the supplied
+SideNote Markdown Syntax Test archive, for trying Markdown and editor behaviors.
+
 Export `.snote` files from SideNote into `notes/`, then add entries to `notes/index.json`:
 
 ```json

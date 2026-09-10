@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const JSZip = require('../app/vendor/jszip.min.js');
+const marked = require('../app/vendor/marked.min.js');
 const notes = JSON.parse(await readFile(new URL('../notes/index.json', import.meta.url), 'utf8'));
 test('published notes have unique routes and valid SideNote archives', async () => {
   const ids = new Set();
@@ -17,8 +18,11 @@ test('published notes have unique routes and valid SideNote archives', async () 
     const metadata = JSON.parse(await archive.file('metadata.json').async('string'));
     assert.equal(typeof metadata.title, 'string');
     const markdown = await archive.file('note.md').async('string');
-    for (const match of markdown.matchAll(/!\[[^\]]*\]\((images\/[^)]+)\)/g)) {
-      assert.ok(archive.file(match[1]), `Missing attachment ${match[1]}`);
-    }
+    // Code examples containing image syntax are not rendered attachments.
+    marked.walkTokens(marked.lexer(markdown), token => {
+      if (token.type === 'image' && token.href.startsWith('images/')) {
+        assert.ok(archive.file(token.href), `Missing attachment ${token.href}`);
+      }
+    });
   }
 });

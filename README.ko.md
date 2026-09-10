@@ -31,6 +31,9 @@ WYSIWYG/소스 편집·내보내기 메뉴는 모두 원본 처리입니다. 다
 
 ## 노트 게시
 
+제공된 `SideNote Markdown Syntax Test.snote`는 `notes/markdown-syntax-test.snote`로
+게시 목록에 포함되어 있어 Markdown과 에디터 기능을 직접 시험할 수 있습니다.
+
 SideNote에서 내보낸 `.snote`를 `notes/`에 넣고 `notes/index.json`에 추가합니다.
 
 ```json

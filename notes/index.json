@@ -1,4 +1,5 @@
 [
   { "id": "welcome", "title": "Welcome to SideNote", "file": "notes/welcome.snote", "pinned": true },
-  { "id": "publishing", "title": "Publish your own notes", "file": "notes/publishing.snote" }
+  { "id": "publishing", "title": "Publish your own notes", "file": "notes/publishing.snote" },
+  { "id": "markdown-syntax-test", "file": "notes/markdown-syntax-test.snote" }
 ]

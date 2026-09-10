@@ -145,8 +145,12 @@ selection highlighting.
 
 ### URLs
 
-When WYSIWYG mode recognizes a pasted URL as a link, it always stores explicit
-Markdown link syntax even when the display text and URL are identical.
+Pasting in WYSIWYG mode automatically links HTTP(S) URLs, including multiple URLs
+inside surrounding text. Each link uses explicit Markdown syntax, even when the
+display text and URL are identical. Existing links and code are left unchanged.
+This conversion runs only on paste: bare URLs typed manually, loaded from source,
+or deliberately changed back to plain text remain plain through mode switches.
+Pasting in source mode does not add Markdown links.
 
 ```markdown
 [https://example.com](https://example.com)
