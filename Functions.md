@@ -230,7 +230,7 @@ Central state management for shared variables:
 ## src/constants.ts
 
 - `THIRTY_DAYS_MS`: Recycle-bin retention period
-- `DEFAULT_PINNED_NOTE_DRAG_DELAY_MS`: Default pinned-note hold delay (`150ms`)
+- `DEFAULT_PINNED_NOTE_DRAG_DELAY_MS`: Default pinned-note hold delay (`350ms`)
 - `MIN_PINNED_NOTE_DRAG_DELAY_MS` / `MAX_PINNED_NOTE_DRAG_DELAY_MS`: Allowed
   global hold-delay range (`100`–`2000ms`)
 
@@ -359,7 +359,7 @@ Settings management (functions exported):
 - `normalizeGlobalSettings(settings)`: Merges partial global settings with defaults
 - `normalizeLineHeight(value, fallback)`: Clamps line spacing to `1.0`–`3.0` and rounds it to `0.1` precision, using the supplied fallback (`1.5` by default)
 - `normalizePinnedNoteDragDelay(value, fallback)`: Normalizes the global-only
-  pinned-note hold delay to an integer from 100 to 2000ms, defaulting to 150ms
+  pinned-note hold delay to an integer from 100 to 2000ms, defaulting to 350ms
 - `resolveEffectiveSettings(note)`: Resolves note-specific settings with global/default fallback
 - `resolveLegacyTextProcessingSettings(settings)`: Returns legacy paste-processing settings, forcing the two-space line-break transform off unless legacy mode is enabled
 - `saveGlobalSettings()`: Saves the global settings to chrome.storage.local
@@ -497,7 +497,7 @@ Note list and editor functionality:
 ### src/notes_view/pinned-note-drag.ts
 
 - `createPinnedNoteDragController(list, onReorder, options)`: Distinguishes a
-  short click/scroll from a configurable long press (150ms by default) and
+  short click/scroll from a configurable long press (350ms by default) and
   reorders only pinned list items with
   Pointer Events. Once active, the grabbed row becomes a smaller fixed floating
   card and a rounded animated placeholder moves through the list to create the

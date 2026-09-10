@@ -129,7 +129,7 @@ describe('settings UI helpers', () => {
 
     expect(populateSettingsForm(true)).toBe(true);
     expect(container.hidden).toBe(false);
-    expect(input.value).toBe('150');
+    expect(input.value).toBe('350');
 
     expect(populateSettingsForm(false, {
       id: 'note-1',

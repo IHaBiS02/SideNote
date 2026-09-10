@@ -33,7 +33,7 @@ vi.mock('../../src/settings.js', () => ({
   applyFontSize: mocks.applyFontSize,
   applyLineHeightSettings: mocks.applyLineHeightSettings,
   isCodeBlockHeaderEnabled: vi.fn(() => true),
-  normalizeGlobalSettings: vi.fn(() => ({ pinnedNoteDragDelayMs: 150 })),
+  normalizeGlobalSettings: vi.fn(() => ({ pinnedNoteDragDelayMs: 350 })),
   resolveEffectiveSettings: vi.fn(() => ({ fontSize: 14 })),
   updateLegacyLineBreakControls: mocks.updateLegacyLineBreakControls,
   updateTildeReplacementButton: mocks.updateTildeReplacementButton,

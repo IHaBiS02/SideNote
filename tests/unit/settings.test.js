@@ -26,7 +26,7 @@ describe('settings model helpers', () => {
     expect(settings.lineHeight).toBe(1.5);
     expect(settings.sourceLineHeight).toBe(1.2);
     expect(settings.codeLineHeight).toBe(1.2);
-    expect(settings.pinnedNoteDragDelayMs).toBe(150);
+    expect(settings.pinnedNoteDragDelayMs).toBe(350);
     expect(settings.mode).toBe('dark');
     expect(settings.wysiwygPreview).toBe(true);
     expect(settings.preventExtraEmptyParagraphs).toBe(true);
@@ -47,7 +47,7 @@ describe('settings model helpers', () => {
   });
 
   it('normalizes the pinned-note hold delay to an integer from 100 to 2000ms', () => {
-    expect(normalizePinnedNoteDragDelay(undefined)).toBe(150);
+    expect(normalizePinnedNoteDragDelay(undefined)).toBe(350);
     expect(normalizePinnedNoteDragDelay(50)).toBe(100);
     expect(normalizePinnedNoteDragDelay(450.6)).toBe(451);
     expect(normalizePinnedNoteDragDelay(2500)).toBe(2000);
