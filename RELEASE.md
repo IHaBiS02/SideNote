@@ -4,21 +4,20 @@
 
 ## 태그 생성 및 전송
 
-Windows PowerShell에서 저장소 루트 디렉터리로 이동한 뒤 실행합니다.
+Node.js와 npm이 설치된 환경에서 저장소 루트 디렉터리로 이동한 뒤 실행합니다. Windows, macOS, Linux에서 같은 npm 명령을 사용합니다.
 
-```powershell
-$version = (Get-Content -LiteralPath package.json | ConvertFrom-Json).version
-$manifestVersion = (Get-Content -LiteralPath manifest.json | ConvertFrom-Json).version
+먼저 두 버전이 일치하는지 확인합니다.
 
-if ($version -ne $manifestVersion) {
-    throw "package.json과 manifest.json의 버전이 다릅니다."
-}
+```sh
+node -e "const p = require('./package.json').version; const m = require('./manifest.json').version; if (p !== m) throw new Error('Version mismatch'); console.log('v' + p)"
+```
 
-$tag = "v$version"
+출력된 태그를 아래 `<version>` 자리에 넣습니다. 예를 들어 `v4.5.5`가 출력되면 `v<version>`을 `v4.5.5`로 바꿉니다.
 
+```sh
 git fetch origin --tags
-git tag -a $tag -m "Release $tag"
-git push origin $tag
+git tag -a v<version> -m "Release v<version>"
+git push origin v<version>
 ```
 
 태그가 푸시되면 [`.github/workflows/release.yml`](.github/workflows/release.yml)이 자동으로 실행되어 다음 작업을 수행합니다.
@@ -31,10 +30,10 @@ git push origin $tag
 
 로컬에서 같은 산출물을 만들려면 저장소 루트에서 다음 명령을 실행합니다.
 
-```powershell
-npm.cmd ci
-npm.cmd run test:run
-npm.cmd run build
+```sh
+npm ci
+npm run test:run
+npm run build
 ```
 
 `build/`에 다음 파일이 생성됩니다.

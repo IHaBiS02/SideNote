@@ -8,7 +8,7 @@ SideNote is a Chrome/Firefox browser extension that provides a simple note-takin
 
 ## Development Commands
 
-All developing command should run on windows environment, as the development environment is on windows 11.
+Development uses Node.js and npm on Windows, macOS, or Linux. Run the commands below from the repository root.
 
 ### Build
 ```bash
@@ -48,7 +48,7 @@ Checks both the SideNote extension runtime and the editor workspace.
 npm install
 ```
 
-**Note**: This is a Windows 11 development environment. Avoid using Linux/Mac-specific commands.
+**Note**: Keep shared development scripts cross-platform. Prefer Node.js APIs and portable npm tools over operating-system-specific shell commands.
 
 ## Architecture
 
@@ -160,7 +160,8 @@ npm install
   another explicit body-dependent feature, and image cleanup reads indexed IDs
   without loading image Blob values
 - **Lazy Vendors**: JSZip, Marked, DOMPurify, and html2pdf are packaged locally
-  but injected only for archive, license, HTML, or PDF operations
+  but injected only for archive, license, HTML, or PDF operations. Both global
+  and active-note imports await JSZip before reading an archive
 - **Shortcut Setup**: `background.ts` checks the activation command only on a
   fresh install and opens `shortcut-setup.html` when the browser reports no
   assigned shortcut

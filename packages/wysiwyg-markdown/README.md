@@ -12,17 +12,17 @@ workspace.
 
 ## Development from the SideNote root
 
-```powershell
-npm.cmd install
-npm.cmd run typecheck
-npm.cmd run test:editor
-npm.cmd run build:editor
+```sh
+npm install
+npm run typecheck
+npm run test:editor
+npm run build:editor
 ```
 
 Start the standalone demo app with:
 
-```powershell
-npm.cmd run demo --workspace @sidenote/wysiwyg-markdown
+```sh
+npm run demo --workspace @sidenote/wysiwyg-markdown
 ```
 
 The production editor build is written to

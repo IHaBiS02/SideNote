@@ -23,11 +23,11 @@ Official references:
 
 From the SideNote repository root:
 
-```powershell
-npm.cmd ci
-npm.cmd run test:run
-npm.cmd run typecheck
-npm.cmd run build
+```sh
+npm ci
+npm run test:run
+npm run typecheck
+npm run build
 ```
 
 `build` creates all browser builds and the reviewer source archive:

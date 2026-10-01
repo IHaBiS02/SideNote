@@ -129,6 +129,31 @@ describe('import/export events', () => {
     expect(document.getElementById('markdown-editor').value).toBe('# Imported');
   });
 
+  it.each(['snote', 'snotes'])('loads JSZip before a first global .%s import', async (extension) => {
+    delete globalThis.JSZip;
+    mocks.parseSnote.mockResolvedValue({});
+    mocks.saveParsedSnote.mockResolvedValue({ id: 'imported' });
+    mocks.parseSnotesArchive.mockResolvedValue([]);
+    mocks.saveImportedNotes.mockResolvedValue([]);
+    const state = await import('../../src/state.js');
+    state.setNotes([]);
+    const { initializeImportExportEvents } = await import('../../src/events/import-export-events.js');
+    initializeImportExportEvents();
+    const input = document.getElementById('global-import-input');
+    const file = new File(['zip'], `backup.${extension}`);
+    Object.defineProperty(input, 'files', { value: [file], configurable: true });
+    input.dispatchEvent(new Event('change'));
+    const script = document.querySelector('script[data-sidenote-vendor="jszip"]');
+    expect(script).not.toBeNull();
+    expect(mocks.renderNoteList).not.toHaveBeenCalled();
+    globalThis.JSZip = { loadAsync: vi.fn().mockResolvedValue({}) };
+    script.dispatchEvent(new Event('load'));
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(globalThis.JSZip.loadAsync).toHaveBeenCalledWith(file);
+    expect(mocks.renderNoteList).toHaveBeenCalledTimes(1);
+    script.remove();
+  });
+
   it('imports .snotes with existing notes available for order rebasing', async () => {
     const existingNote = {
       id: 'existing',

@@ -320,6 +320,7 @@ function initializeImportExportEvents(): void {
     }
 
     try {
+      await ensureJsZipLoaded();
       const zip = await JSZip.loadAsync(file);
       // Single note file (.snote)
       if (file.name.endsWith('.snote')) {
@@ -358,7 +359,6 @@ function initializeImportExportEvents(): void {
     }
     
     try {
-      await ensureJsZipLoaded();
       await ensureJsZipLoaded();
       const zip = await JSZip.loadAsync(file);
       const importedNote = await parseSnote(zip);

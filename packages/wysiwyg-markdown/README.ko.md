@@ -15,17 +15,17 @@ ProseMirror로 만든 확장 가능한 Web Component이며 SideNote npm workspac
 
 ## SideNote 루트에서 개발하기
 
-```powershell
-npm.cmd install
-npm.cmd run typecheck
-npm.cmd run test:editor
-npm.cmd run build:editor
+```sh
+npm install
+npm run typecheck
+npm run test:editor
+npm run build:editor
 ```
 
 독립 데모 앱은 다음 명령으로 실행합니다.
 
-```powershell
-npm.cmd run demo --workspace @sidenote/wysiwyg-markdown
+```sh
+npm run demo --workspace @sidenote/wysiwyg-markdown
 ```
 
 프로덕션 번들은

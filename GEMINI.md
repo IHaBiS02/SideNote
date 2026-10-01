@@ -11,6 +11,6 @@ Current architecture references:
 - [`Functions.md`](./Functions.md): application functions and editor API
 - [`packages/wysiwyg-markdown/ARCHITECTURE.md`](./packages/wysiwyg-markdown/ARCHITECTURE.md): Lit/ProseMirror editor internals
 
-The supported local development environment is Windows 11. The root
+Local development uses Node.js and npm on Windows, macOS, or Linux. The root
 `npm run build` command builds the editor, Chrome/Firefox extensions, and the
 Firefox AMO reviewer source archive.
