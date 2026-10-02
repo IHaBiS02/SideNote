@@ -97,7 +97,6 @@ function createNoteListItem(note: ListItem): HTMLLIElement {
   const controls = document.createElement('div');
   controls.className = 'button-container';
   for (const [className, label, text] of [
-    ...(isFolder(note) ? [['rename-folder-icon', 'Rename Folder', '✎']] : []),
     ['pin-note-icon', note.isPinned ? 'Unpin Item' : 'Pin Item', note.isPinned ? '📌' : '📎'],
     ['delete-note-icon', isFolder(note) ? 'Delete Folder and Contents' : 'Delete Note', '🗑️'],
   ]) {
@@ -109,9 +108,43 @@ function createNoteListItem(note: ListItem): HTMLLIElement {
   return li;
 }
 
+function editFolderTitle(): void {
+  const heading = document.getElementById('notes-list-title');
+  const folder = folders.find(item => item.id === currentFolderId && !item.metadata.deletedAt);
+  if (!heading || !folder || busy || heading.querySelector('input')) return;
+  clearSelection(); paintSelection();
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.id = 'folder-title-input';
+  input.className = 'title-input';
+  input.setAttribute('aria-label', 'Folder name');
+  input.value = folder.title;
+  let finished = false;
+  const finish = (): void => {
+    if (finished) return;
+    finished = true;
+    const name = input.value.trim();
+    heading.textContent = folder.title;
+    if (name && name !== folder.title) void runListAction(() => renameFolder(folder.id, name));
+  };
+  input.addEventListener('keydown', event => {
+    if (event.isComposing) return;
+    if (event.key === 'Enter' || event.key === 'Escape') {
+      event.preventDefault();
+      event.stopPropagation();
+      finish();
+    }
+  });
+  input.addEventListener('blur', finish);
+  heading.replaceChildren(input);
+  input.focus();
+  input.select();
+}
+
 function initializeNoteListClickDelegation(): void {
   if (noteListClickInitialized) return;
   noteListClickInitialized = true;
+  document.getElementById('notes-list-title')?.addEventListener('dblclick', editFolderTitle);
   noteList.setAttribute('role', 'listbox');
   noteList.setAttribute('aria-multiselectable', 'true');
   noteList.setAttribute('aria-label', 'Notes and folders');
@@ -125,8 +158,7 @@ function initializeNoteListClickDelegation(): void {
       button.textContent = 'Create Folder';
       button.onclick = () => {
         menu.remove();
-        const name = prompt('Folder name');
-        if (name !== null) void runListAction(() => createFolder(name));
+        void runListAction(() => createFolder('New Folder'));
       };
       menu.appendChild(button);
     } });
@@ -166,11 +198,6 @@ function initializeNoteListClickDelegation(): void {
     }
     if (event.target.closest('.pin-note-icon')) { await runListAction(() => toggleItemPin(item.id)); return; }
     if (event.target.closest('.delete-note-icon')) { await runListAction(() => trashItem(item.id)); return; }
-    if (event.target.closest('.rename-folder-icon')) {
-      const name = prompt('Folder name', item.title);
-      if (name !== null) await runListAction(() => renameFolder(item.id, name));
-      return;
-    }
     clearSelection(); paintSelection();
     if (isFolder(item)) openFolder(item.id);
     else await openNote(item.id);
@@ -197,7 +224,10 @@ function renderNoteList(): void {
   while (folder && !seen.has(folder.id)) {
     seen.add(folder.id); path.unshift(folder.title); folder = folders.find(f => f.id === folder!.parentId);
   }
-  if (heading) { heading.textContent = path.at(-1) ?? 'Notes'; heading.title = ['Notes', ...path].join(' / '); }
+  if (heading) {
+    heading.textContent = path.at(-1) ?? 'Notes';
+    heading.title = currentFolderId ? 'Double-click to rename folder' : 'Notes';
+  }
   const breadcrumb = document.getElementById('folder-path');
   if (breadcrumb) { breadcrumb.textContent = path.length ? ['Notes', ...path].join(' / ') : ''; breadcrumb.hidden = !path.length; }
   paintSelection();

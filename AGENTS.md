@@ -156,7 +156,7 @@ npm install
   remaining online dependencies. html2pdf.js
   directly downloads a non-interactive rasterized PDF without the print dialog
   or a remote conversion service
-- **Folders**: `+` context menu creates folders; Ctrl/Cmd/Shift selects one pin section; folder drops reset the moved item pin, header drops inherit the source folder pin. Folder contents keep their internal order. See `FOLDER_IMPLEMENTATION.md`.
+- **Folders**: `+` context menu immediately creates `New Folder`; double-click the open folder heading to rename inline (Enter/Escape/blur saves, empty names keep the original); Ctrl/Cmd/Shift selects one pin section; folder drops reset the moved item pin, header drops inherit the source folder pin. Folder contents keep their internal order. See `FOLDER_IMPLEMENTATION.md`.
 - **Pinned Note Ordering**: Pinned rows use delayed Pointer Events, a floating
   drag card, and an animated placeholder gap; completed drops persist
   normalized `pinOrder` values to IndexedDB while cancellation restores order

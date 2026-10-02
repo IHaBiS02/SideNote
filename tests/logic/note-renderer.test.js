@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   getNote: vi.fn(),
+  createFolder: vi.fn().mockResolvedValue(),
+  renameFolder: vi.fn(),
   visibleItems: vi.fn(),
   togglePin: vi.fn().mockResolvedValue(),
   deleteNote: vi.fn().mockResolvedValue(),
@@ -23,6 +25,8 @@ vi.mock('../../src/database/index.js', () => ({
 vi.mock('../../src/folders.js', async importOriginal => ({
   ...await importOriginal(),
   visibleItems: mocks.visibleItems,
+  createFolder: mocks.createFolder,
+  renameFolder: mocks.renameFolder,
   toggleItemPin: mocks.togglePin,
   trashItem: mocks.deleteNote,
   reorderItems: mocks.reorderPinnedNotes,
@@ -69,8 +73,14 @@ describe('note list renderer', () => {
     vi.clearAllMocks();
     const state = await import('../../src/state.js');
     const { children } = await import('../../src/folder-model.js');
+    mocks.renameFolder.mockImplementation(async (id, title) => {
+      const folder = state.folders.find(f => f.id === id);
+      if (folder) folder.title = title;
+    });
     mocks.visibleItems.mockImplementation(() => children({ notes: state.notes, folders: state.folders }, state.currentFolderId));
     document.body.innerHTML = `
+      <div id="folder-header"><h1 id="notes-list-title">Notes</h1><button id="new-note-button">+</button></div>
+      <div id="folder-path"></div>
       <ul id="note-list"></ul>
       <div id="markdown-editor"></div>
       <h1 id="editor-title"></h1>
@@ -150,6 +160,66 @@ describe('note list renderer', () => {
     expect(document.querySelectorAll('[data-note-id]')).toHaveLength(1);
     expect(document.querySelector('[data-note-id]').dataset.noteId).toBe('child');
     expect(document.querySelector('.item-selected')).toBeNull();
+  });
+
+  it('creates New Folder immediately without prompting or adding a rename control', async () => {
+    const state = await import('../../src/state.js');
+    state.setFolders([{ ...summary('folder', 'New Folder'), kind: 'folder', parentId: null, ownModifiedAt: 1 }]);
+    const prompt = vi.spyOn(window, 'prompt');
+    const { renderNoteList } = await import('../../src/notes_view/note-renderer.js');
+    renderNoteList();
+    document.getElementById('new-note-button').dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
+    document.querySelector('.folder-create-menu button').click();
+    await vi.waitFor(() => expect(mocks.createFolder).toHaveBeenCalledWith('New Folder'));
+    expect(prompt).not.toHaveBeenCalled();
+    expect(document.querySelector('.rename-folder-icon')).toBeNull();
+    expect(document.querySelectorAll('[data-kind="folder"] .button-container button')).toHaveLength(2);
+    prompt.mockRestore();
+  });
+
+  it.each(['Enter', 'Escape', 'blur'])('renames the open folder inline on %s exactly once', async finish => {
+    const state = await import('../../src/state.js');
+    state.setFolders([{ ...summary('folder', 'New Folder'), kind: 'folder', parentId: null, ownModifiedAt: 1 }]);
+    state.setCurrentFolderId('folder');
+    const { renderNoteList } = await import('../../src/notes_view/note-renderer.js');
+    renderNoteList();
+    const heading = document.getElementById('notes-list-title');
+    heading.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
+    const input = document.getElementById('folder-title-input');
+    expect(document.activeElement).toBe(input);
+    input.value = ' Projects ';
+    if (finish === 'blur') input.blur();
+    else {
+      const key = new KeyboardEvent('keydown', { key: finish, bubbles: true, cancelable: true });
+      const navigate = vi.fn(); document.addEventListener('keydown', navigate);
+      input.dispatchEvent(key);
+      expect(key.defaultPrevented).toBe(true); expect(navigate).not.toHaveBeenCalled();
+      document.removeEventListener('keydown', navigate);
+      input.dispatchEvent(new Event('blur'));
+    }
+    await vi.waitFor(() => expect(mocks.renameFolder).toHaveBeenCalledTimes(1));
+    expect(mocks.renameFolder).toHaveBeenCalledWith('folder', 'Projects');
+    await vi.waitFor(() => expect(heading.textContent).toBe('Projects'));
+    expect(state.currentFolderId).toBe('folder');
+    expect(document.getElementById('folder-path').textContent).toBe('Notes / Projects');
+  });
+
+  it('does not rename root, commit IME Enter, or save blank names', async () => {
+    const state = await import('../../src/state.js');
+    state.setFolders([{ ...summary('folder', 'New Folder'), kind: 'folder', parentId: null, ownModifiedAt: 1 }]);
+    const { renderNoteList } = await import('../../src/notes_view/note-renderer.js');
+    renderNoteList();
+    const heading = document.getElementById('notes-list-title');
+    heading.dispatchEvent(new MouseEvent('dblclick'));
+    expect(document.getElementById('folder-title-input')).toBeNull();
+    state.setCurrentFolderId('folder'); renderNoteList();
+    heading.dispatchEvent(new MouseEvent('dblclick'));
+    const input = document.getElementById('folder-title-input');
+    input.value = '한국어';
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', isComposing: true, bubbles: true }));
+    expect(input.isConnected).toBe(true); expect(mocks.renameFolder).not.toHaveBeenCalled();
+    input.value = '   '; input.blur();
+    expect(heading.textContent).toBe('New Folder'); expect(mocks.renameFolder).not.toHaveBeenCalled();
   });
 
 });

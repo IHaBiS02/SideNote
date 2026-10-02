@@ -763,3 +763,6 @@ li.task-list-item {
 
 #note-list li.pinned-note-dragging { pointer-events: none; }
 #note-list li { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+
+#notes-list-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0 8px; }
+#folder-title-input { position: static; left: auto; transform: none; width: 100%; min-width: 0; box-sizing: border-box; }
