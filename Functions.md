@@ -669,7 +669,9 @@ The extension source uses TypeScript ES modules with explicit imports/exports;
 - `applyTreeSnapshot(tree)`: Updates state from a completed transaction, retaining hydrated bodies.
 - `createFolder(title)`, `renameFolder(id, title)`: Create in the current folder or rename.
   The UI creates `New Folder` without a prompt and edits names by double-clicking
-  the open folder heading. Enter/Escape/blur saves nonempty changes once.
+  the open folder heading. `editFolderTitle()` replaces the heading with the shared
+  `.title-input` (as note title editing does), then restores the heading.
+  Enter/Escape/blur saves nonempty changes once.
 - `moveItems(ids, target)`: Move to a sibling folder (`{folderId}`) or one level up (`{up: true}`).
 - `toggleItemPin(id)`, `reorderItems(ids)`: Parent-scoped pin mutations for notes and folders.
 - `trashItem(id)`, `restoreItem(id)`, `purgeItems(ids)`: Subtree lifecycle with deletion groups and shared-image protection.

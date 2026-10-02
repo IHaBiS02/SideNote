@@ -81,7 +81,8 @@ SideNote is a browser extension that provides a note-taking interface within the
 The UI is a single-page application with several distinct "views" that are shown or hidden as needed.
 
 -   **`#list-view`**: The main screen.
-    -   Displays the list of all notes (`#note-list`).
+    -   `#notes-list-body` lays out the current folder path and selection status above the scrolling direct-child note/folder list (`#note-list`), between the header and toolbar.
+    -   The open folder heading shares centered note-title styling; inline renaming replaces it with the same `.title-input` used by notes.
     -   Contains the "New Note" button (`#new-note-button`).
     -   A toolbar with global actions: Import (`#global-import-button`), Export (`#global-export-button`), and Settings (`#global-settings-button`).
 -   **`#editor-view`**: The screen for writing and viewing a single note.

@@ -177,6 +177,7 @@ textarea {
 }
 
 .button-container {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
 }
@@ -293,12 +294,31 @@ textarea {
   background-color: #f5f5f5;
 }
 
+#note-list li.item-selected {
+  background-color: #f5f5f5;
+  outline: 1px solid #007bff;
+  outline-offset: -1px;
+}
+
+#folder-header.folder-drop-target,
+#note-list li.folder-drop-target {
+  background-color: #f5f5f5;
+  outline: 2px solid #007bff;
+  outline-offset: -2px;
+}
+
+#note-list li.folder-drop-invalid {
+  outline: 2px solid red;
+  outline-offset: -2px;
+}
+
 #note-list li.pinned-note-dragging {
   position: fixed;
   z-index: 1001;
   box-sizing: border-box;
   margin: 0;
   cursor: grabbing;
+  outline: none;
   background-color: #fff;
   border: 1px solid rgba(0, 0, 0, 0.14);
   border-radius: 12px;
@@ -357,11 +377,6 @@ textarea {
 .delete-note-icon, .restore-note-icon, .pin-note-icon {
   cursor: pointer;
   padding: 5px;
-}
-
-.delete-note-icon:hover, .restore-note-icon:hover, .pin-note-icon:hover {
-  background-color: #ddd;
-  border-radius: 50%;
 }
 
 .delete-item-icon:hover, .restore-item-icon:hover {
@@ -488,11 +503,28 @@ button {
   border-radius: 3px;
 }
 
+/* Semantic buttons keep the original span icons' font, spacing and round hover. */
+.button-container > button {
+  appearance: none;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 5px;
+  font: inherit;
+  color: inherit;
+}
+
 button:hover {
   background-color: #eee;
 }
 
-#editor-title {
+.delete-note-icon:hover, .restore-note-icon:hover, .pin-note-icon:hover {
+  background-color: #ddd;
+  border-radius: 50%;
+}
+
+#editor-title,
+#notes-list-title.folder-title {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -745,23 +777,75 @@ li.task-list-item {
     color: red;
 }
 
-/* Folder navigation and selection share the existing note list appearance. */
-#folder-header.folder-drop-target { outline: 2px solid #4285f4; outline-offset: -2px; background: #4285f422; }
-#folder-header { position: relative; }
-#folder-back-button[hidden] { display: none; }
-#folder-path { font-size: 11px; padding: 4px 10px; overflow-wrap: anywhere; opacity: .75; }
-#folder-status { font-size: 12px; padding: 0 10px; min-height: 0; }
-#folder-status:not(:empty) { padding-bottom: 4px; }
-#note-list li { touch-action: pan-y; }
-#note-list li.item-selected { background: #4285f426; outline: 1px solid #4285f4; outline-offset: -1px; }
-#note-list li.folder-drop-target { background: #4285f440; outline: 2px solid #4285f4; outline-offset: -2px; }
-#note-list li.folder-drop-invalid { outline: 2px solid #d33; outline-offset: -2px; }
-#note-list .item-title { overflow: hidden; text-overflow: ellipsis; }
-#note-list .button-container button { background: transparent; border: 0; padding: 3px; color: inherit; cursor: pointer; }
-#note-list li[data-drag-count]::after { content: attr(data-drag-count) " items"; padding: 3px; }
+/* Folder navigation reuses note headings, title inputs, rows and drag cards. */
+#folder-back-button[hidden] {
+  display: none;
+}
 
-#note-list li.pinned-note-dragging { pointer-events: none; }
-#note-list li { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+#notes-list-title.folder-title {
+  max-width: calc(100% - 100px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-#notes-list-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0 8px; }
-#folder-title-input { position: static; left: auto; transform: none; width: 100%; min-width: 0; box-sizing: border-box; }
+/* Keep navigation metadata above the scrolling rows, inside the toolbar bounds. */
+#notes-list-body {
+  position: absolute;
+  top: 50px;
+  bottom: 41px;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#notes-list-body > #note-list {
+  position: static;
+  flex: 1;
+  min-height: 0;
+}
+
+#folder-path,
+#folder-status {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  font-size: 0.8em;
+  color: #888;
+}
+
+#folder-path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#folder-path[hidden],
+#folder-status:empty {
+  display: none;
+}
+
+#note-list li {
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+#note-list .item-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#note-list li[data-drag-count]::after {
+  content: attr(data-drag-count) " items";
+  flex-shrink: 0;
+  padding-left: 10px;
+  font-size: 0.8em;
+  color: #888;
+}
+
+#note-list li.pinned-note-dragging {
+  pointer-events: none;
+}

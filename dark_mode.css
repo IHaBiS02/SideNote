@@ -24,6 +24,18 @@ body.dark-mode {
     background-color: #333;
 }
 
+/* Folder states use the same dark surfaces and accent as existing lists/history. */
+.dark-mode #note-list li.item-selected,
+.dark-mode #note-list li.folder-drop-target,
+.dark-mode #folder-header.folder-drop-target {
+    background-color: #333;
+    outline-color: #82aaff;
+}
+
+.dark-mode #note-list li.folder-drop-invalid {
+    outline-color: #ff6b6b;
+}
+
 .dark-mode #note-list li.pinned-note-dragging {
     background-color: #262626;
     border-color: #555;

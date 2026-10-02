@@ -111,7 +111,7 @@ function createNoteListItem(note: ListItem): HTMLLIElement {
 function editFolderTitle(): void {
   const heading = document.getElementById('notes-list-title');
   const folder = folders.find(item => item.id === currentFolderId && !item.metadata.deletedAt);
-  if (!heading || !folder || busy || heading.querySelector('input')) return;
+  if (!heading || !folder || busy) return;
   clearSelection(); paintSelection();
   const input = document.createElement('input');
   input.type = 'text';
@@ -125,6 +125,7 @@ function editFolderTitle(): void {
     finished = true;
     const name = input.value.trim();
     heading.textContent = folder.title;
+    input.replaceWith(heading);
     if (name && name !== folder.title) void runListAction(() => renameFolder(folder.id, name));
   };
   input.addEventListener('keydown', event => {
@@ -136,7 +137,7 @@ function editFolderTitle(): void {
     }
   });
   input.addEventListener('blur', finish);
-  heading.replaceChildren(input);
+  heading.replaceWith(input);
   input.focus();
   input.select();
 }
@@ -235,11 +236,16 @@ function renderNoteList(): void {
     seen.add(folder.id); path.unshift(folder.title); folder = folders.find(f => f.id === folder!.parentId);
   }
   if (heading) {
+    heading.classList.toggle('folder-title', currentFolderId !== null);
     heading.textContent = path.at(-1) ?? 'Notes';
     heading.title = currentFolderId ? 'Double-click to rename folder' : 'Notes';
   }
   const breadcrumb = document.getElementById('folder-path');
-  if (breadcrumb) { breadcrumb.textContent = path.length ? ['Notes', ...path].join(' / ') : ''; breadcrumb.hidden = !path.length; }
+  if (breadcrumb) {
+    breadcrumb.textContent = path.length ? ['Notes', ...path].join(' / ') : '';
+    breadcrumb.title = breadcrumb.textContent;
+    breadcrumb.hidden = !path.length;
+  }
   paintSelection();
   pinnedNoteDragController = createPinnedNoteDragController(noteList,
     ids => runListAction(() => reorderItems(ids)), {
