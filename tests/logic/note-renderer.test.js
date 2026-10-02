@@ -169,7 +169,7 @@ describe('note list renderer', () => {
     const { renderNoteList } = await import('../../src/notes_view/note-renderer.js');
     renderNoteList();
     document.getElementById('new-note-button').dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
-    document.querySelector('.folder-create-menu button').click();
+    document.querySelector('.folder-create-menu > div').click();
     await vi.waitFor(() => expect(mocks.createFolder).toHaveBeenCalledWith('New Folder'));
     expect(prompt).not.toHaveBeenCalled();
     expect(document.querySelector('.rename-folder-icon')).toBeNull();

@@ -12,7 +12,7 @@ import {
 import { createFolder, renameFolder, toggleItemPin, trashItem, reorderItems, moveItems, visibleItems, currentTree } from '../folders.js';
 import { isFolder, planMove } from '../folder-model.js';
 import { currentFolderId, setCurrentFolderId, folders } from '../state.js';
-import { createDropdown } from '../ui-helpers.js';
+import { createDropdown, positionDropdownNearButton } from '../ui-helpers.js';
 import type { ListItem } from '../types.js';
 import {
   createPinnedNoteDragController,
@@ -153,15 +153,25 @@ function initializeNoteListClickDelegation(): void {
   });
   document.getElementById('new-note-button')?.addEventListener('contextmenu', event => {
     event.preventDefault();
-    createDropdown({ className: 'folder-create-menu', populate: menu => {
-      const button = document.createElement('button');
-      button.textContent = 'Create Folder';
-      button.onclick = () => {
+    const dropdown = createDropdown({ className: 'folder-create-menu', populate: menu => {
+      menu.classList.add('action-dropdown');
+      const item = document.createElement('div');
+      item.textContent = 'Create Folder';
+      item.tabIndex = 0;
+      item.setAttribute('role', 'button');
+      item.addEventListener('click', event => {
+        event.stopPropagation();
         menu.remove();
         void runListAction(() => createFolder('New Folder'));
-      };
-      menu.appendChild(button);
+      });
+      item.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault(); item.click();
+        }
+      });
+      menu.appendChild(item);
     } });
+    if (dropdown) positionDropdownNearButton(dropdown, event.currentTarget as HTMLButtonElement);
   });
   noteList.addEventListener('keydown', event => {
     if ((event.key === 'Enter' || event.key === ' ') && event.target instanceof HTMLElement && event.target.matches('li[data-note-id]')) {

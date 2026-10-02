@@ -679,3 +679,11 @@ The extension source uses TypeScript ES modules with explicit imports/exports;
 `src/notes.ts` preserves existing note helper names as wrappers over the folder-aware
 services. The UI and startup cleanup use the tree services for folder lifecycle operations.
 The old single-record database CRUD helpers remain low-level note APIs.
+
+### Shared action menu positioning (5.0.2)
+
+`src/ui-helpers.ts` exports `positionDropdownNearButton(dropdown, button)` and
+`setDropdownTop(dropdown, top)` for viewport-bounded placement. Export and folder
+creation menus share `.action-dropdown` styles and direct `div` rows, including
+light/dark backgrounds, borders, shadows, padding and hover/focus states. Folder
+creation is placed below the top button when there is insufficient room above.

@@ -29,7 +29,7 @@ import {
   saveParsedSnote,
   saveParsedSnoteImages
 } from '../import_export.js';
-import { createDropdown } from '../ui-helpers.js';
+import { createDropdown, positionDropdownNearButton, setDropdownTop } from '../ui-helpers.js';
 import {
   downloadStandaloneNoteHtml,
   downloadStandaloneNotePdf,
@@ -147,27 +147,6 @@ async function exportCurrentNoteAsPdf(): Promise<void> {
   }
 }
 
-function positionDropdownNearButton(
-  dropdown: HTMLDivElement,
-  button: HTMLButtonElement,
-): void {
-  const rect = button.getBoundingClientRect();
-  const margin = 6;
-  const left = Math.min(rect.left, window.innerWidth - dropdown.offsetWidth - margin);
-  const topAbove = rect.top - dropdown.offsetHeight - margin;
-  const top = topAbove >= margin ? topAbove : rect.bottom + margin;
-
-  dropdown.style.left = `${Math.max(margin, left)}px`;
-  setDropdownTop(dropdown, top);
-}
-
-function setDropdownTop(dropdown: HTMLDivElement, top: number): void {
-  const margin = 6;
-  const maxTop = window.innerHeight - dropdown.offsetHeight - margin;
-  const boundedTop = Math.min(Math.max(margin, top), Math.max(margin, maxTop));
-  dropdown.style.top = `${boundedTop}px`;
-}
-
 function keepDropdownBottomStable(
   dropdown: HTMLDivElement,
   update: () => void,
@@ -242,6 +221,7 @@ function showExportOptionsDropdown(
   const dropdown = createDropdown({
     className: 'export-options-dropdown',
     populate: (dropdownElement) => {
+      dropdownElement.classList.add('action-dropdown');
       const zipItem = addDropdownItem(dropdownElement, 'Export as .zip', () => zipExport(false));
       zipItem.classList.add('export-zip-option');
       zipItem.addEventListener('contextmenu', (event) => {

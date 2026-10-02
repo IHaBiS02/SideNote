@@ -690,7 +690,7 @@ li.task-list-item {
     color: #007bff;
 }
 
-.export-options-dropdown {
+.action-dropdown {
   position: fixed;
   background-color: white;
   border: 1px solid #ccc;
@@ -701,14 +701,15 @@ li.task-list-item {
   min-width: 170px;
 }
 
-.export-options-dropdown div {
+.action-dropdown > div {
   padding: 8px 12px;
   cursor: pointer;
   white-space: nowrap;
   position: relative;
 }
 
-.export-options-dropdown div:hover {
+.action-dropdown > div:hover,
+.action-dropdown > div:focus-visible {
   background-color: #f5f5f5;
 }
 
@@ -758,8 +759,6 @@ li.task-list-item {
 #note-list .item-title { overflow: hidden; text-overflow: ellipsis; }
 #note-list .button-container button { background: transparent; border: 0; padding: 3px; color: inherit; cursor: pointer; }
 #note-list li[data-drag-count]::after { content: attr(data-drag-count) " items"; padding: 3px; }
-.folder-create-menu { position: fixed; right: 8px; top: 48px; z-index: 1000; padding: 6px; background: var(--background-color, #fff); border: 1px solid #888; border-radius: 5px; }
-.folder-create-menu button { padding: 8px 14px; cursor: pointer; }
 
 #note-list li.pinned-note-dragging { pointer-events: none; }
 #note-list li { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
