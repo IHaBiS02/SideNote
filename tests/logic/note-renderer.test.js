@@ -14,6 +14,7 @@ const mocks = vi.hoisted(() => ({
   updateLegacyLineBreakControls: vi.fn(),
   updateTildeReplacementButton: vi.fn(),
   showEditorView: vi.fn(),
+  showListView: vi.fn(),
   applyEditorDisplayMode: vi.fn(),
   pushToHistory: vi.fn(),
 }));
@@ -52,6 +53,7 @@ vi.mock('../../src/history.js', () => ({
 
 vi.mock('../../src/notes_view/view-manager.js', () => ({
   showEditorView: mocks.showEditorView,
+  showListView: mocks.showListView,
 }));
 
 vi.mock('../../src/notes_view/editor-mode.js', () => ({
@@ -79,7 +81,7 @@ describe('note list renderer', () => {
     });
     mocks.visibleItems.mockImplementation(() => children({ notes: state.notes, folders: state.folders }, state.currentFolderId));
     document.body.innerHTML = `
-      <div id="folder-header"><h1 id="notes-list-title">Notes</h1><button id="new-note-button">+</button></div>
+      <div id="folder-header"><button id="folder-back-button">&lt;</button><h1 id="notes-list-title">Notes</h1><button id="new-note-button">+</button></div>
       <div id="folder-path"></div>
       <ul id="note-list"></ul>
       <div id="markdown-editor"></div>
@@ -160,6 +162,24 @@ describe('note list renderer', () => {
     expect(document.querySelectorAll('[data-note-id]')).toHaveLength(1);
     expect(document.querySelector('[data-note-id]').dataset.noteId).toBe('child');
     expect(document.querySelector('.item-selected')).toBeNull();
+  });
+
+  it('opens exactly one parent folder on ordinary back-button clicks', async () => {
+    const state = await import('../../src/state.js');
+    state.setFolders([
+      { ...summary('parent', 'Parent'), kind: 'folder', parentId: null, ownModifiedAt: 1 },
+      { ...summary('child', 'Child'), kind: 'folder', parentId: 'parent', ownModifiedAt: 1 },
+    ]);
+    state.setCurrentFolderId('child');
+    const { renderNoteList } = await import('../../src/notes_view/note-renderer.js');
+    renderNoteList();
+    document.getElementById('folder-back-button').click();
+    expect(state.currentFolderId).toBe('parent');
+    expect(mocks.showListView).toHaveBeenCalledOnce();
+    renderNoteList();
+    document.getElementById('folder-back-button').click();
+    expect(state.currentFolderId).toBeNull();
+    expect(mocks.showListView).toHaveBeenCalledTimes(2);
   });
 
   it('creates New Folder immediately without prompting or adding a rename control', async () => {

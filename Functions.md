@@ -568,10 +568,10 @@ Navigation, history, and back button functionality:
 
 - `navigateToState(state)`: Navigates to a specific view state
 - `goBack()`: Navigates to the previous view in history
-- `populateHistoryDropdown(dropdown)`: Populates history dropdown with items
+- `populateHistoryDropdown(dropdown)`: Populates history with note-mode labels, `Notes` for root, and `Folder: <current title>` for folder lists
 - `showHistoryDropdown(targetButton)`: Shows the history dropdown menu
 - `refreshHistoryDropdown()`: Refreshes the history dropdown if open
-- `initializeNavigationEvents()`: Sets up all navigation-related event listeners
+- `initializeNavigationEvents()`: Connects the shared history context menu to all back buttons, including the folder back button; its normal parent-navigation click remains owned by the list renderer
 
 ### src/events/editor.ts
 

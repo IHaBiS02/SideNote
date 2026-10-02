@@ -132,8 +132,8 @@ The UI is a single-page application with several distinct "views" that are shown
 
 -   **`showListView()` / `showEditorView()` / `showSettingsView()` / etc.**: A set of functions in `src/notes_view/view-manager.ts` that control UI visibility. They now accept an `addToHistory` parameter and will call `pushToHistory` to record the navigation change.
 -   **`pushToHistory()` / `popFromHistory()` / etc.**: Functions in `history.ts` for managing the `navigationHistory` stack.
--   **`goBack()`**: A function in `src/events/navigation.ts` that is triggered by back buttons or the Escape key. It uses the `navigationHistory` to return the user to the previously visited view.
--   **`backButton` (Context Menu)**: Right-clicking the back button opens a custom dropdown menu displaying the navigation history, allowing the user to jump to a specific previous view.
+-   **`goBack()`**: A function in `src/events/navigation.ts` that is triggered by non-folder back buttons or the Escape key. It uses the `navigationHistory` to return the user to the previously visited view.
+-   **Back buttons (Context Menu)**: Right-clicking any back button, including the folder back button, opens the shared navigation history dropdown. Root lists appear as `Notes`; folder lists use their current folder names. Selecting an entry restores that view without adding history. Ordinary folder back-button clicks still open the immediate parent.
 -   **`navigateToState(state)`**: Navigates to a specific view state based on the provided state object.
 -   **History Dropdown Management**: Functions in `src/events/navigation.ts` to show, populate, and refresh the navigation history dropdown.
 

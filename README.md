@@ -6,7 +6,8 @@ A simple notes browser extension that provides a note-taking interface in the br
 
 - **Nested Folders**: Right-click `+` and choose Create Folder to create `New Folder` immediately.
   Open the folder and double-click its heading to rename it inline; Enter, Escape,
-  or blur saves a nonempty name. Notes and folders share
+  or blur saves a nonempty name. Right-click the folder back button to open the
+  shared navigation history; left-click moves up one folder. Notes and folders share
   each list's pinned and regular sections. Ctrl/Cmd-click or Shift-click selects
   multiple items within one pin section. Hold and drag into a matching folder,
   or onto the header to move up one level, inheriting the containing folder's pin.

@@ -204,6 +204,7 @@ tests/
     ├── import-export-events.test.js
     ├── main.test.js
     ├── notes.test.js
+    ├── navigation.test.js
     ├── note-renderer.test.js
     ├── pinned-note-drag.test.js
     └── shortcut-setup.test.js
