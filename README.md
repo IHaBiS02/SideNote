@@ -4,6 +4,13 @@ A simple notes browser extension that provides a note-taking interface in the br
 
 ## Features
 
+- **Nested Folders**: Right-click `+` to create folders; notes and folders share
+  each list's pinned and regular sections. Ctrl/Cmd-click or Shift-click selects
+  multiple items within one pin section. Hold and drag into a matching folder,
+  or onto the header to move up one level, inheriting the containing folder's pin.
+- **Folder Backups**: Version 2 archives preserve nested and empty folders;
+  previous `.snote` and `.snotes` files still import into the root.
+
 - **Configurable WYSIWYG Preview**: Use the same rendered document in editable
   or read-only mode while keeping Markdown as the stored format
 - **Full Markdown Source Editing**: Double-click Preview or press Edit to edit
@@ -28,7 +35,7 @@ A simple notes browser extension that provides a note-taking interface in the br
   two-finger touchscreen pinch, and mouse or single-finger drag panning
 - **Recycle Bin**: Soft delete with 30-day auto-cleanup
 - **Fast Large-List Startup**: The list reads lightweight note summaries and
-  renders them in one batch; Markdown bodies, cleanup work, and feature-specific
+  and folder metadata and renders them in one batch; Markdown bodies, cleanup work, and feature-specific
   libraries are deferred until they are needed. Deferred image cleanup scans
   indexed deletion keys without loading stored image Blob values
 - **Browser Integration**: Works in Chrome **AND** Firefox ~~(Firefox is in development)~~
@@ -78,7 +85,7 @@ A simple notes browser extension that provides a note-taking interface in the br
    title, Enter or Escape finishes only the title edit and keeps the current
    note open.
 
-Pinned notes remain above regular notes. Hold a pinned note for about 350 ms,
+Pinned notes and folders remain above regular items. See [folder implementation and migration](FOLDER_IMPLEMENTATION.md) for 5.0.0 details. Hold an item for about 350 ms,
 then drag the smaller floating card vertically. An animated rounded gap opens
 at the current drop position, and the drag continues outside the original row.
 Stable row-center boundaries and a 10px hysteresis zone keep the gap from

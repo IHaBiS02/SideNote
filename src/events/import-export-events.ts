@@ -1,3 +1,5 @@
+import { createTreeArchive, importTreeArchive, isTreeArchive } from '../folder-archive.js';
+import { folders, setCurrentFolderId } from '../state.js';
 // Import DOM elements for import/export
 import {
   globalExportButton,
@@ -20,7 +22,6 @@ import {
   downloadFile
 } from '../utils.js';
 import {
-  createAllNotesArchive,
   createSingleNoteArchive,
   parseSnote,
   parseSnotesArchive,
@@ -98,7 +99,7 @@ async function exportAllNotes({
   await ensureJsZipLoaded();
   const timestamp = getTimestamp();
   const activeNotes = await loadActiveNotesInListOrder();
-  const zip = await createAllNotesArchive(activeNotes, {
+  const zip = await createTreeArchive(activeNotes, folders, {
     addTwoSpaceLineBreaks,
     useTitleFolderNames
   });
@@ -331,16 +332,19 @@ function initializeImportExportEvents(): void {
             lastModified: Date.now()
           }
         });
-        notes.push(newNote);
+        if (!notes.some(n => n.id === newNote.id)) notes.push(newNote);
+      } else if (file.name.endsWith('.snotes') && await isTreeArchive(zip)) {
+        await importTreeArchive(zip);
       } else if (file.name.endsWith('.snotes')) {
         // Multiple notes file (.snotes)
         const parsedNotes = await parseSnotesArchive(zip);
-        const newNotes = await saveImportedNotes(parsedNotes, notes);
+        const newNotes = await saveImportedNotes(parsedNotes, [...notes, ...folders].filter(item => !item.parentId && !item.metadata.deletedAt));
         for (const note of newNotes) {
-          notes.push(note);
+          if (!notes.some(n => n.id === note.id)) notes.push(note);
         }
         
       }
+      setCurrentFolderId(null);
       sortNotes();
       renderNoteList();
     } catch (error) {

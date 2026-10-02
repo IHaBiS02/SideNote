@@ -119,7 +119,7 @@ The UI is a single-page application with several distinct "views" that are shown
 #### Initialization & Data Management (`main.ts`, `src/database/`)
 
 -   **`bootstrap()`**: Runs IndexedDB initialization, settings/summary load and migration, initial list rendering, and event binding; `scheduleStartupMaintenance()` then defers expired note/image cleanup until after a paint opportunity.
--   **`initDB()`**: Initializes IndexedDB version 4 with `notes`, `noteSummaries`, and `images`; upgrading from version 2 backfills summaries from existing full notes, and upgrading from version 3 adds the image `deletedAt` index (located in `src/database/init.ts`).
+-   **`initDB()`**: Initializes IndexedDB version 5 with `notes`, `noteSummaries`, `folders`, and `images`; upgrading from version 2 backfills summaries from existing full notes, upgrading from version 3 adds the image `deletedAt` index, and upgrading to version 5 assigns existing notes to the root and adds summary image references (located in `src/database/init.ts`).
 -   **`loadAndMigrateData()`**: Migrates legacy `chrome.storage.local` notes when necessary, then reads only `noteSummaries` for the initial active/recycle lists.
 -   **`saveNote()` / `getNote()` / `getAllNoteSummaries()` / `getAllNotes()` / etc.**: Note persistence functions. Normal list startup uses summaries; body-dependent features explicitly fetch full notes.
 -   **`saveImage()` / `getImage()` / `deleteImage()` / etc.**: Async image CRUD operations in `src/database/images.ts`; `getDeletedImageIdsFromDB()` uses an index key cursor for cleanup paths that do not need image data.
@@ -139,7 +139,7 @@ The UI is a single-page application with several distinct "views" that are shown
 #### Note List (`src/notes_view/`, `src/events/`)
 
 -   **`renderNoteList()`**: Builds every row in one `DocumentFragment`, replaces the list children once, and uses one delegated list click handler for open/pin/delete actions (located in `src/notes_view/note-renderer.ts`).
--   **Pinned-note drag ordering**: Holding a pinned row for the global `pinnedNoteDragDelayMs` duration (350ms by default) activates `pinned-note-drag.ts`. The global settings view allows 100–2000ms; note-specific settings do not expose or override it. The grabbed row becomes a slightly inset, rounded fixed card that follows the pointer, while a separate animated placeholder moves through the pinned section and opens the current drop gap. Keeping the captured row at one DOM position until `pointerup` prevents Chromium from ending the drag when reordering or leaving the original row. Drop slots are calculated from stable row-center snapshots with a 10px hysteresis zone, and the placeholder DOM node moves only when the selected slot changes, preventing its opening animation from repeatedly restarting at a boundary. A completed drop replaces the placeholder and `reorderPinnedNotes()` saves normalized positions to IndexedDB; pointer cancellation or window blur restores the original position. Short taps and movements made before activation preserve normal click and scroll behavior.
+-   **Pinned-note drag ordering**: Holding a pinned row for the global `pinnedNoteDragDelayMs` duration (350ms by default) activates `pinned-note-drag.ts`. The global settings view allows 100–2000ms; note-specific settings do not expose or override it. The grabbed row becomes a slightly inset, rounded fixed card that follows the pointer, while a separate animated placeholder moves through the pinned section and opens the current drop gap. Keeping the captured row at one DOM position until `pointerup` prevents Chromium from ending the drag when reordering or leaving the original row. Drop slots are calculated from stable row-center snapshots with a 10px hysteresis zone, and the placeholder DOM node moves only when the selected slot changes, preventing its opening animation from repeatedly restarting at a boundary. A completed drop replaces the placeholder and `reorderItems()` saves parent-scoped normalized positions to IndexedDB; pointer cancellation or window blur restores the original position. Short taps and movements made before activation preserve normal click and scroll behavior.
 -   **`newNoteButton` (Event Listener)**: Creates a new, empty note object and opens it (handled in `src/events/editor.ts`).
 -   **`deleteNote(noteId)`**: Moves a note to the recycle bin by adding a `deletedAt` timestamp.
 -   **`togglePin(noteId)`**: Toggles the pin status of a note.
@@ -203,3 +203,18 @@ dependency notices and builds the editor workspace. It then compiles
 `LIBRARY_LICENSES.md` into the Chrome and Firefox outputs, and creates the
 allow-listed AMO reviewer source ZIP. The repository therefore has one lockfile,
 one build command, and no manual synchronization step.
+
+## Folder hierarchy (5.0.0)
+
+- `src/list-order.ts`: Shared list comparison and timestamp ceiling used by imports and moves.
+- `src/folder-model.ts`: Body-free child listing, iterative folder date aggregation, move validation, subtree discovery.
+- `src/folders.ts`: Folder/item mutations, current-list queries, deletion groups and restoration.
+- `src/database/tree.ts`: Atomic edits across notes, summaries, folders and image cleanup; publishes committed snapshots.
+- `src/folder-archive.ts`: v2 archive hierarchy, validation and fresh item/image IDs.
+
+The renderer combines direct-child note summaries and folders. It manages one-pin-section
+selection and passes selected IDs plus folder/header targets to the existing pointer
+controller. Header drops inherit the containing folder's pin state. List history stores
+`folderId`; returning from the editor restores its containing list. Startup reads folder
+metadata along with summaries. Autosave updates ancestor dates in the same transaction.
+See [FOLDER_IMPLEMENTATION.md](FOLDER_IMPLEMENTATION.md) for migration and runtime details.

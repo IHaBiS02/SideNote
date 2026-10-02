@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   getNote: vi.fn(),
+  visibleItems: vi.fn(),
   togglePin: vi.fn().mockResolvedValue(),
   deleteNote: vi.fn().mockResolvedValue(),
   reorderPinnedNotes: vi.fn().mockResolvedValue(false),
@@ -19,10 +20,12 @@ vi.mock('../../src/database/index.js', () => ({
   getNote: mocks.getNote,
 }));
 
-vi.mock('../../src/notes.js', () => ({
-  togglePin: mocks.togglePin,
-  deleteNote: mocks.deleteNote,
-  reorderPinnedNotes: mocks.reorderPinnedNotes,
+vi.mock('../../src/folders.js', async importOriginal => ({
+  ...await importOriginal(),
+  visibleItems: mocks.visibleItems,
+  toggleItemPin: mocks.togglePin,
+  trashItem: mocks.deleteNote,
+  reorderItems: mocks.reorderPinnedNotes,
 }));
 
 vi.mock('../../src/notes_view/pinned-note-drag.js', () => ({
@@ -61,9 +64,12 @@ function summary(id, title, isPinned = false) {
 }
 
 describe('note list renderer', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.resetModules();
     vi.clearAllMocks();
+    const state = await import('../../src/state.js');
+    const { children } = await import('../../src/folder-model.js');
+    mocks.visibleItems.mockImplementation(() => children({ notes: state.notes, folders: state.folders }, state.currentFolderId));
     document.body.innerHTML = `
       <ul id="note-list"></ul>
       <div id="markdown-editor"></div>
@@ -113,4 +119,37 @@ describe('note list renderer', () => {
     expect(document.getElementById('markdown-editor').value).toBe('# Body');
     expect(mocks.showEditorView).toHaveBeenCalledTimes(1);
   });
+  it('locks Ctrl/Shift selection to the initial pin section and preserves selection order for dragging', async () => {
+    const state = await import('../../src/state.js');
+    state.setNotes([summary('p1', 'P1', true), summary('p2', 'P2', true), summary('u1', 'U1'), summary('u2', 'U2')]);
+    const { renderNoteList } = await import('../../src/notes_view/note-renderer.js');
+    renderNoteList();
+    const click = (id, modifiers) => document.querySelector(`[data-note-id="${id}"]`).dispatchEvent(new MouseEvent('click', { bubbles: true, ...modifiers }));
+    click('p1', { ctrlKey: true });
+    click('u1', { ctrlKey: true });
+    click('u2', { shiftKey: true });
+    expect([...document.querySelectorAll('.item-selected')].map(e => e.dataset.noteId)).toEqual(['p1']);
+    click('p2', { shiftKey: true });
+    expect([...document.querySelectorAll('.item-selected')].map(e => e.dataset.noteId)).toEqual(['p1', 'p2']);
+    const options = mocks.createPinnedNoteDragController.mock.calls.at(-1)[2];
+    expect(options.getDragIds('p2')).toEqual(['p1', 'p2']);
+    click('p1', { ctrlKey: true }); click('p2', { ctrlKey: true });
+    click('u2', { metaKey: true }); click('u1', { shiftKey: true });
+    expect(options.getDragIds('u1')).toEqual(['u1', 'u2']);
+  });
+
+  it('renders only direct children and clears selection after changing folder', async () => {
+    const state = await import('../../src/state.js');
+    state.setFolders([{ ...summary('folder', 'Folder'), kind: 'folder', parentId: null, ownModifiedAt: 1 }]);
+    state.setNotes([summary('root', 'Root'), { ...summary('child', 'Child'), parentId: 'folder' }]);
+    const { renderNoteList } = await import('../../src/notes_view/note-renderer.js');
+    renderNoteList();
+    expect([...document.querySelectorAll('[data-note-id]')].map(e => e.dataset.noteId)).toEqual(['root', 'folder']);
+    document.querySelector('[data-note-id="root"]').dispatchEvent(new MouseEvent('click', { bubbles: true, ctrlKey: true }));
+    state.setCurrentFolderId('folder'); renderNoteList();
+    expect(document.querySelectorAll('[data-note-id]')).toHaveLength(1);
+    expect(document.querySelector('[data-note-id]').dataset.noteId).toBe('child');
+    expect(document.querySelector('.item-selected')).toBeNull();
+  });
+
 });

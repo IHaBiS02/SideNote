@@ -1,3 +1,6 @@
+import { readTree, publishTree } from './tree.js';
+import { updateFolderDates } from '../folder-model.js';
+import type { TreeSnapshot } from '../types.js';
 // Import database helpers
 import { dbTransaction, getDB } from './init.js';
 import { createNoteSummary } from '../note-summary.js';
@@ -26,14 +29,22 @@ function saveNote(note: Note): Promise<IDBValidKey> {
         }
 
         const transaction = database.transaction(
-            ['notes', 'noteSummaries'],
+            ['notes', 'noteSummaries', 'folders'],
             'readwrite',
         );
         const request = transaction.objectStore('notes').put(note);
         transaction.objectStore('noteSummaries').put(createNoteSummary(note));
         let savedKey: IDBValidKey = note.id;
         request.onsuccess = () => { savedKey = request.result; };
-        transaction.oncomplete = () => resolve(savedKey);
+        let tree: TreeSnapshot;
+        readTree(transaction, snapshot => {
+            try {
+                updateFolderDates(snapshot);
+                for (const folder of snapshot.folders) transaction.objectStore('folders').put(folder);
+                tree = snapshot;
+            } catch { transaction.abort(); }
+        });
+        transaction.oncomplete = () => { publishTree(tree); resolve(savedKey); };
         transaction.onerror = () => reject(transaction.error);
         transaction.onabort = () => reject(transaction.error);
     });

@@ -13,6 +13,7 @@ import { pushToHistory, clearHistory } from '../history.js';
 
 // Import state from state module
 import {
+  currentFolderId,
   isGlobalSettings,
   activeNoteId,
   isPreview,
@@ -40,8 +41,7 @@ function showListView(addToHistory = true): void {
   imageManagementView.style.display = 'none';
   licenseView.style.display = 'none';
   if (addToHistory) {
-    clearHistory();  // 리스트 뷰로 돌아오면 히스토리 초기화
-    pushToHistory({ view: 'list' });
+    pushToHistory({ view: 'list', params: { folderId: currentFolderId } });
   }
   renderNoteList();
 }

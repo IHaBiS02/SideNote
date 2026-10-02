@@ -743,3 +743,23 @@ li.task-list-item {
 .confirmation-dropdown .delete-action.confirm {
     color: red;
 }
+
+/* Folder navigation and selection share the existing note list appearance. */
+#folder-header.folder-drop-target { outline: 2px solid #4285f4; outline-offset: -2px; background: #4285f422; }
+#folder-header { position: relative; }
+#folder-back-button[hidden] { display: none; }
+#folder-path { font-size: 11px; padding: 4px 10px; overflow-wrap: anywhere; opacity: .75; }
+#folder-status { font-size: 12px; padding: 0 10px; min-height: 0; }
+#folder-status:not(:empty) { padding-bottom: 4px; }
+#note-list li { touch-action: pan-y; }
+#note-list li.item-selected { background: #4285f426; outline: 1px solid #4285f4; outline-offset: -1px; }
+#note-list li.folder-drop-target { background: #4285f440; outline: 2px solid #4285f4; outline-offset: -2px; }
+#note-list li.folder-drop-invalid { outline: 2px solid #d33; outline-offset: -2px; }
+#note-list .item-title { overflow: hidden; text-overflow: ellipsis; }
+#note-list .button-container button { background: transparent; border: 0; padding: 3px; color: inherit; cursor: pointer; }
+#note-list li[data-drag-count]::after { content: attr(data-drag-count) " items"; padding: 3px; }
+.folder-create-menu { position: fixed; right: 8px; top: 48px; z-index: 1000; padding: 6px; background: var(--background-color, #fff); border: 1px solid #888; border-radius: 5px; }
+.folder-create-menu button { padding: 8px 14px; cursor: pointer; }
+
+#note-list li.pinned-note-dragging { pointer-events: none; }
+#note-list li { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }

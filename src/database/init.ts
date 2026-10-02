@@ -4,7 +4,7 @@ import type { Note } from '../types.js';
 // 전역 데이터베이스 인스턴스
 let db: IDBDatabase | undefined;
 
-type SideNoteStoreName = 'notes' | 'noteSummaries' | 'images';
+type SideNoteStoreName = 'notes' | 'noteSummaries' | 'images' | 'folders';
 
 /**
  * Initializes the IndexedDB database.
@@ -12,12 +12,15 @@ type SideNoteStoreName = 'notes' | 'noteSummaries' | 'images';
  */
 function initDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    // Version 4 indexes image deletion timestamps without reading Blob values.
-    const request = indexedDB.open('SimpleNotesDB', 4);
+    // Version 5 adds folders and root membership to existing notes/summaries.
+    const request = indexedDB.open('SimpleNotesDB', 5);
 
     // 데이터베이스 버전 업그레이드 시 실행 (첫 실행 또는 버전 변경 시)
-    request.onupgradeneeded = () => {
+    request.onupgradeneeded = (event) => {
       const database = request.result;
+      if (!database.objectStoreNames.contains('folders')) {
+        database.createObjectStore('folders', { keyPath: 'id' });
+      }
       // images 객체 저장소가 없으면 생성
       const imagesStore = database.objectStoreNames.contains('images')
         ? request.transaction?.objectStore('images')
@@ -45,11 +48,26 @@ function initDB(): Promise<IDBDatabase> {
           };
         }
       }
+      if (event.oldVersion < 5) {
+        const transaction = request.transaction!;
+        const cursorRequest = transaction.objectStore('notes').openCursor();
+        cursorRequest.onsuccess = () => {
+          const cursor = cursorRequest.result;
+          if (!cursor) return;
+          const note = cursor.value as Note;
+          note.parentId = note.parentId ?? null;
+          cursor.update(note);
+          transaction.objectStore('noteSummaries').put(createNoteSummary(note));
+          cursor.continue();
+        };
+      }
+
     };
 
     // 데이터베이스 열기 성공 시
     request.onsuccess = () => {
       db = request.result;
+      db.onversionchange = () => closeDB();
       console.log('Database initialized');
       resolve(db);
     };

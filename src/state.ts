@@ -5,7 +5,7 @@
 
 // Shared state variables across modules
 import { isLoadedNote } from './note-summary.js';
-import type { GlobalSettings, Note, NoteListEntry } from './types.js';
+import type { Folder, TreeSnapshot, GlobalSettings, Note, NoteListEntry } from './types.js';
 
 export let notes: NoteListEntry[] = [];         // 활성 노트 목록
 export let deletedNotes: NoteListEntry[] = [];  // 삭제된 노트 목록 (휴지통)
@@ -61,4 +61,26 @@ export function setOriginalNoteContent(content: string): void {
 
 export function setIsPreview(value: boolean): void {
   isPreview = value;
+}
+
+export const folders: Folder[] = [];
+export let currentFolderId: string | null = null;
+export function setCurrentFolderId(id: string | null): void { currentFolderId = id; }
+export function setFolders(values: Folder[]): void { folders.splice(0, folders.length, ...values); }
+
+export function applyTreeSnapshot(tree: TreeSnapshot): void {
+  const loaded = new Map([...notes, ...deletedNotes].filter(isLoadedNote).map(n => [n.id, n]));
+  const entries = tree.notes.map(summary => {
+    const full = loaded.get(summary.id);
+    if (!full) return summary;
+    const next = { ...full, ...summary };
+    if (summary.pinOrder === undefined) delete next.pinOrder;
+    if (summary.pinnedAt === undefined) delete next.pinnedAt;
+    if (summary.deletionGroup === undefined) delete next.deletionGroup;
+    return next;
+  });
+  notes.splice(0, notes.length, ...entries.filter(n => !n.metadata.deletedAt));
+  deletedNotes.splice(0, deletedNotes.length, ...entries.filter(n => n.metadata.deletedAt));
+  setFolders(tree.folders);
+  if (currentFolderId && !folders.some(f => f.id === currentFolderId && !f.metadata.deletedAt)) currentFolderId = null;
 }

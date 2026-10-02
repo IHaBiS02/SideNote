@@ -53,7 +53,8 @@ npm install
 ## Architecture
 
 ### Data Storage
-- **IndexedDB**: Primary storage for notes and images
+- **IndexedDB**: Primary storage for notes, folders, and images
+  - `folders` object store: Parent links, pin order, own and derived modification dates; v5 also adds root `parentId` and image reference IDs to existing note summaries
   - `notes` object store: Full Markdown note content, metadata, settings
   - `noteSummaries` object store: Derived title/ID/pin/recycle metadata used for startup lists; version 3 backfills existing notes
   - `images` object store: Embedded image blobs with a version-4 `deletedAt` index for key-only cleanup scans
@@ -63,6 +64,9 @@ npm install
 - **src/main.ts**: Entry point; renders the summary-based list before scheduling recycle-bin/image cleanup after the first paint opportunity
 - **src/note-summary.ts**: Creates lightweight summary records and identifies hydrated full notes
 - **src/vendor-loader.ts**: Loads JSZip, Marked, DOMPurify, and html2pdf only when their features are used
+- **src/folder-model.ts**, **src/folders.ts**: Parent-scoped listing, folder dates, move/pin/trash/restore rules; exiting inherits the containing folder's pin state
+- **src/list-order.ts**: Shared comparison and batch timestamp calculation
+- **src/folder-archive.ts**: Version-2 tree backups with parent/image ID remapping
 - **src/types.ts**: Shared note, settings, image, and navigation types
 - **src/globals.d.ts**: Types for packaged browser globals and reviewer-safe vendor scripts
 - **src/state.ts**: Centralized state management; list entries begin as summaries and are hydrated in place when opened
@@ -97,10 +101,11 @@ npm install
   `build/extension-runtime/` before packaging
 
 ### Database Module (`src/database/`)
-- **init.ts**: IndexedDB v4 initialization, summary backfill, image-deletion index creation, typed `dbTransaction()` helper, `closeDB()`
+- **init.ts**: IndexedDB v5 initialization, summary backfill, image-deletion index creation, typed `dbTransaction()` helper, `closeDB()`
 - **notes.ts**: Atomic full-note/summary persistence plus note CRUD operations
 - **images.ts**: Image CRUD operations plus `deletedAt` index key scans that avoid cloning Blob values
-- **index.ts**: Re-exports all database functions
+- **tree.ts**: Atomic tree metadata edits, folder timestamp propagation, and unreferenced-image cleanup
+- **index.ts**: Re-exports the existing note/image database functions
 
 ### Events Module (`src/events/`)
 - **editor.ts**: Editor autosave, mode shortcuts, image activation, and title editing
@@ -151,11 +156,12 @@ npm install
   remaining online dependencies. html2pdf.js
   directly downloads a non-interactive rasterized PDF without the print dialog
   or a remote conversion service
+- **Folders**: `+` context menu creates folders; Ctrl/Cmd/Shift selects one pin section; folder drops reset the moved item pin, header drops inherit the source folder pin. Folder contents keep their internal order. See `FOLDER_IMPLEMENTATION.md`.
 - **Pinned Note Ordering**: Pinned rows use delayed Pointer Events, a floating
   drag card, and an animated placeholder gap; completed drops persist
   normalized `pinOrder` values to IndexedDB while cancellation restores order
 - **Recycle Bin**: Soft delete with 30-day auto-cleanup (`THIRTY_DAYS_MS`)
-- **Startup Loading**: Startup reads only `noteSummaries`, batches list DOM work,
+- **Startup Loading**: Startup reads `noteSummaries` and folder metadata, batches list DOM work,
   then defers note/image cleanup; full note bodies are loaded on note open or
   another explicit body-dependent feature, and image cleanup reads indexed IDs
   without loading image Blob values

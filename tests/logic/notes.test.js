@@ -1,188 +1,73 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-
-// Mock database and view modules before importing notes.js
-vi.mock('../../src/database/index.js', () => ({
-  saveNote: vi.fn().mockResolvedValue(),
-  getNote: vi.fn(async (id) => ({
-    id,
-    title: '',
-    content: '',
-    settings: {},
-    isPinned: false,
-    metadata: { createdAt: 0, lastModified: 0 },
-  })),
-  deleteNoteDB: vi.fn().mockResolvedValue(),
-  restoreNoteDB: vi.fn().mockResolvedValue(),
-  deleteNotePermanentlyDB: vi.fn().mockResolvedValue(),
-  deleteImagePermanently: vi.fn().mockResolvedValue(),
-  getDeletedImageIdsFromDB: vi.fn().mockResolvedValue([]),
-}));
-
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { initDB, closeDB } from '../../src/database/init.js';
+import { saveNote, getNote, getAllNoteSummaries } from '../../src/database/notes.js';
+import { saveImage, getImage } from '../../src/database/images.js';
 import { sortNotes, deleteNote, togglePin, reorderPinnedNotes, restoreNote, deleteNotePermanently, emptyRecycleBin } from '../../src/notes.js';
-import { setNotes, setDeletedNotes, notes, deletedNotes } from '../../src/state.js';
-import { saveNote, deleteNoteDB, restoreNoteDB, deleteNotePermanentlyDB, getDeletedImageIdsFromDB, deleteImagePermanently } from '../../src/database/index.js';
+import { setNotes, setDeletedNotes, setFolders, setCurrentFolderId, notes, deletedNotes } from '../../src/state.js';
 
-describe('notes business logic', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    setNotes([]);
-    setDeletedNotes([]);
+const note = (id, extra = {}) => ({ id, title: id, content: '', settings: {}, parentId: null,
+  isPinned: false, metadata: { createdAt: 1, lastModified: 100 }, ...extra });
+async function seed(values) {
+  for (const value of values) await saveNote(value);
+  setNotes(values.filter(n => !n.metadata.deletedAt));
+  setDeletedNotes(values.filter(n => n.metadata.deletedAt));
+}
+beforeEach(async () => {
+  closeDB();
+  await new Promise(resolve => { indexedDB.deleteDatabase('SimpleNotesDB').onsuccess = resolve; });
+  await initDB(); setNotes([]); setDeletedNotes([]); setFolders([]); setCurrentFolderId(null);
+});
+afterEach(closeDB);
+
+describe('note operations through atomic tree storage', () => {
+  it('sorts pins by explicit order then unpinned notes by modification time', () => {
+    setNotes([note('old'), note('p1', { isPinned: true, pinOrder: 1 }), note('p0', { isPinned: true, pinnedAt: 900, pinOrder: 0 }),
+      note('new', { metadata: { createdAt: 1, lastModified: 200 } })]);
+    sortNotes(); expect(notes.map(n => n.id)).toEqual(['p0', 'p1', 'new', 'old']);
   });
-
-  describe('sortNotes', () => {
-    it('should sort pinned notes before unpinned', () => {
-      setNotes([
-        { id: '1', isPinned: false, metadata: { lastModified: 100 } },
-        { id: '2', isPinned: true, pinnedAt: 50, metadata: { lastModified: 50 } },
-      ]);
-      sortNotes();
-      expect(notes[0].id).toBe('2');
-      expect(notes[1].id).toBe('1');
-    });
-
-    it('should sort pinned notes by pinnedAt ascending', () => {
-      setNotes([
-        { id: '1', isPinned: true, pinnedAt: 200, metadata: { lastModified: 100 } },
-        { id: '2', isPinned: true, pinnedAt: 100, metadata: { lastModified: 50 } },
-      ]);
-      sortNotes();
-      expect(notes[0].id).toBe('2');
-      expect(notes[1].id).toBe('1');
-    });
-
-    it('should prefer an explicit pinOrder over the legacy pinnedAt value', () => {
-      setNotes([
-        { id: '1', isPinned: true, pinnedAt: 100, pinOrder: 1, metadata: { lastModified: 100 } },
-        { id: '2', isPinned: true, pinnedAt: 200, pinOrder: 0, metadata: { lastModified: 50 } },
-      ]);
-      sortNotes();
-      expect(notes.map(note => note.id)).toEqual(['2', '1']);
-    });
-
-    it('should sort unpinned notes by lastModified descending', () => {
-      setNotes([
-        { id: '1', isPinned: false, metadata: { lastModified: 100 } },
-        { id: '2', isPinned: false, metadata: { lastModified: 200 } },
-      ]);
-      sortNotes();
-      expect(notes[0].id).toBe('2');
-      expect(notes[1].id).toBe('1');
-    });
+  it('uses the legacy pinnedAt fallback', () => {
+    setNotes([note('late', { isPinned: true, pinnedAt: 200 }), note('early', { isPinned: true, pinnedAt: 100 })]);
+    sortNotes(); expect(notes.map(n => n.id)).toEqual(['early', 'late']);
   });
-
-  describe('deleteNote', () => {
-    it('should move note to deletedNotes with deletedAt timestamp', async () => {
-      setNotes([
-        { id: 'n1', title: 'Test', isPinned: false, metadata: { lastModified: 100 } },
-      ]);
-      await deleteNote('n1');
-      expect(notes).toHaveLength(0);
-      expect(deletedNotes).toHaveLength(1);
-      expect(deletedNotes[0].id).toBe('n1');
-      expect(deletedNotes[0].metadata.deletedAt).toBeDefined();
-      expect(deleteNoteDB).toHaveBeenCalledWith('n1');
-    });
-
-    it('should not do anything for non-existent note', async () => {
-      setNotes([]);
-      await deleteNote('non-existent');
-      expect(deleteNoteDB).not.toHaveBeenCalled();
-    });
+  it('soft deletes and restores both full records and summaries', async () => {
+    await seed([note('n')]); await deleteNote('n');
+    expect(notes).toHaveLength(0); expect(deletedNotes[0].metadata.deletedAt).toBeTypeOf('number');
+    expect((await getNote('n')).metadata.deletedAt).toBeDefined();
+    await restoreNote('n');
+    expect(deletedNotes).toHaveLength(0);
+    expect((await getNote('n')).metadata.deletedAt).toBeUndefined();
+    expect((await getAllNoteSummaries())[0].metadata).toEqual(notes[0].metadata);
   });
-
-  describe('togglePin', () => {
-    it('should pin an unpinned note', async () => {
-      setNotes([
-        { id: 'pinned', isPinned: true, pinOrder: 2, metadata: { lastModified: 200 } },
-        { id: 'n1', isPinned: false, metadata: { lastModified: 100 } },
-      ]);
-      await togglePin('n1');
-      const pinnedNote = notes.find(note => note.id === 'n1');
-      expect(pinnedNote.isPinned).toBe(true);
-      expect(pinnedNote.pinnedAt).toBeDefined();
-      expect(pinnedNote.pinOrder).toBe(3);
-    });
-
-    it('should unpin a pinned note', async () => {
-      setNotes([
-        { id: 'n1', isPinned: true, pinnedAt: 100, pinOrder: 0, metadata: { lastModified: 100 } },
-      ]);
-      await togglePin('n1');
-      expect(notes[0].isPinned).toBe(false);
-      expect(notes[0].pinnedAt).toBeUndefined();
-      expect(notes[0].pinOrder).toBeUndefined();
-    });
+  it('ignores missing deletes', async () => {
+    await deleteNote('missing'); expect(deletedNotes).toHaveLength(0);
   });
-
-  describe('reorderPinnedNotes', () => {
-    it('reorders only pinned notes and persists normalized positions', async () => {
-      setNotes([
-        { id: 'p1', isPinned: true, pinOrder: 0, metadata: { lastModified: 100 } },
-        { id: 'p2', isPinned: true, pinOrder: 1, metadata: { lastModified: 200 } },
-        { id: 'u1', isPinned: false, metadata: { lastModified: 300 } },
-      ]);
-
-      await expect(reorderPinnedNotes(['p2', 'p1'])).resolves.toBe(true);
-
-      expect(notes.map(note => note.id)).toEqual(['p2', 'p1', 'u1']);
-      expect(notes[0].pinOrder).toBe(0);
-      expect(notes[1].pinOrder).toBe(1);
-      expect(saveNote).toHaveBeenCalledTimes(2);
-    });
-
-    it('rejects incomplete pinned orders without changing state', async () => {
-      setNotes([
-        { id: 'p1', isPinned: true, pinOrder: 0, metadata: { lastModified: 100 } },
-        { id: 'p2', isPinned: true, pinOrder: 1, metadata: { lastModified: 200 } },
-      ]);
-
-      await expect(reorderPinnedNotes(['p2'])).resolves.toBe(false);
-
-      expect(notes.map(note => note.id)).toEqual(['p1', 'p2']);
-      expect(saveNote).not.toHaveBeenCalled();
-    });
+  it('pins at the end and removes stale pin fields when unpinned', async () => {
+    await seed([note('p', { isPinned: true, pinOrder: 2 }), note('n')]);
+    await togglePin('n'); expect((await getNote('n')).pinOrder).toBe(3);
+    await togglePin('n');
+    expect(await getNote('n')).toMatchObject({ isPinned: false });
+    expect((await getNote('n')).pinOrder).toBeUndefined();
+    expect((await getNote('n')).pinnedAt).toBeUndefined();
   });
-
-  describe('restoreNote', () => {
-    it('should move note from deletedNotes to notes', async () => {
-      setDeletedNotes([
-        { id: 'n1', title: 'Deleted', isPinned: false, metadata: { lastModified: 100, deletedAt: 200 } },
-      ]);
-      await restoreNote('n1');
-      expect(deletedNotes).toHaveLength(0);
-      expect(notes).toHaveLength(1);
-      expect(notes[0].metadata.deletedAt).toBeUndefined();
-      expect(restoreNoteDB).toHaveBeenCalledWith('n1');
-    });
+  it('persists complete pinned reorder and rejects incomplete input', async () => {
+    await seed([note('a', { isPinned: true, pinOrder: 0 }), note('b', { isPinned: true, pinOrder: 1 }), note('u')]);
+    expect(await reorderPinnedNotes(['b'])).toBe(false);
+    expect(await reorderPinnedNotes(['b', 'a'])).toBe(true);
+    expect((await getNote('b')).pinOrder).toBe(0);
+    expect((await getNote('a')).pinOrder).toBe(1);
+    expect((await getNote('u')).isPinned).toBe(false);
   });
-
-  describe('deleteNotePermanently', () => {
-    it('should remove note from deletedNotes', async () => {
-      setDeletedNotes([
-        { id: 'n1', metadata: { deletedAt: 100 } },
-        { id: 'n2', metadata: { deletedAt: 200 } },
-      ]);
-      await deleteNotePermanently('n1');
-      expect(deletedNotes).toHaveLength(1);
-      expect(deletedNotes[0].id).toBe('n2');
-      expect(deleteNotePermanentlyDB).toHaveBeenCalledWith('n1');
-    });
+  it('permanently removes deleted records', async () => {
+    await seed([note('n')]); await deleteNote('n'); await deleteNotePermanently('n');
+    expect(await getNote('n')).toBeUndefined(); expect(deletedNotes).toHaveLength(0);
   });
-
-  describe('emptyRecycleBin', () => {
-    it('should permanently delete all deleted notes and images', async () => {
-      setDeletedNotes([
-        { id: 'n1', metadata: { deletedAt: 100 } },
-        { id: 'n2', metadata: { deletedAt: 200 } },
-      ]);
-      getDeletedImageIdsFromDB.mockResolvedValue(['img1']);
-
-      await emptyRecycleBin();
-      expect(deletedNotes).toHaveLength(0);
-      expect(deleteNotePermanentlyDB).toHaveBeenCalledTimes(2);
-      expect(getDeletedImageIdsFromDB).toHaveBeenCalledTimes(1);
-      expect(deleteImagePermanently).toHaveBeenCalledWith('img1');
-      expect(deleteImagePermanently).not.toHaveBeenCalledWith('img2');
-    });
+  it('empties the bin without deleting active images', async () => {
+    await seed([note('n')]); await deleteNote('n');
+    await saveImage('active', new Blob(['a']));
+    const { deleteImage } = await import('../../src/database/images.js');
+    await saveImage('deleted', new Blob(['b'])); await deleteImage('deleted');
+    await emptyRecycleBin();
+    expect(deletedNotes).toHaveLength(0); expect(await getImage('deleted')).toBeNull();
+    expect(await getImage('active')).toBeDefined();
   });
 });

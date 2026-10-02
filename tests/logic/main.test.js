@@ -52,6 +52,13 @@ vi.mock('../../src/database/index.js', () => ({
   deleteImagePermanently: mocks.deleteImagePermanently,
 }));
 
+vi.mock('../../src/database/tree.js', () => ({ getAllFolders: vi.fn().mockResolvedValue([]) }));
+vi.mock('../../src/folders.js', () => ({ purgeItems: vi.fn(async ids => {
+  const state = await import('../../src/state.js');
+  for (const id of ids) await mocks.deleteNotePermanentlyDB(id);
+  state.setDeletedNotes(state.deletedNotes.filter(n => !ids.includes(n.id)));
+}) }));
+
 vi.mock('../../src/notes.js', () => ({
   sortNotes: mocks.sortNotes,
 }));

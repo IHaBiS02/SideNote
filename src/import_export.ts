@@ -1,3 +1,4 @@
+import { batchTimestampCeiling } from './list-order.js';
 // Import required functions from database
 import { getImage, saveImage, saveNote } from './database/index.js';
 import { extractImageIds, sanitizeFilename } from './utils.js';
@@ -222,6 +223,7 @@ function createNoteFromParsedSnote(
   // 새 노트 객체 생성
   const isPinned = overrides.isPinned ?? false;
   const newNote: Note = {
+    parentId: null,
     id: overrides.id || crypto.randomUUID(),  // 새 UUID 생성 (중복 방지)
     title: parsedNote.title,
     content: parsedNote.content,
@@ -291,8 +293,7 @@ async function saveImportedNotes(
     (maximum, note) => Math.max(maximum, note.metadata.lastModified),
     0,
   );
-  const timestampCeiling = Math.max(Date.now(), maximumExistingLastModified)
-    + parsedNotes.length + 1;
+  const timestampCeiling = batchTimestampCeiling(Date.now(), maximumExistingLastModified, parsedNotes.length);
   let nextPinOrder = maximumExistingPinOrder + 1;
   let pinnedIndex = 0;
   const savedNotes: Note[] = [];

@@ -53,7 +53,7 @@ note.snote/
 
 ### .snotes (Multiple Notes Export)
 
-A `.snotes` file is a ZIP archive containing multiple notes. A root manifest
+A `.snotes` file is a ZIP archive containing notes and, since 5.0.0, folders. A root manifest
 stores the displayed order and pinned state, while each note remains in its own
 directory named by its ID:
 
@@ -73,7 +73,7 @@ notes.zip/
 └── ...
 ```
 
-#### manifest.json Structure
+#### Legacy version 1 manifest.json Structure
 
 ```json
 {
@@ -120,12 +120,12 @@ notes.zip/
 - Imported regular notes receive a unique descending `lastModified` range above
   the existing regular notes so their archive order is preserved without ties.
 - Existing notes are not overwritten
-- Images are imported to IndexedDB with new IDs to avoid conflicts
+- Version 2 imports remap images to new IDs to avoid conflicts
 - Image references in the Markdown content are automatically updated with the new IDs
 
 ## Note Storage in IndexedDB
 
-The runtime database uses three object stores. Export archives continue to use
+The runtime database uses four object stores in IndexedDB version 5. Export archives continue to use
 full note records; the summary store is a derived startup index and is not part
 of `.snote` or `.snotes` files.
 
@@ -133,6 +133,8 @@ of `.snote` or `.snotes` files.
   ```javascript
   {
     id: "unique-id",
+    parentId: null, // or a folder ID
+    deletionGroup: undefined, // optional soft-delete group ID
     title: "Note Title",
     content: "Markdown content",
     settings: {
@@ -161,6 +163,8 @@ of `.snote` or `.snotes` files.
   ```javascript
   {
     id: "unique-id",
+    parentId: null, // or a folder ID
+    deletionGroup: undefined, // optional soft-delete group ID
     title: "Note Title",
     metadata: {
       createdAt: timestamp,
@@ -194,3 +198,40 @@ of `.snote` or `.snotes` files.
   with `deletedAt: null` are absent from the index. The index is local derived
   database metadata and does not change `.snote`, `.snotes`, HTML, PDF, or ZIP
   export formats.
+
+## Version 2 hierarchy manifest (5.0.0)
+
+Whole-library `.snotes` and ZIP exports now use:
+
+```json
+{
+  "formatVersion": 2,
+  "folders": [{
+    "kind": "folder", "id": "folder-id", "title": "Projects", "parentId": null,
+    "ownModifiedAt": 1704067200000,
+    "metadata": { "createdAt": 1704067200000, "lastModified": 1704067200000 },
+    "isPinned": true, "pinOrder": 0
+  }],
+  "notes": [{
+    "id": "note-id", "folder": "note-id", "parentId": "folder-id",
+    "isPinned": false
+  }]
+}
+```
+
+Note directories still contain `note.md`, `metadata.json` and images. Folders are
+manifest records, including empty folders; they are not nested ZIP directories.
+`parentId` encodes the hierarchy. Pins are scoped to each parent. Version 2 import
+preserves note dates and internal order, remaps note/folder/image IDs, and appends
+imported root pins after existing pins. It validates duplicate IDs, parent links,
+cycles and required note files before one atomic save. Legacy v1/manifest-free
+imports retain their date-rebasing behavior and go to root. Older SideNote versions
+do not understand the v2 manifest.
+
+The `folders` store holds the manifest-style folder records plus optional deletion
+metadata. Notes and summaries gain `parentId` and optional `deletionGroup`.
+Summaries additionally store `imageIds`, derived from the Markdown, for shared-image
+protection on permanent tree deletion. Upgrading v4 to v5 backfills root membership
+and regenerates summaries without changing content, pin order or deletion state.
+Folder `metadata.lastModified` is the maximum of `ownModifiedAt` and active child
+modification times. These rules are detailed in [FOLDER_IMPLEMENTATION.md](FOLDER_IMPLEMENTATION.md).

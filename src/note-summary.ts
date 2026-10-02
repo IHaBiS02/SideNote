@@ -1,8 +1,12 @@
+import { extractImageIds } from './utils.js';
 import type { Note, NoteListEntry, NoteSummary } from './types.js';
 
 function createNoteSummary(note: Note): NoteSummary {
   return {
     id: note.id,
+    parentId: note.parentId ?? null,
+    imageIds: extractImageIds(note.content),
+    ...(note.deletionGroup ? { deletionGroup: note.deletionGroup } : {}),
     title: note.title,
     metadata: { ...note.metadata },
     isPinned: note.isPinned === true,

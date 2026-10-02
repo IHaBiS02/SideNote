@@ -34,6 +34,8 @@ export interface NoteMetadata {
 }
 
 export interface Note {
+  parentId?: string | null;
+  deletionGroup?: string;
   id: string;
   title: string;
   content: string;
@@ -46,6 +48,9 @@ export interface Note {
 
 /** Lightweight list/recycle-bin record that intentionally excludes Markdown. */
 export interface NoteSummary {
+  parentId?: string | null;
+  deletionGroup?: string;
+  imageIds?: string[];
   id: string;
   title: string;
   metadata: NoteMetadata;
@@ -67,7 +72,21 @@ export interface NavigationHistoryState {
   view: string;
   params?: {
     noteId?: string | null;
+    folderId?: string | null;
     inEditMode?: boolean;
     isGlobal?: boolean;
   };
+}
+
+/** Folder timestamps distinguish direct edits from derived subtree activity. */
+export interface Folder extends NoteSummary {
+  kind: 'folder';
+  parentId: string | null;
+  ownModifiedAt: number;
+}
+
+export type ListItem = NoteListEntry | Folder;
+export interface TreeSnapshot {
+  notes: NoteSummary[];
+  folders: Folder[];
 }

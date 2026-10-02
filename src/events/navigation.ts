@@ -27,6 +27,7 @@ import { createDropdown } from '../ui-helpers.js';
 // Import state from state module
 import {
   notes,
+  setCurrentFolderId,
   isGlobalSettings,
   originalNoteContent,
   setIsGlobalSettings,
@@ -72,6 +73,7 @@ async function navigateToState(
 
     switch (state.view) {
         case 'list':
+            setCurrentFolderId(state.params?.folderId ?? null);
             showListView(false);
             break;
         case 'editor':

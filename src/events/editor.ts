@@ -19,6 +19,7 @@ import { resolveEffectiveSettings } from '../settings.js';
 
 import {
   notes,
+  currentFolderId,
   activeNoteId,
   isPreview,
   getLoadedNote,
@@ -50,6 +51,7 @@ function initializeEditorEvents(): void {
     const now = Date.now();
     const newNote = {
       id: crypto.randomUUID(),
+      parentId: currentFolderId,
       title: 'New Note',
       content: '',
       settings: {},
@@ -59,9 +61,9 @@ function initializeEditorEvents(): void {
       },
       isPinned: false
     };
-    notes.push(newNote);
-    sortNotes();
     await saveNote(newNote);
+    if (!notes.some(n => n.id === newNote.id)) notes.push(newNote);
+    sortNotes();
     const inEditMode = false;
     const noteId = newNote.id;
     pushToHistory({ view: 'editor', params: { noteId, inEditMode } });

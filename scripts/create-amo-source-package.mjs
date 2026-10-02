@@ -14,6 +14,8 @@ const sourceEntries = [
   'LICENSE',
   'LIBRARY_LICENSES.md',
   'README.md',
+  'FOLDER_IMPLEMENTATION.md',
+  'SAVEFILE_STRUCTURE.md',
   'FIREFOX_AMO_SOURCE_SUBMISSION_GUIDE.md',
   'background.ts',
   'build.js',

@@ -247,4 +247,56 @@ describe('pinned note long-press dragging', () => {
     expect(onReorder).not.toHaveBeenCalled();
     controller.destroy();
   });
+  it('moves an unpinned selection into a folder without reordering the list', () => {
+    const list = document.querySelector('#note-list');
+    const a = noteItem('a', false), b = noteItem('b', false), folder = noteItem('f', false);
+    folder.dataset.kind = 'folder'; list.append(a, b, folder);
+    setBounds(list, 0, 160); setBounds(a, 0); setBounds(b, 40); setBounds(folder, 80);
+    Object.defineProperty(document, 'elementFromPoint', { configurable: true, value: vi.fn(() => folder) });
+    const reorder = vi.fn(), drop = vi.fn().mockResolvedValue();
+    const controller = createPinnedNoteDragController(list, reorder, {
+      getDragIds: () => ['a', 'b'], canDrop: () => true, onDrop: drop,
+    });
+    a.dispatchEvent(createPointerEvent('pointerdown', { x: 10, y: 10 })); vi.advanceTimersByTime(350);
+    expect(b.style.display).toBe('none');
+    window.dispatchEvent(createPointerEvent('pointermove', { x: 10, y: 100 }));
+    expect(folder.classList.contains('folder-drop-target')).toBe(true);
+    window.dispatchEvent(createPointerEvent('pointerup', { x: 10, y: 100 }));
+    expect(drop).toHaveBeenCalledWith(['a', 'b'], { folderId: 'f' });
+    expect(reorder).not.toHaveBeenCalled(); expect(b.style.display).toBe(''); controller.destroy();
+  });
+
+  it('drops on the header once and suppresses the add/back button click', () => {
+    const list = document.querySelector('#note-list'), item = noteItem('a', false);
+    list.append(item); setBounds(item, 40); setBounds(list, 40, 200);
+    const header = document.createElement('div'), button = document.createElement('button');
+    header.append(button); document.body.prepend(header);
+    Object.defineProperty(document, 'elementFromPoint', { configurable: true, value: vi.fn(() => button) });
+    const click = vi.fn(); button.addEventListener('click', click);
+    const drop = vi.fn().mockResolvedValue();
+    const controller = createPinnedNoteDragController(list, vi.fn(), { upTarget: header, onDrop: drop, canDrop: () => true });
+    item.dispatchEvent(createPointerEvent('pointerdown', { x: 10, y: 50 })); vi.advanceTimersByTime(350);
+    window.dispatchEvent(createPointerEvent('pointermove', { x: 10, y: 10 }));
+    expect(drop).not.toHaveBeenCalled();
+    window.dispatchEvent(createPointerEvent('pointerup', { x: 10, y: 10 }));
+    button.click(); expect(click).not.toHaveBeenCalled(); expect(drop).toHaveBeenCalledWith(['a'], { up: true });
+    controller.destroy();
+  });
+
+  it('cancels invalid folder drops and Escape without calling either mutation', () => {
+    const list = document.querySelector('#note-list'), item = noteItem('a', true), folder = noteItem('f', false);
+    folder.dataset.kind = 'folder'; list.append(item, folder); setBounds(item, 0); setBounds(folder, 40); setBounds(list, 0, 200);
+    Object.defineProperty(document, 'elementFromPoint', { configurable: true, value: vi.fn(() => folder) });
+    const drop = vi.fn(), reorder = vi.fn();
+    const controller = createPinnedNoteDragController(list, reorder, { onDrop: drop, canDrop: () => false });
+    item.dispatchEvent(createPointerEvent('pointerdown', { x: 10, y: 10 })); vi.advanceTimersByTime(350);
+    window.dispatchEvent(createPointerEvent('pointermove', { x: 10, y: 60 }));
+    expect(folder.classList.contains('folder-drop-invalid')).toBe(true);
+    window.dispatchEvent(createPointerEvent('pointerup', { x: 10, y: 60 }));
+    item.dispatchEvent(createPointerEvent('pointerdown', { x: 10, y: 10 })); vi.advanceTimersByTime(350);
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    expect(drop).not.toHaveBeenCalled(); expect(reorder).not.toHaveBeenCalled();
+    expect(list.querySelector('.pinned-note-dragging')).toBeNull(); controller.destroy();
+  });
+
 });

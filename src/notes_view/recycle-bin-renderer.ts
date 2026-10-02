@@ -4,16 +4,13 @@ import {
 } from '../dom.js';
 
 // Import required functions from other modules
-import { 
-  restoreNote, 
-  deleteNotePermanently 
-} from '../notes.js';
-
+import { restoreItem, purgeItems } from '../folders.js';
 import { getAllImageObjectsFromDB, restoreImage, deleteImagePermanently } from '../database/index.js';
 
 // Import state from state module
 import {
-  deletedNotes
+  deletedNotes,
+  folders
 } from '../state.js';
 
 import { THIRTY_DAYS_MS } from '../constants.js';
@@ -21,10 +18,10 @@ import { createBlobUrlTracker } from '../utils.js';
 
 // Import image modal function
 import { showImageModal } from './image-manager.js';
-import type { NoteListEntry, StoredImage } from '../types.js';
+import type { ListItem, StoredImage } from '../types.js';
 
-type DeletedNoteItem = NoteListEntry & {
-  type: 'note';
+type DeletedNoteItem = ListItem & {
+  type: 'note' | 'folder';
   deletedAt: number;
 };
 
@@ -51,9 +48,12 @@ async function renderDeletedItemsList(): Promise<void> {
   
   // 2. 노트와 이미지를 합쳐서 정렬
   const deletedItems: DeletedItem[] = [
-    ...deletedNotes.map(n => ({
+    ...[...deletedNotes, ...folders.filter(f => f.metadata.deletedAt)].filter(item => {
+      const parent = folders.find(f => f.id === item.parentId);
+      return !parent?.metadata.deletedAt;
+    }).map(n => ({
       ...n,
-      type: 'note' as const,
+      type: ('kind' in n ? 'folder' : 'note') as 'folder' | 'note',
       deletedAt: n.metadata.deletedAt as number,
     })),
     ...deletedImageObjects.map(i => ({
@@ -73,10 +73,10 @@ async function renderDeletedItemsList(): Promise<void> {
     const itemInfo = document.createElement('div');
     itemInfo.classList.add('item-info');
 
-    if (item.type === 'note') {
+    if (item.type !== 'image') {
       itemInfo.classList.add('note-info');
       const titleSpan = document.createElement('span');
-      titleSpan.textContent = item.title;
+      titleSpan.textContent = `${item.type === 'folder' ? '📁 ' : ''}${item.title}`;
       itemInfo.appendChild(titleSpan);
 
       const deletionDate = new Date(item.deletedAt + THIRTY_DAYS_MS);
@@ -117,12 +117,12 @@ async function renderDeletedItemsList(): Promise<void> {
 
     const restoreSpan = document.createElement('span');
     restoreSpan.textContent = '♻️';
-    restoreSpan.title = `Restore ${item.type === 'note' ? 'Note' : 'Image'}`;
+    restoreSpan.title = `Restore ${item.type !== 'image' ? 'Note' : 'Image'}`;
     restoreSpan.classList.add('restore-item-icon');
     restoreSpan.addEventListener('click', async (e) => {
       e.stopPropagation();
-      if (item.type === 'note') {
-        await restoreNote(item.id);
+      if (item.type !== 'image') {
+        await restoreItem(item.id);
         renderDeletedItemsList();
       } else {
         await restoreImage(item.id);
@@ -132,12 +132,12 @@ async function renderDeletedItemsList(): Promise<void> {
 
     const deleteSpan = document.createElement('span');
     deleteSpan.textContent = '🗑️';
-    deleteSpan.title = `Delete ${item.type === 'note' ? 'Note' : 'Image'} Permanently`;
+    deleteSpan.title = `Delete ${item.type !== 'image' ? 'Note' : 'Image'} Permanently`;
     deleteSpan.classList.add('delete-item-icon');
     deleteSpan.addEventListener('click', async (e) => {
       e.stopPropagation();
-      if (item.type === 'note') {
-        await deleteNotePermanently(item.id);
+      if (item.type !== 'image') {
+        await purgeItems([item.id]);
         renderDeletedItemsList();
       } else {
         await deleteImagePermanently(item.id);

@@ -43,6 +43,12 @@ vi.mock('../../src/import_export.js', () => ({
   saveParsedSnoteImages: mocks.saveParsedSnoteImages,
 }));
 
+vi.mock('../../src/folder-archive.js', () => ({
+  createTreeArchive: (notes, folders, options) => mocks.createAllNotesArchive(notes, options),
+  isTreeArchive: vi.fn().mockResolvedValue(false),
+  importTreeArchive: vi.fn(),
+}));
+
 vi.mock('../../src/document-export.js', () => ({
   downloadStandaloneNoteHtml: mocks.downloadStandaloneNoteHtml,
   downloadStandaloneNotePdf: mocks.downloadStandaloneNotePdf,

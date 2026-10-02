@@ -5,7 +5,14 @@ const DEFAULT_DROP_HYSTERESIS_PX = 10;
 const SUPPRESS_CLICK_DURATION_MS = 600;
 const FLOATING_HORIZONTAL_INSET_PX = 8;
 
+type ItemDrop = { folderId: string } | { up: true };
+let globalSuppressClickUntil = 0;
+
 interface PinnedNoteDragOptions {
+  getDragIds?: (id: string) => string[];
+  canDrop?: (ids: string[], target: ItemDrop) => boolean;
+  onDrop?: (ids: string[], target: ItemDrop) => Promise<void>;
+  upTarget?: HTMLElement | null;
   longPressDelayMs?: number;
   moveTolerancePx?: number;
   dropHysteresisPx?: number;
@@ -30,6 +37,10 @@ interface ActiveDrag {
   dropIndex: number;
   dropBoundariesY: number[];
   initialScrollTop: number;
+  ids: string[];
+  originalItems: HTMLLIElement[];
+  dropTarget?: ItemDrop | null;
+  invalidTarget?: boolean;
 }
 
 interface PinnedNoteDragController {
@@ -46,7 +57,7 @@ function findPinnedNoteItem(
 ): HTMLLIElement | null {
   if (!(target instanceof Element)) return null;
   const item = target.closest<HTMLLIElement>(
-    'li[data-note-id][data-pinned="true"]',
+    'li[data-note-id]',
   );
   return item && list.contains(item) ? item : null;
 }
@@ -86,7 +97,7 @@ function movePinnedPlaceholderAtPointer(
 
   const otherPinnedItems = Array.from(
     list.querySelectorAll<HTMLLIElement>('li[data-pinned="true"]'),
-  ).filter(candidate => candidate !== drag.item);
+  ).filter(candidate => !drag.ids.includes(candidate.dataset.noteId!));
   const insertBefore = otherPinnedItems[nextDropIndex];
 
   if (insertBefore) {
@@ -121,6 +132,7 @@ function createPinnedNoteDragController(
     ?? DEFAULT_MOVE_TOLERANCE_PX;
   const dropHysteresisPx = options.dropHysteresisPx
     ?? DEFAULT_DROP_HYSTERESIS_PX;
+  let highlighted: HTMLElement | null = null;
   let candidate: DragCandidate | null = null;
   let activeDrag: ActiveDrag | null = null;
   let suppressedClickNoteId: string | null = null;
@@ -143,6 +155,10 @@ function createPinnedNoteDragController(
   };
 
   const cleanUpActiveDrag = (drag: ActiveDrag): void => {
+    highlighted?.classList.remove('folder-drop-target', 'folder-drop-invalid');
+    highlighted = null;
+    for (const item of drag.originalItems) item.style.removeProperty('display');
+    delete drag.item.dataset.dragCount;
     drag.placeholder.remove();
     drag.item.classList.remove('pinned-note-dragging');
     drag.item.removeAttribute('aria-grabbed');
@@ -159,12 +175,19 @@ function createPinnedNoteDragController(
     }
 
     const bounds = current.item.getBoundingClientRect();
+    const originalItems = Array.from(list.querySelectorAll<HTMLLIElement>('li[data-note-id]'));
+    const ids = options.getDragIds?.(current.noteId) ?? [current.noteId];
+    if (!ids.length) { clearCandidate(); return; }
+    for (const item of originalItems) {
+      if (item !== current.item && ids.includes(item.dataset.noteId!)) item.style.display = 'none';
+    }
+    if (ids.length > 1) current.item.dataset.dragCount = String(ids.length);
     const pinnedItems = Array.from(
       list.querySelectorAll<HTMLLIElement>('li[data-pinned="true"]'),
     );
-    const dropIndex = pinnedItems.indexOf(current.item);
+    const dropIndex = pinnedItems.slice(0, pinnedItems.indexOf(current.item)).filter(item => !ids.includes(item.dataset.noteId!)).length;
     const dropBoundariesY = pinnedItems
-      .filter(item => item !== current.item)
+      .filter(item => !ids.includes(item.dataset.noteId!))
       .map((item) => {
         const itemBounds = item.getBoundingClientRect();
         return itemBounds.top + itemBounds.height / 2;
@@ -184,6 +207,8 @@ function createPinnedNoteDragController(
     candidate = null;
     activeDrag = {
       item: current.item,
+      ids,
+      originalItems,
       placeholder,
       originalNextSibling,
       noteId: current.noteId,
@@ -222,12 +247,24 @@ function createPinnedNoteDragController(
     activeDrag = null;
     if (event?.cancelable) event.preventDefault();
 
-    list.insertBefore(finishedDrag.item, finishedDrag.placeholder);
+    const reorder = finishedDrag.item.dataset.pinned === 'true' && !finishedDrag.dropTarget && !finishedDrag.invalidTarget;
+    if (reorder) {
+      for (const item of finishedDrag.originalItems) {
+        if (finishedDrag.ids.includes(item.dataset.noteId!)) list.insertBefore(item, finishedDrag.placeholder);
+      }
+    } else {
+      for (const item of finishedDrag.originalItems) list.appendChild(item);
+    }
     cleanUpActiveDrag(finishedDrag);
     suppressClickUntil = Date.now() + SUPPRESS_CLICK_DURATION_MS;
 
-    void Promise.resolve(onReorder(pinnedNoteIds(list))).catch((error) => {
-      console.error('Failed to reorder pinned notes:', error);
+    globalSuppressClickUntil = suppressClickUntil;
+    const action = finishedDrag.dropTarget && options.onDrop
+      ? options.onDrop(finishedDrag.ids, finishedDrag.dropTarget)
+      : reorder ? onReorder(pinnedNoteIds(list)) : undefined;
+    void Promise.resolve(action).catch((error) => {
+      for (const item of finishedDrag.originalItems) if (item.isConnected) list.appendChild(item);
+      console.error('Failed to move items:', error);
     });
   };
 
@@ -236,20 +273,17 @@ function createPinnedNoteDragController(
     if (!cancelledDrag) return;
     activeDrag = null;
 
-    if (
-      cancelledDrag.originalNextSibling
-      && cancelledDrag.originalNextSibling.parentNode === list
-    ) {
-      list.insertBefore(cancelledDrag.item, cancelledDrag.originalNextSibling);
-    } else {
-      list.appendChild(cancelledDrag.item);
-    }
+    for (const item of cancelledDrag.originalItems) list.appendChild(item);
     cleanUpActiveDrag(cancelledDrag);
     suppressedClickNoteId = null;
-    suppressClickUntil = 0;
+    suppressClickUntil = Date.now() + SUPPRESS_CLICK_DURATION_MS;
+    globalSuppressClickUntil = suppressClickUntil;
   };
 
   const handlePointerDown = (event: PointerEvent): void => {
+    // A fresh press is a new gesture, so it must not inherit a previous drop's click suppression.
+    globalSuppressClickUntil = 0;
+    suppressClickUntil = 0;
     if (event.button !== 0 || event.isPrimary === false || candidate || activeDrag) {
       return;
     }
@@ -260,7 +294,8 @@ function createPinnedNoteDragController(
 
     const item = findPinnedNoteItem(list, event.target);
     const noteId = item?.dataset.noteId;
-    if (!item || !noteId) return;
+    if (!item || !noteId || (item.dataset.pinned !== 'true' && !options.onDrop)) return;
+    if (event.ctrlKey || event.metaKey || event.shiftKey) return;
 
     candidate = {
       item,
@@ -286,6 +321,37 @@ function createPinnedNoteDragController(
     if (event.cancelable) event.preventDefault();
 
     activeDrag.item.style.top = `${event.clientY - activeDrag.grabOffsetY}px`;
+    if (options.onDrop) {
+      highlighted?.classList.remove('folder-drop-target', 'folder-drop-invalid');
+      highlighted = null;
+      activeDrag.dropTarget = null;
+      activeDrag.invalidTarget = false;
+      const under = document.elementFromPoint?.(event.clientX, event.clientY);
+      const header = options.upTarget;
+      const row = under?.closest<HTMLElement>('li[data-kind="folder"]');
+      let target: ItemDrop | null = null;
+      if (header && under && header.contains(under)) { target = { up: true }; highlighted = header; }
+      else if (row && list.contains(row)) {
+        const rect = row.getBoundingClientRect();
+        if (event.clientY >= rect.top + rect.height * 0.2 && event.clientY <= rect.bottom - rect.height * 0.2) {
+          target = { folderId: row.dataset.noteId! }; highlighted = row;
+        }
+      }
+      if (target) {
+        const valid = options.canDrop?.(activeDrag.ids, target) ?? true;
+        activeDrag.dropTarget = valid ? target : null;
+        activeDrag.invalidTarget = !valid;
+        highlighted?.classList.add(valid ? 'folder-drop-target' : 'folder-drop-invalid');
+        return;
+      }
+      const bounds = list.getBoundingClientRect();
+      if (event.clientY < bounds.top || event.clientY > bounds.bottom || event.clientX < bounds.left || event.clientX > bounds.right) {
+        activeDrag.invalidTarget = true; return;
+      }
+      if (event.clientY > bounds.bottom - 35) list.scrollTop += 12;
+      else if (event.clientY < bounds.top + 35) list.scrollTop -= 12;
+    }
+    if (activeDrag.item.dataset.pinned !== 'true') return;
     movePinnedPlaceholderAtPointer(
       list,
       activeDrag,
@@ -315,15 +381,7 @@ function createPinnedNoteDragController(
   };
 
   const handleClick = (event: MouseEvent): void => {
-    if (!suppressedClickNoteId || Date.now() > suppressClickUntil) {
-      suppressedClickNoteId = null;
-      return;
-    }
-    const item = event.target instanceof Element
-      ? event.target.closest<HTMLLIElement>('li[data-note-id]')
-      : null;
-    if (item?.dataset.noteId !== suppressedClickNoteId) return;
-
+    if (Date.now() > Math.max(suppressClickUntil, globalSuppressClickUntil)) return;
     suppressedClickNoteId = null;
     event.preventDefault();
     event.stopImmediatePropagation();
@@ -345,8 +403,14 @@ function createPinnedNoteDragController(
     cancelActiveDrag();
   };
 
+  const handleKey = (event: KeyboardEvent): void => {
+    if (event.key === 'Escape' && (candidate || activeDrag)) {
+      event.preventDefault(); event.stopImmediatePropagation(); clearCandidate(); cancelActiveDrag();
+    }
+  };
+  window.addEventListener('keydown', handleKey, true);
   list.addEventListener('pointerdown', handlePointerDown);
-  list.addEventListener('click', handleClick, true);
+  window.addEventListener('click', handleClick, true);
   list.addEventListener('contextmenu', handleContextMenu);
   list.addEventListener('touchmove', handleTouchMove, { passive: false });
   window.addEventListener('pointermove', handlePointerMove, { passive: false });
@@ -356,10 +420,11 @@ function createPinnedNoteDragController(
 
   return {
     destroy: () => {
+      window.removeEventListener('keydown', handleKey, true);
       clearCandidate();
       cancelActiveDrag();
       list.removeEventListener('pointerdown', handlePointerDown);
-      list.removeEventListener('click', handleClick, true);
+      window.removeEventListener('click', handleClick, true);
       list.removeEventListener('contextmenu', handleContextMenu);
       list.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('pointermove', handlePointerMove);

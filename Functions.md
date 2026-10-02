@@ -246,16 +246,16 @@ IndexedDB operations are now modularized into separate files for better organiza
 
 Database initialization and shared instance management:
 
-- `initDB()`: Opens IndexedDB version 4, creates `notes`, `noteSummaries`, and
+- `initDB()`: Opens IndexedDB version 5, creates `notes`, `noteSummaries`, `folders`, and
   `images`, backfills summaries while upgrading an existing version-2 DB, and
-  adds the image `deletedAt` index when upgrading from version 3
+  adds the image `deletedAt` index when upgrading from version 3; v5 adds root parent links and image reference summaries
 - `getDB()`: Gets the shared database instance for other modules
 
 ### src/database/notes.ts
 
 Note-related database operations:
 
-- `saveNote(note)`: Atomically saves the full note and its derived summary
+- `saveNote(note)`: Atomically saves the full note, its derived summary, and ancestor folder dates
 - `getNote(id)`: Retrieves one full Markdown note by ID
 - `getAllNotes()`: Retrieves all note objects from the database
 - `getAllNoteSummaries()`: Retrieves the lightweight startup/list records
@@ -397,7 +397,7 @@ Note operations (functions exported):
 - `togglePin(noteId)`: Toggles the pin status of a note and appends a newly
   pinned note to the pinned section
 - `reorderPinnedNotes(orderedNoteIds)`: Validates a complete pinned-note order,
-  normalizes `pinOrder`, updates in-memory order, and persists every pinned note
+  delegates parent-scoped normalization and atomic persistence to `reorderItems()`
 - `restoreNote(noteId)`: Restores a deleted note from recycle bin
 - `deleteNotePermanently(noteId)`: Permanently deletes a note
 - `emptyRecycleBin()`: Empties the recycle bin (permanent deletion of all
@@ -493,7 +493,7 @@ Note list and editor functionality:
 
 - `renderNoteList()`: Builds all rows in a `DocumentFragment`, replaces the DOM
   once, retains one delegated click listener for open/pin/delete, and attaches
-  long-press dragging to pinned entries.
+  long-press dragging to notes/folders. Only direct children are rendered; Ctrl/Cmd/Shift selection stays within one pin section.
 - `openNote(noteId, inEditMode, addToHistory)`: Returns a promise, loads the
   full note by ID when state still contains a summary, hydrates state, and opens
   it in the editor.
@@ -512,7 +512,9 @@ Note list and editor functionality:
   CSS gap animations while the pointer rests near a boundary.
   `pointerup` moves the card to the placeholder and reports the final pinned ID
   order; pointer cancellation or window blur restores the original position.
-  The generated drop click is suppressed and pin/delete controls are excluded.
+  The generated drop click is suppressed and row controls are excluded. Optional
+  `getDragIds`, `canDrop`, `onDrop`, and `upTarget` extend the controller to selected
+  groups, folder entry, and one-level header drops. General items never reorder.
 
 ### src/notes_view/editor-mode.ts
 
@@ -655,3 +657,23 @@ The extension source uses TypeScript ES modules with explicit imports/exports;
 3. **Entry Point**: Source `main.ts` is emitted as `src/main.js`, which is loaded as `type="module"` in HTML
 4. **Event Initialization**: Event listeners are organized in `src/events/` modules and initialized via `initializeAllEvents()` call
 5. **Circular Dependencies**: Avoided through careful module structure and state centralization
+
+## Folder APIs (5.0.0)
+
+- `children(tree, parentId)`: Sorted active direct children (notes and folders).
+- `updateFolderDates(tree)`: Validates parents/cycles and derives folder dates bottom-up.
+- `planMove(tree, ids, sourceId, target, now)`: Validates and applies folder entry or parent exit to a transaction-local snapshot.
+- `batchTimestampCeiling(now, maximum, count)`: `max(now, maximum) + count + 1`; caller assigns `ceiling - index`.
+- `mutateTree(plan, additions)`: Commits tree edits, full-note mirrors, optional imported notes/images and reference cleanup atomically.
+- `getAllFolders()`: Reads folder metadata.
+- `applyTreeSnapshot(tree)`: Updates state from a completed transaction, retaining hydrated bodies.
+- `createFolder(title)`, `renameFolder(id, title)`: Create in the current folder or rename.
+- `moveItems(ids, target)`: Move to a sibling folder (`{folderId}`) or one level up (`{up: true}`).
+- `toggleItemPin(id)`, `reorderItems(ids)`: Parent-scoped pin mutations for notes and folders.
+- `trashItem(id)`, `restoreItem(id)`, `purgeItems(ids)`: Subtree lifecycle with deletion groups and shared-image protection.
+- `createTreeArchive(notes, folders, options)`: Builds a formatVersion 2 archive.
+- `isTreeArchive(zip)`, `importTreeArchive(zip)`: Detect and validate v2, remap IDs, and atomically merge at root.
+
+`src/notes.ts` preserves existing note helper names as wrappers over the folder-aware
+services. The UI and startup cleanup use the tree services for folder lifecycle operations.
+The old single-record database CRUD helpers remain low-level note APIs.

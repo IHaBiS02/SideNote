@@ -10,10 +10,13 @@
 </head>
 <body>
   <div id="list-view">
-    <div class="header">
+    <div class="header" id="folder-header">
+      <button id="folder-back-button" title="Open parent folder" aria-label="Open parent folder" hidden>&lt;</button>
       <h1 id="notes-list-title">Notes</h1>
       <button id="new-note-button">+</button>
     </div>
+    <div id="folder-path" hidden></div>
+    <div id="folder-status" role="status" aria-live="polite"></div>
     <ul id="note-list"></ul>
     <div class="toolbar">
       <button id="global-import-button" title="Import Notes">📂</button>

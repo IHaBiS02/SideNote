@@ -1,3 +1,7 @@
+import { getAllFolders } from './database/tree.js';
+import { purgeItems } from './folders.js';
+import { folders, setFolders, applyTreeSnapshot } from './state.js';
+import type { TreeSnapshot } from './types.js';
 // Import all required modules  
 import {
   initDB,
@@ -18,8 +22,13 @@ import type { GlobalSettings, Note } from './types.js';
 
 // === 애플리케이션 초기화 ===
 
+function onTreeChanged(event: Event): void {
+  applyTreeSnapshot((event as CustomEvent<TreeSnapshot>).detail);
+}
+
 async function bootstrap(): Promise<void> {
   await initDB();
+  document.addEventListener('sidenote-tree-changed', onTreeChanged);
   await loadAndMigrateData();
   initializeInitialView();
   initializeAllEvents();
@@ -90,6 +99,7 @@ async function loadAndMigrateData(): Promise<void> {
 
   // Load only list metadata. Full Markdown is fetched when a note is opened.
   const allNotesFromDB = await getAllNoteSummaries();
+  setFolders(await getAllFolders());
   // 활성 노트와 삭제된 노트 분리
   setNotes(allNotesFromDB.filter(note => !note.metadata.deletedAt));
   setDeletedNotes(allNotesFromDB.filter(note => note.metadata.deletedAt));
@@ -121,15 +131,11 @@ async function cleanupDeletedNotes(): Promise<void> {
       note => typeof note.metadata.deletedAt === 'number'
         && note.metadata.deletedAt < thirtyDaysAgo,
     );
-    // 영구 삭제
-    for (const note of notesToDelete) {
-        await deleteNotePermanentlyDB(note.id);
+    const foldersToDelete = folders.filter(f => f.metadata.deletedAt && f.metadata.deletedAt < thirtyDaysAgo);
+    if (notesToDelete.length || foldersToDelete.length) {
+      await purgeItems([...notesToDelete, ...foldersToDelete].map(item => item.id));
     }
-    // 메모리에서도 제거
-    setDeletedNotes(deletedNotes.filter(
-      note => typeof note.metadata.deletedAt === 'number'
-        && note.metadata.deletedAt >= thirtyDaysAgo,
-    ));
+
 }
 
 if (!globalThis.__SIDENOTE_DISABLE_AUTO_BOOTSTRAP__) {
