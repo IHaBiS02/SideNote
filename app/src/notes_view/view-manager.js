@@ -1,9 +1,9 @@
 // Import required DOM elements
 import { listView, editorView, settingsView, licenseView, recycleBinView, imageManagementView } from '../dom.js';
 // Import required functions from other modules
-import { pushToHistory, clearHistory } from '../history.js';
+import { pushToHistory } from '../history.js';
 // Import state from state module
-import { isGlobalSettings, activeNoteId, isPreview, setActiveNoteId } from '../state.js';
+import { currentFolderId, isGlobalSettings, activeNoteId, isPreview, setActiveNoteId } from '../state.js';
 // Import render functions that will be needed
 import { renderNoteList } from './note-renderer.js';
 import { renderDeletedItemsList } from './recycle-bin-renderer.js';
@@ -23,8 +23,7 @@ function showListView(addToHistory = true) {
     imageManagementView.style.display = 'none';
     licenseView.style.display = 'none';
     if (addToHistory) {
-        clearHistory(); // 리스트 뷰로 돌아오면 히스토리 초기화
-        pushToHistory({ view: 'list' });
+        pushToHistory({ view: 'list', params: { folderId: currentFolderId } });
     }
     renderNoteList();
 }

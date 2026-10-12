@@ -177,6 +177,7 @@ textarea {
 }
 
 .button-container {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
 }
@@ -293,12 +294,61 @@ textarea {
   background-color: #f5f5f5;
 }
 
+/* Selection and drop feedback stay flat like the rest of the list: an accent
+   tint instead of a boxed outline, and the dashed rounded outline of the
+   pinned drop gap for places that accept (or refuse) the dragged rows. */
+#note-list li.item-selected {
+  background-color: rgba(0, 123, 255, 0.08);
+  box-shadow: inset 3px 0 0 #007bff;
+}
+
+#note-list li.item-selected:hover {
+  background-color: rgba(0, 123, 255, 0.13);
+}
+
+#note-list li[data-kind] {
+  position: relative;
+}
+
+#folder-header.folder-drop-target::before,
+#note-list li.folder-drop-target::before,
+#note-list li.folder-drop-invalid::before {
+  content: "";
+  position: absolute;
+  inset: 4px 8px;
+  pointer-events: none;
+  background-color: rgba(0, 123, 255, 0.08);
+  border: 1px dashed #007bff;
+  border-radius: 10px;
+  animation: folder-drop-hint 140ms ease-out;
+}
+
+#note-list li.folder-drop-invalid {
+  cursor: not-allowed;
+}
+
+#note-list li.folder-drop-invalid::before {
+  background-color: rgba(255, 0, 0, 0.05);
+  border-color: red;
+}
+
+@keyframes folder-drop-hint {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 #note-list li.pinned-note-dragging {
   position: fixed;
   z-index: 1001;
   box-sizing: border-box;
   margin: 0;
   cursor: grabbing;
+  outline: none;
   background-color: #fff;
   border: 1px solid rgba(0, 0, 0, 0.14);
   border-radius: 12px;
@@ -357,11 +407,6 @@ textarea {
 .delete-note-icon, .restore-note-icon, .pin-note-icon {
   cursor: pointer;
   padding: 5px;
-}
-
-.delete-note-icon:hover, .restore-note-icon:hover, .pin-note-icon:hover {
-  background-color: #ddd;
-  border-radius: 50%;
 }
 
 .delete-item-icon:hover, .restore-item-icon:hover {
@@ -488,11 +533,28 @@ button {
   border-radius: 3px;
 }
 
+/* Semantic buttons keep the original span icons' font, spacing and round hover. */
+.button-container > button {
+  appearance: none;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 5px;
+  font: inherit;
+  color: inherit;
+}
+
 button:hover {
   background-color: #eee;
 }
 
-#editor-title {
+.delete-note-icon:hover, .restore-note-icon:hover, .pin-note-icon:hover {
+  background-color: #ddd;
+  border-radius: 50%;
+}
+
+#editor-title,
+#notes-list-title.folder-title {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -690,7 +752,7 @@ li.task-list-item {
     color: #007bff;
 }
 
-.export-options-dropdown {
+.action-dropdown {
   position: fixed;
   background-color: white;
   border: 1px solid #ccc;
@@ -701,14 +763,15 @@ li.task-list-item {
   min-width: 170px;
 }
 
-.export-options-dropdown div {
+.action-dropdown > div {
   padding: 8px 12px;
   cursor: pointer;
   white-space: nowrap;
   position: relative;
 }
 
-.export-options-dropdown div:hover {
+.action-dropdown > div:hover,
+.action-dropdown > div:focus-visible {
   background-color: #f5f5f5;
 }
 
@@ -742,4 +805,113 @@ li.task-list-item {
 
 .confirmation-dropdown .delete-action.confirm {
     color: red;
+}
+
+/* Folder navigation reuses note headings, title inputs, rows and drag cards. */
+#folder-back-button[hidden] {
+  display: none;
+}
+
+#notes-list-title.folder-title {
+  max-width: calc(100% - 100px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Keep navigation metadata above the scrolling rows, inside the toolbar bounds. */
+#notes-list-body {
+  position: absolute;
+  top: 50px;
+  bottom: 41px;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#notes-list-body > #note-list {
+  position: static;
+  flex: 1;
+  min-height: 0;
+}
+
+#folder-path {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8em;
+  color: #888;
+  border-bottom: 1px solid #eee;
+}
+
+/* The selection count floats over the list like the dropdown menus, so
+   selecting rows never pushes the list down. */
+#folder-status {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  z-index: 4;
+  transform: translateX(-50%);
+  padding: 3px 12px;
+  pointer-events: none;
+  white-space: nowrap;
+  font-size: 0.9em;
+  color: #555;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+#folder-path[hidden],
+#folder-status:empty {
+  display: none;
+}
+
+#note-list li {
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+#note-list .item-title {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Multi-item drags show a stacked card with an accent count badge. */
+#note-list li[data-drag-count] {
+  box-shadow: 0 5px 0 -2px #fff, 0 5px 0 -1px rgba(0, 0, 0, 0.14),
+    0 12px 26px rgba(0, 0, 0, 0.2), 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+#note-list li[data-drag-count] .item-title {
+  flex: 1;
+}
+
+#note-list li[data-drag-count] .button-container {
+  order: 1;
+}
+
+#note-list li[data-drag-count]::after {
+  content: attr(data-drag-count);
+  flex-shrink: 0;
+  min-width: 1.5em;
+  margin: 0 6px 0 10px;
+  padding: 0 5px;
+  box-sizing: border-box;
+  text-align: center;
+  font-size: 0.9em;
+  font-weight: 700;
+  color: #fff;
+  background-color: #007bff;
+  border-radius: 999px;
+}
+
+#note-list li.pinned-note-dragging {
+  pointer-events: none;
 }

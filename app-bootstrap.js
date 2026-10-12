@@ -30,7 +30,7 @@ async function seed() {
   closeDB();
 }
 function snapshot() {
-  return { note: state.getLoadedNote(), notes: state.notes, deletedNotes: state.deletedNotes, globalSettings: state.globalSettings };
+  return { note: state.getLoadedNote(), notes: state.notes, deletedNotes: state.deletedNotes, folders: state.folders, globalSettings: state.globalSettings };
 }
 function publish() {
   if (receiving) return;
@@ -47,6 +47,7 @@ async function receive(value) {
     const settingsChanged = JSON.stringify(state.globalSettings) !== JSON.stringify(value.globalSettings) || JSON.stringify(previous?.settings) !== JSON.stringify(value.note?.settings);
     state.setNotes(structuredClone(value.notes));
     state.setDeletedNotes(structuredClone(value.deletedNotes));
+    state.setFolders(structuredClone(value.folders ?? []));
     state.setGlobalSettings(structuredClone(value.globalSettings));
     applyMode(normalizeGlobalSettings(value.globalSettings).mode);
     if (!value.note) {

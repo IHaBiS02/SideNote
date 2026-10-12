@@ -1,3 +1,5 @@
+import { createTreeArchive, importTreeArchive, isTreeArchive } from '../folder-archive.js';
+import { folders, setCurrentFolderId } from '../state.js';
 // Import DOM elements for import/export
 import { globalExportButton, globalImportButton, globalImportInput, exportNoteButton, importNoteButton, importNoteInput, editorTitle, markdownEditor } from '../dom.js';
 // Import functions from other modules
@@ -5,8 +7,8 @@ import { sortNotes } from '../notes.js';
 import { renderNoteList } from '../notes_view/index.js';
 import { getAllNotes, getNote, saveNote } from '../database/index.js';
 import { getTimestamp, sanitizeFilename, downloadFile } from '../utils.js';
-import { createAllNotesArchive, createSingleNoteArchive, parseSnote, parseSnotesArchive, saveImportedNotes, saveParsedSnote, saveParsedSnoteImages } from '../import_export.js';
-import { createDropdown } from '../ui-helpers.js';
+import { createSingleNoteArchive, parseSnote, parseSnotesArchive, saveImportedNotes, saveParsedSnote, saveParsedSnoteImages } from '../import_export.js';
+import { createDropdown, positionDropdownNearButton, setDropdownTop } from '../ui-helpers.js';
 import { downloadStandaloneNoteHtml, downloadStandaloneNotePdf, } from '../document-export.js';
 // Import state from state module
 import { notes, activeNoteId, getLoadedNote, hydrateNote, } from '../state.js';
@@ -34,7 +36,7 @@ async function exportAllNotes({ extension = 'snotes', addTwoSpaceLineBreaks = fa
     await ensureJsZipLoaded();
     const timestamp = getTimestamp();
     const activeNotes = await loadActiveNotesInListOrder();
-    const zip = await createAllNotesArchive(activeNotes, {
+    const zip = await createTreeArchive(activeNotes, folders, {
         addTwoSpaceLineBreaks,
         useTitleFolderNames
     });
@@ -75,21 +77,6 @@ async function exportCurrentNoteAsPdf() {
         console.error('Failed to export note as PDF:', error);
         alert('Failed to save this note as PDF. A referenced image may be missing.');
     }
-}
-function positionDropdownNearButton(dropdown, button) {
-    const rect = button.getBoundingClientRect();
-    const margin = 6;
-    const left = Math.min(rect.left, window.innerWidth - dropdown.offsetWidth - margin);
-    const topAbove = rect.top - dropdown.offsetHeight - margin;
-    const top = topAbove >= margin ? topAbove : rect.bottom + margin;
-    dropdown.style.left = `${Math.max(margin, left)}px`;
-    setDropdownTop(dropdown, top);
-}
-function setDropdownTop(dropdown, top) {
-    const margin = 6;
-    const maxTop = window.innerHeight - dropdown.offsetHeight - margin;
-    const boundedTop = Math.min(Math.max(margin, top), Math.max(margin, maxTop));
-    dropdown.style.top = `${boundedTop}px`;
 }
 function keepDropdownBottomStable(dropdown, update) {
     const previousBottom = dropdown.getBoundingClientRect().bottom;
@@ -141,6 +128,7 @@ function showExportOptionsDropdown(button, { archiveExtension, zipExport, archiv
     const dropdown = createDropdown({
         className: 'export-options-dropdown',
         populate: (dropdownElement) => {
+            dropdownElement.classList.add('action-dropdown');
             const zipItem = addDropdownItem(dropdownElement, 'Export as .zip', () => zipExport(false));
             zipItem.classList.add('export-zip-option');
             zipItem.addEventListener('contextmenu', (event) => {
@@ -210,6 +198,7 @@ function initializeImportExportEvents() {
             return;
         }
         try {
+            await ensureJsZipLoaded();
             const zip = await JSZip.loadAsync(file);
             // Single note file (.snote)
             if (file.name.endsWith('.snote')) {
@@ -220,16 +209,22 @@ function initializeImportExportEvents() {
                         lastModified: Date.now()
                     }
                 });
-                notes.push(newNote);
+                if (!notes.some(n => n.id === newNote.id))
+                    notes.push(newNote);
+            }
+            else if (file.name.endsWith('.snotes') && await isTreeArchive(zip)) {
+                await importTreeArchive(zip);
             }
             else if (file.name.endsWith('.snotes')) {
                 // Multiple notes file (.snotes)
                 const parsedNotes = await parseSnotesArchive(zip);
-                const newNotes = await saveImportedNotes(parsedNotes, notes);
+                const newNotes = await saveImportedNotes(parsedNotes, [...notes, ...folders].filter(item => !item.parentId && !item.metadata.deletedAt));
                 for (const note of newNotes) {
-                    notes.push(note);
+                    if (!notes.some(n => n.id === note.id))
+                        notes.push(note);
                 }
             }
+            setCurrentFolderId(null);
             sortNotes();
             renderNoteList();
         }
@@ -246,7 +241,6 @@ function initializeImportExportEvents() {
             return;
         }
         try {
-            await ensureJsZipLoaded();
             await ensureJsZipLoaded();
             const zip = await JSZip.loadAsync(file);
             const importedNote = await parseSnote(zip);

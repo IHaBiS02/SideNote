@@ -144,3 +144,20 @@ test('original pin, recycle, settings persistence and archive export operate on 
   assert.match(await zip.file('note.md').async('string'), /Attached image/);
   assert.equal(JSON.parse(await zip.file('metadata.json').async('string')).title, state.getLoadedNote().title);
 });
+
+test('folders created after the expanded pane loads still reach it', async t => {
+  const left = await app(t);
+  const doc = left.w.document;
+  doc.querySelector('#note-list li[data-kind="note"]').click();
+  await waitFor(() => left.platform.latest?.note);
+  const right = await app(t, left.platform, true);
+  await waitFor(() => right.state.activeNoteId);
+  assert.equal(right.state.folders.length, 0);
+  doc.dispatchEvent(new left.w.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  await waitFor(() => !left.state.activeNoteId);
+  doc.getElementById('new-note-button').dispatchEvent(new left.w.MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
+  doc.querySelector('.folder-create-menu div').click();
+  await waitFor(() => doc.querySelector('#note-list li[data-kind="folder"]'));
+  await waitFor(() => right.state.folders.length === 1);
+  assert.equal(right.state.folders[0].title, 'New Folder');
+});

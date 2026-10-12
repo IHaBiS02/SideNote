@@ -51,3 +51,28 @@ export function setOriginalNoteContent(content) {
 export function setIsPreview(value) {
     isPreview = value;
 }
+export const folders = [];
+export let currentFolderId = null;
+export function setCurrentFolderId(id) { currentFolderId = id; }
+export function setFolders(values) { folders.splice(0, folders.length, ...values); }
+export function applyTreeSnapshot(tree) {
+    const loaded = new Map([...notes, ...deletedNotes].filter(isLoadedNote).map(n => [n.id, n]));
+    const entries = tree.notes.map(summary => {
+        const full = loaded.get(summary.id);
+        if (!full)
+            return summary;
+        const next = { ...full, ...summary };
+        if (summary.pinOrder === undefined)
+            delete next.pinOrder;
+        if (summary.pinnedAt === undefined)
+            delete next.pinnedAt;
+        if (summary.deletionGroup === undefined)
+            delete next.deletionGroup;
+        return next;
+    });
+    notes.splice(0, notes.length, ...entries.filter(n => !n.metadata.deletedAt));
+    deletedNotes.splice(0, deletedNotes.length, ...entries.filter(n => n.metadata.deletedAt));
+    setFolders(tree.folders);
+    if (currentFolderId && !folders.some(f => f.id === currentFolderId && !f.metadata.deletedAt))
+        currentFolderId = null;
+}

@@ -14,7 +14,7 @@ At widths up to 760px or in portrait orientation, only the sidebar is visible.
 The empty wide pane and frame backgrounds follow the app's Light/Dark/System
 setting. System theme changes are reflected even before a note is selected.
 
-Settings, Escape navigation, title editing, pinning, long-press reorder, creation,
+Settings, Escape navigation, title editing, pinning, long-press reorder, folders, creation,
 deletion, restore, image management, WYSIWYG/source editing and all original
 export menus use the original handlers. Downloads export the current visitor's
 content, including edits, rather than always returning the published archive.

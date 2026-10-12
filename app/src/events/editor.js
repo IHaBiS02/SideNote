@@ -4,7 +4,7 @@ import { openNote, getPreviewModeButtonLabel, togglePreview, showImageModal, ren
 import { saveNote } from '../database/index.js';
 import { pushToHistory } from '../history.js';
 import { resolveEffectiveSettings } from '../settings.js';
-import { notes, activeNoteId, isPreview, getLoadedNote, setIsPreview } from '../state.js';
+import { notes, currentFolderId, activeNoteId, isPreview, getLoadedNote, setIsPreview } from '../state.js';
 function initializeEditorEvents() {
     // A double-click in editable or read-only Preview opens the full source editor.
     markdownEditor.addEventListener('mode-change', (event) => {
@@ -28,6 +28,7 @@ function initializeEditorEvents() {
         const now = Date.now();
         const newNote = {
             id: crypto.randomUUID(),
+            parentId: currentFolderId,
             title: 'New Note',
             content: '',
             settings: {},
@@ -37,9 +38,10 @@ function initializeEditorEvents() {
             },
             isPinned: false
         };
-        notes.push(newNote);
-        sortNotes();
         await saveNote(newNote);
+        if (!notes.some(n => n.id === newNote.id))
+            notes.push(newNote);
+        sortNotes();
         const inEditMode = false;
         const noteId = newNote.id;
         pushToHistory({ view: 'editor', params: { noteId, inEditMode } });

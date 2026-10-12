@@ -7,7 +7,7 @@ import { getNote, saveNote } from '../database/index.js';
 import { populateSettingsForm } from '../settings.js';
 import { createDropdown } from '../ui-helpers.js';
 // Import state from state module
-import { notes, isGlobalSettings, originalNoteContent, setIsGlobalSettings, getLoadedNote, hydrateNote, } from '../state.js';
+import { notes, folders, setCurrentFolderId, isGlobalSettings, originalNoteContent, setIsGlobalSettings, getLoadedNote, hydrateNote, } from '../state.js';
 import { moveBack, getCurrentHistoryState, getHistory, getHistoryIndex, goToHistoryState } from '../history.js';
 // === Navigation utility functions ===
 // Save editor content if changed before navigating away
@@ -32,6 +32,7 @@ async function navigateToState(state) {
     }
     switch (state.view) {
         case 'list':
+            setCurrentFolderId(state.params?.folderId ?? null);
             showListView(false);
             break;
         case 'editor':
@@ -115,6 +116,12 @@ function populateHistoryDropdown(dropdown) {
             const mode = params.inEditMode ? 'Edit' : 'Preview';
             title = `${mode}: ${noteTitle}`;
         }
+        else if (state.view === 'list') {
+            const folderId = state.params?.folderId;
+            title = folderId
+                ? `Folder: ${folders.find(folder => folder.id === folderId)?.title ?? 'Untitled'}`
+                : 'Notes';
+        }
         else {
             // Capitalize first letter
             title = state.view.charAt(0).toUpperCase() + state.view.slice(1);
@@ -162,8 +169,10 @@ const backButtons = [
 function initializeNavigationEvents() {
     backButtons.forEach(button => {
         button.addEventListener('click', goBack);
-        // Show history dropdown on right click
-        button.addEventListener('contextmenu', (e) => {
+    });
+    // Folder left-click opens its parent; only the history menu is shared.
+    [...backButtons, document.getElementById('folder-back-button')].forEach(button => {
+        button?.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             showHistoryDropdown(e.currentTarget);
         });

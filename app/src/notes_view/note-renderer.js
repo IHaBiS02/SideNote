@@ -2,7 +2,10 @@
 import { noteList, markdownEditor, editorTitle } from '../dom.js';
 // Import required functions from other modules
 import { getNote, } from '../database/index.js';
-import { togglePin, deleteNote, reorderPinnedNotes, } from '../notes.js';
+import { createFolder, renameFolder, toggleItemPin, trashItem, reorderItems, moveItems, visibleItems, currentTree } from '../folders.js';
+import { isFolder, planMove } from '../folder-model.js';
+import { currentFolderId, setCurrentFolderId, folders } from '../state.js';
+import { createDropdown, positionDropdownNearButton } from '../ui-helpers.js';
 import { createPinnedNoteDragController, } from './pinned-note-drag.js';
 import { applyFontSize, applyLineHeightSettings, isCodeBlockHeaderEnabled, normalizeGlobalSettings, resolveEffectiveSettings, updateLegacyLineBreakControls, updateTildeReplacementButton } from '../settings.js';
 import { pushToHistory } from '../history.js';
@@ -10,7 +13,7 @@ import { pushToHistory } from '../history.js';
 import { notes, globalSettings, setActiveNoteId, hydrateNote, setOriginalNoteContent, setIsPreview } from '../state.js';
 import { isLoadedNote } from '../note-summary.js';
 // Import view manager functions
-import { showEditorView } from './view-manager.js';
+import { showEditorView, showListView } from './view-manager.js';
 import { applyEditorDisplayMode } from './editor-mode.js';
 /**
  * Renders the list of notes.
@@ -18,70 +21,273 @@ import { applyEditorDisplayMode } from './editor-mode.js';
 // === 노트 목록 렌더링 ===
 let pinnedNoteDragController = null;
 let noteListClickInitialized = false;
+const selectedIds = new Set();
+let anchorId = null;
+let selectionParent = null;
+let busy = false;
+function clearSelection() { selectedIds.clear(); anchorId = null; }
+function paintSelection() {
+    for (const row of noteList.querySelectorAll('li[data-note-id]')) {
+        const selected = selectedIds.has(row.dataset.noteId);
+        row.classList.toggle('item-selected', selected);
+        row.setAttribute('aria-selected', String(selected));
+    }
+    const status = document.getElementById('folder-status');
+    if (status)
+        status.textContent = selectedIds.size ? `${selectedIds.size} selected` : '';
+}
+async function runListAction(action) {
+    if (busy)
+        return;
+    busy = true;
+    try {
+        await action();
+        clearSelection();
+    }
+    catch (error) {
+        console.error(error);
+        alert(error instanceof Error ? error.message : 'Could not update items');
+    }
+    finally {
+        busy = false;
+        renderNoteList();
+    }
+}
+function openFolder(id) {
+    clearSelection();
+    setCurrentFolderId(id);
+    showListView();
+}
 function createNoteListItem(note) {
     const li = document.createElement('li');
     li.dataset.noteId = note.id;
-    li.dataset.pinned = note.isPinned ? 'true' : 'false';
-    if (note.isPinned)
-        li.title = 'Hold and drag to reorder pinned notes';
+    li.dataset.kind = isFolder(note) ? 'folder' : 'note';
+    li.dataset.pinned = String(note.isPinned);
+    li.tabIndex = 0;
+    li.setAttribute('role', 'option');
+    li.title = note.isPinned ? 'Hold and drag to reorder or move into a pinned folder' : 'Hold and drag into an unpinned folder';
     const titleSpan = document.createElement('span');
-    titleSpan.textContent = note.title;
-    const buttonContainer = document.createElement('div');
-    buttonContainer.classList.add('button-container');
-    const pinSpan = document.createElement('span');
-    pinSpan.textContent = note.isPinned ? '📌' : '📎';
-    pinSpan.title = note.isPinned ? 'Unpin Note' : 'Pin Note';
-    pinSpan.classList.add('pin-note-icon');
-    const deleteSpan = document.createElement('span');
-    deleteSpan.textContent = '🗑️';
-    deleteSpan.title = 'Delete Note';
-    deleteSpan.classList.add('delete-note-icon');
+    titleSpan.className = 'item-title';
+    titleSpan.textContent = `${isFolder(note) ? '📁 ' : ''}${note.title}`;
     li.appendChild(titleSpan);
-    buttonContainer.appendChild(pinSpan);
-    buttonContainer.appendChild(deleteSpan);
-    li.appendChild(buttonContainer);
+    const controls = document.createElement('div');
+    controls.className = 'button-container';
+    for (const [className, label, text] of [
+        ['pin-note-icon', note.isPinned ? 'Unpin Item' : 'Pin Item', note.isPinned ? '📌' : '📎'],
+        ['delete-note-icon', isFolder(note) ? 'Delete Folder and Contents' : 'Delete Note', '🗑️'],
+    ]) {
+        const button = document.createElement('button');
+        button.className = className;
+        button.title = label;
+        button.setAttribute('aria-label', label);
+        button.textContent = text;
+        controls.appendChild(button);
+    }
+    li.appendChild(controls);
     return li;
+}
+function editFolderTitle() {
+    const heading = document.getElementById('notes-list-title');
+    const folder = folders.find(item => item.id === currentFolderId && !item.metadata.deletedAt);
+    if (!heading || !folder || busy)
+        return;
+    clearSelection();
+    paintSelection();
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.id = 'folder-title-input';
+    input.className = 'title-input';
+    input.setAttribute('aria-label', 'Folder name');
+    input.value = folder.title;
+    let finished = false;
+    const finish = () => {
+        if (finished)
+            return;
+        finished = true;
+        const name = input.value.trim();
+        heading.textContent = folder.title;
+        input.replaceWith(heading);
+        if (name && name !== folder.title)
+            void runListAction(() => renameFolder(folder.id, name));
+    };
+    input.addEventListener('keydown', event => {
+        if (event.isComposing)
+            return;
+        if (event.key === 'Enter' || event.key === 'Escape') {
+            event.preventDefault();
+            event.stopPropagation();
+            finish();
+        }
+    });
+    input.addEventListener('blur', finish);
+    heading.replaceWith(input);
+    input.focus();
+    input.select();
 }
 function initializeNoteListClickDelegation() {
     if (noteListClickInitialized)
         return;
     noteListClickInitialized = true;
+    document.getElementById('notes-list-title')?.addEventListener('dblclick', editFolderTitle);
+    noteList.setAttribute('role', 'listbox');
+    noteList.setAttribute('aria-multiselectable', 'true');
+    noteList.setAttribute('aria-label', 'Notes and folders');
+    document.getElementById('folder-back-button')?.addEventListener('click', () => {
+        if (!busy)
+            openFolder(folders.find(f => f.id === currentFolderId)?.parentId ?? null);
+    });
+    document.getElementById('new-note-button')?.addEventListener('contextmenu', event => {
+        event.preventDefault();
+        const dropdown = createDropdown({ className: 'folder-create-menu', populate: menu => {
+                menu.classList.add('action-dropdown');
+                const item = document.createElement('div');
+                item.textContent = 'Create Folder';
+                item.tabIndex = 0;
+                item.setAttribute('role', 'button');
+                item.addEventListener('click', event => {
+                    event.stopPropagation();
+                    menu.remove();
+                    void runListAction(() => createFolder('New Folder'));
+                });
+                item.addEventListener('keydown', event => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        item.click();
+                    }
+                });
+                menu.appendChild(item);
+            } });
+        if (dropdown)
+            positionDropdownNearButton(dropdown, event.currentTarget);
+    });
+    noteList.addEventListener('keydown', event => {
+        if ((event.key === 'Enter' || event.key === ' ') && event.target instanceof HTMLElement && event.target.matches('li[data-note-id]')) {
+            event.preventDefault();
+            event.target.click();
+        }
+    });
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && selectedIds.size) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            clearSelection();
+            paintSelection();
+        }
+    }, true);
     noteList.addEventListener('click', async (event) => {
-        const target = event.target;
-        if (!(target instanceof Element))
+        if (busy || !(event.target instanceof Element))
             return;
-        const row = target.closest('li[data-note-id]');
-        const noteId = row?.dataset.noteId;
-        if (!row || !noteId)
+        const row = event.target.closest('li[data-note-id]');
+        const item = visibleItems().find(i => i.id === row?.dataset.noteId);
+        if (!item)
             return;
-        if (target.closest('.pin-note-icon')) {
-            await togglePin(noteId);
-            renderNoteList();
+        if (event.ctrlKey || event.metaKey || event.shiftKey) {
+            const items = visibleItems();
+            const first = items.find(i => selectedIds.has(i.id));
+            if (first && first.isPinned !== item.isPinned)
+                return;
+            if (event.shiftKey && anchorId) {
+                const start = items.findIndex(i => i.id === anchorId);
+                const end = items.indexOf(item);
+                if (start >= 0)
+                    for (const entry of items.slice(Math.min(start, end), Math.max(start, end) + 1)) {
+                        if (entry.isPinned === item.isPinned)
+                            selectedIds.add(entry.id);
+                    }
+            }
+            else {
+                if (selectedIds.has(item.id))
+                    selectedIds.delete(item.id);
+                else
+                    selectedIds.add(item.id);
+                anchorId = item.id;
+            }
+            if (!selectedIds.size)
+                anchorId = null;
+            paintSelection();
             return;
         }
-        if (target.closest('.delete-note-icon')) {
-            await deleteNote(noteId);
-            renderNoteList();
+        if (event.target.closest('.pin-note-icon')) {
+            await runListAction(() => toggleItemPin(item.id));
             return;
         }
-        await openNote(noteId);
+        if (event.target.closest('.delete-note-icon')) {
+            await runListAction(() => trashItem(item.id));
+            return;
+        }
+        clearSelection();
+        paintSelection();
+        if (isFolder(item))
+            openFolder(item.id);
+        else
+            await openNote(item.id);
     });
 }
 function renderNoteList() {
     initializeNoteListClickDelegation();
     pinnedNoteDragController?.destroy();
     pinnedNoteDragController = null;
-    if (!Array.isArray(notes))
-        return;
+    if (currentFolderId && !folders.some(f => f.id === currentFolderId && !f.metadata.deletedAt))
+        setCurrentFolderId(null);
+    if (selectionParent !== currentFolderId) {
+        clearSelection();
+        selectionParent = currentFolderId;
+    }
+    const items = visibleItems();
+    for (const id of selectedIds)
+        if (!items.some(i => i.id === id))
+            selectedIds.delete(id);
     const fragment = document.createDocumentFragment();
-    notes.forEach(note => fragment.appendChild(createNoteListItem(note)));
+    items.forEach(item => fragment.appendChild(createNoteListItem(item)));
     noteList.replaceChildren(fragment);
-    pinnedNoteDragController = createPinnedNoteDragController(noteList, async (orderedNoteIds) => {
-        if (await reorderPinnedNotes(orderedNoteIds))
-            renderNoteList();
-    }, {
-        longPressDelayMs: normalizeGlobalSettings(globalSettings)
-            .pinnedNoteDragDelayMs,
+    const back = document.getElementById('folder-back-button');
+    if (back)
+        back.hidden = currentFolderId === null;
+    const heading = document.getElementById('notes-list-title');
+    const path = [];
+    let folder = folders.find(f => f.id === currentFolderId);
+    const seen = new Set();
+    while (folder && !seen.has(folder.id)) {
+        seen.add(folder.id);
+        path.unshift(folder.title);
+        folder = folders.find(f => f.id === folder.parentId);
+    }
+    if (heading) {
+        heading.classList.toggle('folder-title', currentFolderId !== null);
+        heading.textContent = path.at(-1) ?? 'Notes';
+        heading.title = currentFolderId ? 'Double-click to rename folder' : 'Notes';
+    }
+    const breadcrumb = document.getElementById('folder-path');
+    if (breadcrumb) {
+        breadcrumb.textContent = path.length ? ['Notes', ...path].join(' / ') : '';
+        breadcrumb.title = breadcrumb.textContent;
+        breadcrumb.hidden = !path.length;
+    }
+    paintSelection();
+    pinnedNoteDragController = createPinnedNoteDragController(noteList, ids => runListAction(() => reorderItems(ids)), {
+        longPressDelayMs: normalizeGlobalSettings(globalSettings).pinnedNoteDragDelayMs,
+        getDragIds: id => {
+            if (busy)
+                return [];
+            if (!selectedIds.has(id)) {
+                clearSelection();
+                selectedIds.add(id);
+                anchorId = id;
+                paintSelection();
+            }
+            return items.filter(i => selectedIds.has(i.id)).map(i => i.id);
+        },
+        upTarget: currentFolderId ? document.getElementById('folder-header') : null,
+        canDrop: (ids, target) => {
+            try {
+                planMove(structuredClone(currentTree()), ids, currentFolderId, target);
+                return true;
+            }
+            catch {
+                return false;
+            }
+        },
+        onDrop: (ids, target) => runListAction(() => moveItems(ids, target)),
     });
 }
 /**
@@ -96,6 +302,7 @@ async function openNote(noteId, inEditMode = false, addToHistory = true) {
     const note = isLoadedNote(entry) ? entry : await getNote(noteId);
     if (note) {
         hydrateNote(note);
+        setCurrentFolderId(note.parentId ?? null);
         setActiveNoteId(noteId);
         setOriginalNoteContent(note.content); // 원본 내용 저장 (변경 감지용)
         editorTitle.textContent = note.title;

@@ -24,6 +24,37 @@ body.dark-mode {
     background-color: #333;
 }
 
+/* Folder states use the same dark surfaces and accent as existing lists/history. */
+.dark-mode #note-list li.item-selected {
+    background-color: rgba(130, 170, 255, 0.14);
+    box-shadow: inset 3px 0 0 #82aaff;
+}
+
+.dark-mode #note-list li.item-selected:hover {
+    background-color: rgba(130, 170, 255, 0.2);
+}
+
+.dark-mode #folder-header.folder-drop-target::before,
+.dark-mode #note-list li.folder-drop-target::before {
+    background-color: rgba(130, 170, 255, 0.12);
+    border-color: #82aaff;
+}
+
+.dark-mode #note-list li.folder-drop-invalid::before {
+    background-color: rgba(255, 107, 107, 0.1);
+    border-color: #ff6b6b;
+}
+
+.dark-mode #folder-path {
+    border-bottom-color: #333;
+}
+
+.dark-mode #folder-status {
+    background-color: #2d2d2d;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
 .dark-mode #note-list li.pinned-note-dragging {
     background-color: #262626;
     border-color: #555;
@@ -33,6 +64,16 @@ body.dark-mode {
 
 .dark-mode #note-list li.pinned-note-dragging:hover {
     background-color: #262626;
+}
+
+.dark-mode #note-list li[data-drag-count] {
+    box-shadow: 0 5px 0 -2px #262626, 0 5px 0 -1px #555,
+        0 12px 26px rgba(0, 0, 0, 0.58), 0 3px 8px rgba(0, 0, 0, 0.38);
+}
+
+.dark-mode #note-list li[data-drag-count]::after {
+    color: #1e1e1e;
+    background-color: #82aaff;
 }
 
 .dark-mode #note-list li.pinned-note-drop-placeholder {
@@ -222,13 +263,14 @@ body.dark-mode {
     color: #82aaff;
 }
 
-.dark-mode .export-options-dropdown {
+.dark-mode .action-dropdown {
     background-color: #2d2d2d;
     border-color: #444;
     color: #e0e0e0;
 }
 
-.dark-mode .export-options-dropdown div:hover {
+.dark-mode .action-dropdown > div:hover,
+.dark-mode .action-dropdown > div:focus-visible {
     background-color: #444;
 }
 

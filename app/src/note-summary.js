@@ -1,6 +1,10 @@
+import { extractImageIds } from './utils.js';
 function createNoteSummary(note) {
     return {
         id: note.id,
+        parentId: note.parentId ?? null,
+        imageIds: extractImageIds(note.content),
+        ...(note.deletionGroup ? { deletionGroup: note.deletionGroup } : {}),
         title: note.title,
         metadata: { ...note.metadata },
         isPinned: note.isPinned === true,

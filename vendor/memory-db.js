@@ -24,7 +24,7 @@ var SideNoteMemoryDB = (() => {
     IDBKeyRange: () => FDBKeyRange_default
   });
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/errors.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/errors.js
   var messages = {
     AbortError: "A request was aborted, for example through a call to IDBTransaction.abort.",
     ConstraintError: "A mutation operation in the transaction failed because a constraint was not satisfied. For example, an object such as an object store or index already exists and a request attempted to create a new one.",
@@ -101,12 +101,12 @@ var SideNoteMemoryDB = (() => {
     }
   };
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/isSharedArrayBuffer.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/isSharedArrayBuffer.js
   function isSharedArrayBuffer(input) {
     return typeof SharedArrayBuffer !== "undefined" && input instanceof SharedArrayBuffer;
   }
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/valueToKeyWithoutThrowing.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/valueToKeyWithoutThrowing.js
   var INVALID_TYPE = /* @__PURE__ */ Symbol("INVALID_TYPE");
   var INVALID_VALUE = /* @__PURE__ */ Symbol("INVALID_VALUE");
   var valueToKeyWithoutThrowing = (input, seen) => {
@@ -179,7 +179,7 @@ var SideNoteMemoryDB = (() => {
   };
   var valueToKeyWithoutThrowing_default = valueToKeyWithoutThrowing;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/valueToKey.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/valueToKey.js
   var valueToKey = (input, seen) => {
     const result = valueToKeyWithoutThrowing_default(input, seen);
     if (result === INVALID_VALUE || result === INVALID_TYPE) {
@@ -189,7 +189,7 @@ var SideNoteMemoryDB = (() => {
   };
   var valueToKey_default = valueToKey;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/cmp.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/cmp.js
   var getType = (x) => {
     if (typeof x === "number") {
       return "Number";
@@ -264,7 +264,7 @@ var SideNoteMemoryDB = (() => {
   };
   var cmp_default = cmp;
 
-  // ../../node_modules/fake-indexeddb/build/esm/FDBKeyRange.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/FDBKeyRange.js
   var FDBKeyRange = class _FDBKeyRange {
     static only(value) {
       if (arguments.length === 0) {
@@ -331,7 +331,7 @@ var SideNoteMemoryDB = (() => {
   };
   var FDBKeyRange_default = FDBKeyRange;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/extractKey.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/extractKey.js
   var extractKey = (keyPath, value) => {
     if (Array.isArray(keyPath)) {
       const result = [];
@@ -380,7 +380,7 @@ var SideNoteMemoryDB = (() => {
   };
   var extractKey_default = extractKey;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/cloneValueForInsertion.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/cloneValueForInsertion.js
   function cloneValueForInsertion(value, transaction) {
     if (transaction._state !== "active") {
       throw new Error("Assert: transaction state is active");
@@ -393,7 +393,7 @@ var SideNoteMemoryDB = (() => {
     }
   }
 
-  // ../../node_modules/fake-indexeddb/build/esm/FDBCursor.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/FDBCursor.js
   var getEffectiveObjectStore = (cursor) => {
     if (cursor.source instanceof FDBObjectStore_default) {
       return cursor.source;
@@ -825,7 +825,7 @@ var SideNoteMemoryDB = (() => {
   };
   var FDBCursor_default = FDBCursor;
 
-  // ../../node_modules/fake-indexeddb/build/esm/FDBCursorWithValue.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/FDBCursorWithValue.js
   var FDBCursorWithValue = class extends FDBCursor_default {
     value = void 0;
     constructor(source, range, direction, request) {
@@ -837,7 +837,7 @@ var SideNoteMemoryDB = (() => {
   };
   var FDBCursorWithValue_default = FDBCursorWithValue;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/FakeEventTarget.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/FakeEventTarget.js
   var stopped = (event, listener) => {
     return event.immediatePropagationStopped || event.eventPhase === event.CAPTURING_PHASE && listener.capture === false || event.eventPhase === event.BUBBLING_PHASE && listener.capture === true;
   };
@@ -943,7 +943,7 @@ var SideNoteMemoryDB = (() => {
   };
   var FakeEventTarget_default = FakeEventTarget;
 
-  // ../../node_modules/fake-indexeddb/build/esm/FDBRequest.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/FDBRequest.js
   var FDBRequest = class extends FakeEventTarget_default {
     _result = null;
     _error = null;
@@ -976,7 +976,7 @@ var SideNoteMemoryDB = (() => {
   };
   var FDBRequest_default = FDBRequest;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/FakeDOMStringList.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/FakeDOMStringList.js
   var FakeDOMStringList = class {
     constructor(...values) {
       this._values = values;
@@ -1017,7 +1017,7 @@ var SideNoteMemoryDB = (() => {
   };
   var FakeDOMStringList_default = FakeDOMStringList;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/valueToKeyRange.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/valueToKeyRange.js
   var valueToKeyRange = (value, nullDisallowedFlag = false) => {
     if (value instanceof FDBKeyRange_default) {
       return value;
@@ -1033,13 +1033,13 @@ var SideNoteMemoryDB = (() => {
   };
   var valueToKeyRange_default = valueToKeyRange;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/getKeyPath.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/getKeyPath.js
   var convertKey = (key) => typeof key === "object" && key ? key + "" : key;
   function getKeyPath(keyPath) {
     return Array.isArray(keyPath) ? keyPath.map(convertKey) : convertKey(keyPath);
   }
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/isPotentiallyValidKeyRange.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/isPotentiallyValidKeyRange.js
   var isPotentiallyValidKeyRange = (value) => {
     if (value instanceof FDBKeyRange_default) {
       return true;
@@ -1049,7 +1049,7 @@ var SideNoteMemoryDB = (() => {
   };
   var isPotentiallyValidKeyRange_default = isPotentiallyValidKeyRange;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/enforceRange.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/enforceRange.js
   var enforceRange = (num, type) => {
     const min = 0;
     const max = type === "unsigned long" ? 4294967295 : 9007199254740991;
@@ -1062,7 +1062,7 @@ var SideNoteMemoryDB = (() => {
   };
   var enforceRange_default = enforceRange;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/extractGetAllOptions.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/extractGetAllOptions.js
   var extractGetAllOptions = (queryOrOptions, count, numArguments) => {
     let query;
     let direction;
@@ -1091,7 +1091,7 @@ var SideNoteMemoryDB = (() => {
   };
   var extractGetAllOptions_default = extractGetAllOptions;
 
-  // ../../node_modules/fake-indexeddb/build/esm/FDBIndex.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/FDBIndex.js
   var confirmActiveTransaction = (index) => {
     if (index._rawIndex.deleted || index.objectStore._rawObjectStore.deleted) {
       throw new InvalidStateError();
@@ -1279,7 +1279,7 @@ var SideNoteMemoryDB = (() => {
   };
   var FDBIndex_default = FDBIndex;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/canInjectKey.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/canInjectKey.js
   var canInjectKey = (keyPath, value) => {
     if (Array.isArray(keyPath)) {
       throw new Error("The key paths used in this section are always strings and never sequences, since it is not possible to create a object store which has a key generator and also has a key path that is a sequence.");
@@ -1303,7 +1303,7 @@ var SideNoteMemoryDB = (() => {
   };
   var canInjectKey_default = canInjectKey;
 
-  // ../../node_modules/fake-indexeddb/build/esm/FDBRecord.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/FDBRecord.js
   var FDBRecord = class {
     constructor(key, primaryKey, value) {
       this._key = key;
@@ -1331,7 +1331,7 @@ var SideNoteMemoryDB = (() => {
   };
   var FDBRecord_default = FDBRecord;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/binarySearchTree.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/binarySearchTree.js
   var MAX_TOMBSTONE_FACTOR = 2 / 3;
   var EVERYTHING_KEY_RANGE = new FDBKeyRange_default(void 0, void 0, false, false);
   var BinarySearchTree = class {
@@ -1587,7 +1587,7 @@ var SideNoteMemoryDB = (() => {
     }
   };
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/RecordStore.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/RecordStore.js
   var RecordStore = class {
     constructor(keysAreUnique) {
       this.keysAreUnique = keysAreUnique;
@@ -1678,7 +1678,7 @@ var SideNoteMemoryDB = (() => {
   };
   var RecordStore_default = RecordStore;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/Index.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/Index.js
   var Index = class {
     deleted = false;
     // Initialized should be used to decide whether to throw an error or abort the versionchange transaction when there is a
@@ -1832,7 +1832,7 @@ var SideNoteMemoryDB = (() => {
   };
   var Index_default = Index;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/validateKeyPath.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/validateKeyPath.js
   var validateKeyPath = (keyPath, parent) => {
     if (keyPath !== void 0 && keyPath !== null && typeof keyPath !== "string" && keyPath.toString && (parent === "array" || !Array.isArray(keyPath))) {
       keyPath = keyPath.toString();
@@ -1875,7 +1875,7 @@ var SideNoteMemoryDB = (() => {
   };
   var validateKeyPath_default = validateKeyPath;
 
-  // ../../node_modules/fake-indexeddb/build/esm/FDBObjectStore.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/FDBObjectStore.js
   var confirmActiveTransaction2 = (objectStore) => {
     if (objectStore._rawObjectStore.deleted) {
       throw new InvalidStateError();
@@ -2235,7 +2235,7 @@ var SideNoteMemoryDB = (() => {
   };
   var FDBObjectStore_default = FDBObjectStore;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/FakeEvent.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/FakeEvent.js
   var Event = class {
     eventPath = [];
     NONE = 0;
@@ -2274,7 +2274,7 @@ var SideNoteMemoryDB = (() => {
   };
   var FakeEvent_default = Event;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/scheduling.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/scheduling.js
   function getSetImmediateFromJsdom() {
     if (typeof navigator !== "undefined" && /jsdom/.test(navigator.userAgent)) {
       const outerRealmFunctionConstructor = Node.constructor;
@@ -2290,7 +2290,7 @@ var SideNoteMemoryDB = (() => {
     setImmediate(fn);
   };
 
-  // ../../node_modules/fake-indexeddb/build/esm/FDBTransaction.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/FDBTransaction.js
   var prioritizedListenerTypes = ["error", "abort", "complete"];
   var FDBTransaction = class extends FakeEventTarget_default {
     _state = "active";
@@ -2500,7 +2500,7 @@ var SideNoteMemoryDB = (() => {
   };
   var FDBTransaction_default = FDBTransaction;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/KeyGenerator.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/KeyGenerator.js
   var MAX_KEY = 9007199254740992;
   var KeyGenerator = class {
     // This is kind of wrong. Should start at 1 and increment only after record is saved
@@ -2522,7 +2522,7 @@ var SideNoteMemoryDB = (() => {
   };
   var KeyGenerator_default = KeyGenerator;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/ObjectStore.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/ObjectStore.js
   var ObjectStore = class {
     deleted = false;
     records = new RecordStore_default(true);
@@ -2730,7 +2730,7 @@ var SideNoteMemoryDB = (() => {
   };
   var ObjectStore_default = ObjectStore;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/closeConnection.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/closeConnection.js
   var closeConnection = (connection, forced = false) => {
     connection._closePending = true;
     const transactionsComplete = connection._rawDatabase.transactions.every((transaction) => {
@@ -2757,7 +2757,7 @@ var SideNoteMemoryDB = (() => {
   };
   var closeConnection_default = closeConnection;
 
-  // ../../node_modules/fake-indexeddb/build/esm/FDBDatabase.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/FDBDatabase.js
   var confirmActiveVersionchangeTransaction = (database) => {
     let transaction;
     if (database._runningVersionchangeTransaction) {
@@ -2900,7 +2900,7 @@ var SideNoteMemoryDB = (() => {
   };
   var FDBDatabase_default = FDBDatabase;
 
-  // ../../node_modules/fake-indexeddb/build/esm/FDBOpenDBRequest.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/FDBOpenDBRequest.js
   var FDBOpenDBRequest = class extends FDBRequest_default {
     onupgradeneeded = null;
     onblocked = null;
@@ -2910,7 +2910,7 @@ var SideNoteMemoryDB = (() => {
   };
   var FDBOpenDBRequest_default = FDBOpenDBRequest;
 
-  // ../../node_modules/fake-indexeddb/build/esm/FDBVersionChangeEvent.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/FDBVersionChangeEvent.js
   var FDBVersionChangeEvent = class extends FakeEvent_default {
     constructor(type, parameters = {}) {
       super(type);
@@ -2923,7 +2923,7 @@ var SideNoteMemoryDB = (() => {
   };
   var FDBVersionChangeEvent_default = FDBVersionChangeEvent;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/intersection.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/intersection.js
   function intersection(set1, set2) {
     if ("intersection" in set1) {
       return set1.intersection(set2);
@@ -2931,7 +2931,7 @@ var SideNoteMemoryDB = (() => {
     return new Set([...set1].filter((item) => set2.has(item)));
   }
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/Database.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/Database.js
   var Database = class {
     transactions = [];
     rawObjectStores = /* @__PURE__ */ new Map();
@@ -2963,14 +2963,14 @@ var SideNoteMemoryDB = (() => {
   };
   var Database_default = Database;
 
-  // ../../node_modules/fake-indexeddb/build/esm/lib/validateRequiredArguments.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/lib/validateRequiredArguments.js
   function validateRequiredArguments(numArguments, expectedNumArguments, methodName) {
     if (numArguments < expectedNumArguments) {
       throw new TypeError(`${methodName}: At least ${expectedNumArguments} ${expectedNumArguments === 1 ? "argument" : "arguments"} required, but only ${arguments.length} passed`);
     }
   }
 
-  // ../../node_modules/fake-indexeddb/build/esm/FDBFactory.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/FDBFactory.js
   var runTaskInConnectionQueue = (connectionQueues, name, task) => {
     const queue = connectionQueues.get(name) ?? Promise.resolve();
     connectionQueues.set(name, queue.then(task));
@@ -3276,7 +3276,7 @@ var SideNoteMemoryDB = (() => {
   };
   var FDBFactory_default = FDBFactory;
 
-  // ../../node_modules/fake-indexeddb/build/esm/fakeIndexedDB.js
+  // ../../../../../../home/justpain02/문서/SideNote/node_modules/fake-indexeddb/build/esm/fakeIndexedDB.js
   var fakeIndexedDB = new FDBFactory_default();
   return __toCommonJS(stdin_exports);
 })();
