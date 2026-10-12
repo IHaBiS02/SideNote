@@ -298,9 +298,9 @@ rm commit_message.txt
 ```
 When you commit to git, do not write
 ```
-🤖 Generated with Codex
+🤖 Generated with Claude
 
-Co-Authored-By: Codex noreply@anthropic.com
+Co-Authored-By: Claude noreply@anthropic.com
 ```
 on the commit message.
 

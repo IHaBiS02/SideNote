@@ -294,22 +294,52 @@ textarea {
   background-color: #f5f5f5;
 }
 
+/* Selection and drop feedback stay flat like the rest of the list: an accent
+   tint instead of a boxed outline, and the dashed rounded outline of the
+   pinned drop gap for places that accept (or refuse) the dragged rows. */
 #note-list li.item-selected {
-  background-color: #f5f5f5;
-  outline: 1px solid #007bff;
-  outline-offset: -1px;
+  background-color: rgba(0, 123, 255, 0.08);
+  box-shadow: inset 3px 0 0 #007bff;
 }
 
-#folder-header.folder-drop-target,
-#note-list li.folder-drop-target {
-  background-color: #f5f5f5;
-  outline: 2px solid #007bff;
-  outline-offset: -2px;
+#note-list li.item-selected:hover {
+  background-color: rgba(0, 123, 255, 0.13);
+}
+
+#note-list li[data-kind] {
+  position: relative;
+}
+
+#folder-header.folder-drop-target::before,
+#note-list li.folder-drop-target::before,
+#note-list li.folder-drop-invalid::before {
+  content: "";
+  position: absolute;
+  inset: 4px 8px;
+  pointer-events: none;
+  background-color: rgba(0, 123, 255, 0.08);
+  border: 1px dashed #007bff;
+  border-radius: 10px;
+  animation: folder-drop-hint 140ms ease-out;
 }
 
 #note-list li.folder-drop-invalid {
-  outline: 2px solid red;
-  outline-offset: -2px;
+  cursor: not-allowed;
+}
+
+#note-list li.folder-drop-invalid::before {
+  background-color: rgba(255, 0, 0, 0.05);
+  border-color: red;
+}
+
+@keyframes folder-drop-hint {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 #note-list li.pinned-note-dragging {
@@ -806,18 +836,34 @@ li.task-list-item {
   min-height: 0;
 }
 
-#folder-path,
-#folder-status {
+#folder-path {
   flex-shrink: 0;
   padding: 4px 10px;
-  font-size: 0.8em;
-  color: #888;
-}
-
-#folder-path {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 0.8em;
+  color: #888;
+  border-bottom: 1px solid #eee;
+}
+
+/* The selection count floats over the list like the dropdown menus, so
+   selecting rows never pushes the list down. */
+#folder-status {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  z-index: 4;
+  transform: translateX(-50%);
+  padding: 3px 12px;
+  pointer-events: none;
+  white-space: nowrap;
+  font-size: 0.9em;
+  color: #555;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
 }
 
 #folder-path[hidden],
@@ -834,16 +880,36 @@ li.task-list-item {
 
 #note-list .item-title {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
+}
+
+/* Multi-item drags show a stacked card with an accent count badge. */
+#note-list li[data-drag-count] {
+  box-shadow: 0 5px 0 -2px #fff, 0 5px 0 -1px rgba(0, 0, 0, 0.14),
+    0 12px 26px rgba(0, 0, 0, 0.2), 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+#note-list li[data-drag-count] .item-title {
+  flex: 1;
+}
+
+#note-list li[data-drag-count] .button-container {
+  order: 1;
 }
 
 #note-list li[data-drag-count]::after {
-  content: attr(data-drag-count) " items";
+  content: attr(data-drag-count);
   flex-shrink: 0;
-  padding-left: 10px;
-  font-size: 0.8em;
-  color: #888;
+  min-width: 1.5em;
+  margin: 0 6px 0 10px;
+  padding: 0 5px;
+  box-sizing: border-box;
+  text-align: center;
+  font-size: 0.9em;
+  font-weight: 700;
+  color: #fff;
+  background-color: #007bff;
+  border-radius: 999px;
 }
 
 #note-list li.pinned-note-dragging {

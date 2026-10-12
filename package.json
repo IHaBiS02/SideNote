@@ -1,6 +1,6 @@
 {
   "name": "simple-notes-extension",
-  "version": "5.0.4",
+  "version": "5.0.5",
   "description": "A simple notes extension using the side panel.",
   "private": true,
   "workspaces": [
